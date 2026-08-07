@@ -114,7 +114,7 @@ rustc --version
 # Clone the repository
 sudo mkdir -p /opt/verdis-chain-rust
 sudo chown -R $USER:$USER /opt/verdis-chain-rust
-git clone https://github.com/verdis-chain/verdis-chain-rust.git /opt/verdis-chain-rust
+git clone https://github.com/Protremix/Verdischain-.git /opt/verdis-chain-rust
 cd /opt/verdis-chain-rust
 ```
 

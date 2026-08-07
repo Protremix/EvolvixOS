@@ -272,7 +272,7 @@ cd /opt/verdis
 
 # Clone repository
 if [ ! -d "Verdis" ]; then
-  git clone https://github.com/verdischain/Verdis.git
+  git clone https://github.com/Protremix/Verdischain-.git
 fi
 cd Verdis
 
@@ -576,7 +576,7 @@ echo "=== Health Check Complete ===" """,
             (3, "Server Hardening", "Apply security hardening (firewall, SSH, fail2ban)", "bash harden_server.sh", "15 min", [1]),
             (4, "SSL Certificates", "Obtain Let's Encrypt SSL certificates", "bash setup_ssl.sh", "10 min", [2, 3]),
             (5, "Install Docker", "Install Docker and Docker Compose", "curl -fsSL get.docker.com | sh", "5 min", [3]),
-            (6, "Clone Repository", "Clone Verdis repo to /opt/verdis", "git clone https://github.com/verdischain/Verdis.git", "2 min", [5]),
+            (6, "Clone Repository", "Clone Verdis repo to /opt/verdis", "git clone https://github.com/Protremix/Verdischain-.git", "2 min", [5]),
             (7, "Configure Environment", "Edit .env with production values", "nano .env", "5 min", [6]),
             (8, "Build Verdis Node", "Compile Verdis blockchain node", "cargo build --release", "20 min", [6]),
             (9, "Build Docker Images", "Build EvolvixOS backend and frontend images", "docker compose -f docker-compose.prod.yml build", "10 min", [5, 6]),

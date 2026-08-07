@@ -198,7 +198,7 @@ class MultiProjectManager:
             name="Verdis",
             project_type="blockchain",
             description="Verdis blockchain — DPoS + BABE/GRANDPA, carbon-negative, native AMM DEX",
-            repository="https://github.com/verdischain/Verdis",
+            repository="https://github.com/Protremix/Verdischain-",
             domain="verdischain.com",
             health_endpoint="https://verdischain.com/rpc",
             config={

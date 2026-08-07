@@ -10,7 +10,7 @@ EvolvixOS orchestrates 11 autonomous AI agents to manage the complete software d
 
 ```bash
 # Clone
-git clone https://github.com/verdischain/Verdis.git
+git clone https://github.com/Protremix/Verdischain-.git
 cd Verdis/evolvixos
 
 # Configure

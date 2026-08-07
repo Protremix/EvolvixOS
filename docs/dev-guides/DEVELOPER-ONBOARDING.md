@@ -30,7 +30,7 @@ Visit verdischain.com/markets to purchase VRDX.
 
 ```bash
 # Clone the repo
-git clone https://github.com/verdischain/Verdis.git
+git clone https://github.com/Protremix/Verdischain-.git
 cd Verdis
 
 # Install dependencies
@@ -106,7 +106,7 @@ with 11 AI agents, automated pipelines, and continuous monitoring.
 
 ## 6. Community
 
-- GitHub: https://github.com/verdischain/Verdis
+- GitHub: https://github.com/Protremix/Verdischain-
 - Explorer: https://verdischain.com/explorer
 - Documentation: https://verdischain.com/docs
 - Whitepaper: https://verdischain.com/whitepaper

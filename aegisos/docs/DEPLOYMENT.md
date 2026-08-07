@@ -44,7 +44,7 @@ certbot --nginx -d evolvixos.verdischain.com
 
 ```bash
 # Clone repository
-git clone https://github.com/verdischain/Verdis.git /opt/evolvixos
+git clone https://github.com/Protremix/Verdischain-.git /opt/evolvixos
 cd /opt/evolvixos/evolvixos
 
 # Configure environment

@@ -165,7 +165,7 @@ sudo journalctl -u verdis-node | grep -E "BABE: epoch|GRANDPA: voter|Session: ne
 ### 6.2. Escalation & Communication Flow
 1. **Infrastructure On-Call:** Automated health check (`/opt/verdis-health-check.sh`) triggers alert.
 2. **Core Engineers:** Core developers notified via internal incident escalation channel.
-3. **GitHub Issue Tracking:** Create an official incident issue under `https://github.com/verdis-chain/verdis-chain/issues`.
+3. **GitHub Issue Tracking:** Create an official incident issue under `https://github.com/Protremix/Verdischain-/issues`.
 4. *Note: All communications must be logged via official GitHub repository channels.*
 
 ---

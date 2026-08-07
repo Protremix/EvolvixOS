@@ -12,7 +12,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/verdischain/Verdis.git
+git clone https://github.com/Protremix/Verdischain-.git
 cd Verdis/evolvixos
 
 # Copy environment template

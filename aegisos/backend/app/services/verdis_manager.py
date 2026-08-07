@@ -81,17 +81,17 @@ VERDIS_COMPONENTS = [
     ),
     VerdisEcosystemComponent(
         name="TypeScript SDK", type="sdk",
-        url="https://github.com/verdischain/Verdis", version="1.0.0",
+        url="https://github.com/Protremix/Verdischain-", version="1.0.0",
         notes="19 files, 13 tests, @polkadot/api wrapper"
     ),
     VerdisEcosystemComponent(
         name="CLI Tool", type="cli",
-        url="https://github.com/verdischain/Verdis", version="1.0.0",
+        url="https://github.com/Protremix/Verdischain-", version="1.0.0",
         notes="13 files, 6 commands"
     ),
     VerdisEcosystemComponent(
         name="Bridge (Solidity + Relayer)", type="bridge",
-        url="https://github.com/verdischain/Verdis", version="0.1.0",
+        url="https://github.com/Protremix/Verdischain-", version="0.1.0",
         notes="Multi-relayer M-of-N, EIP-712, not yet deployed"
     ),
     VerdisEcosystemComponent(
@@ -101,12 +101,12 @@ VERDIS_COMPONENTS = [
     ),
     VerdisEcosystemComponent(
         name="Android Wallet", type="wallet",
-        url="https://github.com/verdischain/Verdis", version="1.0.0",
+        url="https://github.com/Protremix/Verdischain-", version="1.0.0",
         notes="Native, dependency-free widgets"
     ),
     VerdisEcosystemComponent(
         name="Documentation", type="docs",
-        url="https://github.com/verdischain/Verdis", version="1.0.0",
+        url="https://github.com/Protremix/Verdischain-", version="1.0.0",
         notes="4 files, 4096 words, English consolidated"
     ),
 ]

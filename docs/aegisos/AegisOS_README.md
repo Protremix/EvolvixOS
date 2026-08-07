@@ -49,7 +49,7 @@ Orchestrate, govern, and scale software systems from intent to production.
 
 ```bash
 # Clone the repository
-git clone https://github.com/verdischain/aegisos.git
+git clone https://github.com/Protremix/EvolvixOS.git
 cd aegisos
 
 # Copy environment file

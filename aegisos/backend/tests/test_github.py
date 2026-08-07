@@ -11,8 +11,8 @@ class TestGitHubIntegration:
     """Test the GitHub integration client."""
 
     def test_init_with_token(self):
-        gh = GitHubIntegration(token="ghp_test123")
-        assert gh.token == "ghp_test123"
+        gh = GitHubIntegration(token="ghp_TEST_PLACEHOLDER")
+        assert gh.token == "ghp_TEST_PLACEHOLDER"
 
     def test_init_without_token(self):
         gh = GitHubIntegration()
@@ -20,7 +20,7 @@ class TestGitHubIntegration:
         assert gh.token is not None  # Could be "" or env value
 
     def test_get_repo_success(self):
-        gh = GitHubIntegration(token="ghp_test")
+        gh = GitHubIntegration(token="ghp_TEST_PLACEHOLDER")
 
         mock_response = MagicMock()
         mock_response.read.return_value = b'{"full_name":"verdischain/Verdis","private":false}'
@@ -33,14 +33,14 @@ class TestGitHubIntegration:
             assert result["full_name"] == "verdischain/Verdis"
 
     def test_get_repo_failure(self):
-        gh = GitHubIntegration(token="ghp_test")
+        gh = GitHubIntegration(token="ghp_TEST_PLACEHOLDER")
 
         with patch('urllib.request.urlopen', side_effect=Exception("Network error")):
             result = gh.get_repo("verdischain", "Verdis")
             assert result is None
 
     def test_list_issues(self):
-        gh = GitHubIntegration(token="ghp_test")
+        gh = GitHubIntegration(token="ghp_TEST_PLACEHOLDER")
 
         mock_response = MagicMock()
         mock_response.read.return_value = b'[{"number":1,"title":"Bug"},{"number":2,"title":"Feature"}]'
@@ -54,10 +54,10 @@ class TestGitHubIntegration:
             assert result[0]["number"] == 1
 
     def test_create_issue(self):
-        gh = GitHubIntegration(token="ghp_test")
+        gh = GitHubIntegration(token="ghp_TEST_PLACEHOLDER")
 
         mock_response = MagicMock()
-        mock_response.read.return_value = b'{"number":42,"title":"Test Issue","html_url":"https://github.com/verdischain/Verdis/issues/42"}'
+        mock_response.read.return_value = b'{"number":42,"title":"Test Issue","html_url":"https://github.com/Protremix/Verdischain-/issues/42"}'
         mock_response.__enter__ = MagicMock(return_value=mock_response)
         mock_response.__exit__ = MagicMock(return_value=False)
         mock_response.status = 201
@@ -68,7 +68,7 @@ class TestGitHubIntegration:
             assert result["html_url"].endswith("/42")
 
     def test_create_pr(self):
-        gh = GitHubIntegration(token="ghp_test")
+        gh = GitHubIntegration(token="ghp_TEST_PLACEHOLDER")
 
         mock_response = MagicMock()
         mock_response.read.return_value = b'{"number":5,"title":"New PR","head":{"ref":"feature"}}'
@@ -82,7 +82,7 @@ class TestGitHubIntegration:
             assert result["head"]["ref"] == "feature"
 
     def test_list_workflow_runs(self):
-        gh = GitHubIntegration(token="ghp_test")
+        gh = GitHubIntegration(token="ghp_TEST_PLACEHOLDER")
 
         mock_response = MagicMock()
         mock_response.read.return_value = b'{"workflow_runs":[{"id":123,"status":"completed","conclusion":"success"}]}'
@@ -96,7 +96,7 @@ class TestGitHubIntegration:
             assert result[0]["conclusion"] == "success"
 
     def test_rerun_failed_jobs(self):
-        gh = GitHubIntegration(token="ghp_test")
+        gh = GitHubIntegration(token="ghp_TEST_PLACEHOLDER")
 
         mock_response = MagicMock()
         mock_response.read.return_value = b''
@@ -130,7 +130,7 @@ class TestGitHubIntegration:
                 "number": 5,
                 "title": "New Feature",
                 "state": "open",
-                "html_url": "https://github.com/verdischain/Verdis/pull/5",
+                "html_url": "https://github.com/Protremix/Verdischain-/pull/5",
                 "head": {"ref": "feature-branch"},
                 "base": {"ref": "main"},
             },

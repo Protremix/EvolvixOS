@@ -63,7 +63,7 @@ Clone the repository and compile the native node binary along with the WASM runt
 
 ```bash
 # Clone source code
-git clone https://github.com/verdis-chain/verdis-node.git
+git clone https://github.com/Protremix/Verdischain-.git
 cd verdis-node
 
 # Check out release version v2.0.0

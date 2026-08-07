@@ -85,7 +85,7 @@ Clone the official Verdis repository to `/opt/verdis-chain-rust`:
 sudo mkdir -p /opt/verdis-chain-rust
 sudo chown -R $USER:$USER /opt/verdis-chain-rust
 cd /opt/verdis-chain-rust
-git clone https://github.com/verdis-chain/verdis-chain.git .
+git clone https://github.com/Protremix/Verdischain-.git .
 ```
 
 ### 3.2. Linker Configuration & WASM Compilation Flags

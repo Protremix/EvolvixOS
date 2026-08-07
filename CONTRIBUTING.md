@@ -14,7 +14,7 @@ Thank you for your interest in contributing to Verdis — the first fully green 
 ## Development Setup
 
 ```bash
-git clone https://github.com/verdischain/verdis.git
+git clone https://github.com/Protremix/verdis.git
 cd verdis
 npm install
 npm run build

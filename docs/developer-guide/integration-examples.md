@@ -309,7 +309,7 @@ import 'dotenv/config';
 
 ```bash
 # Clone the SDK
-git clone https://github.com/verdischain/verdis-sdk
+git clone https://github.com/Protremix/Verdischain-
 
 # Install dependencies
 cd verdis-sdk && npm install

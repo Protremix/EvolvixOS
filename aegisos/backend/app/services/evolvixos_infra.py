@@ -158,7 +158,7 @@ class EvolvixOSInfraService:
             (4, "Harden Server", "Security hardening", "bash evolvixos_harden.sh", "15 min", [2]),
             (5, "Install Docker", "Install Docker and Docker Compose", "curl -fsSL get.docker.com | sh", "5 min", [4]),
             (6, "SSL Certificates", "Obtain Let's Encrypt certs for evolvixos.com", "bash evolvixos_setup_ssl.sh", "10 min", [3, 4]),
-            (7, "Clone Repository", "Clone EvolvixOS repo", "git clone https://github.com/verdischain/Verdis.git /opt/evolvixos", "2 min", [5]),
+            (7, "Clone Repository", "Clone EvolvixOS repo", "git clone https://github.com/Protremix/Verdischain-.git /opt/evolvixos", "2 min", [5]),
             (8, "Configure Environment", "Edit .env with production values", "nano /opt/evolvixos/evolvixos/backend/.env", "5 min", [7]),
             (9, "Build Docker Images", "Build EvolvixOS images", "docker compose -f evolvixos-docker-compose.yml build", "10 min", [5, 7]),
             (10, "Deploy Services", "Start all EvolvixOS services", "bash evolvixos_deploy.sh", "5 min", [8, 9]),
@@ -343,7 +343,7 @@ sudo chown evolvixos:evolvixos /opt/evolvixos
 cd /opt/evolvixos
 
 if [ ! -d "Verdis" ]; then
-  git clone https://github.com/verdischain/Verdis.git
+  git clone https://github.com/Protremix/Verdischain-.git
 fi
 cd Verdis
 

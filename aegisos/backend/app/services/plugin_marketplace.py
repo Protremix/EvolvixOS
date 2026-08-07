@@ -144,8 +144,8 @@ class PluginMarketplaceService:
                 license=lic, tags=tags, downloads=downloads,
                 rating=rating, rating_count=rc, status=PluginStatus.APPROVED.value,
                 approved_at=datetime.utcnow().isoformat(),
-                homepage=f"https://github.com/verdischain/{slug}",
-                repository=f"https://github.com/verdischain/{slug}",
+                homepage=f"https://github.com/Protremix/{slug}",
+                repository=f"https://github.com/Protremix/{slug}",
             )
             self._plugins[p.id] = p
             self._slug_index[slug] = p.id

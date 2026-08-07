@@ -52,7 +52,7 @@ EvolvixOS is a universal AI Engineering Operating System that orchestrates auton
 
 ```bash
 # Clone
-git clone https://github.com/verdischain/Verdis.git
+git clone https://github.com/Protremix/Verdischain-.git
 cd Verdis/evolvixos
 
 # Configure
