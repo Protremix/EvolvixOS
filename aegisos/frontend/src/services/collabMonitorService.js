@@ -1,0 +1,20 @@
+import api from './api';
+export default {
+  patterns: () => api.get('/collab-monitor/patterns'),
+  getPattern: (key) => api.get(`/collab-monitor/patterns/${key}`),
+  createSession: (data) => api.post('/collab-monitor/sessions', data),
+  listSessions: (status) => api.get('/collab-monitor/sessions', { params: { status } }),
+  getSession: (id) => api.get(`/collab-monitor/sessions/${id}`),
+  updateStep: (sid, stepId, data) => api.put(`/collab-monitor/sessions/${sid}/steps/${stepId}`, data),
+  stepContext: (sid, stepId) => api.get(`/collab-monitor/sessions/${sid}/steps/${stepId}/context`),
+  simulateSession: (id) => api.post(`/collab-monitor/sessions/${id}/simulate`),
+  executeSession: (id, useVerdis) => api.post(`/collab-monitor/sessions/${id}/execute`, null, { params: { use_verdis_context: useVerdis } }),
+  collabStats: () => api.get('/collab-monitor/stats'),
+  events: (limit, type, source) => api.get('/collab-monitor/events', { params: { limit, type, source } }),
+  emitEvent: (data) => api.post('/collab-monitor/events', data),
+  liveFeed: (limit) => api.get('/collab-monitor/events/feed', { params: { limit } }),
+  eventTypes: () => api.get('/collab-monitor/events/types'),
+  metrics: (name) => api.get('/collab-monitor/metrics', { params: { name } }),
+  recordMetric: (name, value, unit) => api.post('/collab-monitor/metrics', null, { params: { name, value, unit } }),
+  systemStats: () => api.get('/collab-monitor/system-stats'),
+};

@@ -1,0 +1,47 @@
+name: AegisOS Backend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "aegisos/backend/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "aegisos/backend/**"
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('aegisos/backend/requirements*.txt') }}
+      - name: Install dependencies
+        run: |
+          cd aegisos/backend
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt || true
+          pip install pytest pytest-asyncio
+      - name: Run tests
+        run: |
+          cd aegisos/backend
+          python -m pytest --tb=short -q
+      - name: Run linter
+        run: |
+          cd aegisos/backend
+          pip install ruff || true
+          ruff check app/ || true
+      - name: Test summary
+        if: always()
+        run: |
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "Backend tests completed" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,21 @@
+import api from './api';
+export default {
+  dashboard: () => api.get('/onchain/dashboard'),
+  metrics: () => api.get('/onchain/metrics'),
+  metricHistory: (type, limit) => api.get(`/onchain/metrics/${type}/history`, { params: { limit } }),
+  latestBlock: () => api.get('/onchain/blocks/latest'),
+  recentBlocks: (limit) => api.get('/onchain/blocks/recent', { params: { limit } }),
+  collect: () => api.post('/onchain/collect'),
+  tpsTrend: (window) => api.get('/onchain/tps/trend', { params: { window } }),
+  gasAnalytics: (window) => api.get('/onchain/gas/analytics', { params: { window } }),
+  blockAnalytics: (window) => api.get('/onchain/blocks/analytics', { params: { window } }),
+  createAlert: (data) => api.post('/onchain/alerts', data),
+  listAlerts: (triggered) => api.get('/onchain/alerts', { params: { triggered } }),
+  deleteAlert: (id) => api.delete(`/onchain/alerts/${id}`),
+  resetAlert: (id) => api.post(`/onchain/alerts/${id}/reset`),
+  startMonitoring: (interval) => api.post('/onchain/monitoring/start', null, { params: { interval } }),
+  stopMonitoring: () => api.post('/onchain/monitoring/stop'),
+  monitoringStatus: () => api.get('/onchain/monitoring/status'),
+  metricTypes: () => api.get('/onchain/metric-types'),
+  stats: () => api.get('/onchain/stats'),
+};

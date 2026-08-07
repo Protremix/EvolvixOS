@@ -1,0 +1,2327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verdis Explorer — Blockchain Explorer & Data Analytics</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--bg-card:#161b22;--bg-hover:#1c2128;--border:#30363d;--border-light:#21262d;--text:#e6edf3;--text-muted:#8b949e;--text-dim:#484f58;--green:#3fb950;--green-bg:rgba(63,185,80,.1);--blue:#58a6ff;--blue-bg:rgba(88,166,255,.1);--purple:#bc8cff;--purple-bg:rgba(188,140,255,.1);--orange:#d29922;--orange-bg:rgba(210,153,34,.1);--red:#f85149;--red-bg:rgba(248,81,73,.1);--teal:#2dd4bf;--teal-bg:rgba(45,212,191,.1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.5}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.container{max-width:1400px;margin:0 auto;padding:0 16px}
+
+/* HEADER */
+.header{background:var(--bg-card);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.header-inner{display:flex;align-items:center;gap:16px;padding:12px 16px;max-width:1400px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;white-space:nowrap}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#3fb950,#2dd4bf);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.logo-text{font-size:18px;font-weight:700;color:var(--text)}
+.logo-sub{font-size:11px;color:var(--text-muted);margin-top:-2px}
+.search-bar{flex:1;max-width:600px;position:relative}
+.search-bar input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px 8px 40px;color:var(--text);font-size:14px;outline:none;transition:border .2s}
+.search-bar input:focus{border-color:var(--blue)}
+.search-bar input::placeholder{color:var(--text-dim)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:16px}
+.header-nav{display:flex;gap:4px;align-items:center}
+.header-nav a{color:var(--text-muted);font-size:13px;padding:6px 12px;border-radius:6px;transition:all .2s;white-space:nowrap}
+.header-nav a:hover{background:var(--bg-hover);color:var(--text);text-decoration:none}
+.header-nav a.active{color:var(--green);background:var(--green-bg)}
+.network-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);white-space:nowrap}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* NAV TABS */
+.nav-tabs{background:var(--bg-card);border-bottom:1px solid var(--border);overflow-x:auto;white-space:nowrap}
+.nav-tabs-inner{display:flex;gap:2px;max-width:1400px;margin:0 auto;padding:0 16px}
+.nav-tab{padding:10px 16px;font-size:13px;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:6px}
+.nav-tab:hover{color:var(--text);background:var(--bg-hover)}
+.nav-tab.active{color:var(--green);border-bottom-color:var(--green)}
+.guide-nav-btn.active{background:var(--green);color:#0d1117;border-color:var(--green)}
+
+/* STATS CARDS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+.stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px;position:relative;overflow:hidden}
+.stat-card:hover{border-color:var(--border-light)}
+.stat-card .icon{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.stat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.stat-value{font-size:24px;font-weight:700;color:var(--text)}
+.stat-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+.stat-change{font-size:12px;font-weight:600}
+.stat-change.up{color:var(--green)}
+.stat-change.down{color:var(--red)}
+
+/* LAYOUT */
+.page-content{padding:20px 0 60px}
+.section{display:none}
+.section.active{display:block}
+.section-title{font-size:16px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title .count{font-size:12px;color:var(--text-muted);font-weight:400}
+
+/* TABLES */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{text-align:left;font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;padding:8px 12px;border-bottom:1px solid var(--border);font-weight:600}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--border-light);font-size:13px}
+.data-table tr:hover td{background:var(--bg-hover)}
+.table-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.table-wrap .table-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:between;font-weight:600;font-size:14px}
+.link-text{color:var(--blue);cursor:pointer}
+.link-text:hover{text-decoration:underline}
+.hash-text{font-family:monospace;font-size:12px;color:var(--text-muted)}
+.hash-text a{color:var(--blue)}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* CARD */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px}
+.card-header{font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.card-body{padding:0}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-green{background:var(--green-bg);color:var(--green)}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}
+.badge-purple{background:var(--purple-bg);color:var(--purple)}
+.badge-orange{background:var(--orange-bg);color:var(--orange)}
+.badge-red{background:var(--red-bg);color:var(--red)}
+.badge-teal{background:var(--teal-bg);color:var(--teal)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);color:var(--text);font-size:13px;cursor:pointer;transition:all .2s;font-weight:500}
+.btn:hover{border-color:var(--blue);background:var(--bg-hover)}
+.btn-primary{background:var(--green);color:#0d1117;border-color:var(--green);font-weight:600}
+.btn-primary:hover{background:#2ea043;border-color:#2ea043}
+.btn-blue{background:var(--blue);color:#0d1117;border-color:var(--blue);font-weight:600}
+.btn-blue:hover{background:#3884d9}
+.btn-sm{padding:4px 10px;font-size:12px}
+
+/* INPUTS */
+input,select,textarea{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--text);font-size:13px;outline:none;transition:border .2s;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+input::placeholder{color:var(--text-dim)}
+label{font-size:12px;color:var(--text-muted);margin-bottom:4px;display:block}
+.form-group{margin-bottom:12px}
+.form-row{display:flex;gap:12px}
+.form-row>*{flex:1}
+
+/* EXPLORER */
+.explore-header{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:16px}
+.explore-header h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.explore-header p{color:var(--text-muted);font-size:13px}
+
+/* ADDRESS */
+.address-header{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:16px}
+.address-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.address-label{font-size:12px;color:var(--text-muted);min-width:100px}
+.address-value{font-family:monospace;font-size:14px;color:var(--text)}
+
+/* CHARTS */
+.chart-container{position:relative;height:200px;width:100%}
+
+/* DEX */
+.dex-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pool-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px;cursor:pointer;transition:all .2s}
+.pool-card:hover{border-color:var(--blue)}
+.pool-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pool-pair{font-size:15px;font-weight:600}
+.pool-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pool-stat{font-size:12px}
+.pool-stat-label{color:var(--text-muted)}
+.pool-stat-value{font-weight:600;margin-top:2px}
+
+/* VALIDATORS */
+.validator-card{display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid var(--border-light)}
+.validator-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.validator-info{flex:1}
+.validator-name{font-size:14px;font-weight:600}
+.validator-addr{font-size:12px;color:var(--text-muted);font-family:monospace}
+.validator-stats{display:flex;gap:16px;font-size:12px;color:var(--text-muted)}
+
+/* WALLET CONNECT */
+.wallet-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.wallet-info{display:flex;align-items:center;gap:8px;font-size:13px}
+.wallet-addr{font-family:monospace;color:var(--blue)}
+
+/* ECO */
+.eco-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.eco-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+.eco-icon{font-size:32px;margin-bottom:8px}
+.eco-value{font-size:28px;font-weight:700;color:var(--green)}
+.eco-label{font-size:12px;color:var(--text-muted);margin-top:4px}
+
+/* RESPONSIVE */
+@media(max-width:900px){.stats-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.dex-grid{grid-template-columns:1fr}.eco-grid{grid-template-columns:1fr}.header-nav{display:none}.search-bar{max-width:300px}}
+@media(max-width:600px){.stats-grid{grid-template-columns:1fr}.logo-sub{display:none}.header-inner{flex-wrap:wrap}}
+.hidden{display:none!important}
+.mono{font-family:monospace}
+.text-green{color:var(--green)}.text-blue{color:var(--blue)}.text-red{color:var(--red)}.text-muted{color:var(--text-muted)}
+.text-sm{font-size:12px}.text-lg{font-size:16px}.text-xl{font-size:20px}
+.mt-4{margin-top:16px}.mb-4{margin-bottom:16px}.flex{display:flex}.gap-2{gap:8px}.items-center{align-items:center}.justify-between{justify-content:space-between}.flex-1{flex:1}
+.copy-btn{cursor:pointer;color:var(--text-muted);font-size:12px;padding:2px 6px;border-radius:4px;transition:all .2s}
+.copy-btn:hover{color:var(--blue);background:var(--bg-hover)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg-card);border:1px solid var(--green);border-radius:8px;padding:12px 20px;color:var(--green);font-size:13px;z-index:1000;animation:slideIn .3s}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+</style>
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="dark">
+<meta name="apple-mobile-web-app-title" content="Verdis">
+<link rel="manifest" href="/api/pwa-manifest">
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo" onclick="showSection('overview')">
+      <div class="logo-icon">🌿</div>
+      <div>
+        <div class="logo-text">Verdis</div>
+        <div class="logo-sub">Block Explorer</div>
+      </div>
+    </div>
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search by Address / Tx Hash / Block Number" onkeydown="if(event.key==='Enter')doSearch()">
+    </div>
+    <div class="network-status">
+      <span class="status-dot"></span>
+      <span id="netStatus">Connecting...</span>
+    </div>
+    <div class="header-nav">
+      <a onclick="showSection('overview')" id="nav-overview">Overview</a>
+      <a onclick="showSection('blocks')" id="nav-blocks">Blocks</a>
+      <a onclick="showSection('txs')" id="nav-txs">Transactions</a>
+      <a onclick="showSection('validators')" id="nav-validators">Validators</a>
+      <a onclick="showSection('dex')" id="nav-dex">DEX</a>
+      <a onclick="showSection('contracts')" id="nav-contracts">Contracts</a>
+      <a onclick="showSection('eco')" id="nav-eco">Eco</a>
+      <a onclick="showSection('bridge')" id="nav-bridge">Bridge</a>
+      <a onclick="showSection('guide')" id="nav-guide">Guide</a>
+      <a onclick="showSection('faucet')" id="nav-faucet">Faucet</a>
+      <a onclick="showSection('governance')" id="nav-governance">Governance</a>
+    </div>
+  </div>
+</div>
+
+<!-- NAV TABS (mobile-friendly) -->
+<div class="nav-tabs">
+  <div class="nav-tabs-inner">
+    <div class="nav-tab active" onclick="showSection('overview',this)">📊 Overview</div>
+    <div class="nav-tab" onclick="showSection('blocks',this)">⛓ Blocks</div>
+    <div class="nav-tab" onclick="showSection('txs',this)">💸 Transactions</div>
+    <div class="nav-tab" onclick="showSection('validators',this)">🏛 Validators</div>
+    <div class="nav-tab" onclick="showSection('dex',this)">💱 DEX</div>
+    <div class="nav-tab" onclick="showSection('contracts',this)">📜 Contracts</div>
+    <div class="nav-tab" onclick="showSection('eco',this)">🌿 Eco</div>
+    <div class="nav-tab" onclick="showSection('bridge',this)">🌉 Bridge</div>
+    <div class="nav-tab" onclick="showSection('wallet',this)">👛 Wallet</div>
+    <div class="nav-tab" onclick="showSection('monitoring',this)">📈 Monitoring</div>
+    <div class="nav-tab" onclick="showSection('guide',this)">📖 Guide</div>
+    <div class="nav-tab" onclick="showSection('faucet',this)">🚰 Faucet</div>
+    <div class="nav-tab" onclick="showSection('staking',this)">🏛 Staking</div>
+    <div class="nav-tab" onclick="showSection('governance',this)">🗳 Governance</div>
+    <div class="nav-tab" onclick="showSection('nft',this)">🎨 NFT</div>
+    <div class="nav-tab" onclick="showSection('tokens',this)">🪙 Tokens</div>
+    <div class="nav-tab" onclick="showSection('apidocs',this)">📚 API Docs</div>
+    <div class="nav-tab" onclick="showSection('whitepaper',this)">📄 Whitepaper</div>
+    <div class="nav-tab" onclick="showSection('notifications',this)">🔔 Alerts</div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="container">
+  <div class="page-content">
+
+    <!-- OVERVIEW -->
+    <div class="section active" id="section-overview">
+      <!-- STATS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="icon" style="background:var(--blue-bg)">⛓</div>
+          <div class="stat-label">Block Height</div>
+          <div class="stat-value" id="ov-blockHeight">—</div>
+          <div class="stat-sub" id="ov-blockTime">~5s block time</div>
+        </div>
+        <div class="stat-card">
+          <div class="icon" style="background:var(--green-bg)">✓</div>
+          <div class="stat-label">Transactions</div>
+          <div class="stat-value" id="ov-txCount">—</div>
+          <div class="stat-sub" id="ov-tps">— TPS</div>
+        </div>
+        <div class="stat-card">
+          <div class="icon" style="background:var(--purple-bg)">🏛</div>
+          <div class="stat-label">Validators</div>
+          <div class="stat-value" id="ov-validators">—</div>
+          <div class="stat-sub">DPoS Consensus</div>
+        </div>
+        <div class="stat-card">
+          <div class="icon" style="background:var(--teal-bg)">🌿</div>
+          <div class="stat-label">CO₂ Offset</div>
+          <div class="stat-value" id="ov-carbon">—</div>
+          <div class="stat-sub" id="ov-trees">— trees planted</div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="grid-2 mb-4">
+        <div class="card">
+          <div class="card-header">Block Production <span class="text-muted text-sm">Last 20 blocks</span></div>
+          <div class="chart-container"><canvas id="blockChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-header">DEX Volume <span class="text-muted text-sm">Swap history</span></div>
+          <div class="chart-container"><canvas id="dexChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- LATEST BLOCKS + TXS -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">Latest Blocks <a onclick="showSection('blocks')" class="text-sm">View All →</a></div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Block</th><th>Validator</th><th>Txs</th><th>Time</th></tr></thead>
+              <tbody id="latestBlocks"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">Latest Transactions <a onclick="showSection('txs')" class="text-sm">View All →</a></div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Tx Hash</th><th>From</th><th>Amount</th><th>Time</th></tr></thead>
+              <tbody id="latestTxs"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- NETWORK INFO -->
+      <div class="card mt-4">
+        <div class="card-header">Network Information</div>
+        <div class="grid-4" id="networkInfo">
+          <div><div class="text-muted text-sm">Chain ID</div><div class="text-lg mono">909</div></div>
+          <div><div class="text-muted text-sm">Symbol</div><div class="text-lg">VRS</div></div>
+          <div><div class="text-muted text-sm">Total Supply</div><div class="text-lg" id="netSupply">—</div></div>
+          <div><div class="text-muted text-sm">Consensus</div><div class="text-lg">DPoS</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCKS -->
+    <div class="section" id="section-blocks">
+      <div class="explore-header">
+        <h2>Blocks</h2>
+        <p>Browse all blocks on the Verdis blockchain</p>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header">Latest Blocks</div>
+        <table class="data-table">
+          <thead><tr><th>Block</th><th>Hash</th><th>Validator</th><th>Transactions</th><th>Timestamp</th></tr></thead>
+          <tbody id="allBlocks"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TRANSACTIONS -->
+    <div class="section" id="section-txs">
+      <div class="explore-header">
+        <h2>Transactions</h2>
+        <p>Browse all transactions on the Verdis blockchain</p>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header">Latest Transactions</div>
+        <table class="data-table">
+          <thead><tr><th>Tx Hash</th><th>From</th><th>To</th><th>Amount</th><th>Timestamp</th></tr></thead>
+          <tbody id="allTxs"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VALIDATORS -->
+    <div class="section" id="section-validators">
+      <div class="explore-header">
+        <h2>Validators <span class="badge badge-green">DPoS</span></h2>
+        <p>Super Representatives securing the Verdis network</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Active Validators</div><div class="stat-value" id="valActive">—</div></div>
+        <div class="stat-card"><div class="stat-label">Total Registered</div><div class="stat-value" id="valTotal">—</div></div>
+        <div class="stat-card"><div class="stat-label">Current Producer</div><div class="stat-value text-sm mono" id="valProducer">—</div></div>
+        <div class="stat-card"><div class="stat-label">Total Staked</div><div class="stat-value" id="valStaked">—</div></div>
+      </div>
+      <div class="table-wrap mt-4">
+        <div class="table-header">Super Representatives</div>
+        <div id="validatorList"></div>
+      </div>
+    </div>
+
+    <!-- DEX -->
+    <div class="section" id="section-dex">
+      <div class="explore-header">
+        <h2>Decentralized Exchange <span class="badge badge-teal">AMM</span></h2>
+        <p>Trade tokens on the Verdis native AMM DEX</p>
+      </div>
+      <!-- SWAP INTERFACE -->
+      <div class="card">
+        <div class="card-header">Swap Tokens</div>
+        <div class="form-group">
+          <label>From</label>
+          <div class="flex gap-2">
+            <input type="number" id="swapAmountIn" placeholder="0.0" style="flex:1">
+            <select id="swapTokenIn" style="width:120px"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>To</label>
+          <div class="flex gap-2">
+            <input type="number" id="swapAmountOut" placeholder="0.0" readonly style="flex:1">
+            <select id="swapTokenOut" style="width:120px"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Trader Address (optional, uses demo wallet if empty)</label>
+          <input type="text" id="swapTrader" placeholder="0x..." class="mono">
+        </div>
+        <button class="btn btn-primary" onclick="doSwap()">Swap</button>
+        <span id="swapResult" class="text-sm ml-4"></span>
+      </div>
+      <!-- POOLS -->
+      <div class="card">
+        <div class="card-header">Liquidity Pools</div>
+        <div class="dex-grid" id="dexPools"></div>
+      </div>
+      <!-- PRICE CHART -->
+      <div class="card mt-4">
+        <div class="card-header">Price Chart <select id="priceChartPair" onchange="loadPriceChart()" style="font-size:12px;padding:2px 8px"></select></div>
+        <div class="chart-container" style="height:300px"><canvas id="priceChart"></canvas></div>
+      </div>
+
+      <!-- MARKET DATA -->
+      <div class="grid-2 mt-4">
+        <div class="card">
+          <div class="card-header">Token Prices</div>
+          <table class="data-table">
+            <thead><tr><th>Token</th><th>Price (VRS)</th><th>Volume</th><th>Swaps</th></tr></thead>
+            <tbody id="tokenPrices"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-header">Swap History</div>
+          <table class="data-table">
+            <thead><tr><th>Pair</th><th>Amount</th><th>Time</th></tr></thead>
+            <tbody id="swapHistory"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTRACTS -->
+    <div class="section" id="section-contracts">
+      <div class="explore-header">
+        <h2>Smart Contracts <span class="badge badge-purple">VM</span></h2>
+        <p>Deploy and interact with smart contracts on the Verdis VM</p>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">Deploy Contract</div>
+          <div class="form-group">
+            <label>Contract Name</label>
+            <input type="text" id="contractName" placeholder="MyContract">
+          </div>
+          <div class="form-group">
+            <label>Bytecode (space-separated opcodes)</label>
+            <textarea id="contractCode" rows="6" placeholder="PUSH 10 PUSH 5 ADD STOP"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Deployer Address</label>
+            <input type="text" id="contractDeployer" placeholder="0x..." class="mono">
+          </div>
+          <button class="btn btn-primary" onclick="deployContract()">Deploy</button>
+          <span id="deployResult" class="text-sm ml-4"></span>
+        </div>
+        <div class="card">
+          <div class="card-header">Deployed Contracts</div>
+          <div id="contractList"><p class="text-muted">Loading...</p></div>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header">Execute Contract</div>
+        <div class="form-row">
+          <div class="form-group"><label>Contract ID</label><input type="text" id="execContractId" placeholder="contract ID" class="mono"></div>
+          <div class="form-group"><label>Method</label><input type="text" id="execMethod" placeholder="method name"></div>
+          <div class="form-group"><label>Args (comma-separated)</label><input type="text" id="execArgs" placeholder="arg1,arg2"></div>
+        </div>
+        <div class="form-group"><label>Caller Address</label><input type="text" id="execCaller" placeholder="0x..." class="mono"></div>
+        <button class="btn btn-blue" onclick="executeContract()">Execute</button>
+        <pre id="execResult" class="text-sm mt-4" style="background:var(--bg);padding:12px;border-radius:6px;border:1px solid var(--border);display:none"></pre>
+      </div>
+    </div>
+
+    <!-- ECO -->
+    <div class="section" id="section-eco">
+      <div class="explore-header">
+        <h2>🌿 Eco System <span class="badge badge-green">Carbon Negative</span></h2>
+        <p>Verdis is the world's first carbon-negative blockchain</p>
+      </div>
+      <div class="eco-grid">
+        <div class="eco-card"><div class="eco-icon">🌍</div><div class="eco-value" id="ecoCarbon">—</div><div class="eco-label">Tons CO₂ Offset</div></div>
+        <div class="eco-card"><div class="eco-icon">🌳</div><div class="eco-value" id="ecoTrees">—</div><div class="eco-label">Trees Planted</div></div>
+        <div class="eco-card"><div class="eco-icon">⚡</div><div class="eco-value" id="ecoEnergy">—</div><div class="eco-label">kWh Saved</div></div>
+      </div>
+      <div class="grid-2 mt-4">
+        <div class="card">
+          <div class="card-header">Carbon Credits</div>
+          <table class="data-table">
+            <thead><tr><th>ID</th><th>Amount (tCO₂)</th><th>Status</th><th>Project</th></tr></thead>
+            <tbody id="carbonCredits"></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-header">Reforestation Projects</div>
+          <div id="reforestProjects"><p class="text-muted">Loading...</p></div>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header">Green Validator Scores</div>
+        <table class="data-table">
+          <thead><tr><th>Validator</th><th>Score</th><th>Rank</th><th>Energy Source</th></tr></thead>
+          <tbody id="greenScores"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BRIDGE -->
+    <div class="section" id="section-bridge">
+      <div class="explore-header">
+        <h2>🌉 Cross-Chain Bridge <span class="badge badge-orange">BSC</span></h2>
+        <p>Bridge VRS to Binance Smart Chain as wVRS, trade on PancakeSwap</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total Locked</div><div class="stat-value" id="bridgeLocked">—</div><div class="stat-sub">VRS locked for bridging</div></div>
+        <div class="stat-card"><div class="stat-label">Total Redeemed</div><div class="stat-value" id="bridgeRedeemed">—</div><div class="stat-sub">VRS returned from BSC</div></div>
+        <div class="stat-card"><div class="stat-label">wVRS on BSC</div><div class="stat-value text-sm" id="wvrsContract">Pending</div><div class="stat-sub">Contract address</div></div>
+        <div class="stat-card"><div class="stat-label">BSC Chain ID</div><div class="stat-value">56</div><div class="stat-sub">PancakeSwap ready</div></div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header">Lock VRS → Mint wVRS on BSC</div>
+        <div class="form-row">
+          <div class="form-group"><label>Your Verdis Address</label><input type="text" id="bridgeFrom" placeholder="0x..." class="mono"></div>
+          <div class="form-group"><label>Amount (VRS)</label><input type="number" id="bridgeAmount" placeholder="100"></div>
+          <div class="form-group"><label>BSC Address (0x...)</label><input type="text" id="bridgeBsc" placeholder="0x..." class="mono"></div>
+        </div>
+        <div class="form-group"><label>Private Key (signs lock transaction)</label><input type="password" id="bridgeKey" placeholder="Private key" class="mono"></div>
+        <button class="btn btn-primary" onclick="lockBridge()">Lock VRS</button>
+        <span id="bridgeResult" class="text-sm ml-4"></span>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header">Bridge Locks</div>
+        <table class="data-table">
+          <thead><tr><th>Mint ID</th><th>From</th><th>Amount</th><th>BSC Address</th><th>Status</th></tr></thead>
+          <tbody id="bridgeLocks"><tr><td colspan="5" class="text-muted text-center">No locks yet</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- WALLET -->
+    <div class="section" id="section-wallet">
+      <div class="explore-header">
+        <h2>Wallet</h2>
+        <p>Create wallets, check balances, and send transactions</p>
+      </div>
+      <!-- WALLET CONNECT BAR -->
+      <div class="wallet-bar">
+        <div class="wallet-info" id="walletDisplay">
+          <span class="text-muted">No wallet connected</span>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-sm" onclick="createWallet()">Create Wallet</button>
+          <button class="btn btn-sm btn-blue" onclick="connectWallet('metamask')" id="mmBtn">🦊 Connect MetaMask</button>
+          <button class="btn btn-sm" onclick="connectWallet('trust')" id="twBtn">🛡️ Connect Trust Wallet</button>
+          <button class="btn btn-sm" style="background:#3375BB;color:white" onclick="openInWallet('metamask')" id="mmMobileBtn">📱 Open in MetaMask</button>
+          <button class="btn btn-sm" style="background:#2175EB;color:white" onclick="openInWallet('trust')" id="twMobileBtn">📱 Open in Trust Wallet</button>
+          <button class="btn btn-sm" style="background:#8b5cf6;color:white" onclick="addVRSToken()" id="addTokenBtn">➕ Add VRS to Wallet</button>
+          <button class="btn btn-sm" style="background:#10b981;color:white" onclick="addVerdisNetwork()" id="addNetworkBtn">🌐 Add Verdis Network</button>
+        </div>
+      </div>
+      
+      <!-- Trust Wallet Setup Box -->
+      <div class="card mt-4" style="border:1px solid #2175EB;background:rgba(33,117,235,0.05)">
+        <div class="card-header" style="color:#2175EB">🛡️ Trust Wallet Setup (Android)</div>
+        <div style="padding:12px 0">
+          <p style="font-size:14px;margin-bottom:6px"><b>Step 1: Add Verdis Network in Trust Wallet</b></p>
+          <p style="font-size:13px;margin-left:16px;color:#999">Trust Wallet &rarr; Settings &rarr; Networks &rarr; Add Custom Network:</p>
+          <table style="margin-left:16px;font-size:13px;font-family:monospace;color:#ccc;border-spacing:4px">
+            <tr><td style="color:#666">Network Name:</td><td style="color:#4ade80">Verdis</td></tr>
+            <tr><td style="color:#666">RPC URL:</td><td style="color:#4ade80">https://rpc.verdischain.com</td></tr>
+            <tr><td style="color:#666">Chain ID:</td><td style="color:#4ade80">909</td></tr>
+            <tr><td style="color:#666">Symbol:</td><td style="color:#4ade80">VRS</td></tr>
+            <tr><td style="color:#666">Explorer:</td><td style="color:#4ade80">https://verdischain.com</td></tr>
+          </table>
+          
+          <p style="font-size:14px;margin:14px 0 6px"><b>Step 2: Import Your Wallet</b></p>
+          <p style="font-size:13px;margin-left:16px;color:#999">Trust Wallet &rarr; Settings &rarr; Wallets &rarr; Import &rarr; Paste Private Key:</p>
+          <div style="margin-left:16px;padding:8px 12px;background:rgba(0,0,0,0.4);border-radius:6px;font-family:monospace;font-size:12px;color:#4ade80;word-break:break-all;cursor:pointer" id="trustPrivKey" title="Tap to copy" onclick="copyPrivKey()">e94b8e73f77d02f41019e36563bdb1b39d13bb580db38a14e0cf12d6b72c8da4</div>
+          <p style="font-size:12px;margin-left:16px;color:#666;margin-top:4px">&uarr; Tap to copy &mdash; This wallet has <b style="color:#4ade80">1000 VRS</b></p>
+          
+          <p style="font-size:14px;margin:14px 0 6px"><b>Step 3: Open Dashboard in Trust Wallet</b></p>
+          <button class="btn btn-sm" style="background:#2175EB;color:white;font-size:14px;padding:10px 24px" onclick="openInWallet('trust')">📱 Open in Trust Wallet</button>
+          
+          <p style="font-size:14px;margin:14px 0 6px"><b>Step 4: Connect</b></p>
+          <p style="font-size:13px;margin-left:16px;color:#999">Once dashboard loads in Trust Wallet, tap "🛡️ Connect Trust Wallet"</p>
+          
+          <hr style="margin:14px 0;border-color:#222">
+          <p style="font-size:12px;color:#666">Wallet: <span style="font-family:monospace;color:#4ade80">0xa1e846855e1768b9C0BEe6E747bedd7bec1Af616</span></p>
+        </div>
+      </div>
+      
+      <div class="grid-2 mt-4">
+        <div class="card">
+          <div class="card-header">Send VRS</div>
+          <div class="form-group"><label>From Address</label><input type="text" id="sendFrom" placeholder="0x..." class="mono"></div>
+          <div class="form-group"><label>Private Key</label><input type="password" id="sendKey" placeholder="Private key (for non-wallet connections)" class="mono"></div>
+          <div class="form-group"><label>To Address</label><input type="text" id="sendTo" placeholder="0x..." class="mono"></div>
+          <div class="form-group"><label>Amount</label><input type="number" id="sendAmount" placeholder="100"></div>
+          <button class="btn btn-primary" onclick="sendTx()">Send</button>
+          <span id="sendResult" class="text-sm ml-4"></span>
+        </div>
+        <div class="card">
+          <div class="card-header">Check Balance</div>
+          <div class="form-group"><label>Address</label><input type="text" id="balAddr" placeholder="0x..." class="mono"></div>
+          <button class="btn" onclick="checkBal()">Check</button>
+          <div id="balResult" class="mt-4"></div>
+          <div class="card-header mt-4">Trust Wallet / MetaMask Setup</div>
+          <div class="text-sm text-muted">
+            Network Name: <span class="text-green mono">Verdis</span><br>
+            RPC URL: <span class="mono text-blue" id="rpcUrl">https://rpc.verdischain.com</span><br>
+            Chain ID: <span class="mono">909</span> | Symbol: <span class="mono">VRS</span><br>
+            Explorer: <span class="mono text-blue">https://verdischain.com/dashboard</span>
+          </div>
+          <div class="card-header mt-4">Quick Add Network</div>
+          <div class="text-sm text-muted">
+            1. Install MetaMask or Trust Wallet browser extension<br>
+            2. Click "Connect MetaMask" or "Connect Trust Wallet" above (desktop)<br>
+            3. On mobile? Use "📱 Open in MetaMask" or "📱 Open in Trust Wallet" buttons<br>
+            4. This opens the dashboard inside your wallet's built-in browser where the wallet is automatically connected<br>
+            3. Approve the network addition in your wallet<br>
+            4. Your wallet is now connected to Verdis Chain ID 909
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="section" id="section-notifications">
+      <div class="explore-header">
+        <h2>🔔 Notifications</h2>
+        <p>Subscribe to transaction alerts and network events</p>
+      </div>
+      <div class="card">
+        <div class="card-header">Subscribe to Notifications</div>
+        <div class="form-row">
+          <div class="form-group"><label>Your Address</label><input type="text" id="notifAddr" placeholder="0x..." class="mono"></div>
+          <div class="form-group"><label>Telegram Username (optional)</label><input type="text" id="notifTelegram" placeholder="@username"></div>
+          <div class="form-group"><label>Email (optional)</label><input type="text" id="notifEmail" placeholder="you@email.com"></div>
+        </div>
+        <button class="btn btn-primary" onclick="subscribeNotif()">Subscribe</button>
+        <span id="notifResult" class="text-sm ml-4"></span>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header">How It Works</div>
+        <p class="text-sm" style="line-height:1.8;color:var(--text-muted)">When you subscribe, Verdis monitors the blockchain for transactions involving your address. You'll receive alerts when:<br>• You receive VRS from another user<br>• A swap involving your tokens completes<br>• A governance proposal you voted on ends<br>• Your validator produces a block<br><br>Notifications are sent via Telegram or email (whichever you provide). Your data is never shared with third parties.</p>
+      </div>
+    </div>
+
+    <!-- MONITORING -->
+    <div class="section" id="section-monitoring">
+      <div class="explore-header">
+        <h2>Network Monitoring</h2>
+        <p>Real-time health and performance metrics</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Status</div><div class="stat-value text-green" id="monStatus">—</div></div>
+        <div class="stat-card"><div class="stat-label">Uptime</div><div class="stat-value" id="monUptime">—</div></div>
+        <div class="stat-card"><div class="stat-label">Block Height</div><div class="stat-value" id="monHeight">—</div></div>
+        <div class="stat-card"><div class="stat-label">Memory</div><div class="stat-value" id="monMem">—</div></div>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header">Health Check</div>
+        <pre id="healthData" class="text-sm" style="background:var(--bg);padding:12px;border-radius:6px;border:1px solid var(--border);overflow:auto">Loading...</pre>
+      </div>
+      <div class="card mt-4">
+        <div class="card-header">Security Audit</div>
+        <div id="securityAudit"><p class="text-muted">Loading...</p></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FAUCET -->
+  <div class="section" id="section-faucet">
+    <div class="explore-header">
+      <h2>🚰 VRS Faucet</h2>
+      <p>Get free VRS tokens to try the Verdis network — 1,000 VRS per claim, 1 hour cooldown</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Amount Per Claim</div><div class="stat-value">1,000 VRS</div></div>
+      <div class="stat-card"><div class="stat-label">Cooldown</div><div class="stat-value">60 min</div></div>
+      <div class="stat-card"><div class="stat-label">Total Claims</div><div class="stat-value" id="faucetTotal">—</div></div>
+      <div class="stat-card"><div class="stat-label">Your Status</div><div class="stat-value text-sm" id="faucetStatus">—</div></div>
+    </div>
+    <div class="card mt-4">
+      <div class="card-header">Claim Free VRS</div>
+      <div class="form-group"><label>Your Verdis Address</label><input type="text" id="faucetAddr" placeholder="0x..." class="mono"></div>
+      <button class="btn btn-primary" onclick="claimFaucet()">🚰 Claim 1,000 VRS</button>
+      <span id="faucetResult" class="text-sm ml-4"></span>
+    </div>
+  </div>
+
+  <!-- STAKING -->
+  <div class="section" id="section-staking">
+    <div class="explore-header">
+      <h2>🏛 Staking <span class="badge badge-green">DPoS</span></h2>
+      <p>Delegate VRS to validators and earn rewards</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Active Validators</div><div class="stat-value" id="stakeActive">—</div></div>
+      <div class="stat-card"><div class="stat-label">Total Staked</div><div class="stat-value" id="stakeTotal">—</div></div>
+      <div class="stat-card"><div class="stat-label">Avg Reward Rate</div><div class="stat-value">0.01%/day</div></div>
+      <div class="stat-card"><div class="stat-label">Your Staked</div><div class="stat-value" id="stakeYours">—</div></div>
+    </div>
+    <div class="grid-2 mt-4">
+      <div class="card">
+        <div class="card-header">Delegate VRS</div>
+        <div class="form-group"><label>Your Address</label><input type="text" id="stakeVoter" placeholder="0x..." class="mono"></div>
+        <div class="form-group"><label>Validator</label><select id="stakeValidator"></select></div>
+        <div class="form-group"><label>Amount (VRS)</label><input type="number" id="stakeAmount" placeholder="100"></div>
+        <button class="btn btn-primary" onclick="delegateStake()">Delegate</button>
+        <span id="stakeResult" class="text-sm ml-4"></span>
+      </div>
+      <div class="card">
+        <div class="card-header">Your Delegations</div>
+        <div id="stakeDelegations"><p class="text-muted">Enter your address to see delegations</p></div>
+        <div class="form-group mt-4"><label>Check Address</label><input type="text" id="stakeCheckAddr" placeholder="0x..." class="mono" oninput="loadDelegations()"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOVERNANCE -->
+  <div class="section" id="section-governance">
+    <div class="explore-header">
+      <h2>🗳 Governance <span class="badge badge-purple">On-Chain</span></h2>
+      <p>Propose and vote on protocol changes</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">Create Proposal</div>
+        <div class="form-group"><label>Title</label><input type="text" id="govTitle" placeholder="Proposal title"></div>
+        <div class="form-group"><label>Description</label><textarea id="govDesc" rows="4" placeholder="Describe the proposal..."></textarea></div>
+        <div class="form-group"><label>Proposer Address</label><input type="text" id="govProposer" placeholder="0x..." class="mono"></div>
+        <div class="form-group"><label>Type</label><select id="govType"><option value="improvement">Improvement</option><option value="parameter">Parameter Change</option><option value="upgrade">Protocol Upgrade</option><option value="eco">Eco Initiative</option></select></div>
+        <button class="btn btn-primary" onclick="createProposal()">Submit Proposal</button>
+        <span id="govResult" class="text-sm ml-4"></span>
+      </div>
+      <div class="card">
+        <div class="card-header">Active Proposals</div>
+        <div id="govProposals"><p class="text-muted">Loading...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NFT -->
+  <div class="section" id="section-nft">
+    <div class="explore-header">
+      <h2>🎨 Eco NFTs <span class="badge badge-teal">Carbon-Backed</span></h2>
+      <p>Mint and trade carbon credit NFTs, reforestation certificates, and eco achievements</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">Mint NFT</div>
+        <div class="form-group"><label>NFT Name</label><input type="text" id="nftName" placeholder="Amazon Carbon Certificate"></div>
+        <div class="form-group"><label>Description</label><textarea id="nftDesc" rows="3" placeholder="NFT representing..."></textarea></div>
+        <div class="form-group"><label>Creator Address</label><input type="text" id="nftCreator" placeholder="0x..." class="mono"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Category</label><select id="nftCategory"><option value="carbon">Carbon Credit</option><option value="reforest">Reforestation</option><option value="energy">Renewable Energy</option><option value="achievement">Eco Achievement</option></select></div>
+          <div class="form-group"><label>Carbon Value (tons CO₂)</label><input type="number" id="nftCarbon" placeholder="10"></div>
+        </div>
+        <button class="btn btn-primary" onclick="mintNFT()">Mint NFT</button>
+        <span id="nftResult" class="text-sm ml-4"></span>
+      </div>
+      <div class="card">
+        <div class="card-header">NFT Gallery</div>
+        <div id="nftGallery"><p class="text-muted">Loading...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOKENS -->
+  <div class="section" id="section-tokens">
+    <div class="explore-header">
+      <h2>🪙 Token Factory <span class="badge badge-blue">Create</span></h2>
+      <p>Create custom tokens on Verdis — automatically paired with VRS on the DEX</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">Create Token</div>
+        <div class="form-group"><label>Token Name</label><input type="text" id="tokName" placeholder="EcoToken"></div>
+        <div class="form-group"><label>Symbol</label><input type="text" id="tokSymbol" placeholder="ECO2" maxlength="10"></div>
+        <div class="form-group"><label>Total Supply</label><input type="number" id="tokSupply" placeholder="1000000"></div>
+        <div class="form-group"><label>Creator Address</label><input type="text" id="tokCreator" placeholder="0x..." class="mono"></div>
+        <button class="btn btn-primary" onclick="createToken()">Create Token</button>
+        <span id="tokResult" class="text-sm ml-4"></span>
+      </div>
+      <div class="card">
+        <div class="card-header">Created Tokens</div>
+        <div id="tokenList"><p class="text-muted">Loading...</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API DOCS -->
+  <div class="section" id="section-apidocs">
+    <div class="explore-header">
+      <h2>📚 API Documentation</h2>
+      <p>Complete reference for the Verdis Blockchain REST API & JSON-RPC</p>
+    </div>
+    <div class="card">
+      <div class="card-header">REST API Endpoints</div>
+      <div id="apiDocsContent"><p class="text-muted">Loading...</p></div>
+    </div>
+    <div class="card mt-4">
+      <div class="card-header">JSON-RPC Methods</div>
+      <table class="data-table">
+        <thead><tr><th>Method</th><th>Params</th><th>Returns</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">eth_chainId</td><td>—</td><td>Chain ID (0x38d = 909)</td></tr>
+          <tr><td class="mono">eth_blockNumber</td><td>—</td><td>Current block number</td></tr>
+          <tr><td class="mono">eth_getBalance</td><td>address, block</td><td>Account balance in wei</td></tr>
+          <tr><td class="mono">eth_getTransactionByHash</td><td>tx hash</td><td>Transaction details</td></tr>
+          <tr><td class="mono">eth_sendRawTransaction</td><td>signed tx</td><td>Transaction hash</td></tr>
+          <tr><td class="mono">net_version</td><td>—</td><td>Network ID (909)</td></tr>
+          <tr><td class="mono">web3_clientVersion</td><td>—</td><td>Client version string</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WHITEPAPER -->
+  <div class="section" id="section-whitepaper">
+    <div class="explore-header">
+      <h2>📄 Verdis Whitepaper</h2>
+      <p>Technical overview of the Verdis blockchain architecture</p>
+    </div>
+    <div class="card">
+      <div class="card-header">1. Abstract</div>
+      <p class="text-sm" style="line-height:1.8;color:var(--text-muted)">Verdis is a carbon-negative Layer 1 blockchain built on Delegated Proof of Stake (DPoS) consensus with an integrated Automated Market Maker (AMM) decentralized exchange, native smart contract virtual machine, and on-chain carbon credit tracking. The network achieves 5-second block times with energy-efficient validation while funding environmental projects through transaction fees. Verdis is Ethereum-compatible (Chain ID 909) with full JSON-RPC support for Trust Wallet and MetaMask integration.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">2. Consensus — DPoS</div>
+      <p class="text-sm" style="line-height:1.8;color:var(--text-muted)">Verdis uses Delegated Proof of Stake inspired by Tron's Super Representative model. Token holders vote for validators by staking VRS. The top 5 validators (configurable up to 27) are active block producers, rotating every block for fairness. Block rewards (1 VRS per block) are split: 80% to the producing validator, 20% distributed to voters proportional to stake. Validators using renewable energy receive bonus rewards via the Green Validator scoring system.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">3. Cryptography</div>
+      <p class="text-sm" style="line-height:1.8;color:var(--text-muted)">All transactions are signed using secp256k1 elliptic curve cryptography via @noble/secp256k1. Transaction integrity is verified with SHA-256 hashing (@noble/hashes). EVM-compatible addresses are derived using Keccak256, enabling full Trust Wallet and MetaMask compatibility. Replay protection is enforced via nonce tracking per address.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">4. DEX & Tokenomics</div>
+      <p class="text-sm" style="line-height:1.8;color:var(--text-muted)">The native AMM DEX uses the constant product formula (x * y = k) with a 0.3% swap fee. Liquidity providers earn fees proportional to their pool share. LP tokens are minted when liquidity is added and burned when removed. VRS has a maximum supply of 50,000,000,000 (50 billion) tokens. Transaction fees fund environmental projects through the Carbon Offset Pool.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">5. Eco System</div>
+      <p class="text-sm" style="line-height:1.8;color:var(--text-muted)">Verdis is the first carbon-negative blockchain. Every transaction contributes to environmental funding. The system tracks: (1) Carbon Credits — minted by verified environmental projects, each representing 1 ton CO₂ offset; (2) Reforestation Projects — tracked from planting to verification; (3) Green Validator Scores — validators earn higher scores for using solar/wind/hydro energy. Carbon credit NFTs provide verifiable proof of environmental impact.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">6. Smart Contracts</div>
+      <p class="text-sm" style="line-height:1.8;color:var(--text-muted)">Verdis includes a stack-based virtual machine supporting opcodes: PUSH, POP, ADD, SUB, MUL, DIV, DUP, SWAP, STOP, and more. Contracts are deployed with bytecode and executed with input parameters. Contract state is persisted to disk and survives restarts.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">7. Security</div>
+      <p class="text-sm" style="line-height:1.8;color:var(--text-muted)">13 security mechanisms protect the network: secp256k1 signatures, SHA-256+Keccak256 hashing, tamper detection, double-spend prevention, chain validation, rate limiting (30/min standard, 5/min strict), nonce replay protection, admin API key auth, validator slashing for malicious behavior, input validation, mempool caps (1000), max transaction (1B VRS), and max block size (500 txs).</p>
+    </div>
+    <div class="card">
+      <div class="card-header">8. Governance</div>
+      <p class="text-sm" style="line-height:1.8;color:var(--text-muted)">On-chain governance allows VRS holders to propose and vote on protocol changes. Proposals remain active for 3 days. Voting power is proportional to VRS balance. Proposals can be: improvement, parameter change, protocol upgrade, or eco initiative.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">9. Cross-Chain Bridge</div>
+      <p class="text-sm" style="line-height:1.8;color:var(--text-muted)">The Verdis ↔ BSC bridge allows VRS to be locked on Verdis and minted as wVRS (Wrapped Verdis) on Binance Smart Chain. wVRS can be traded on PancakeSwap and other BSC DEXs. The bridge supports bidirectional transfers: lock VRS → mint wVRS, or burn wVRS → unlock VRS.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">10. NFT & Eco Assets</div>
+      <p class="text-sm" style="line-height:1.8;color:var(--text-muted)">Verdis supports eco-themed NFTs including carbon credit certificates, reforestation milestones, and renewable energy achievements. Each NFT can carry a carbon value (tons CO₂) providing verifiable environmental impact. NFTs are transferable between addresses.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">11. Network Parameters</div>
+      <table class="data-table">
+        <tbody>
+          <tr><td>Chain ID</td><td class="mono">909</td></tr>
+          <tr><td>Symbol</td><td class="mono">VRS</td></tr>
+          <tr><td>Max Supply</td><td class="mono">50,000,000,000 VRS</td></tr>
+          <tr><td>Block Time</td><td class="mono">5 seconds</td></tr>
+          <tr><td>Active Validators</td><td class="mono">5 (configurable up to 27)</td></tr>
+          <tr><td>DEX Fee</td><td class="mono">0.3%</td></tr>
+          <tr><td>Block Reward</td><td class="mono">1 VRS (80% validator / 20% voters)</td></tr>
+          <tr><td>RPC URL</td><td class="mono">https://rpc.verdischain.com</td></tr>
+          <tr><td>Explorer</td><td class="mono">https://verdischain.com/dashboard</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GUIDE -->
+  <div class="section" id="section-guide">
+    <div class="explore-header">
+      <h2>📖 User Guide</h2>
+      <p>Step-by-step instructions to get started on Verdis</p>
+    </div>
+
+    <!-- Guide Navigation -->
+    <div class="card" style="padding:8px">
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="btn btn-sm guide-nav-btn active" onclick="showGuideTab(0,this)" style="margin:2px">1️⃣ Quick Start</button>
+        <button class="btn btn-sm guide-nav-btn" onclick="showGuideTab(1,this)" style="margin:2px">2️⃣ Create Wallet</button>
+        <button class="btn btn-sm guide-nav-btn" onclick="showGuideTab(2,this)" style="margin:2px">3️⃣ Get VRS</button>
+        <button class="btn btn-sm guide-nav-btn" onclick="showGuideTab(3,this)" style="margin:2px">4️⃣ Send & Receive</button>
+        <button class="btn btn-sm guide-nav-btn" onclick="showGuideTab(4,this)" style="margin:2px">5️⃣ Trust Wallet</button>
+        <button class="btn btn-sm guide-nav-btn" onclick="showGuideTab(5,this)" style="margin:2px">6️⃣ DEX Trading</button>
+        <button class="btn btn-sm guide-nav-btn" onclick="showGuideTab(6,this)" style="margin:2px">7️⃣ Staking</button>
+        <button class="btn btn-sm guide-nav-btn" onclick="showGuideTab(7,this)" style="margin:2px">8️⃣ Smart Contracts</button>
+        <button class="btn btn-sm guide-nav-btn" onclick="showGuideTab(8,this)" style="margin:2px">9️⃣ BSC Bridge</button>
+        <button class="btn btn-sm guide-nav-btn" onclick="showGuideTab(9,this)" style="margin:2px">🔟 Carbon Credits</button>
+        <button class="btn btn-sm guide-nav-btn" onclick="showGuideTab(10,this)" style="margin:2px">🔒 Security</button>
+      </div>
+    </div>
+
+    <!-- Guide Content -->
+    <div id="guideContent" style="margin-top:16px"></div>
+  </div>
+
+</div>
+
+<script>
+// === GLOBAL STATE ===
+let blockChart, dexChart;
+let autoRefresh;
+
+// === API HELPER ===
+async function api(path, method='GET', body=null) {
+  const opts = {method, headers:{'Content-Type':'application/json'}};
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const r = await fetch('/api/'+path, opts);
+    return await r.json();
+  } catch(e) { return {error: e.message}; }
+}
+
+// === SECTION NAVIGATION ===
+function showSection(name, tabEl) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('section-'+name)?.classList.add('active');
+  localStorage.setItem('verdis_active_tab', name);
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  if (tabEl) tabEl.classList.add('active');
+  // Also update header nav
+  document.querySelectorAll('.header-nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('nav-'+name)?.classList.add('active');
+  // Load section data
+  if (name==='overview') loadOverview();
+  if (name==='blocks') loadBlocks();
+  if (name==='txs') loadTxs();
+  if (name==='validators') loadValidators();
+  if (name==='dex') loadDEX();
+  if (name==='contracts') loadContracts();
+  if (name==='eco') loadEco();
+  if (name==='bridge') loadBridge();
+  if (name==='monitoring') loadMonitoring();
+  if (name==='guide') loadGuide();
+  if (name==='faucet') loadFaucet();
+  if (name==='staking') loadStaking();
+  if (name==='governance') loadGovernance();
+  if (name==='nft') loadNFT();
+  if (name==='tokens') loadTokens();
+  if (name==='apidocs') loadApiDocs();
+  if (name==='whitepaper') loadWhitepaper();
+  if (name==='notifications') {};
+}
+
+// === SEARCH ===
+async function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) return;
+  
+  // Try block number
+  if (/^\d+$/.test(q)) {
+    const data = await api('explorer/block/'+q);
+    if (data && !data.error) { showBlockDetail(data); return; }
+  }
+  
+  // Try address (starts with 0x)
+  if (q.startsWith('0x') || q.startsWith('0X')) {
+    const data = await api('explorer/address/'+q);
+    if (data && !data.error) { showAddressDetail(data); return; }
+  }
+  
+  // Try transaction hash
+  const txData = await api('explorer/tx/'+q);
+  if (txData && !txData.error) { showTxDetail(txData); return; }
+  
+  // Try block by hash or address without 0x
+  const addrData = await api('explorer/address/'+q);
+  if (addrData && !addrData.error) { showAddressDetail(addrData); return; }
+  
+  alert('Not found: '+q);
+}
+
+function showBlockDetail(block) {
+  showSection('blocks');
+  const html = '<div class="card"><div class="card-header">Block #'+block.header.index+'</div>'
+    + '<table class="data-table"><tbody>'
+    + '<tr><td>Hash</td><td class="mono">'+block.hash+'</td></tr>'
+    + '<tr><td>Previous Hash</td><td class="mono">'+(block.header.previousHash||'—')+'</td></tr>'
+    + '<tr><td>Merkle Root</td><td class="mono">'+(block.header.merkleRoot||'—')+'</td></tr>'
+    + '<tr><td>Validator</td><td class="mono">'+(block.header.validator||block.header.producer||'—')+'</td></tr>'
+    + '<tr><td>Timestamp</td><td>'+new Date(block.header.timestamp).toLocaleString()+'</td></tr>'
+    + '<tr><td>Transactions</td><td>'+block.transactions.length+'</td></tr>'
+    + '</tbody></table></div>';
+  document.getElementById('allBlocks').innerHTML = html;
+  document.querySelector('#section-blocks .explore-header').innerHTML = '<h2>Block #'+block.header.index+'</h2><p><a onclick="showSection(\'blocks\')">← Back to Blocks</a></p>';
+}
+
+function showAddressDetail(data) {
+  showSection('wallet');
+  const html = '<div class="address-header" style="background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:16px">'
+    + '<h2>Address '+data.address.slice(0,16)+'...</h2>'
+    + '<div class="address-row"><div class="address-label">Full Address</div><div class="address-value">'+data.address+'</div></div>'
+    + '<div class="address-row"><div class="address-label">Balance</div><div class="address-value text-green text-lg">'+data.balance+' VRS</div></div>'
+    + (data.isValidator ? '<div class="address-row"><div class="address-label">Role</div><span class="badge badge-green">Validator</span></div>' : '')
+    + '<div class="address-row"><div class="address-label">Transactions</div><div class="address-value">'+data.totalTransactions+'</div></div>'
+    + '</div>';
+  if (data.transactions && data.transactions.length > 0) {
+    html2 = '<div class="card"><div class="card-header">Transaction History</div><table class="data-table"><thead><tr><th>Tx Hash</th><th>From</th><th>To</th><th>Amount</th><th>Block</th></tr></thead><tbody>';
+    data.transactions.forEach(t => {
+      html2 += '<tr><td class="hash-text">'+(t.id||t.hash||'').slice(0,16)+'...</td><td class="hash-text">'+t.from.slice(0,12)+'...</td><td class="hash-text">'+t.to.slice(0,12)+'...</td><td>'+t.amount+' VRS</td><td>#'+t.blockHeight+'</td></tr>';
+    });
+    html2 += '</tbody></table></div>';
+  }
+  document.getElementById('balResult').innerHTML = html + (html2||'');
+  document.getElementById('balAddr').value = data.address;
+}
+
+function showTxDetail(tx) {
+  showSection('txs');
+  const txId = tx.id || tx.hash || '';
+  const html = '<div class="card"><div class="card-header">Transaction Details</div><table class="data-table"><tbody>'
+    + '<tr><td>Hash</td><td class="mono">'+txId+'</td></tr>'
+    + '<tr><td>From</td><td class="mono">'+(tx.from||'—')+'</td></tr>'
+    + '<tr><td>To</td><td class="mono">'+(tx.to||'—')+'</td></tr>'
+    + '<tr><td>Amount</td><td class="text-green">'+(tx.amount||0)+' VRS</td></tr>'
+    + '<tr><td>Block</td><td>#'+(tx.blockHeight||'—')+'</td></tr>'
+    + '<tr><td>Block Hash</td><td class="mono">'+(tx.blockHash||'—').slice(0,32)+'</td></tr>'
+    + '<tr><td>Timestamp</td><td>'+(tx.timestamp ? new Date(tx.timestamp).toLocaleString() : '—')+'</td></tr>'
+    + '</tbody></table></div>';
+  document.getElementById('allTxs').innerHTML = html;
+  document.querySelector('#section-txs .explore-header').innerHTML = '<h2>Transaction '+txId.slice(0,16)+'...</h2><p><a onclick="showSection(\'txs\')">← Back to Transactions</a></p>';
+}
+
+// === OVERVIEW ===
+async function loadOverview() {
+  const [info, health, eco, market] = await Promise.all([
+    api('blockchain/info'),
+    api('monitoring/health'),
+    api('eco/impact'),
+    api('token/market')
+  ]);
+
+  if (info) {
+    document.getElementById('ov-blockHeight').textContent = info.height || info.currentHeight || '—';
+    document.getElementById('ov-validators').textContent = info.validatorCount || '—';
+    document.getElementById('netSupply').textContent = (info.totalSupply/1e9).toFixed(2)+'B' || '—';
+    document.getElementById('ov-txCount').textContent = info.totalTransactions || info.txCount || '—';
+    if (document.getElementById('ov-txCount').textContent === '—') {
+      // Calculate from blocks
+      const blockData = await api('blockchain/blocks?limit=100');
+      if (blockData && Array.isArray(blockData)) {
+        const txCount = blockData.reduce((sum, b) => sum + (b.transactions?.length||0), 0);
+        document.getElementById('ov-txCount').textContent = txCount || '0';
+      }
+    }
+  }
+  if (health) {
+    document.getElementById('netStatus').textContent = 'Connected · Block '+health.chain?.height;
+    document.getElementById('ov-blockTime').textContent = '~'+health.chain?.blockTime+'s block time';
+  }
+  if (eco) {
+    document.getElementById('ov-carbon').textContent = (eco.totalCO2Offset || eco.carbonOffset || eco.totalCarbonOffset || 0).toFixed(2);
+    document.getElementById('ov-trees').textContent = (eco.totalTrees || eco.treesPlanted || 0).toLocaleString()+' trees planted';
+  }
+  if (market) {
+    document.getElementById('ov-tps').textContent = (market.totalSwaps||market.swapCount||0)+' swaps';
+  } else {
+    // Try getting swap count from DEX pools
+    const pools = await api('dex/pools');
+    if (pools && Array.isArray(pools)) {
+      const totalSwaps = pools.reduce((sum, p) => sum + (p.swapCount||p.totalSwaps||0), 0);
+      document.getElementById('ov-tps').textContent = totalSwaps+' swaps';
+    }
+  }
+
+  // Load latest blocks
+  const blocks = await api('blockchain/blocks?limit=8');
+  if (blocks && Array.isArray(blocks)) {
+    document.getElementById('latestBlocks').innerHTML = blocks.slice(0,8).map(b => `
+      <tr>
+        <td><span class="link-text" onclick="showSection('blocks')">#${b.header.index}</span></td>
+        <td class="hash-text">${(b.header.validator||b.header.producer||'—').slice(0,12)}...</td>
+        <td>${b.transactions?.length||0}</td>
+        <td class="text-muted text-sm">${timeAgo(b.header.timestamp)}</td>
+      </tr>
+    `).join('');
+  }
+
+  // Load latest transactions (from blockchain + DEX swaps)
+  const txData = await api('blockchain/transactions?limit=8');
+  if (txData && Array.isArray(txData) && txData.length > 0) {
+    document.getElementById('latestTxs').innerHTML = txData.slice(0,8).map(t => `
+      <tr>
+        <td class="hash-text"><span class="link-text" onclick="doSearch('${t.id||t.hash||''}')">${(t.id||t.hash||t.type||'—').slice(0,18)}</span></td>
+        <td class="hash-text">${(t.from||'—').slice(0,14)}...</td>
+        <td>${t.amount||0} ${t.type==='swap' ? '' : 'VRS'}</td>
+        <td class="text-muted text-sm">${timeAgo(t.timestamp)}</td>
+      </tr>
+    `).join('');
+  } else {
+    document.getElementById('latestTxs').innerHTML = '<tr><td colspan="4" class="text-muted">No transactions yet</td></tr>';
+  }
+
+  // Load charts
+  loadCharts(blocks || []);
+}
+
+// === BLOCKS ===
+async function loadBlocks() {
+  const blocks = await api('blockchain/blocks?limit=50');
+  if (blocks && Array.isArray(blocks)) {
+    document.getElementById('allBlocks').innerHTML = blocks.map(b => `
+      <tr>
+        <td><span class="link-text" onclick="showBlockBySearch(${b.header.index})">#${b.header.index}</span></td>
+        <td class="hash-text"><span class="link-text" onclick="doSearch('${b.hash}')">${b.hash?.slice(0,20)}...</span></td>
+        <td class="hash-text">${(b.header.validator||b.header.producer||'—').slice(0,14)}...</td>
+        <td>${b.transactions?.length||0}</td>
+        <td class="text-muted text-sm">${timeAgo(b.header.timestamp)}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+// === TRANSACTIONS ===
+async function loadTxs() {
+  const blocks = await api('blockchain/blocks?limit=100');
+  let allTxs = [];
+  if (blocks && Array.isArray(blocks)) {
+    blocks.forEach(b => {
+      if (b.transactions) b.transactions.forEach(t => allTxs.push({...t, blockHeight: b.header.index, type: 'transfer'}));
+    });
+  }
+  // Also get DEX swaps as transactions
+  const swaps = await api('token/swaps');
+  if (swaps && Array.isArray(swaps)) {
+    swaps.slice(0,50).forEach(s => {
+      allTxs.push({
+        id: s.id || s.swapId || 'swap-'+Math.random().toString(36).slice(2),
+        hash: s.id || s.swapId || '',
+        from: s.trader || s.provider || '—',
+        to: s.trader || s.provider || '—',
+        amount: (s.amountIn||0) + ' ' + (s.tokenIn||''),
+        type: 'swap',
+        blockHeight: s.blockHeight || '—',
+        timestamp: s.timestamp || Date.now()
+      });
+    });
+  }
+  // Also get mempool
+  const mempool = await api('mempool');
+  if (mempool && Array.isArray(mempool)) {
+    mempool.forEach(t => allTxs.push({...t, blockHeight: 'pending'}));
+  }
+  document.getElementById('allTxs').innerHTML = allTxs.length > 0 ? allTxs.slice(0,50).map(t => `
+    <tr>
+      <td class="hash-text">${t.id?.slice(0,18)||'...'}...</td>
+      <td class="hash-text">${t.from?.slice(0,12)}...</td>
+      <td class="hash-text">${t.to?.slice(0,12)}...</td>
+      <td>${t.amount||0} VRS</td>
+      <td class="text-muted text-sm">${t.timestamp ? timeAgo(t.timestamp) : '—'}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="5" class="text-muted text-center">No transactions yet</td></tr>';
+}
+
+// === VALIDATORS ===
+async function loadValidators() {
+  const [validators, topVals, info] = await Promise.all([
+    api('validators'),
+    api('validators/top'),
+    api('blockchain/info')
+  ]);
+  if (info) {
+    document.getElementById('valActive').textContent = info.validatorCount || '—';
+    document.getElementById('valTotal').textContent = (validators?.length||'—');
+    document.getElementById('valStaked').textContent = (info.totalStaked||'—');
+  }
+  if (validators && Array.isArray(validators)) {
+    document.getElementById('validatorList').innerHTML = validators.map((v, i) => {
+      const isActive = i < 5;
+      return `
+        <div class="validator-card">
+          <div class="validator-rank" style="background:${isActive?'var(--green-bg)':'var(--bg-hover)'};color:${isActive?'var(--green)':'var(--text-muted)'}">${i+1}</div>
+          <div class="validator-info">
+            <div class="validator-name">${v.name||'Validator '+(i+1)} ${isActive?'<span class="badge badge-green">Active</span>':''}</div>
+            <div class="validator-addr">${v.address}</div>
+          </div>
+          <div class="validator-stats">
+            <div>Blocks: ${v.blocksProduced||0}</div>
+            <div>Votes: ${v.votes||0}</div>
+            ${v.greenScore?`<div>Green: ⚡${v.greenScore}</div>`:''}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+// === DEX ===
+async function loadDEX() {
+  const [pools, market, swaps] = await Promise.all([
+    api('dex/pools'),
+    api('token/market'),
+    api('token/swaps')
+  ]);
+  // Populate pools
+  if (pools && Array.isArray(pools)) {
+    document.getElementById('dexPools').innerHTML = pools.map(p => `
+      <div class="pool-card">
+        <div class="pool-header">
+          <div class="pool-pair">${p.tokenA}/${p.tokenB}</div>
+          <span class="badge badge-teal">AMM</span>
+        </div>
+        <div class="pool-stats">
+          <div class="pool-stat"><div class="pool-stat-label">Reserve A</div><div class="pool-stat-value">${fmt(p.reserveA)} ${p.tokenA}</div></div>
+          <div class="pool-stat"><div class="pool-stat-label">Reserve B</div><div class="pool-stat-value">${fmt(p.reserveB)} ${p.tokenB}</div></div>
+          <div class="pool-stat"><div class="pool-stat-label">Fee</div><div class="pool-stat-value">0.3%</div></div>
+          <div class="pool-stat"><div class="pool-stat-label">LP Tokens</div><div class="pool-stat-value">${fmt(p.totalSupply||0)}</div></div>
+        </div>
+      </div>
+    `).join('');
+    // Populate swap token dropdowns
+    const tokens = [...new Set(pools.flatMap(p => [p.tokenA, p.tokenB]))];
+    document.getElementById('swapTokenIn').innerHTML = tokens.map(t => `<option value="${t}">${t}</option>`).join('');
+    document.getElementById('swapTokenOut').innerHTML = tokens.map(t => `<option value="${t}">${t}</option>`).join('');
+    if (tokens.length > 1) document.getElementById('swapTokenOut').selectedIndex = 1;
+  }
+  // Market data
+  if (market) {
+    document.getElementById('tokenPrices').innerHTML = (market.tokens||[]).map(t => `
+      <tr>
+        <td><span class="badge badge-blue">${t.symbol}</span></td>
+        <td>${t.price||'—'}</td>
+        <td>${fmt(t.volume||0)}</td>
+        <td>${t.swaps||0}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="4" class="text-muted text-center">No data</td></tr>';
+  }
+  // Swap history
+  if (swaps && Array.isArray(swaps)) {
+    document.getElementById('swapHistory').innerHTML = swaps.slice(0,20).map(s => `
+      <tr>
+        <td>${s.tokenIn}/${s.tokenOut}</td>
+        <td>${fmt(s.amountIn)} → ${fmt(s.amountOut)}</td>
+        <td class="text-muted text-sm">${timeAgo(s.timestamp)}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="3" class="text-muted text-center">No swaps yet</td></tr>';
+  }
+}
+
+async function doSwap() {
+  const tokenIn = document.getElementById('swapTokenIn').value;
+  const tokenOut = document.getElementById('swapTokenOut').value;
+  const amountIn = parseFloat(document.getElementById('swapAmountIn').value);
+  let trader = document.getElementById('swapTrader').value.trim();
+  if (!trader) {
+    // Use a demo wallet
+    const w = await api('wallet/create','POST');
+    if (w && w.address) trader = w.address;
+  }
+  if (!tokenIn || !tokenOut || !amountIn) { document.getElementById('swapResult').innerHTML = '<span class="text-red">Fill all fields</span>'; return; }
+  const r = await api('dex/swap','POST', {trader, tokenIn, tokenOut, amountIn, minAmountOut:0});
+  if (r && r.amountOut) {
+    document.getElementById('swapAmountOut').value = r.amountOut.toFixed(4);
+    document.getElementById('swapResult').innerHTML = '<span class="text-green">✓ Swapped '+amountIn+' '+tokenIn+' → '+r.amountOut.toFixed(4)+' '+tokenOut+'</span>';
+  } else {
+    document.getElementById('swapResult').innerHTML = '<span class="text-red">Error: '+(r?.error||'failed')+'</span>';
+  }
+}
+
+// === CONTRACTS ===
+async function loadContracts() {
+  const contracts = await api('contracts');
+  if (contracts && Array.isArray(contracts)) {
+    document.getElementById('contractList').innerHTML = contracts.map(c => `
+      <div class="card" style="background:var(--bg);margin-bottom:8px;padding:12px">
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="text-green font-medium">${c.name||'Unnamed'}</div>
+            <div class="hash-text text-sm">ID: ${c.id}</div>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-sm" onclick="viewContract('${c.id}')">View</button>
+            <button class="btn btn-sm" onclick="document.getElementById('execContractId').value='${c.id}'">Execute</button>
+          </div>
+        </div>
+      </div>
+    `).join('') || '<p class="text-muted">No contracts deployed</p>';
+  }
+}
+
+async function deployContract() {
+  const name = document.getElementById('contractName').value;
+  const code = document.getElementById('contractCode').value;
+  let deployer = document.getElementById('contractDeployer').value.trim();
+  if (!deployer) { const w = await api('wallet/create','POST'); if (w) deployer = w.address; }
+  const r = await api('contract/deploy','POST', {name, code, deployer});
+  if (r && r.contractId) {
+    document.getElementById('deployResult').innerHTML = '<span class="text-green">✓ Deployed: '+r.contractId+'</span>';
+    loadContracts();
+  } else {
+    document.getElementById('deployResult').innerHTML = '<span class="text-red">Error: '+(r?.error||'failed')+'</span>';
+  }
+}
+
+async function executeContract() {
+  const id = document.getElementById('execContractId').value;
+  const method = document.getElementById('execMethod').value;
+  const args = document.getElementById('execArgs').value.split(',').map(s=>s.trim()).filter(Boolean);
+  let caller = document.getElementById('execCaller').value.trim();
+  if (!caller) { const w = await api('wallet/create','POST'); if (w) caller = w.address; }
+  const r = await api('contract/'+id+'/execute','POST', {method, args, caller});
+  const pre = document.getElementById('execResult');
+  pre.style.display = 'block';
+  pre.textContent = JSON.stringify(r, null, 2);
+}
+
+function viewContract(id) {
+  showSection('contracts');
+  document.getElementById('execContractId').value = id;
+}
+
+// === ECO ===
+async function loadEco() {
+  const [impact, credits, reforest, greens] = await Promise.all([
+    api('eco/impact'),
+    api('eco/carbon/credits'),
+    api('eco/reforest/projects'),
+    api('eco/green-scores')
+  ]);
+  if (impact) {
+    document.getElementById('ecoCarbon').textContent = (impact.totalCarbonOffset||impact.carbonOffset||'—');
+    document.getElementById('ecoTrees').textContent = (impact.totalTreesPlanted||impact.treesPlanted||'—');
+    document.getElementById('ecoEnergy').textContent = (impact.energySaved||'—');
+  }
+  if (credits && Array.isArray(credits)) {
+    document.getElementById('carbonCredits').innerHTML = credits.map(c => `
+      <tr>
+        <td class="hash-text">${c.id?.slice(0,12)}</td>
+        <td>${c.amount||c.tons||'—'}</td>
+        <td><span class="badge ${c.status==='retired'?'badge-green':'badge-orange'}">${c.status||'active'}</span></td>
+        <td>${c.project||'—'}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="4" class="text-muted text-center">No credits</td></tr>';
+  }
+  if (reforest && Array.isArray(reforest)) {
+    document.getElementById('reforestProjects').innerHTML = reforest.map(p => `
+      <div style="padding:8px 0;border-bottom:1px solid var(--border-light)">
+        <div class="flex justify-between">
+          <span>${p.name||'Project '+p.id}</span>
+          <span class="badge badge-green">${p.status||'active'}</span>
+        </div>
+        <div class="text-muted text-sm mt-4">🌳 ${p.treesPlanted||0} trees | ${p.location||'—'}</div>
+      </div>
+    `).join('') || '<p class="text-muted">No projects</p>';
+  }
+  if (greens && Array.isArray(greens)) {
+    document.getElementById('greenScores').innerHTML = greens.map((g, i) => `
+      <tr>
+        <td class="hash-text">${g.address?.slice(0,16)}...</td>
+        <td><span class="badge badge-green">${g.score||0}/100</span></td>
+        <td>#${i+1}</td>
+        <td>${g.energySource||'solar'}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="4" class="text-muted text-center">No scores</td></tr>';
+  }
+}
+
+// === BRIDGE ===
+async function loadBridge() {
+  const stats = await api('bridge/stats');
+  if (stats) {
+    document.getElementById('bridgeLocked').textContent = stats.totalLockedAmount||0;
+    document.getElementById('bridgeRedeemed').textContent = stats.totalRedeemedAmount||0;
+    document.getElementById('wvrsContract').textContent = stats.wvrsContract||'Pending';
+  }
+  const locks = await api('bridge/locks');
+  if (locks && locks.locks && locks.locks.length > 0) {
+    document.getElementById('bridgeLocks').innerHTML = locks.locks.map(l => `
+      <tr>
+        <td class="hash-text">${l.mintId?.slice(0,16)}...</td>
+        <td class="hash-text">${l.fromAddress?.slice(0,12)}...</td>
+        <td>${l.amount}</td>
+        <td class="hash-text">${l.bscAddress?.slice(0,12)}...</td>
+        <td><span class="badge ${l.status==='locked'?'badge-orange':'badge-green'}">${l.status}</span></td>
+      </tr>
+    `).join('');
+  }
+}
+
+async function lockBridge() {
+  const fromAddress = document.getElementById('bridgeFrom').value.trim();
+  const amount = parseFloat(document.getElementById('bridgeAmount').value);
+  const bscAddress = document.getElementById('bridgeBsc').value.trim();
+  const privateKey = document.getElementById('bridgeKey').value.trim();
+  if (!fromAddress || !amount || !bscAddress || !privateKey) {
+    document.getElementById('bridgeResult').innerHTML = '<span class="text-red">All fields required</span>';
+    return;
+  }
+  const r = await api('bridge/lock','POST', {fromAddress, amount, bscAddress, privateKey});
+  if (r && r.success) {
+    document.getElementById('bridgeResult').innerHTML = '<span class="text-green">✓ Locked! Mint ID: '+r.mintId?.slice(0,16)+'...</span>';
+    loadBridge();
+  } else {
+    document.getElementById('bridgeResult').innerHTML = '<span class="text-red">Error: '+(r?.error||'failed')+'</span>';
+  }
+}
+
+// === WALLET ===
+async function createWallet() {
+  const w = await api('wallet/create','POST');
+  if (w && w.address) {
+    document.getElementById('walletDisplay').innerHTML = '<span class="text-muted">Connected:</span> <span class="wallet-addr">'+w.address+'</span>';
+    document.getElementById('sendFrom').value = w.address;
+    showToast('Wallet created: '+w.address.slice(0,10)+'...');
+  }
+}
+
+// Universal wallet connection — supports MetaMask, Trust Wallet, and any EIP-1193 provider
+let connectedWallet = null;
+let walletProvider = null;
+
+async function addVerdisNetwork() {
+    try {
+        const provider = window.ethereum || (window.web3 && window.web3.currentProvider);
+        if (!provider) {
+            alert('No wallet provider found. Install MetaMask or Trust Wallet browser extension, or open this page in your wallet dApp browser.');
+            return;
+        }
+        const response = await provider.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+                chainId: '0x38d',
+                chainName: 'Verdis',
+                nativeCurrency: {
+                    name: 'Verdis',
+                    symbol: 'VRS',
+                    decimals: 18
+                },
+                rpcUrls: ['https://rpc.verdischain.com'],
+                blockExplorerUrls: ['https://verdischain.com']
+            }]
+        });
+        if (response === null) {
+            alert('Verdis network added to your wallet! You can now add the VRS token.');
+        } else {
+            alert('Network added or already exists.');
+        }
+    } catch(e) {
+        if (e.code === 4001) {
+            alert('Request rejected. Please approve the network addition in your wallet.');
+        } else {
+            alert('Error adding network: ' + e.message + '\n\nYou can add it manually:\nNetwork Name: Verdis\nRPC URL: https://rpc.verdischain.com\nChain ID: 909\nSymbol: VRS\nExplorer: https://verdischain.com');
+        }
+    }
+}
+
+async function addVRSToken() {
+    try {
+        const provider = window.ethereum || (window.web3 && window.web3.currentProvider);
+        if (!provider) {
+            alert("Please install MetaMask or Trust Wallet browser extension first, or open this page in your wallet's dApp browser.");
+            return;
+        }
+        const tokenAddress = '0x36a8927c9ffad16ff16330a083b572611f7f2659';
+        const wasAdded = await provider.request({
+            method: 'wallet_watchAsset',
+            params: {
+                type: 'ERC20',
+                options: {
+                    address: tokenAddress,
+                    symbol: 'VRS',
+                    decimals: 18,
+                    image: 'https://verdischain.com/logo.png',
+                },
+            },
+        });
+        if (wasAdded) {
+            alert('VRS token added to your wallet!');
+        } else {
+            alert('Token was not added. You can add it manually with contract address: ' + tokenAddress);
+        }
+    } catch(e) {
+        alert('Error adding token: ' + e.message + '\n\nYou can add it manually:\nContract: 0x36a8927c9ffad16ff16330a083b572611f7f2659\nSymbol: VRS\nDecimals: 18');
+    }
+}
+
+async function connectWallet(type) {
+  let provider = null;
+  
+  // Detect wallet provider
+  if (type === 'metamask') {
+    provider = window.ethereum || (window.web3 && window.web3.currentProvider);
+  } else if (type === 'trust') {
+    // Trust Wallet injects window.ethereum with isTrust = true
+    provider = window.trustwallet || (window.ethereum && window.ethereum.isTrust ? window.ethereum : null) || window.ethereum;
+  }
+  
+  // Trust Wallet mobile app injection
+  if (!provider && type === 'trust') {
+    provider = window.ethereum;
+  }
+  
+  // Also check for multiple providers (MetaMask + Trust Wallet coexistence)
+  if (window.ethereum && window.ethereum.providers && Array.isArray(window.ethereum.providers)) {
+    const trustProvider = window.ethereum.providers.find(p => p.isTrust);
+    if (trustProvider && type === 'trust') {
+      provider = trustProvider;
+    }
+    const mmProvider = window.ethereum.providers.find(p => p.isMetaMask);
+    if (mmProvider && type === 'metamask') {
+      provider = mmProvider;
+    }
+  }
+  
+  if (!provider) {
+    // Try any available EIP-1193 provider
+    provider = window.ethereum || (window.web3 && window.web3.currentProvider);
+  }
+  
+  if (!provider) {
+    const walletName = type === 'trust' ? 'Trust Wallet' : 'MetaMask';
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      openInWallet(type);
+      return;
+    }
+    showToast(walletName + ' not detected. Install the browser extension, or use "Open in ' + walletName + '" button for mobile.');
+    return;
+  }
+  
+  walletProvider = provider;
+  
+  try {
+    // Step 1: Request accounts
+    const accounts = await provider.request({method: 'eth_requestAccounts'});
+    if (!accounts || accounts.length === 0) {
+      showToast('No accounts returned. Unlock your wallet and try again.');
+      return;
+    }
+    const account = accounts[0];
+    
+    // Step 2: Try switching to Verdis network first
+    let chainSwitched = false;
+    try {
+      await provider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{chainId: '0x38d'}]
+      });
+      chainSwitched = true;
+    } catch(switchErr) {
+      // Chain not added yet — add it
+      if (switchErr.code === 4902 || (switchErr.message && switchErr.message.includes('4902')) || switchErr.code === -32603) {
+        try {
+          await provider.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0x38d',
+              chainName: 'Verdis',
+              nativeCurrency: {name: 'Verdis', symbol: 'VRS', decimals: 18},
+              rpcUrls: ['https://rpc.verdischain.com'],
+              blockExplorerUrls: ['https://verdischain.com']
+            }]
+          });
+          chainSwitched = true;
+        } catch(addErr) {
+          // Trust Wallet may not support wallet_addEthereumChain in all versions
+          // Continue anyway — user can add the network manually
+          console.log('Could not add network automatically:', addErr.message);
+          showToast('Could not auto-add Verdis network. Add it manually in Trust Wallet Settings > Networks:\nRPC: https://rpc.verdischain.com\nChain ID: 909\nSymbol: VRS');
+        }
+      } else {
+        console.log('Switch chain error:', switchErr.message);
+        // Continue anyway — some wallets work without explicit chain switch
+      }
+    }
+    
+    // Step 3: Get balance
+    let balance = '0';
+    try {
+      const balHex = await provider.request({
+        method: 'eth_getBalance',
+        params: [account, 'latest']
+      });
+      balance = BigInt(balHex).toString();
+    } catch(e) {
+      // Fallback to our API
+      try {
+        const balData = await api('wallet/' + account + '/balance');
+        balance = String(balData.balance || 0);
+      } catch(e2) {
+        balance = '0';
+      }
+    }
+    
+    const balanceVRS = (Number(balance) / 1e18).toFixed(2);
+    const walletLabel = type === 'trust' ? '🛡️ Trust Wallet' : '🦊 MetaMask';
+    
+    // Step 4: Update UI
+    connectedWallet = account;
+    localStorage.setItem('verdis_connected_wallet', account);
+    localStorage.setItem('verdis_wallet_type', type);
+    document.getElementById('walletDisplay').innerHTML = 
+      '<span class="text-muted">' + walletLabel + ':</span> ' +
+      '<span class="wallet-addr">' + account + '</span>' +
+      '<span class="text-muted ml-2">(' + balanceVRS + ' VRS)</span>';
+    
+    // Auto-fill send form
+    if (document.getElementById('sendFrom')) document.getElementById('sendFrom').value = account;
+    if (document.getElementById('bridgeFrom')) document.getElementById('bridgeFrom').value = account;
+    if (document.getElementById('bridgeBsc')) document.getElementById('bridgeBsc').value = account;
+    if (document.getElementById('balAddr')) document.getElementById('balAddr').value = account;
+    
+    // Change button text
+    const btn = type === 'trust' ? document.getElementById('twBtn') : document.getElementById('mmBtn');
+    if (btn) btn.textContent = type === 'trust' ? '🛡️ Disconnect' : '🦊 Disconnect';
+    btn.onclick = () => disconnectWallet();
+    
+    // Listen for account changes
+    if (provider.on) {
+      provider.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
+        } else {
+          connectedWallet = accounts[0];
+          document.querySelector('.wallet-addr').textContent = accounts[0];
+          if (document.getElementById('sendFrom')) document.getElementById('sendFrom').value = accounts[0];
+          showToast('Account changed: ' + accounts[0].slice(0,10) + '...');
+        }
+      });
+      provider.on('chainChanged', () => {
+        // Reload on chain change
+        window.location.reload();
+      });
+    }
+    
+    showToast(walletLabel + ' connected: ' + account.slice(0,10) + '...');
+    
+  } catch(e) {
+    console.error('Wallet connection error:', e);
+    if (e.code === 4001) {
+      showToast('Connection rejected by user');
+    } else if (e.code === -32002) {
+      showToast('Wallet already has a pending request. Check your wallet.');
+    } else {
+      showToast('Connection failed: ' + (e.message || 'unknown error'));
+    }
+  }
+}
+
+function openInWallet(wallet) {
+  const dashboardUrl = wallet === 'trust' ? 'https://verdischain.com/trust-connect' : 'https://verdischain.com/dashboard';
+  
+  let url;
+  if (wallet === 'trust') {
+    // Trust Wallet: use universal link first, then custom scheme fallback
+    url = 'https://link.trustwallet.com/open_url?url=' + encodeURIComponent(dashboardUrl);
+    // Also try the direct deep link as backup
+    setTimeout(function() {
+      window.location.href = 'trust://open_url?url=' + encodeURIComponent(dashboardUrl);
+    }, 500);
+  } else if (wallet === 'metamask') {
+    // MetaMask: universal link
+    url = 'https://metamask.app.link/dapp/' + dashboardUrl.replace('https://', '');
+  }
+  
+  window.location.href = url;
+  showToast('Opening ' + (wallet === 'trust' ? 'Trust Wallet' : 'MetaMask') + '...');
+  
+  // If the app doesn't open after 2 seconds, show instructions
+  setTimeout(function() {
+    if (wallet === 'trust') {
+      showToast('If Trust Wallet did not open, install it from Play Store and try again. Or add the Verdis network manually in Trust Wallet: Settings > Network > Custom RPC: https://rpc.verdischain.com, Chain ID: 909, Symbol: VRS');
+    }
+  }, 2500);
+}
+
+function disconnectWallet() {
+  connectedWallet = null;
+  walletProvider = null;
+  localStorage.removeItem('verdis_connected_wallet');
+  localStorage.removeItem('verdis_wallet_type');
+  document.getElementById('walletDisplay').innerHTML = '<span class="text-muted">No wallet connected</span>';
+  document.getElementById('mmBtn').textContent = '🦊 Connect MetaMask';
+  document.getElementById('mmBtn').onclick = () => connectWallet('metamask');
+  document.getElementById('twBtn').textContent = '🛡️ Connect Trust Wallet';
+  document.getElementById('twBtn').onclick = () => connectWallet('trust');
+  if (document.getElementById('sendFrom')) document.getElementById('sendFrom').value = '';
+  showToast('Wallet disconnected');
+}
+
+async function sendTx() {
+  const from = document.getElementById('sendFrom').value.trim();
+  const privateKey = document.getElementById('sendKey').value.trim();
+  const to = document.getElementById('sendTo').value.trim();
+  const amount = parseFloat(document.getElementById('sendAmount').value);
+  if (!from || !privateKey || !to || !amount) {
+    document.getElementById('sendResult').innerHTML = '<span class="text-red">All fields required</span>';
+    return;
+  }
+  const r = await api('transaction/send','POST', {from, privateKey, to, amount});
+  if (r && r.txId) {
+    document.getElementById('sendResult').innerHTML = '<span class="text-green">✓ Sent! Tx: '+r.txId.slice(0,16)+'...</span>';
+  } else {
+    document.getElementById('sendResult').innerHTML = '<span class="text-red">Error: '+(r?.error||'failed')+'</span>';
+  }
+}
+
+async function checkBal() {
+  const addr = document.getElementById('balAddr').value.trim();
+  if (!addr) return;
+  const r = await api('wallet/'+addr+'/balance');
+  document.getElementById('balResult').innerHTML = '<div class="card" style="background:var(--bg)"><div class="text-muted text-sm">Address</div><div class="mono text-sm mb-4">'+addr+'</div><div class="text-muted text-sm">Balance</div><div class="text-xl text-green">'+(r.balance||0)+' VRS</div></div>';
+}
+
+// === MONITORING ===
+async function loadMonitoring() {
+  const [health, audit] = await Promise.all([
+    api('monitoring/health'),
+    api('security/audit')
+  ]);
+  if (health) {
+    document.getElementById('monStatus').textContent = health.status||'—';
+    document.getElementById('monUptime').textContent = health.uptime?.human||'—';
+    document.getElementById('monHeight').textContent = health.chain?.height||'—';
+    document.getElementById('monMem').textContent = (health.system?.memory?.usedMb||'—')+'MB';
+    document.getElementById('healthData').textContent = JSON.stringify(health, null, 2);
+  }
+  if (audit && audit.checks) {
+    document.getElementById('securityAudit').innerHTML = audit.checks.map(c => `
+      <div class="flex justify-between items-center" style="padding:6px 0;border-bottom:1px solid var(--border-light)">
+        <span>${c.name}</span>
+        <span class="badge ${c.status==='pass'?'badge-green':'badge-red'}">${c.status}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// === CHARTS ===
+async function loadCharts(blocks) {
+  const ctx1 = document.getElementById('blockChart');
+  if (!ctx1) return;
+  if (blockChart) blockChart.destroy();
+  const labels = blocks.slice(0,20).map(b => '#'+b.header.index).reverse();
+  const blockHeights = blocks.slice(0,20).map(b => b.header.index).reverse();
+  blockChart = new Chart(ctx1, {
+    type:'line',
+    data:{labels, datasets:[{label:'Block Height', data:blockHeights, borderColor:'#3fb950', backgroundColor:'rgba(63,185,80,.1)', fill:true, tension:0.3, borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#8b949e',font:{size:10}}},y:{grid:{color:'#30363d'},ticks:{color:'#8b949e',font:{size:10}}}}}
+  });
+
+  // DEX chart
+  const market = await api('token/market');
+  const ctx2 = document.getElementById('dexChart');
+  if (!ctx2) return;
+  if (dexChart) dexChart.destroy();
+  const swapHistory = await api('token/swaps');
+  const swapLabels = (swapHistory||[]).slice(0,20).map((s,i)=>'#'+(i+1)).reverse();
+  const swapData = (swapHistory||[]).slice(0,20).map(s=>s.amountIn||0).reverse();
+  dexChart = new Chart(ctx2, {
+    type:'line',
+    data:{labels:swapLabels, datasets:[{label:'Swap Volume', data:swapData, borderColor:'#2dd4bf',backgroundColor:'rgba(45,212,191,.1)',fill:true,tension:.4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#8b949e',font:{size:10}}},y:{grid:{color:'#30363d'},ticks:{color:'#8b949e',font:{size:10}}}}}
+  });
+}
+
+// === HELPERS ===
+function fmt(n) { if(!n) return '0'; if(n>1e9) return (n/1e9).toFixed(2)+'B'; if(n>1e6) return (n/1e6).toFixed(2)+'M'; if(n>1e3) return (n/1e3).toFixed(2)+'K'; return Number(n).toFixed(2); }
+function timeAgo(ts) { if(!ts) return '—'; const s=(Date.now()-ts)/1000; if(s<60) return Math.floor(s)+'s ago'; if(s<3600) return Math.floor(s/60)+'m ago'; if(s<86400) return Math.floor(s/3600)+'h ago'; return Math.floor(s/86400)+'d ago'; }
+function copyPrivKey() {
+  const pk = document.getElementById('trustPrivKey').textContent;
+  navigator.clipboard.writeText(pk).then(() => {
+    showToast('Private key copied! Paste it in Trust Wallet');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = pk;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Private key copied! Paste it in Trust Wallet');
+  });
+}
+
+function showToast(msg) { const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
+
+// === GUIDE ===
+const guideData = [
+  {
+    title: '1️⃣ Quick Start',
+    icon: '🚀',
+    steps: [
+      { step: 1, title: 'Open the Explorer', text: 'You are here! This is the Verdis Block Explorer — similar to Etherscan or Tronscan. Use the search bar at the top to look up any address, transaction hash, or block number.', action: null },
+      { step: 2, title: 'Create a Wallet', text: 'Go to the Wallet tab or click "Create Wallet" below. You\'ll get a Verdis address (starts with 0x) and a private key. Save your private key — it\'s the only way to access your funds.', action: 'createWallet' },
+      { step: 3, title: 'Get VRS Tokens', text: 'New wallets start with 0 VRS. To get tokens: (a) swap CARBON or ECO tokens for VRS on the DEX, (b) receive from another user, or (c) earn validator rewards by running a node.', action: 'showSection' , param: 'dex' },
+      { step: 4, title: 'Explore the Network', text: 'Browse blocks, transactions, and validators using the navigation tabs at the top. All data updates automatically every 10 seconds.', action: 'showSection', param: 'overview' },
+    ]
+  },
+  {
+    title: '2️⃣ Create a Wallet',
+    icon: '👛',
+    steps: [
+      { step: 1, title: 'Click "Create Wallet"', text: 'Go to the Wallet tab. Click the "Create Wallet" button. A new wallet is instantly generated with a unique Verdis address and private key using secp256k1 cryptography.', action: 'showSection', param: 'wallet' },
+      { step: 2, title: 'Save Your Private Key', text: 'Your private key is shown once. Copy it and store it securely (password manager, offline note). Never share it with anyone — whoever has the key controls the wallet.', action: null },
+      { step: 3, title: 'Copy Your Address', text: 'Your Verdis address starts with "0x" followed by 40 hex characters. This is what others use to send you VRS. Share it freely.', action: null },
+      { step: 4, title: 'Connect MetaMask (Optional)', text: 'Click "Connect MetaMask" to link your browser wallet. You\'ll be prompted to add the Verdis network (Chain ID 909, RPC: https://rpc.verdischain.com). This lets you use MetaMask/Trust Wallet with Verdis.', action: 'connectMetaMask' },
+    ]
+  },
+  {
+    title: '3️⃣ Get VRS Tokens',
+    icon: '💰',
+    steps: [
+      { step: 1, title: 'Swap on the DEX', text: 'The easiest way to get VRS is to swap other tokens for it. Go to the DEX tab, select CARBON→VRS or ECO→VRS, enter an amount, and click "Swap". The AMM automatically calculates the rate.', action: 'showSection', param: 'dex' },
+      { step: 2, title: 'Receive from Another User', text: 'Give your Verdis address to someone who has VRS. They can send VRS to your address using the "Send VRS" form in the Wallet tab.', action: 'showSection', param: 'wallet' },
+      { step: 3, title: 'Run a Validator', text: 'Run a Verdis node and register as a validator. Active validators earn block rewards in VRS for producing blocks every 5 seconds.', action: 'showSection', param: 'validators' },
+      { step: 4, title: 'Mint Tokens (Admin)', text: 'Token creators can mint new tokens using the API: POST /api/dex/token/mint with {token, address, amount}. This is how new tokens enter circulation.', action: null },
+    ]
+  },
+  {
+    title: '4️⃣ Send & Receive VRS',
+    icon: '💸',
+    steps: [
+      { step: 1, title: 'Open the Wallet Tab', text: 'Navigate to the Wallet tab. Find the "Send VRS" card on the left side.', action: 'showSection', param: 'wallet' },
+      { step: 2, title: 'Enter Your Address', text: 'In the "From Address" field, paste your Verdis address (0x...). This must match the address generated by your private key.', action: null },
+      { step: 3, title: 'Enter Your Private Key', text: 'In the "Private Key" field, paste the private key for your wallet. This signs the transaction with secp256k1. Your key is never stored — it\'s only used to sign this transaction.', action: null },
+      { step: 4, title: 'Enter Recipient & Amount', text: 'Paste the recipient\'s Verdis address in "To Address" and enter the amount of VRS to send. Click "Send" to broadcast the transaction.', action: null },
+      { step: 5, title: 'Verify the Transaction', text: 'Your transaction enters the mempool and is included in the next block (~5 seconds). You can verify it by searching for the returned transaction hash in the search bar.', action: null },
+    ]
+  },
+  {
+    title: '5️⃣ Connect Trust Wallet (Android)',
+
+    icon: '🔗',
+    steps: [
+      { step: 1, title: 'Open Your Wallet App', text: 'Open Trust Wallet or MetaMask on your phone or browser extension. Go to network settings.', action: null },
+      { step: 2, title: 'Add Custom Network', text: 'Add a new custom network with these details:\n  • Network Name: Verdis\n  • RPC URL: https://rpc.verdischain.com\n  • Chain ID: 909\n  • Symbol: VRS\n  • Block Explorer: https://verdischain.com', action: null },
+      { step: 3, title: 'Import Your Wallet', text: 'Import your Verdis wallet using your private key. Your address and balance will appear in the app. Trust Wallet uses Keccak256 for address derivation, matching Verdis EVM addresses.', action: null },
+      { step: 4, title: 'Or Use MetaMask Connect', text: 'On the dashboard, click "Connect MetaMask" in the Wallet tab. Your browser will prompt you to add the Verdis network and connect your account automatically.', action: 'connectMetaMask' },
+    ]
+  },
+  {
+    title: '6️⃣ Trade on the DEX',
+    icon: '💱',
+    steps: [
+      { step: 1, title: 'Open the DEX Tab', text: 'Navigate to the DEX tab. You\'ll see all active liquidity pools and their reserves.', action: 'showSection', param: 'dex' },
+      { step: 2, title: 'Select Tokens to Swap', text: 'In the "From" dropdown, select the token you want to sell (e.g., CARBON). In the "To" dropdown, select the token you want to buy (e.g., VRS).', action: null },
+      { step: 3, title: 'Enter Amount', text: 'Enter the amount of tokens you want to swap. The "To" field will show the estimated output amount based on the AMM formula (x*y=k with 0.3% fee).', action: null },
+      { step: 4, title: 'Click "Swap"', text: 'Click the Swap button. The transaction is processed instantly on-chain. Your new tokens appear in your wallet balance immediately.', action: null },
+      { step: 5, title: 'View Swap History', text: 'Scroll down to see the "Swap History" table with all recent DEX trades, including amounts and timestamps.', action: null },
+    ]
+  },
+  {
+    title: '7️⃣ Staking & Validators',
+    icon: '🏛',
+    steps: [
+      { step: 1, title: 'View Validators', text: 'Go to the Validators tab to see all registered Super Representatives. The top 5 are active block producers. Each validator shows their rank, blocks produced, and votes.', action: 'showSection', param: 'validators' },
+      { step: 2, title: 'Stake VRS', text: 'Delegate your VRS to a validator to earn a share of block rewards. Use the API: POST /api/validators/stake with {voter, validatorAddress, amount}. Your stake earns rewards proportional to the validator\'s block production.', action: null },
+      { step: 3, title: 'Green Validator Scores', text: 'Each validator has a green score based on their energy source (solar, wind, hydro get higher scores). Validators using renewable energy get bonus rewards. View scores in the Eco tab.', action: 'showSection', param: 'eco' },
+      { step: 4, title: 'Run Your Own Validator', text: 'To become a validator: (1) generate a key pair, (2) register via POST /api/validators/register, (3) get enough votes to enter the top 5. Validators are rotated every block for fairness.', action: null },
+    ]
+  },
+  {
+    title: '8️⃣ Smart Contracts',
+    icon: '📜',
+    steps: [
+      { step: 1, title: 'Open the Contracts Tab', text: 'Go to the Contracts tab. You\'ll see two sections: "Deploy Contract" and "Deployed Contracts".', action: 'showSection', param: 'contracts' },
+      { step: 2, title: 'Write Your Contract', text: 'Verdis uses a stack-based VM. Write your contract as space-separated opcodes: PUSH, POP, ADD, SUB, MUL, DIV, STOP, and more. Example: "PUSH 10 PUSH 5 ADD STOP" adds 10+5.', action: null },
+      { step: 3, title: 'Deploy', text: 'Enter a contract name, paste your bytecode, and optionally provide a deployer address. Click "Deploy" — the contract is deployed to the VM and you get a contract ID.', action: null },
+      { step: 4, title: 'Execute', text: 'In the "Execute Contract" section, enter the contract ID, method name, and arguments. Click "Execute" to run the contract. The result is displayed in the output box.', action: null },
+      { step: 5, title: 'View Existing Contracts', text: 'The "Deployed Contracts" section lists all contracts on the chain. Click "View" to inspect any contract, or "Execute" to run it.', action: null },
+    ]
+  },
+  {
+    title: '9️⃣ BSC Bridge to PancakeSwap',
+    icon: '🌉',
+    steps: [
+      { step: 1, title: 'Open the Bridge Tab', text: 'Go to the Bridge tab. You\'ll see bridge stats and the lock form.', action: 'showSection', param: 'bridge' },
+      { step: 2, title: 'Enter Your Verdis Address', text: 'In the lock form, enter your Verdis address (the one holding VRS you want to bridge).', action: null },
+      { step: 3, title: 'Specify Amount', text: 'Enter the amount of VRS to lock. This VRS will be locked on the Verdis chain and an equivalent amount of wVRS will be minted on BSC.', action: null },
+      { step: 4, title: 'Enter BSC Address', text: 'Enter your Binance Smart Chain address (0x...) where you want to receive wVRS.', action: null },
+      { step: 5, title: 'Sign & Lock', text: 'Enter your private key to sign the lock transaction. Click "Lock VRS". You\'ll receive a mint ID to track the bridging process.', action: null },
+      { step: 6, title: 'Trade on PancakeSwap', text: 'Once wVRS is minted on BSC, go to pancakeswap.finance and trade wVRS with BNB or any other token. wVRS can also be added to PancakeSwap liquidity pools.', action: null },
+      { step: 7, title: 'Redeem Back', text: 'To return VRS to Verdis, burn your wVRS on BSC and use the redeem endpoint (POST /api/bridge/redeem). Your VRS is unlocked on Verdis and sent to your address.', action: null },
+    ]
+  },
+  {
+    title: '🔟 Carbon Credits & Eco',
+    icon: '🌿',
+    steps: [
+      { step: 1, title: 'View Eco Impact', text: 'Go to the Eco tab. See total CO₂ offset, trees planted, and green validator scores. Verdis is carbon-negative — every transaction funds environmental projects.', action: 'showSection', param: 'eco' },
+      { step: 2, title: 'Mint Carbon Credits', text: 'Verified environmental projects can mint carbon credits on-chain: POST /api/eco/carbon/mint with {amount, project, verifier}. Each credit represents 1 ton of CO₂ offset.', action: null },
+      { step: 3, title: 'Verify & Retire Credits', text: 'Credits can be verified by auditors (POST /api/eco/carbon/verify) and retired (POST /api/eco/carbon/retire). Retired credits are permanently removed from circulation, proving real carbon offset.', action: null },
+      { step: 4, title: 'Create Reforestation Projects', text: 'Register reforestation projects: POST /api/eco/reforest/create with {name, location, treesTarget}. Update progress with POST /api/eco/reforest/update and verify with POST /api/eco/reforest/verify.', action: null },
+      { step: 5, title: 'Green Validator Scoring', text: 'Validators register their energy source via POST /api/eco/green/register. Solar/wind/hydro energy gets higher scores. Top green validators earn bonus rewards.', action: null },
+    ]
+  },
+  {
+    title: '🔒 Security Best Practices',
+    icon: '🛡️',
+    steps: [
+      { step: 1, title: 'Never Share Your Private Key', text: 'Your private key controls your wallet. Never paste it into untrusted sites, never send it to anyone, and never store it in plain text. Use a password manager or hardware wallet.', action: null },
+      { step: 2, title: 'Verify Addresses', text: 'Always double-check the recipient address before sending. Blockchain transactions are irreversible. A single wrong character means lost funds.', action: null },
+      { step: 3, title: 'Use Rate Limits', text: 'Verdis enforces rate limiting (30 requests/min for most endpoints, 5/min for sensitive ones). Don\'t spam the API or your IP may be temporarily blocked.', action: null },
+      { step: 4, title: 'Check Security Status', text: 'Go to the Monitoring tab and check the Security Audit section. All 13 security checks should show "active". This confirms signature verification, replay protection, and chain validation are working.', action: 'showSection', param: 'monitoring' },
+      { step: 5, title: 'Backup Your Wallet', text: 'Write down your private key on paper and store it in a safe place. If you lose access to your wallet, there is no recovery — your funds are gone permanently.', action: null },
+      { step: 6, title: 'Use HTTPS Only', text: 'Always access Verdis via https://verdischain.com. Never use HTTP connections or unverified URLs. The SSL certificate ensures your connection is encrypted and authenticated.', action: null },
+    ]
+  },
+];
+
+let currentGuideTab = 0;
+
+function showGuideTab(index, btn) {
+  currentGuideTab = index;
+  document.querySelectorAll('.guide-nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderGuide();
+}
+
+function renderGuide() {
+  const guide = guideData[currentGuideTab];
+  if (!guide) return;
+  let html = '<div class="card"><div class="card-header">' + guide.title + '</div>';
+  html += '<div style="max-width:800px">';
+  
+  guide.steps.forEach(s => {
+    const stepNum = s.step;
+    html += '<div style="display:flex;gap:16px;padding:16px 0;border-bottom:1px solid var(--border-light)">';
+    html += '<div style="flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--green-bg);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px">' + stepNum + '</div>';
+    html += '<div style="flex:1">';
+    html += '<div style="font-size:15px;font-weight:600;margin-bottom:4px">' + s.title + '</div>';
+    html += '<div style="font-size:13px;color:var(--text-muted);line-height:1.6;white-space:pre-line">' + s.text + '</div>';
+    if (s.action) {
+      html += '<button class="btn btn-sm btn-primary" style="margin-top:8px" onclick="guideAction(\''+s.action+'\', \''+(s.param||'')+'\')">' + getActionLabel(s.action) + '</button>';
+    }
+    html += '</div></div>';
+  });
+  
+  html += '</div>';
+  
+  // Navigation buttons
+  html += '<div style="display:flex;justify-content:space-between;margin-top:16px">';
+  if (currentGuideTab > 0) {
+    html += '<button class="btn" onclick="prevGuide()">← Previous</button>';
+  } else {
+    html += '<span></span>';
+  }
+  if (currentGuideTab < guideData.length - 1) {
+    html += '<button class="btn btn-primary" onclick="nextGuide()">Next →</button>';
+  } else {
+    html += '<span></span>';
+  }
+  html += '</div>';
+  
+  html += '</div>';
+  document.getElementById('guideContent').innerHTML = html;
+}
+
+function getActionLabel(action) {
+  const labels = {
+    'createWallet': 'Create Wallet Now',
+    'showSection': 'Go to Section',
+    'connectMetaMask': 'Connect MetaMask'
+  };
+  return labels[action] || 'Go';
+}
+
+function guideAction(action, param) {
+  if (action === 'createWallet') createWallet();
+  else if (action === 'connectMetaMask') connectMetaMask();
+  else if (action === 'showSection') showSection(param);
+}
+
+function nextGuide() {
+  if (currentGuideTab < guideData.length - 1) {
+    currentGuideTab++;
+    document.querySelectorAll('.guide-nav-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === currentGuideTab);
+    });
+    renderGuide();
+    document.getElementById('section-guide').scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function prevGuide() {
+  if (currentGuideTab > 0) {
+    currentGuideTab--;
+    document.querySelectorAll('.guide-nav-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === currentGuideTab);
+    });
+    renderGuide();
+    document.getElementById('section-guide').scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function loadGuide() {
+  if (!document.getElementById('guideContent').innerHTML) {
+    renderGuide();
+  }
+}
+
+// === FAUCET ===
+async function loadFaucet() {
+  const status = await api('faucet/status');
+  if (status) document.getElementById('faucetTotal').textContent = status.totalClaims || 0;
+}
+async function claimFaucet() {
+  const address = document.getElementById('faucetAddr').value.trim();
+  if (!address) { document.getElementById('faucetResult').innerHTML = '<span class="text-red">Enter your address</span>'; return; }
+  const r = await api('faucet/claim', 'POST', { address });
+  if (r && r.success) {
+    document.getElementById('faucetResult').innerHTML = '<span class="text-green">✅ ' + r.amount + ' VRS sent!</span>';
+    loadFaucet();
+  } else {
+    document.getElementById('faucetResult').innerHTML = '<span class="text-red">' + (r?.error || 'Failed') + '</span>';
+  }
+}
+
+// === STAKING ===
+async function loadStaking() {
+  const [validators, info] = await Promise.all([api('validators'), api('blockchain/info')]);
+  if (validators && Array.isArray(validators)) {
+    document.getElementById('stakeValidator').innerHTML = validators.map(v => '<option value="'+v.address+'">'+(v.name||'Validator')+' — '+(v.votes||0)+' votes</option>').join('');
+  }
+  if (info) {
+    document.getElementById('stakeActive').textContent = info.validatorCount || '—';
+  }
+}
+async function delegateStake() {
+  const voter = document.getElementById('stakeVoter').value.trim();
+  const validatorAddress = document.getElementById('stakeValidator').value;
+  const amount = parseFloat(document.getElementById('stakeAmount').value);
+  if (!voter || !validatorAddress || !amount) { document.getElementById('stakeResult').innerHTML = '<span class="text-red">All fields required</span>'; return; }
+  const r = await api('staking/delegate', 'POST', { voter, validatorAddress, amount });
+  if (r && r.success) {
+    document.getElementById('stakeResult').innerHTML = '<span class="text-green">✅ Delegated ' + amount + ' VRS</span>';
+    loadDelegations(voter);
+  } else {
+    document.getElementById('stakeResult').innerHTML = '<span class="text-red">' + (r?.error || 'Failed') + '</span>';
+  }
+}
+async function loadDelegations(addr) {
+  const address = addr || document.getElementById('stakeCheckAddr')?.value?.trim();
+  if (!address) return;
+  const r = await api('staking/delegations/' + address);
+  if (r && r.delegations) {
+    document.getElementById('stakeDelegations').innerHTML = r.delegations.length > 0 ? r.delegations.map(d => '<div style="padding:8px 0;border-bottom:1px solid var(--border-light)"><span class="text-sm">Validator: '+d.validator.slice(0,16)+'...</span><br><span class="text-green text-sm">'+d.amount+' VRS staked</span></div>').join('') : '<p class="text-muted">No delegations</p>';
+    document.getElementById('stakeYours').textContent = r.delegations.reduce((s,d)=>s+d.amount,0) + ' VRS';
+  }
+}
+
+// === GOVERNANCE ===
+async function loadGovernance() {
+  const proposals = await api('governance/proposals');
+  if (proposals && Array.isArray(proposals)) {
+    document.getElementById('govProposals').innerHTML = proposals.length > 0 ? proposals.map(p => {
+      const timeLeft = Math.max(0, Math.ceil((p.endsAt - Date.now())/3600000));
+      return '<div class="card" style="background:var(--bg);margin-bottom:8px"><div class="flex justify-between"><div><div class="text-green">'+p.title+'</div><div class="text-muted text-sm">'+p.description.slice(0,100)+'...</div><div class="text-sm mt-4"><span class="badge badge-green">For: '+p.votesFor+'</span> <span class="badge badge-red">Against: '+p.votesAgainst+'</span> <span class="text-muted">'+timeLeft+'h left</span></div></div></div></div>';
+    }).join('') : '<p class="text-muted">No proposals yet</p>';
+  }
+}
+async function createProposal() {
+  const title = document.getElementById('govTitle').value;
+  const description = document.getElementById('govDesc').value;
+  let proposer = document.getElementById('govProposer').value.trim();
+  if (!title || !description || !proposer) { document.getElementById('govResult').innerHTML = '<span class="text-red">All fields required</span>'; return; }
+  const r = await api('governance/proposal', 'POST', { title, description, proposer, type: document.getElementById('govType').value });
+  if (r && r.success) {
+    document.getElementById('govResult').innerHTML = '<span class="text-green">✅ Proposal created</span>';
+    loadGovernance();
+  } else {
+    document.getElementById('govResult').innerHTML = '<span class="text-red">' + (r?.error || 'Failed') + '</span>';
+  }
+}
+
+// === NFT ===
+async function loadNFT() {
+  const nfts = await api('nft/list');
+  if (nfts && Array.isArray(nfts)) {
+    document.getElementById('nftGallery').innerHTML = nfts.length > 0 ? nfts.map(n => {
+      const catColors = {carbon:'badge-green',reforest:'badge-teal',energy:'badge-blue',achievement:'badge-purple'};
+      return '<div class="card" style="background:var(--bg);margin-bottom:8px"><div class="flex justify-between items-center"><div><div class="text-green">'+n.name+'</div><div class="text-muted text-sm">'+n.description+'</div><div class="text-sm mt-4"><span class="badge '+(catColors[n.category]||'badge-blue')+'">'+n.category+'</span> '+n.carbonValue+' tCO₂</div></div><div class="text-muted text-sm mono">'+n.id.slice(0,12)+'...</div></div></div>';
+    }).join('') : '<p class="text-muted">No NFTs minted yet</p>';
+  }
+}
+async function mintNFT() {
+  const name = document.getElementById('nftName').value;
+  const description = document.getElementById('nftDesc').value;
+  let creator = document.getElementById('nftCreator').value.trim();
+  const category = document.getElementById('nftCategory').value;
+  const carbonValue = parseFloat(document.getElementById('nftCarbon').value) || 0;
+  if (!name || !creator) { document.getElementById('nftResult').innerHTML = '<span class="text-red">Name and creator required</span>'; return; }
+  const r = await api('nft/mint', 'POST', { name, description, creator, category, carbonValue });
+  if (r && r.success) {
+    document.getElementById('nftResult').innerHTML = '<span class="text-green">✅ NFT minted</span>';
+    loadNFT();
+  } else {
+    document.getElementById('nftResult').innerHTML = '<span class="text-red">' + (r?.error || 'Failed') + '</span>';
+  }
+}
+
+// === TOKENS ===
+async function loadTokens() {
+  const tokens = await api('token/list');
+  if (tokens && Array.isArray(tokens)) {
+    document.getElementById('tokenList').innerHTML = tokens.length > 0 ? tokens.map(t => '<div class="card" style="background:var(--bg);margin-bottom:8px;padding:12px"><div class="flex justify-between"><div><div class="text-green">'+t.name+' ('+t.symbol+')</div><div class="text-muted text-sm">Supply: '+t.totalSupply.toLocaleString()+'</div><div class="text-muted text-sm">Creator: '+t.creator.slice(0,16)+'...</div></div></div></div>').join('') : '<p class="text-muted">No custom tokens created yet</p>';
+  }
+}
+async function createToken() {
+  const name = document.getElementById('tokName').value;
+  const symbol = document.getElementById('tokSymbol').value;
+  const totalSupply = parseFloat(document.getElementById('tokSupply').value);
+  let creator = document.getElementById('tokCreator').value.trim();
+  if (!name || !symbol || !totalSupply || !creator) { document.getElementById('tokResult').innerHTML = '<span class="text-red">All fields required</span>'; return; }
+  const r = await api('token/create', 'POST', { name, symbol, totalSupply, creator });
+  if (r && r.success) {
+    document.getElementById('tokResult').innerHTML = '<span class="text-green">✅ ' + r.token.symbol + ' created</span>';
+    loadTokens();
+  } else {
+    document.getElementById('tokResult').innerHTML = '<span class="text-red">' + (r?.error || 'Failed') + '</span>';
+  }
+}
+
+// === API DOCS ===
+async function loadApiDocs() {
+  const docs = await api('docs');
+  if (docs && docs.endpoints) {
+    let html = '';
+    for (const [category, endpoints] of Object.entries(docs.endpoints)) {
+      html += '<div style="margin-bottom:16px"><div class="text-green font-semibold mb-4">' + category.toUpperCase() + '</div>';
+      endpoints.forEach(ep => {
+        const parts = ep.split(' ');
+        const method = parts[0];
+        const path = parts.slice(1).join(' ');
+        const methodColors = {GET:'badge-green',POST:'badge-blue',PUT:'badge-orange',DELETE:'badge-red'};
+        html += '<div style="padding:4px 0;display:flex;gap:8px;align-items:center"><span class="badge ' + (methodColors[method]||'badge-blue') + '">' + method + '</span><span class="mono text-sm">' + path + '</span></div>';
+      });
+      html += '</div>';
+    }
+    document.getElementById('apiDocsContent').innerHTML = html;
+  }
+}
+
+// === WHITEPAPER ===
+function loadWhitepaper() { /* Static content, nothing to load dynamically */ }
+
+// === HELPER: Search block by number ===
+async function showBlockBySearch(height) {
+  const data = await api('explorer/block/'+height);
+  if (data && !data.error) showBlockDetail(data);
+}
+
+// === AUTO REFRESH ===
+async function refreshData() {
+  const health = await api('monitoring/health');
+  if (health) {
+    document.getElementById('netStatus').textContent = 'Connected · Block '+health.chain?.height;
+  }
+  const active = document.querySelector('.section.active')?.id;
+  if (active === 'section-overview') loadOverview();
+}
+
+// === PRICE CHART ===
+let priceChart;
+async function loadPriceChart() {
+  const pair = document.getElementById('priceChartPair')?.value || 'CARBON/VRS';
+  const swaps = await api('token/swaps');
+  const pairSwaps = (swaps||[]).filter(s => (s.tokenIn+'/'+s.tokenOut === pair) || (s.tokenOut+'/'+s.tokenIn === pair));
+  const ctx = document.getElementById('priceChart');
+  if (!ctx) return;
+  if (priceChart) priceChart.destroy();
+  const labels = pairSwaps.slice(0,30).reverse().map((s,i) => '#'+(i+1));
+  const prices = pairSwaps.slice(0,30).reverse().map(s => s.tokenIn === pair.split('/')[0] ? s.amountOut/s.amountIn : s.amountIn/s.amountOut);
+  priceChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{ label: pair+' Price', data: prices, borderColor: '#2dd4bf', backgroundColor: 'rgba(45,212,191,.1)', fill: true, tension: 0.4, borderWidth: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#8b949e', font: { size: 10 } } }, y: { grid: { color: '#30363d' }, ticks: { color: '#8b949e', font: { size: 10 } } } } }
+  });
+}
+
+// === NOTIFICATIONS ===
+async function subscribeNotif() {
+  const address = document.getElementById('notifAddr').value.trim();
+  const telegram = document.getElementById('notifTelegram').value.trim();
+  const email = document.getElementById('notifEmail').value.trim();
+  if (!address) { document.getElementById('notifResult').innerHTML = '<span class="text-red">Address required</span>'; return; }
+  const r = await api('notifications/subscribe', 'POST', { address, telegram, email });
+  if (r && r.success) {
+    document.getElementById('notifResult').innerHTML = '<span class="text-green">✅ Subscribed! You will receive alerts.</span>';
+  } else {
+    document.getElementById('notifResult').innerHTML = '<span class="text-red">' + (r?.error || 'Failed') + '</span>';
+  }
+}
+
+// === WEBSOCKET LIVE UPDATES ===
+function initWebSocket() {
+  try {
+    const wsUrl = (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws';
+    const ws = new WebSocket(wsUrl);
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'newBlock') {
+        document.getElementById('netStatus').textContent = 'Live · Block ' + data.height;
+        const active = document.querySelector('.section.active')?.id;
+        if (active === 'section-overview') loadOverview();
+        if (active === 'section-blocks') loadBlocks();
+        if (active === 'section-txs') loadTxs();
+      }
+    };
+    ws.onopen = () => console.log('WebSocket connected');
+    ws.onclose = () => setTimeout(initWebSocket, 10000); // Reconnect after 10s
+  } catch(e) { console.log('WebSocket not available'); }
+}
+
+// === INIT ===
+// Auto-reconnect wallet on page load
+async function autoReconnectWallet() {
+  const savedWallet = localStorage.getItem('verdis_connected_wallet');
+  const savedType = localStorage.getItem('verdis_wallet_type') || 'metamask';
+  if (savedWallet) {
+    const provider = window.ethereum || (window.web3 && window.web3.currentProvider);
+    if (provider) {
+      try {
+        const accounts = await provider.request({method: 'eth_accounts'});
+        if (accounts && accounts.length > 0 && accounts.includes(savedWallet)) {
+          walletProvider = provider;
+          connectedWallet = savedWallet;
+          
+          // Get balance
+          let balance = '0';
+          try {
+            const balHex = await provider.request({
+              method: 'eth_getBalance',
+              params: [savedWallet, 'latest']
+            });
+            balance = BigInt(balHex).toString();
+          } catch(e) {
+            try {
+              const balData = await api('wallet/' + savedWallet + '/balance');
+              balance = String(balData.balance || 0);
+            } catch(e2) { balance = '0'; }
+          }
+          
+          const balanceVRS = (Number(balance) / 1e18).toFixed(2);
+          const walletLabel = savedType === 'trust' ? '🛡️ Trust Wallet' : '🦊 MetaMask';
+          document.getElementById('walletDisplay').innerHTML = 
+            '<span class="text-muted">' + walletLabel + ':</span> ' +
+            '<span class="wallet-addr">' + savedWallet + '</span>' +
+            '<span class="text-muted ml-2">(' + balanceVRS + ' VRS)</span>';
+          
+          const btn = savedType === 'trust' ? document.getElementById('twBtn') : document.getElementById('mmBtn');
+          if (btn) {
+            btn.textContent = '🔌 Disconnect ' + (savedType === 'trust' ? 'Trust Wallet' : 'MetaMask');
+            btn.onclick = () => disconnectWallet();
+          }
+          
+          // Listen for account changes
+          if (provider.on) {
+            provider.on('accountsChanged', (accounts) => {
+              if (accounts.length === 0) {
+                disconnectWallet();
+              } else {
+                connectedWallet = accounts[0];
+                localStorage.setItem('verdis_connected_wallet', accounts[0]);
+              }
+            });
+          }
+          
+          console.log('Wallet auto-reconnected:', savedWallet);
+          return;
+        }
+      } catch(e) {
+        console.log('Auto-reconnect failed:', e.message);
+      }
+    }
+    // If we get here, the saved wallet is no longer available — clear it
+    localStorage.removeItem('verdis_connected_wallet');
+    localStorage.removeItem('verdis_wallet_type');
+  }
+}
+
+// Click to copy private key
+document.addEventListener('DOMContentLoaded', function() {
+  const pkEl = document.getElementById('trustPrivKey');
+  if (pkEl) {
+    pkEl.style.cursor = 'pointer';
+    pkEl.title = 'Click to copy';
+    pkEl.addEventListener('click', function() {
+      navigator.clipboard.writeText(pkEl.textContent).then(() => {
+        showToast('Private key copied to clipboard!');
+      }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = pkEl.textContent;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('Private key copied!');
+      });
+    });
+  }
+});
+
+window.addEventListener('load', () => {
+  // Auto-reconnect wallet first
+  autoReconnectWallet();
+  
+  // Restore last active tab
+  const savedTab = localStorage.getItem('verdis_active_tab');
+  if (savedTab) {
+    setTimeout(() => showSection(savedTab), 100);
+  }
+  loadOverview();
+  autoRefresh = setInterval(refreshData, 10000);
+  document.getElementById('rpcUrl').textContent = window.location.origin + '/rpc';
+  initWebSocket();
+  // Populate price chart pair selector
+  api('dex/pools').then(pools => {
+    if (pools && Array.isArray(pools)) {
+      const sel = document.getElementById('priceChartPair');
+      if (sel) sel.innerHTML = pools.map(p => '<option value="'+p.tokenA+'/'+p.tokenB+'">'+p.tokenA+'/'+p.tokenB+'</option>').join('');
+      loadPriceChart();
+    }
+  });
+});
+</script>
+</body>
+</html>

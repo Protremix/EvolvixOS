@@ -1,0 +1,23 @@
+import api from './api';
+export default {
+  dashboard: (addr) => api.get('/notifications/dashboard', { params: { user_address: addr } }),
+  list: (params) => api.get('/notifications', { params }),
+  get: (id) => api.get(`/notifications/${id}`),
+  create: (data) => api.post('/notifications', data),
+  broadcast: (data) => api.post('/notifications/broadcast', data),
+  unreadCount: (addr) => api.get('/notifications/unread/count', { params: { user_address: addr } }),
+  stats: (addr) => api.get('/notifications/stats', { params: { user_address: addr } }),
+  markRead: (id) => api.post(`/notifications/${id}/read`),
+  markAllRead: (addr) => api.post('/notifications/read-all', null, { params: { user_address: addr } }),
+  delete: (id) => api.delete(`/notifications/${id}`),
+  clearAll: (addr) => api.delete('/notifications/clear/all', { params: { user_address: addr } }),
+  clearRead: (addr) => api.delete('/notifications/clear/read', { params: { user_address: addr } }),
+  getPreferences: (addr) => api.get(`/notifications/preferences/${addr}`),
+  updatePreferences: (addr, data) => api.patch(`/notifications/preferences/${addr}`, data),
+  templates: () => api.get('/notifications/templates/list'),
+  types: () => api.get('/notifications/types/list'),
+  severities: () => api.get('/notifications/severities/list'),
+  startMonitoring: (interval) => api.post('/notifications/monitoring/start', null, { params: { interval } }),
+  stopMonitoring: () => api.post('/notifications/monitoring/stop'),
+  monitoringStatus: () => api.get('/notifications/monitoring/status'),
+};

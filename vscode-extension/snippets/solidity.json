@@ -1,0 +1,61 @@
+{
+  "Verdis ERC-20 Token": {
+    "prefix": "verdis-erc20",
+    "body": [
+      "// SPDX-License-Identifier: MIT",
+      "pragma solidity ^0.8.20;",
+      "",
+      "import \"@openzeppelin/contracts/token/ERC20/ERC20.sol\";",
+      "import \"@openzeppelin/contracts/access/Ownable.sol\";",
+      "",
+      "contract ${1:MyToken} is ERC20, Ownable {",
+      "    constructor(uint256 initialSupply) ERC20(\"${1:MyToken}\", \"${2:MTK}\") {",
+      "        _mint(msg.sender, initialSupply);",
+      "    }",
+      "}"
+    ],
+    "description": "Verdis ERC-20 token template"
+  },
+  "Verdis Carbon Credit": {
+    "prefix": "verdis-carbon",
+    "body": [
+      "// SPDX-License-Identifier: MIT",
+      "pragma solidity ^0.8.20;",
+      "",
+      "contract ${1:CarbonTracker} {",
+      "    mapping(uint256 => uint256) public credits;",
+      "    uint256 public totalCredits;",
+      "    ",
+      "    function issueCredit(address to, uint256 tons) external {",
+      "        // Credit issuance logic",
+      "    }",
+      "    ",
+      "    function retireCredit(uint256 creditId, uint256 tons) external {",
+      "        // Credit retirement logic",
+      "    }",
+      "}"
+    ],
+    "description": "Verdis carbon credit contract template"
+  },
+  "Verdis Green Validator": {
+    "prefix": "verdis-validator",
+    "body": [
+      "// SPDX-License-Identifier: MIT",
+      "pragma solidity ^0.8.20;",
+      "",
+      "contract ${1:GreenValidator} {",
+      "    struct ValidatorScore {",
+      "        uint256 carbonFootprint;",
+      "        uint256 renewablePercentage;",
+      "        uint256 greenScore;",
+      "    }",
+      "    mapping(address => ValidatorScore) public validators;",
+      "    ",
+      "    function updateScore(address validator, uint256 footprint, uint256 renewable) external {",
+      "        // Scoring logic",
+      "    }",
+      "}"
+    ],
+    "description": "Verdis green validator scoring template"
+  }
+}

@@ -1,0 +1,71 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deployment target"
+        required: true
+        type: choice
+        options:
+          - verdis-mainnet
+          - aegisos-staging
+          - aegisos-production
+      version:
+        description: "Version tag"
+        required: false
+        type: string
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.event.inputs.target }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.target }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pre-deployment checks
+        run: |
+          echo "## Deployment Checklist" >> $GITHUB_STEP_SUMMARY
+          echo "- Target: ${{ github.event.inputs.target }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Version: ${{ github.event.inputs.version || 'latest' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Verdis Mainnet Deployment
+        if: github.event.inputs.target == 'verdis-mainnet'
+        run: |
+          echo "Deploying Verdis blockchain to mainnet..."
+          # 1. Build release binary
+          # cargo build --release
+          # 2. Run final tests
+          # cargo test --release --workspace
+          # 3. SSH to server and deploy
+          # ssh $SERVER_USER@$SERVER_IP 'cd /opt/verdis && git pull && cargo build --release && systemctl restart verdis'
+          # 4. Verify health
+          # curl -X POST https://verdischain.com/rpc -d '{"jsonrpc":"2.0","method":"system_health","id":1}'
+          echo "Verdis mainnet deployment requires SSH access."
+          echo "Run deploy/install.sh on the server."
+
+      - name: AegisOS Staging Deployment
+        if: github.event.inputs.target == 'aegisos-staging'
+        run: |
+          echo "Deploying AegisOS to staging..."
+          # cd aegisos && docker-compose -f docker-compose.prod.yml up -d
+          echo "AegisOS staging requires server access."
+          echo "Use: cd aegisos && docker-compose -f docker-compose.prod.yml up -d --build"
+
+      - name: AegisOS Production Deployment
+        if: github.event.inputs.target == 'aegisos-production'
+        run: |
+          echo "Deploying AegisOS to production..."
+          echo "AegisOS production requires server access."
+          echo "1. cd aegisos && docker-compose -f docker-compose.prod.yml up -d --build"
+          echo "2. systemctl restart aegisos"
+          echo "3. curl http://localhost:8000/health"
+
+      - name: Post-deployment notification
+        if: always()
+        run: |
+          echo "## Deployment Result" >> $GITHUB_STEP_SUMMARY
+          echo "Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY

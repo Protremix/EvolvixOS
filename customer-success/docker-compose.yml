@@ -1,0 +1,17 @@
+services:
+  customer-success:
+    build: .
+    container_name: customer-success
+    ports:
+      - "3400:3400"
+    environment:
+      - DATABASE_URL=postgresql://evolvixos:EvolvixOS2026@postgres:5432/evolvixos
+      - REDIS_URL=redis://redis:6379/2
+      - OPENAI_API_KEY=OPENAI_API_KEY_PLACEHOLDER
+    networks:
+      - aegisos_default
+    restart: unless-stopped
+
+networks:
+  aegisos_default:
+    external: true

@@ -1,0 +1,38 @@
+services:
+  loki:
+    image: grafana/loki:latest
+    container_name: evolvixos-loki
+    restart: always
+    user: "10001:10001"
+    ports:
+      - "127.0.0.1:3100:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki/data
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - logging-net
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: evolvixos-promtail
+    restart: always
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/config.yaml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log/journal:/var/log/journal:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/log/nginx:/var/log/nginx:ro
+      - /opt/backups/logs:/opt/backups/logs:ro
+    command: -config.file=/etc/promtail/config.yaml
+    networks:
+      - logging-net
+    depends_on:
+      - loki
+
+volumes:
+  loki_data:
+
+networks:
+  logging-net:
+    driver: bridge

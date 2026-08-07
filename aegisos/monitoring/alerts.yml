@@ -1,0 +1,50 @@
+groups:
+  - name: evolvixos
+    rules:
+      - alert: HighErrorRate
+        expr: rate(evolvixos_requests_total{status=~"5.."}[5m]) / rate(evolvixos_requests_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate (>10%) on EvolvixOS API"
+      
+      - alert: APIUnreachable
+        expr: up{job="evolvixos-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "EvolvixOS API is unreachable"
+      
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes{job="evolvixos-api"} > 1073741824
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API memory usage > 1GB"
+      
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(evolvixos_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "API p95 response time > 2s"
+      
+      - alert: PostgreSQLDown
+        expr: up{job="postgres-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL is down"
+      
+      - alert: RedisDown
+        expr: up{job="redis-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"

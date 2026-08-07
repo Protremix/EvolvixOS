@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verdis - Add Network</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:16px;min-height:100vh}
+.logo{font-size:26px;font-weight:800;color:#4ade80;text-align:center;margin:12px 0 2px;letter-spacing:2px}
+.sub{color:#666;font-size:12px;text-align:center;margin-bottom:16px}
+.card{background:#15151f;border:1px solid #252535;border-radius:12px;padding:16px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:10px}
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin:6px 0;text-align:center;text-decoration:none;color:white}
+.btn-blue{background:#2175EB}.btn-green{background:#10b981}.btn-orange{background:#f6851b}
+.btn:active{opacity:0.8}
+.st{padding:11px;border-radius:8px;font-size:13px;margin:8px 0;text-align:center;display:none}
+.st.ok{background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);display:block}
+.st.err{background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);display:block}
+.st.inf{background:rgba(33,117,235,0.1);color:#60a5fa;border:1px solid rgba(33,117,235,0.2);display:block}
+.info{font-size:13px;color:#999;line-height:1.7;margin-bottom:8px}
+.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a2a;font-size:12px}
+.row:last-child{border:none}
+.rl{color:#666;min-width:70px}
+.rv{color:#4ade80;font-family:monospace;text-align:right;word-break:break-all;margin-left:6px}
+.words-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:10px 0}
+.word-cell{background:#0a0a0f;border:1px solid #2a2a3a;border-radius:6px;padding:6px 4px;text-align:center}
+.word-num{font-size:9px;color:#444;display:block;margin-bottom:2px}
+.word-val{font-size:13px;color:#4ade80;font-weight:600}
+.pk{background:#0a0a0f;padding:10px;border-radius:8px;font-family:monospace;font-size:11px;color:#4ade80;word-break:break-all;border:1px solid #2a2a3a;margin:8px 0;-webkit-user-select:all;user-select:all;line-height:1.5;cursor:pointer}
+.note{font-size:11px;color:#555;margin-top:6px;line-height:1.5}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #444;border-top-color:#60a5fa;border-radius:50%;animation:sp 0.8s linear infinite;margin-right:6px;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+#loading{text-align:center;padding:30px;color:#666;font-size:14px}
+#content{display:none}
+</style>
+</head>
+<body>
+<div class="logo">VERDIS</div>
+<div class="sub">Wallet Setup — Works with MetaMask & Trust Wallet</div>
+
+<div id="loading"><span class="spin"></span>Creating your wallet...</div>
+<div id="content">
+
+<div id="st" class="st inf">Choose your wallet below</div>
+
+<!-- MetaMask -->
+<div class="card">
+  <div class="card-title">🦊 MetaMask (Recommended — supports custom networks)</div>
+  <div class="info">MetaMask lets you add custom networks directly. If you have it installed:</div>
+  <button class="btn btn-orange" onclick="addToMetaMask()">🦊 Add Verdis to MetaMask</button>
+  <div class="info" style="margin-top:8px;font-size:12px;color:#666">
+    Don't have MetaMask? Get it from your app store, then come back here.
+  </div>
+</div>
+
+<!-- Seed phrase for Trust Wallet -->
+<div class="card">
+  <div class="card-title">🔑 Trust Wallet — Import Recovery Phrase</div>
+  <div class="info">In Trust Wallet: <b style="color:#ccc">Settings → Wallets → + → Import Wallet → Recovery Phrase</b></div>
+  <div class="info" style="margin-bottom:6px">Your 12 words (tap "Copy" then paste in Trust Wallet):</div>
+  <div class="words-grid" id="wordGrid"></div>
+  <button class="btn btn-blue" onclick="copyMnemonic()">📋 Copy All 12 Words</button>
+  <div id="mnemonicCopied" class="note" style="color:#10b981;display:none;text-align:center">✅ Copied!</div>
+  <div class="note">⚠️ These words ARE your wallet. Save them somewhere safe.</div>
+</div>
+
+<!-- Network details (for any wallet) -->
+<div class="card">
+  <div class="card-title">⚙️ Verdis Network Details</div>
+  <div class="info" style="margin-bottom:6px">For wallets that support custom networks:</div>
+  <div class="row"><span class="rl">Network</span><span class="rv">Verdis</span></div>
+  <div class="row"><span class="rl">RPC URL</span><span class="rv">https://rpc.verdischain.com</span></div>
+  <div class="row"><span class="rl">Chain ID</span><span class="rv">909</span></div>
+  <div class="row"><span class="rl">Symbol</span><span class="rv">VRS</span></div>
+  <div class="row"><span class="rl">Explorer</span><span class="rv">https://verdischain.com</span></div>
+</div>
+
+<!-- Wallet info -->
+<div class="card">
+  <div class="card-title">💰 Your Wallet</div>
+  <div class="row"><span class="rl">Address</span><span class="rv" id="walletAddr" style="font-size:11px"></span></div>
+  <div class="row"><span class="rl">Balance</span><span class="rv" style="color:#4ade80;font-weight:700">1000 VRS</span></div>
+  <div style="font-size:12px;color:#666;margin:8px 0 4px">Private key (backup only):</div>
+  <div class="pk" id="pkBox" onclick="copyPK()"></div>
+  <div id="pkCopied" class="note" style="color:#10b981;display:none;text-align:center">✅ Copied</div>
+</div>
+
+<!-- Dashboard -->
+<div class="card">
+  <div class="card-title">📊 Dashboard (No Wallet Needed)</div>
+  <div class="info">The dashboard works directly — no wallet connection required:</div>
+  <a class="btn btn-green" href="https://verdischain.com/dashboard">📊 Open Verdis Dashboard</a>
+</div>
+
+</div>
+
+<script>
+let walletData = null;
+
+async function init() {
+  try {
+    const resp = await fetch('/api/wallet/create-mnemonic', {method:'POST'});
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.error);
+    walletData = data;
+    renderWallet(data);
+  } catch(e) {
+    document.getElementById('loading').innerHTML = '<div class="st err">Error: ' + e.message + '</div>';
+  }
+}
+
+function renderWallet(data) {
+  const grid = document.getElementById('wordGrid');
+  data.words.forEach((word, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'word-cell';
+    cell.innerHTML = '<span class="word-num">' + (i+1) + '</span><span class="word-val">' + word + '</span>';
+    grid.appendChild(cell);
+  });
+  document.getElementById('walletAddr').textContent = data.address;
+  document.getElementById('pkBox').textContent = data.privateKey;
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('content').style.display = 'block';
+}
+
+async function addToMetaMask() {
+  if (typeof window.ethereum === 'undefined') {
+    document.getElementById('st').className = 'st err';
+    document.getElementById('st').innerHTML = 'MetaMask not detected. Install it from your app store, then come back.';
+    return;
+  }
+  try {
+    await window.ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [{
+        chainId: '0x38d',
+        chainName: 'Verdis',
+        nativeCurrency: {name:'Verdis', symbol:'VRS', decimals:18},
+        rpcUrls: ['https://rpc.verdischain.com'],
+        blockExplorerUrls: ['https://verdischain.com']
+      }]
+    });
+    document.getElementById('st').className = 'st ok';
+    document.getElementById('st').innerHTML = '✅ Verdis added to MetaMask! Now import your wallet using the seed phrase below.';
+  } catch(e) {
+    document.getElementById('st').className = 'st err';
+    document.getElementById('st').innerHTML = 'Error: ' + e.message;
+  }
+}
+
+function copyMnemonic() {
+  if (!walletData) return;
+  copyText(walletData.mnemonic, 'mnemonicCopied');
+}
+
+function copyPK() {
+  if (!walletData) return;
+  copyText(walletData.privateKey, 'pkCopied');
+}
+
+function copyText(text, feedbackId) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showFb(feedbackId)).catch(() => fbCopy(text, feedbackId));
+  } else { fbCopy(text, feedbackId); }
+}
+
+function fbCopy(text, feedbackId) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); showFb(feedbackId); }
+  catch(e) { alert('Long-press text and copy'); }
+  document.body.removeChild(ta);
+}
+
+function showFb(id) {
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 3000);
+}
+
+window.addEventListener('load', init);
+</script>
+</body>
+</html>

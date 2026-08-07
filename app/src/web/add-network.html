@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verdis - Add Network</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0f;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:16px;min-height:100vh}
+.logo{font-size:26px;font-weight:800;color:#4ade80;text-align:center;margin:12px 0 2px;letter-spacing:2px}
+.sub{color:#666;font-size:12px;text-align:center;margin-bottom:16px}
+.card{background:#15151f;border:1px solid #252535;border-radius:12px;padding:16px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:10px}
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;margin:6px 0;text-align:center;text-decoration:none;color:white}
+.btn-blue{background:#2175EB}.btn-green{background:#10b981}.btn-orange{background:#f6851b}
+.btn:active{opacity:0.8}
+.st{padding:11px;border-radius:8px;font-size:13px;margin:8px 0;text-align:center;display:none}
+.st.ok{background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);display:block}
+.st.err{background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);display:block}
+.st.inf{background:rgba(33,117,235,0.1);color:#60a5fa;border:1px solid rgba(33,117,235,0.2);display:block}
+.info{font-size:13px;color:#999;line-height:1.7}
+.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a2a;font-size:12px}
+.row:last-child{border:none}
+.rl{color:#666;min-width:70px}
+.rv{color:#4ade80;font-family:monospace;text-align:right;word-break:break-all;margin-left:6px}
+</style>
+</head>
+<body>
+<div class="logo">VERDIS</div>
+<div class="sub">Add Verdis Network to Your Wallet</div>
+
+<div id="st" class="st inf">Tap a button below to add Verdis network</div>
+
+<div class="card">
+  <div class="card-title">🦊 MetaMask (Recommended)</div>
+  <div class="info" style="margin-bottom:8px">MetaMask fully supports custom networks. Open this page inside MetaMask browser and tap:</div>
+  <button class="btn btn-orange" onclick="addMetaMask()">🦊 Add Verdis to MetaMask</button>
+</div>
+
+<div class="card">
+  <div class="card-title">📱 Trust Wallet Deep Link</div>
+  <div class="info" style="margin-bottom:8px">Tap to open Trust Wallet with network params:</div>
+  <a class="btn btn-blue" id="trustLink" href="#">📱 Add to Trust Wallet</a>
+  <div class="info" style="margin-top:6px;font-size:12px;color:#666">If this doesn't work, Trust Wallet may not support custom networks.</div>
+</div>
+
+<div class="card">
+  <div class="card-title">⚙️ Manual Network Details</div>
+  <div class="row"><span class="rl">Name</span><span class="rv">Verdis</span></div>
+  <div class="row"><span class="rl">RPC URL</span><span class="rv">https://rpc.verdischain.com</span></div>
+  <div class="row"><span class="rl">Chain ID</span><span class="rv">909</span></div>
+  <div class="row"><span class="rl">Symbol</span><span class="rv">VRS</span></div>
+  <div class="row"><span class="rl">Explorer</span><span class="rv">https://verdischain.com</span></div>
+</div>
+
+<div class="card">
+  <div class="card-title">📊 Dashboard (No Wallet Needed)</div>
+  <div class="info" style="margin-bottom:8px">Use the full dashboard without any wallet app:</div>
+  <a class="btn btn-green" href="https://verdischain.com/dashboard">📊 Open Dashboard Directly</a>
+</div>
+
+<script>
+// Trust Wallet deep link for adding custom network
+const trustDeepLink = 'https://link.trustwallet.com/add_custom_rpc?rpc_url=https://rpc.verdischain.com&chain_id=909&symbol=VRS&name=Verdis&explorer=https://verdischain.com';
+document.getElementById('trustLink').href = trustDeepLink;
+
+async function addMetaMask() {
+  if (typeof window.ethereum === 'undefined') {
+    document.getElementById('st').className = 'st err';
+    document.getElementById('st').innerHTML = 'MetaMask not detected. Open this page inside MetaMask browser, or install MetaMask.';
+    return;
+  }
+  try {
+    await window.ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params: [{
+        chainId: '0x38d',
+        chainName: 'Verdis',
+        nativeCurrency: {name:'Verdis', symbol:'VRS', decimals:18},
+        rpcUrls: ['https://rpc.verdischain.com'],
+        blockExplorerUrls: ['https://verdischain.com']
+      }]
+    });
+    document.getElementById('st').className = 'st ok';
+    document.getElementById('st').innerHTML = '✅ Verdis added! Switch to Verdis network in MetaMask.';
+  } catch(e) {
+    document.getElementById('st').className = 'st err';
+    document.getElementById('st').innerHTML = 'Error: ' + e.message;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+node_modules/
+dist/
+build/
+.env
+*.log
+*.pem
+*.key
+.env.local
+docker-compose.override.yml

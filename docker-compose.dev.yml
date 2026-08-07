@@ -1,0 +1,74 @@
+version: "3.9"
+
+services:
+  # AegisOS Backend
+  aegisos-backend:
+    build:
+      context: ./aegisos/backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./data/aegisos.db
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=dev-secret-change-in-production
+      - OPENAI_API_KEY=${OPENAI_API_KEY_2:-}
+      - DEBUG=true
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+    volumes:
+      - ./aegisos/backend/data:/app/data
+      - ./aegisos/backend:/app
+    depends_on:
+      - redis
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+  # AegisOS Frontend
+  aegisos-frontend:
+    build:
+      context: ./aegisos/frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api/v1
+    volumes:
+      - ./aegisos/frontend:/app
+      - /app/node_modules
+    depends_on:
+      - aegisos-backend
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+
+  # Redis for event bus
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+  # PostgreSQL (optional, for production-like testing)
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=aegisos
+      - POSTGRES_USER=aegisos
+      - POSTGRES_PASSWORD=aegisos_dev
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    profiles: ["postgres"]
+
+  # Prometheus monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    profiles: ["monitoring"]
+
+volumes:
+  redis-data:
+  pg-data:

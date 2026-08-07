@@ -1,0 +1,73 @@
+{
+  "name": "verdis-devkit",
+  "displayName": "Verdis DevKit",
+  "description": "Development toolkit for the Verdis blockchain ecosystem",
+  "version": "0.1.0",
+  "publisher": "verdischain",
+  "engines": { "vscode": "^1.80.0" },
+  "categories": ["Extension Packs", "Snippets", "Programming Languages"],
+  "activationEvents": ["onLanguage:solidity", "onCommand:verdis.deploy"],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "verdis.deploy",
+        "title": "Verdis: Deploy Contract"
+      },
+      {
+        "command": "verdis.compile",
+        "title": "Verdis: Compile Contract"
+      },
+      {
+        "command": "verdis.checkHealth",
+        "title": "Verdis: Check Chain Health"
+      },
+      {
+        "command": "verdis.getBalance",
+        "title": "Verdis: Get VRDX Balance"
+      },
+      {
+        "command": "verdis.openExplorer",
+        "title": "Verdis: Open in Verdiscan"
+      },
+      {
+        "command": "verdis.runAudit",
+        "title": "Verdis: Run AegisOS Audit"
+      }
+    ],
+    "configuration": {
+      "title": "Verdis DevKit",
+      "properties": {
+        "verdis.rpcUrl": {
+          "type": "string",
+          "default": "https://verdischain.com/rpc",
+          "description": "Verdis RPC endpoint"
+        },
+        "verdis.chainId": {
+          "type": "number",
+          "default": 909,
+          "description": "Verdis chain ID"
+        },
+        "verdis.explorerUrl": {
+          "type": "string",
+          "default": "https://verdischain.com/explorer",
+          "description": "Verdiscan URL"
+        },
+        "verdis.aegisOSUrl": {
+          "type": "string",
+          "default": "http://localhost:8000",
+          "description": "AegisOS API URL"
+        }
+      }
+    },
+    "snippets": [
+      {
+        "language": "solidity",
+        "path": "./snippets/solidity.json"
+      }
+    ]
+  },
+  "dependencies": {
+    "ethers": "^6.0.0"
+  }
+}
