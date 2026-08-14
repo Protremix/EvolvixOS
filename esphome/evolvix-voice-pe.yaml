@@ -1,0 +1,225 @@
+# ─── EvolvixOS Voice PE — ESPHome Configuration ──────────────────────
+# Home Assistant Voice Preview Edition configured for EvolvixOS
+#
+# Flash this with: esphome run evolvix-voice-pe.yaml
+#
+# The device acts as a thin voice terminal:
+#   MIC → Wi-Fi → HA → Wyoming Bridge → EvolvixOS → TTS → Speaker
+#
+# EvolvixOS remains the ONLY AI brain. This device is just mic + speaker + WiFi.
+
+# ─── Substitutions ─────────────────────────────────────────────────
+substitutions:
+  name: "evolvix-voice-pe"
+  friendly_name: "EvolvixOS Voice PE"
+  wifi_ssid: !secret wifi_ssid
+  wifi_password: !secret wifi_password
+  ha_url: !secret ha_url          # e.g. http://homeassistant.local:8123
+  # Wake word: "hey evolvix" (custom openWakeWord model)
+  # Configure in HA Assist Pipeline, not here — ESPHome uses HA's wake word
+
+# ─── ESP32-S3 Board (Home Assistant Voice PE) ───────────────────────
+esp32:
+  board: esp32-s3-devkitc-1
+  flash_size: 16MB
+  framework:
+    type: esp-idf
+    version: 5.1.2
+    platform_version: 6.7.0
+
+# ─── Esphome Core ───────────────────────────────────────────────────
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: true
+  project:
+    name: "evolvixos.voice-pe"
+    version: "1.0.0"
+  min_version: "2024.6.0"
+  on_boot:
+    priority: 600
+    then:
+      - light.turn_on:
+          id: led
+          brightness: 30%
+          red: 0.0
+          green: 0.5
+          blue: 1.0
+
+# ─── Wi-Fi ──────────────────────────────────────────────────────────
+wifi:
+  ssid: ${wifi_ssid}
+  password: ${wifi_password}
+  ap:
+    ssid: "EvolvixOS-Voice-PE"
+    password: "evolvixos"
+  on_connect:
+    - light.turn_on:
+        id: led
+        brightness: 50%
+        red: 0.0
+        green: 1.0
+        blue: 0.0
+
+# ─── API + OTA ─────────────────────────────────────────────────────
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+# ─── Logger ─────────────────────────────────────────────────────────
+logger:
+  level: INFO
+  logs:
+    voice_assistant: DEBUG
+    audio: INFO
+
+# ─── I2S Audio (Microphone — 16kHz mono 16-bit) ────────────────────
+i2s_audio:
+  - id: i2s_in
+    i2s_lrclk_pin: GPIO5
+    i2s_bclk_pin: GPIO6
+  - id: i2s_out
+    i2s_lrclk_pin: GPIO46
+    i2s_bclk_pin: GPIO9
+
+microphone:
+  - platform: i2s_audio
+    id: evolvix_mic
+    i2s_audio_id: i2s_in
+    adc_pin: GPIO7
+    sample_rate: 16000
+    channel: left
+    pdm: false
+    bits_per_sample: 16
+
+speaker:
+  - platform: i2s_audio
+    id: evolvix_speaker
+    i2s_audio_id: i2s_out
+    dac_pin: GPIO16
+    sample_rate: 22050
+    channel: left
+    bits_per_sample: 16
+
+# ─── Status LED ────────────────────────────────────────────────────
+light:
+  - platform: esp32_rmt_led_strip
+    id: led
+    pin: GPIO48
+    num_leds: 1
+    rgb_order: GRB
+    name: "Voice PE LED"
+
+# ─── Voice Assistant ───────────────────────────────────────────────
+# This connects to Home Assistant's Assist Pipeline.
+# HA routes audio to the Wyoming Bridge → EvolvixOS.
+#
+# The wake word is configured in Home Assistant's Assist Pipeline settings,
+# NOT in ESPHome. Use openWakeWord with "hey evolvix" as a custom wake word.
+#
+# In HA:
+#   Settings → Assist → Wake Word → Add "hey evolvix" custom wake word
+#   Settings → Assist → Pipeline → Select evolvixos-stt + evolvixos-conversation + evolvixos-tts
+voice_assistant:
+  microphone: evolvix_mic
+  speaker: evolvix_speaker
+  noise_suppression_level: 2
+  auto_gain: 31dB
+  volume_multiplier: 4.0
+  vad_threshold: 0.5
+  on_listening:
+    - light.turn_on:
+        id: led
+        blue: 1.0
+        red: 0.0
+        green: 0.0
+        brightness: 80%
+  on_start:
+    - light.turn_on:
+        id: led
+        blue: 0.0
+        red: 1.0
+        green: 0.0
+        brightness: 80%
+  on_tts_start:
+    - light.turn_on:
+        id: led
+        blue: 0.0
+        red: 0.5
+        green: 0.5
+        brightness: 80%
+  on_tts_end:
+    - light.turn_on:
+        id: led
+        blue: 1.0
+        red: 0.0
+        green: 0.0
+        brightness: 50%
+  on_end:
+    - light.turn_on:
+        id: led
+        blue: 0.0
+        red: 0.0
+        green: 1.0
+        brightness: 30%
+  on_error:
+    - light.turn_on:
+        id: led
+        blue: 0.0
+        red: 1.0
+        green: 0.0
+        brightness: 100%
+    - delay: 1s
+    - light.turn_on:
+        id: led
+        blue: 0.0
+        red: 0.0
+        green: 1.0
+        brightness: 30%
+
+# ─── Boot Button (for factory reset / mute toggle) ─────────────────
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode:
+        input: true
+        pullup: true
+    name: "Boot Button"
+    on_click:
+      - min_length: 50ms
+        max_length: 350ms
+        then:
+          - switch.toggle: mute_switch
+      - min_length: 1000ms
+        max_length: 5000ms
+        then:
+          - button.press: factory_reset_btn
+
+switch:
+  - platform: template
+    id: mute_switch
+    name: "Mute"
+    icon: "mdi:microphone-off"
+    optimistic: true
+    on_turn_on:
+      - voice_assistant.stop
+    on_turn_off:
+      - voice_assistant.start
+
+button:
+  - platform: factory_reset
+    id: factory_reset_btn
+    name: "Factory Reset"
+
+# ─── Diagnostics Sensor ────────────────────────────────────────────
+sensor:
+  - platform: uptime
+    name: "Uptime"
+  - platform: wifi_signal
+    name: "Wi-Fi Signal"
+    update_interval: 60s

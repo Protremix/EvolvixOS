@@ -1,0 +1,64 @@
+# ─── Home Assistant Configuration for EvolvixOS Voice PE ────────────
+# Add these sections to your Home Assistant configuration.yaml
+#
+# This configures HA to use the EvolvixOS Wyoming Bridge for:
+#   - Speech-to-Text  (EvolvixOS Whisper, port 10300)
+#   - Conversation     (EvolvixOS AgentCore, port 10301)
+#   - Text-to-Speech  (EvolvixOS Kokoro, port 10302)
+
+# ─── Wyoming Protocol Integration ──────────────────────────────────
+# This tells HA to connect to the three EvolvixOS bridge services.
+# The bridge must be running on the same machine (or change host).
+wyoming:
+  # STT service — EvolvixOS Whisper
+  - host: localhost
+    port: 10300
+  # Conversation service — EvolvixOS AgentCore
+  - host: localhost
+    port: 10301
+  # TTS service — EvolvixOS Kokoro
+  - host: localhost
+    port: 10302
+
+# ─── Assist Pipeline ───────────────────────────────────────────────
+# The pipeline is configured in HA UI: Settings → Assist → Pipelines
+#
+# Create a new pipeline named "EvolvixOS" with:
+#   Wake Word:  hey evolvix (custom openWakeWord model)
+#   STT:        evolvixos-stt (auto-discovered from Wyoming)
+#   Conversation Agent: evolvixos-conversation (auto-discovered from Wyoming)
+#   TTS:        evolvixos-tts (auto-discovered from Wyoming)
+#
+# Then set this pipeline as the preferred pipeline.
+#
+# For Russian language:
+#   1. In the pipeline settings, set language to "ru"
+#   2. Ensure EvolvixOS Whisper is configured with language: ru in config.yaml
+#   3. The bridge passes the language code to EvolvixOS automatically
+
+# ─── Wake Word (openWakeWord) ──────────────────────────────────────
+# Home Assistant uses openWakeWord for on-device wake word detection.
+# "hey evolvix" is a custom wake word — configure it in:
+#   Settings → Voice Assistants → Wake Word → Add Custom Wake Word
+#
+# Or use a built-in wake word (jarvis, nova, etc.) as a fallback.
+# The wake word runs ON the ESP32 device — no audio is sent to the
+# server until the wake word is detected.
+
+# ─── Alternative: Direct REST API (without Wyoming) ────────────────
+# If you prefer to call EvolvixOS directly without the Wyoming bridge,
+# you can use a RESTful conversation agent instead:
+#
+# conversation:
+#   - platform: rest
+#     name: EvolvixOS Direct
+#     url: "http://localhost:5000/api/v1/chat"
+#     method: POST
+#     headers:
+#       Content-Type: application/json
+#       X-API-Key: "YOUR_API_KEY"
+#     payload_template: '{"message": "{{ text }}", "session_id": "{{ conversation_id }}"}'
+#     response_template: "{{ response }}"
+#
+# Note: This bypasses Wyoming STT/TTS. You would still need Wyoming
+# services for STT and TTS, or use HA's built-in STT/TTS alternatives.
