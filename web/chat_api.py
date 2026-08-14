@@ -34,7 +34,7 @@ app.add_middleware(
 )
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-MODEL = os.environ.get("EVOLVIX_MODEL", "qwen2.5:7b")
+MODEL = os.environ.get("EVOLVIX_MODEL", "qwen2.5:14b")
 SYSTEM_PROMPT = os.environ.get(
     "EVOLVIX_SYSTEM_PROMPT",
     """You are EvolvixOS, an autonomous AI engineering assistant running 100% locally with zero paid tokens. You are helpful, practical, and action-oriented.
