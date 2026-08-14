@@ -2,11 +2,11 @@
 
 # 🧬 EvolvixOS
 
-### The Open-Source AI Engineering Platform
+### The AI Engineering Operating System
 
 **100% Local · Zero Tokens · Zero Cloud · Zero Subscriptions · Free Forever**
 
-*Just type what you need. EvolvixOS builds it, manages it, and handles everything — including your real life.*
+*Five autonomous AI agents that design, build, deploy, and secure your software 24/7 — no manual ops required.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -16,6 +16,7 @@
 [![Templates: 11K](https://img.shields.io/badge/Templates-11K-orange.svg)](#templates)
 [![Cost: $0](https://img.shields.io/badge/Cost-$0.00-success.svg)](#philosophy)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](#deployment)
+[![Microservices: 30+](https://img.shields.io/badge/Microservices-30+-blueviolet.svg)](#architecture)
 
 </div>
 
@@ -40,7 +41,7 @@
 
 ## Overview
 
-EvolvixOS is a fully autonomous, self-improving AI engineering platform that runs entirely on your hardware. No cloud. No API keys. No tokens. No subscriptions. It discovers, installs, and learns from open-source AI tools across GitHub — getting continuously smarter without spending a single cent.
+EvolvixOS is the world's first AI Engineering Operating System — a fully autonomous, self-improving platform that runs entirely on your hardware. Five specialized AI agents handle the entire software lifecycle: architecture, coding, security, monitoring, and deployment. No cloud. No API keys. No tokens. No subscriptions. It discovers, installs, and learns from open-source AI tools across GitHub — getting continuously smarter without spending a single cent.
 
 **What can it do?**
 
@@ -54,6 +55,22 @@ EvolvixOS is a fully autonomous, self-improving AI engineering platform that run
 - 🎬 **Create movies** — Full cinematic pipeline with local AI video generation.
 - 🗣️ **Real voice** — Local Whisper (STT) + Kokoro (TTS). No cloud voice services.
 - 🚀 **Deploy anywhere** — One command to your own server with Docker.
+
+---
+
+## The Five AI Agents
+
+EvolvixOS operates through five specialized autonomous AI agents, each handling a critical phase of the software lifecycle:
+
+| Agent | Role | What It Does |
+| --- | --- | --- |
+| 🏗️ **The Architect** | System Design | Designs architecture, plans features, writes technical specs, creates project blueprints |
+| 💻 **The Builder** | Code Generation | Writes, tests, and deploys production-grade code across 10+ project types |
+| 🛡️ **The Guardian** | Security | Scans for vulnerabilities, fixes issues, enforces 10-point security protocol, hardens systems |
+| 📊 **The Analyst** | Monitoring | Performance monitoring, analytics, optimization, experiment tracking, model evaluation |
+| 🚀 **The Deployer** | Infrastructure | CI/CD pipelines, server management, Docker orchestration, Hetzner cloud deployment |
+
+Each agent runs as an independent microservice, communicates via the unified REST API, and can spawn sub-agents for parallel work.
 
 ---
 
@@ -75,7 +92,11 @@ EvolvixOS is a fully autonomous, self-improving AI engineering platform that run
 | **Zero-code builder** | No | **Yes — the Genie builds anything from plain English** |
 | **Life management** | No | **Tasks, calendar, budget, goals, shopping, reminders** |
 | **Video generation** | Cloud, expensive | **Wan 2.1, local, free** |
-| **Marketing / ads** | Billion-dollar budgets | **None. Build free. Teach him. Enjoy.** |
+| **Marketing / ads** | Billion-dollar budgets | **None. Build free. Self-improving. Free forever.** |
+| **Five AI agents** | No | **Architect, Builder, Guardian, Analyst, Deployer** |
+| **Microservices** | Monolithic | **30+ Docker containers, fully distributed** |
+| **Blockchain audit** | No | **VerdisChain — immutable AI decision logs** |
+
 
 ---
 
@@ -829,6 +850,24 @@ EvolvixOS/
 ├── output/                 # Generated projects
 └── logs/                   # System logs
 ```
+
+### Production Microservices (30+ Containers)
+
+When deployed to production, EvolvixOS runs as a distributed system of 30+ Docker containers:
+
+| Category | Services |
+| --- | --- |
+| **AI Agents** | agent-framework, core-agents, agent-execution, ai-gateway-v2 |
+| **Platform** | platform-api, orchestration, marketplace, rbac, queue-api |
+| **Development** | devsupport-api, sandbox-api, contracts-api, community-api |
+| **Infrastructure** | infra-api, monitoring, loadtest, enterprise-api |
+| **Security** | security-api, hardening-api |
+| **Data** | PostgreSQL, Redis, Prometheus, Grafana, Loki, Promtail |
+| **Frontend** | evolvixos-frontend (React SPA on port 3000) |
+| **Blockchain** | verdis-node (VerdisChain mainnet) |
+
+All services communicate via REST APIs, are monitored with Grafana/Prometheus, and log to Loki.
+
 
 ### How GitHub Learning Works
 
