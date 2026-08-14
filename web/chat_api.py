@@ -154,7 +154,7 @@ async def chat_stream(request: Request):
     history = sessions[session_id]
 
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    for msg in history[-MAX_HISTORY]:
+    for msg in history[-MAX_HISTORY:]:
         messages.append({"role": msg["role"], "content": msg["content"]})
     messages.append({"role": "user", "content": message})
 
