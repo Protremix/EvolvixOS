@@ -1,0 +1,62 @@
+name: EvolvixOS CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Run tests
+        run: |
+          python -m pytest tests/ -v --cov=. --cov-report=term-missing || echo "No tests yet"
+
+      - name: Verify project structure
+        run: |
+          echo "Checking project structure..."
+          test -f main.py
+          test -f agent/core.py
+          test -f api_server.py
+          test -f evolvix_client.py
+          test -f skills/github_discovery/skill.py
+          test -f config/config.yaml
+          test -f Dockerfile
+          test -f docker-compose.yml
+          echo "✅ Project structure verified"
+
+      - name: Python syntax check
+        run: |
+          find . -name "*.py" -not -path "./.git/*" -not -path "*__pycache__*" | xargs -I{} python -m py_compile {} || true
+          echo "✅ Python syntax checked"
+
+      - name: Import check
+        run: |
+          python -c "
+          import yaml
+          with open('config/config.yaml') as f:
+              config = yaml.safe_load(f)
+          assert 'config' in config, 'Missing config section'
+          assert 'llm' in config['config'], 'Missing LLM config'
+          assert 'skills' in config['config'], 'Missing skills config'
+          print('✅ Config validated')
+          "

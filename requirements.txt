@@ -1,0 +1,125 @@
+# EvolvixOS — 100% local, no external API tokens
+# Updated v0.4 — 31 skills, all free, all open source
+
+# Core LLM (runs via Ollama, zero tokens)
+ollama>=0.4.0
+
+# Agent framework
+langgraph>=0.2.0
+langchain>=0.3.0
+langchain-ollama>=0.2.0
+
+# === Core Skills ===
+
+# Research — local web search and scraping
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+trafilatura>=1.12.0
+markdownify>=0.13.0
+
+# Video — local generation
+torch>=2.2.0
+torchvision>=0.17.0
+diffusers>=0.30.0
+transformers>=4.44.0
+accelerate>=0.34.0
+imageio>=2.34.0
+imageio-ffmpeg>=0.5.1
+moviepy>=1.0.3
+
+# Audio — local TTS and music
+soundfile>=0.12.0
+librosa>=0.10.0
+
+# Voice — Speech-to-Text (Whisper, Apache 2.0, runs locally)
+openai-whisper>=20231117
+
+# Voice — Text-to-Speech (Kokoro, Apache 2.0, runs locally)
+kokoro>=0.1.0
+pyttsx3>=2.90
+
+# Image — local generation (FLUX.1 / Stable Diffusion)
+pillow>=10.0.0
+
+# === v0.4 New Skills (all free, all open source) ===
+
+# Web Scraper (already covered by requests + beautifulsoup4 + lxml)
+
+# Data Analyst
+pandas>=2.2.0
+numpy>=1.26.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Document Processor
+PyPDF2>=3.0.0
+python-docx>=1.1.0
+openpyxl>=3.1.0
+python-pptx>=0.6.23
+pdfplumber>=0.11.0
+reportlab>=4.0.0
+
+# Translator (offline)
+argostranslate>=1.9.0
+
+# OCR
+pytesseract>=0.3.10
+easyocr>=1.7.0
+
+# Image Editor (already covered by Pillow)
+
+# Audio Processor
+pydub>=0.25.1
+
+# Video Editor (already covered by moviepy)
+
+# Code Analyzer
+radon>=6.0.1
+bandit>=1.7.0
+
+# Summarizer (uses Ollama, already installed)
+
+# File Converter
+pypandoc>=1.13.0
+
+# Security Scanner (already covered by bandit)
+safety>=3.0.0
+
+# Math Solver
+sympy>=1.12.0
+
+# Visualizer (already covered by matplotlib)
+plotly>=5.18.0
+
+# Scheduler
+APScheduler>=3.10.0
+
+# System Monitor
+psutil>=5.9.0
+
+# Email Sender (stdlib smtplib, no pip needed)
+
+# Database Manager (stdlib sqlite3, no pip needed)
+duckdb>=0.10.0
+
+# Markdown Builder (no deps needed)
+
+# Browser Automation
+playwright>=1.40.0
+
+# === Web UI + API Server ===
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# === Deploy ===
+paramiko>=3.4.0
+
+# === Utilities ===
+pyyaml>=6.0
+rich>=13.0.0
+prompt_toolkit>=3.0.0
+watchdog>=4.0.0
+
+# === Testing ===
+pytest>=8.0.0

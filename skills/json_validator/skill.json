@@ -1,0 +1,8 @@
+{
+  "name": "JSON Validator",
+  "description": "Validate JSON syntax and return error details.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

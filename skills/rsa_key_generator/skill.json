@@ -1,0 +1,8 @@
+{
+  "name": "RSA Key Helper",
+  "description": "Generate RSA key parameter metrics.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

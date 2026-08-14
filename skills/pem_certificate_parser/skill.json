@@ -1,0 +1,8 @@
+{
+  "name": "PEM Certificate Parser",
+  "description": "Extract header and base64 body from PEM certs.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

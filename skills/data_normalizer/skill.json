@@ -1,0 +1,8 @@
+{
+  "name": "Data Normalizer",
+  "description": "Normalize numeric array using Min-Max scaling.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

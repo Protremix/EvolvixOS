@@ -1,0 +1,10 @@
+{
+  "name": "Skill Forge",
+  "description": "Generates new EvolvixOS skills on the fly using local Ollama LLM.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

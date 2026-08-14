@@ -1,0 +1,8 @@
+{
+  "name": "Hashtag Generator",
+  "description": "Extract keywords from text and format into social media hashtags.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

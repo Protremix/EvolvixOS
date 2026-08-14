@@ -1,0 +1,22 @@
+{
+  "name": "Landing Template 93",
+  "category": "landing",
+  "tags": [
+    "landing",
+    "arctic-ice",
+    "mono"
+  ],
+  "layout": "centered",
+  "colors": {
+    "name": "Arctic Ice",
+    "primary": "#00B4D8",
+    "secondary": "#90E0EF",
+    "bg": "#0A1015",
+    "surface": "#152030",
+    "text": "#D0E8F0",
+    "muted": "#608090"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

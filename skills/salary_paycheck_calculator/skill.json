@@ -1,0 +1,8 @@
+{
+  "name": "Paycheck Estimator",
+  "description": "Estimate net paycheck after taxes.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

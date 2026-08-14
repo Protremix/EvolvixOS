@@ -1,0 +1,8 @@
+{
+  "name": "Simple Linear Regression",
+  "description": "Compute OLS linear regression y=mx+b.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

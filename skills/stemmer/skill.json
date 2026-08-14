@@ -1,0 +1,8 @@
+{
+  "name": "Porter Stemmer",
+  "description": "Reduce words to stem forms.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

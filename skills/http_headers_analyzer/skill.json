@@ -1,0 +1,8 @@
+{
+  "name": "HTTP Headers Analyzer",
+  "description": "Analyze HTTP headers for missing security flags.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

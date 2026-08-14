@@ -1,0 +1,8 @@
+{
+  "name": "Sentence Splitter",
+  "description": "Split text into distinct sentences handling abbreviations.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

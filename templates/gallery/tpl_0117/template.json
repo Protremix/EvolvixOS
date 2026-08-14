@@ -1,0 +1,22 @@
+{
+  "name": "Gallery Template 117",
+  "category": "gallery",
+  "tags": [
+    "gallery",
+    "mono-light",
+    "open sans"
+  ],
+  "layout": "boxed",
+  "colors": {
+    "name": "Mono Light",
+    "primary": "#000000",
+    "secondary": "#444444",
+    "bg": "#FFFFFF",
+    "surface": "#F5F5F5",
+    "text": "#1A1A1A",
+    "muted": "#888888"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

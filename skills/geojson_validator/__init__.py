@@ -1,0 +1,1 @@
+"""GeoJSON Validator EvolvixOS Skill."""

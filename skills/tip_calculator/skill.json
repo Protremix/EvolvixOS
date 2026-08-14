@@ -1,0 +1,8 @@
+{
+  "name": "Tip & Split Calculator",
+  "description": "Calculate total tip amount and bill split.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

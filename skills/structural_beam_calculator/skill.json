@@ -1,0 +1,8 @@
+{
+  "name": "Structural Beam Calculator",
+  "description": "Calculate max bending moment for simple beam.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

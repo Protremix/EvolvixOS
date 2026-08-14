@@ -1,0 +1,8 @@
+{
+  "name": "Loan Calculator",
+  "description": "Calculate monthly loan payment and total interest.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

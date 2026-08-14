@@ -1,0 +1,8 @@
+{
+  "name": "Vector Calculator",
+  "description": "Compute dot product and magnitude of vectors.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

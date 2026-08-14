@@ -1,0 +1,22 @@
+{
+  "name": "Ecommerce Template 829",
+  "category": "ecommerce",
+  "tags": [
+    "ecommerce",
+    "mint-fresh",
+    "helvetica"
+  ],
+  "layout": "centered",
+  "colors": {
+    "name": "Mint Fresh",
+    "primary": "#00C9A7",
+    "secondary": "#00D4AA",
+    "bg": "#0A1A18",
+    "surface": "#102A28",
+    "text": "#CCF0E8",
+    "muted": "#669988"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

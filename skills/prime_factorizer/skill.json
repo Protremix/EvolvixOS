@@ -1,0 +1,8 @@
+{
+  "name": "Prime Factorizer",
+  "description": "Find prime factors and test primality.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

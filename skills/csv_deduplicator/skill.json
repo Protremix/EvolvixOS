@@ -1,0 +1,8 @@
+{
+  "name": "CSV Deduplicator",
+  "description": "Remove duplicate rows from CSV data.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

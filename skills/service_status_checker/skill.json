@@ -1,0 +1,8 @@
+{
+  "name": "Service Status Checker",
+  "description": "Check reachability and handshake response.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

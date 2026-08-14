@@ -1,0 +1,10 @@
+{
+  "name": "Break-Even Analyzer",
+  "description": "Calculate break-even point",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

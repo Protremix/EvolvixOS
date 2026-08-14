@@ -1,0 +1,8 @@
+{
+  "name": "CSV to JSON",
+  "description": "Convert CSV formatted text into array of JSON objects.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

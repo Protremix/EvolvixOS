@@ -1,0 +1,8 @@
+{
+  "name": "DNA Complement",
+  "description": "Generate complementary DNA strand and RNA transcription.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

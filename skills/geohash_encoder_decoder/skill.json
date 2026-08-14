@@ -1,0 +1,8 @@
+{
+  "name": "Geohash Encoder/Decoder",
+  "description": "Encode lat/lon to geohash.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

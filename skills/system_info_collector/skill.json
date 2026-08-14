@@ -1,0 +1,8 @@
+{
+  "name": "System Info Collector",
+  "description": "Gather system specs.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

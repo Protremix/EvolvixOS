@@ -1,0 +1,8 @@
+{
+  "name": "Pig Latin Translator",
+  "description": "Convert English text to Pig Latin.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

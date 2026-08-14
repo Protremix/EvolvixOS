@@ -1,0 +1,8 @@
+{
+  "name": "Feature Scaler",
+  "description": "Standardize feature arrays (mean=0, std=1).",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

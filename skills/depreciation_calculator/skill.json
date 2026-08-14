@@ -1,0 +1,8 @@
+{
+  "name": "Depreciation Calculator",
+  "description": "Calculate straight-line depreciation schedule.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

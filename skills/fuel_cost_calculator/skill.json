@@ -1,0 +1,8 @@
+{
+  "name": "Fuel Cost Calculator",
+  "description": "Calculate total trip fuel cost.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

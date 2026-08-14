@@ -1,0 +1,8 @@
+{
+  "name": "MIDI Note Converter",
+  "description": "Convert MIDI note number to note name and frequency.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

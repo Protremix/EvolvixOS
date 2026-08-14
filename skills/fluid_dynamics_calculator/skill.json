@@ -1,0 +1,8 @@
+{
+  "name": "Fluid Dynamics Calculator",
+  "description": "Calculate Reynolds number and flow rate.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

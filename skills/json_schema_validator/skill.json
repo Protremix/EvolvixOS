@@ -1,0 +1,8 @@
+{
+  "name": "JSON Schema Validator Light",
+  "description": "Validate JSON objects against light schema.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

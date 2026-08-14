@@ -1,0 +1,8 @@
+{
+  "name": "Shamir Secret Sharing",
+  "description": "Split secret integer into threshold shares.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

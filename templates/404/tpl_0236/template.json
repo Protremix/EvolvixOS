@@ -1,0 +1,22 @@
+{
+  "name": "404 Template 236",
+  "category": "404",
+  "tags": [
+    "404",
+    "mono-dark",
+    "roboto"
+  ],
+  "layout": "fullwidth",
+  "colors": {
+    "name": "Mono Dark",
+    "primary": "#FFFFFF",
+    "secondary": "#AAAAAA",
+    "bg": "#000000",
+    "surface": "#111111",
+    "text": "#FFFFFF",
+    "muted": "#555555"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

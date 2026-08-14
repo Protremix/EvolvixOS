@@ -1,0 +1,8 @@
+{
+  "name": "Discount Calculator",
+  "description": "Calculate final price after percentage discount.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

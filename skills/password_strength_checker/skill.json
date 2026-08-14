@@ -1,0 +1,8 @@
+{
+  "name": "Password Strength Checker",
+  "description": "Evaluate password strength score.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

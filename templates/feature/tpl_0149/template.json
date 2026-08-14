@@ -1,0 +1,22 @@
+{
+  "name": "Feature Template 149",
+  "category": "feature",
+  "tags": [
+    "feature",
+    "mint-fresh",
+    "montserrat"
+  ],
+  "layout": "grid",
+  "colors": {
+    "name": "Mint Fresh",
+    "primary": "#00C9A7",
+    "secondary": "#00D4AA",
+    "bg": "#0A1A18",
+    "surface": "#102A28",
+    "text": "#CCF0E8",
+    "muted": "#669988"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

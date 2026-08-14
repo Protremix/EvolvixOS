@@ -1,0 +1,8 @@
+{
+  "name": "Astronomy Calculator",
+  "description": "Calculate light-year distances and orbital velocity.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

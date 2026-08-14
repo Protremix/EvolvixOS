@@ -1,0 +1,8 @@
+{
+  "name": "Gaussian Naive Bayes",
+  "description": "Naive Bayes prior probability classifier.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

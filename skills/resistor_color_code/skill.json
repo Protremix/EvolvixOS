@@ -1,0 +1,8 @@
+{
+  "name": "Resistor Color Code Calculator",
+  "description": "Decode 4-band resistor colors.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

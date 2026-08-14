@@ -1,0 +1,22 @@
+{
+  "name": "Ecommerce Template 141",
+  "category": "ecommerce",
+  "tags": [
+    "ecommerce",
+    "violet-dream",
+    "arial"
+  ],
+  "layout": "hero",
+  "colors": {
+    "name": "Violet Dream",
+    "primary": "#7C5CFF",
+    "secondary": "#00D4AA",
+    "bg": "#0F0F1A",
+    "surface": "#1A1A2E",
+    "text": "#E0E0E0",
+    "muted": "#8888AA"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

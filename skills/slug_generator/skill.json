@@ -1,0 +1,8 @@
+{
+  "name": "Slug Generator",
+  "description": "Convert title or text into clean lowercased URL slugs.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

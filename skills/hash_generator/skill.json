@@ -1,0 +1,8 @@
+{
+  "name": "Hash Generator",
+  "description": "Generate MD5, SHA1, SHA256, BLAKE2 hashes.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

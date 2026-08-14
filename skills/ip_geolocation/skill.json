@@ -1,0 +1,8 @@
+{
+  "name": "IP Geolocation Lookup",
+  "description": "Retrieve geographical details for an IP address.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

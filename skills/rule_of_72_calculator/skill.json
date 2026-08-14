@@ -1,0 +1,8 @@
+{
+  "name": "Rule of 72 Calculator",
+  "description": "Estimate years required to double money.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

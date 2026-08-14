@@ -1,0 +1,8 @@
+{
+  "name": "Significant Figures Calculator",
+  "description": "Round number to specified sig figs.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

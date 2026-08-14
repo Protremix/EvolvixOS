@@ -1,0 +1,22 @@
+{
+  "name": "Feature Template 15",
+  "category": "feature",
+  "tags": [
+    "feature",
+    "lava-glow",
+    "playfair"
+  ],
+  "layout": "boxed",
+  "colors": {
+    "name": "Lava Glow",
+    "primary": "#FF4500",
+    "secondary": "#FFD700",
+    "bg": "#1A0500",
+    "surface": "#2A0F05",
+    "text": "#FFE0C0",
+    "muted": "#AA6650"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

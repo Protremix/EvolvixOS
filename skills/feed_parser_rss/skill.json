@@ -1,0 +1,8 @@
+{
+  "name": "RSS Feed Parser",
+  "description": "Parse RSS XML feeds to extract titles.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

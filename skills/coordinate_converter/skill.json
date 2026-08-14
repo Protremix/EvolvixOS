@@ -1,0 +1,8 @@
+{
+  "name": "Coordinate Converter",
+  "description": "Convert between Decimal Degrees (DD) and DMS.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

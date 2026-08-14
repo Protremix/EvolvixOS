@@ -1,0 +1,10 @@
+{
+  "name": "Depreciation Calculator",
+  "description": "Calculate depreciation (straight-line, declining)",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

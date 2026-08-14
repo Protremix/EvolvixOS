@@ -1,0 +1,8 @@
+{
+  "name": "Nautical Miles Converter",
+  "description": "Convert nautical miles to km and miles.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

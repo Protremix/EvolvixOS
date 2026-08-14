@@ -1,0 +1,8 @@
+{
+  "name": "Flight Time Estimator",
+  "description": "Estimate flight duration between coordinates.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

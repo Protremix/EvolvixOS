@@ -1,0 +1,8 @@
+{
+  "name": "One-Hot Encoder",
+  "description": "Encode labels into one-hot binary vectors.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

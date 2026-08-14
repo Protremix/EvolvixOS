@@ -1,0 +1,8 @@
+{
+  "name": "Port Scanner",
+  "description": "Scan target host for open TCP ports.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

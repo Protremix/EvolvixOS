@@ -1,0 +1,22 @@
+{
+  "name": "Event Template 334",
+  "category": "event",
+  "tags": [
+    "event",
+    "deep-indigo",
+    "helvetica"
+  ],
+  "layout": "sidebar",
+  "colors": {
+    "name": "Deep Indigo",
+    "primary": "#3D5A80",
+    "secondary": "#98C1D9",
+    "bg": "#0A0F1A",
+    "surface": "#141F30",
+    "text": "#D0D8E8",
+    "muted": "#506880"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

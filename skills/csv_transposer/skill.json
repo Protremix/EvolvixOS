@@ -1,0 +1,8 @@
+{
+  "name": "CSV Transposer",
+  "description": "Transpose rows and columns of CSV data.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

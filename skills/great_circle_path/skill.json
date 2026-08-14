@@ -1,0 +1,8 @@
+{
+  "name": "Great Circle Path Generator",
+  "description": "Generate intermediate waypoints.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Dashboard Template 292",
+  "category": "dashboard",
+  "tags": [
+    "dashboard",
+    "earth-brown",
+    "trebuchet"
+  ],
+  "layout": "split",
+  "colors": {
+    "name": "Earth Brown",
+    "primary": "#8B4513",
+    "secondary": "#D2691E",
+    "bg": "#1A1005",
+    "surface": "#2A1A10",
+    "text": "#F0DCC0",
+    "muted": "#88664A"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

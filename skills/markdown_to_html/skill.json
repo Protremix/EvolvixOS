@@ -1,0 +1,8 @@
+{
+  "name": "Markdown to HTML",
+  "description": "Convert basic Markdown text to HTML markup.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

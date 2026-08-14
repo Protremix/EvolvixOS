@@ -1,0 +1,8 @@
+{
+  "name": "Lightweight Web Scraper",
+  "description": "Extract page title, meta tags, and links.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

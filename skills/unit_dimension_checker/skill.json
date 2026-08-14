@@ -1,0 +1,8 @@
+{
+  "name": "Unit Dimension Checker",
+  "description": "Check SI dimensions balance.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

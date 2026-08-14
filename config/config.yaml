@@ -1,0 +1,216 @@
+# EvolvixOS Configuration v0.4
+# 100% local, zero tokens, zero external API calls.
+# Now with 21 skills — all free, all open source.
+
+config:
+  # === LLM (Ollama — runs locally, zero tokens) ===
+  llm:
+    primary_model: "deepseek-r1:7b"
+    coder_model: "qwen2.5-coder:7b"
+    fast_model: "llama3.2:3b"
+    host: "http://localhost:11434"
+    temperature: 0.7
+    max_tokens: 8192
+    num_ctx: 32768
+
+  # === Agent Behavior ===
+  agent:
+    name: "Evolvix"
+    max_steps: 50
+    max_retries: 3
+    memory_enabled: true
+    memory_db: "./data/evolvix_memory.db"
+    self_reflect: true
+    auto_learn_from_github: true
+    github_learn_interval_hours: 24
+
+  # === Skills (21 total) ===
+  skills:
+    # Core AI Skills
+    research:
+      enabled: true
+      searxng_url: "http://localhost:8888"
+      max_results: 10
+      depth: 5
+      max_report_words: 5000
+
+    coding:
+      enabled: true
+      output_dir: "./output/code"
+      allow_execution: true
+      languages: ["python", "javascript", "bash", "html", "css", "sql"]
+
+    video:
+      enabled: true
+      model: "wan2.1"
+      output_dir: "./output/videos"
+      default_resolution: "720p"
+      default_fps: 24
+      default_duration_seconds: 5
+      device: "cuda"
+      vram_optimization: "sequential_cpu_offload"
+
+    audio:
+      enabled: true
+      tts_model: "kokoro"
+      music_model: "musicgen-small"
+      output_dir: "./output/audio"
+      sample_rate: 24000
+
+    image:
+      enabled: true
+      model: "flux-schnell"
+      output_dir: "./output/images"
+      default_size: "1024x1024"
+      device: "cuda"
+
+    deploy:
+      enabled: true
+      deploy_dir: "/opt/evolvix-deployments"
+
+    project_learner:
+      enabled: true
+      max_files: 500
+      max_file_size: 50000
+      db_dir: "./data/projects"
+
+    voice:
+      enabled: true
+      stt_model: "base"
+      tts_model: "kokoro"
+      default_voice: "af"
+      sample_rate: 24000
+      output_dir: "./output/audio"
+
+    github_discovery:
+      enabled: true
+      skills_dir: "./skills"
+      cache_dir: "./data/github_cache"
+      min_stars: 50
+      install_min_stars: 100
+      max_install: 50
+      auto_learn: true
+
+    self_improver:
+      enabled: true
+      skills_dir: "./skills"
+      coder_model: "qwen2.5-coder:7b"
+      auto_fix: true
+      max_fix_iterations: 3
+
+    movie_maker:
+      enabled: true
+      output_dir: "./output/videos"
+      default_resolution: "720p"
+      default_style: "cinematic"
+      default_voice: "af"
+      default_music: "epic"
+
+    # NEW v0.4 Skills — All free, all open source
+    web_scraper:
+      enabled: true
+      output_dir: "./output/scraped"
+      timeout: 30
+      user_agent: "Mozilla/5.0 (X11; Linux x86_64) EvolvixOS/1.0"
+
+    data_analyst:
+      enabled: true
+      output_dir: "./output/analysis"
+
+    document_processor:
+      enabled: true
+      output_dir: "./output/documents"
+
+    translator:
+      enabled: true
+      output_dir: "./output/translations"
+      default_from: "en"
+      default_to: "es"
+
+    ocr:
+      enabled: true
+      output_dir: "./output/ocr"
+      engine: "tesseract"
+      lang: "eng"
+
+    image_editor:
+      enabled: true
+      output_dir: "./output/images_edited"
+
+    audio_processor:
+      enabled: true
+      output_dir: "./output/audio_processed"
+
+    video_editor:
+      enabled: true
+      output_dir: "./output/videos_edited"
+
+    code_analyzer:
+      enabled: true
+      output_dir: "./output/code_analysis"
+
+    summarizer:
+      enabled: true
+      output_dir: "./output/summaries"
+      model: "llama3.2:3b"
+      host: "http://localhost:11434"
+
+    file_converter:
+      enabled: true
+      output_dir: "./output/converted"
+
+    security_scanner:
+      enabled: true
+      output_dir: "./output/security"
+
+    math_solver:
+      enabled: true
+      output_dir: "./output/math"
+
+    visualizer:
+      enabled: true
+      output_dir: "./output/charts"
+
+    scheduler:
+      enabled: true
+      output_dir: "./output/scheduled"
+
+    system_monitor:
+      enabled: true
+      output_dir: "./output/monitor"
+
+    email_sender:
+      enabled: true
+      output_dir: "./output/emails"
+      smtp_host: "localhost"
+      smtp_port: 25
+
+    database_manager:
+      enabled: true
+      output_dir: "./output/databases"
+
+    markdown_builder:
+      enabled: true
+      output_dir: "./output/markdown"
+
+    browser_automation:
+      enabled: true
+      output_dir: "./output/browser"
+
+  # === Web UI ===
+  web:
+    enabled: true
+    host: "0.0.0.0"
+    port: 5000
+
+  # === API Server ===
+  api:
+    enabled: true
+    host: "0.0.0.0"
+    port: 5001
+    cors_enabled: true
+
+  # === Logging ===
+  logging:
+    level: "INFO"
+    file: "./logs/evolvix.log"

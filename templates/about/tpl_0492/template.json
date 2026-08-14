@@ -1,0 +1,22 @@
+{
+  "name": "About Template 492",
+  "category": "about",
+  "tags": [
+    "about",
+    "earth-brown",
+    "open sans"
+  ],
+  "layout": "split",
+  "colors": {
+    "name": "Earth Brown",
+    "primary": "#8B4513",
+    "secondary": "#D2691E",
+    "bg": "#1A1005",
+    "surface": "#2A1A10",
+    "text": "#F0DCC0",
+    "muted": "#88664A"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

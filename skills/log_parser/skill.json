@@ -1,0 +1,8 @@
+{
+  "name": "Nginx/Apache Log Parser",
+  "description": "Parse web server log lines.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

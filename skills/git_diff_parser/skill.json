@@ -1,0 +1,8 @@
+{
+  "name": "Git Diff Parser",
+  "description": "Parse unified git diff strings.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

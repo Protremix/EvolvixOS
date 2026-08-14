@@ -1,0 +1,8 @@
+{
+  "name": "Markup Calculator",
+  "description": "Calculate selling price from cost and markup.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

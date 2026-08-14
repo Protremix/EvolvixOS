@@ -1,0 +1,8 @@
+{
+  "name": "N-Gram Generator",
+  "description": "Generate word or character n-grams.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

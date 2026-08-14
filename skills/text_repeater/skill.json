@@ -1,0 +1,8 @@
+{
+  "name": "Text Repeater",
+  "description": "Repeat input string N times with custom delimiter.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

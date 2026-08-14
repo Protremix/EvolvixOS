@@ -1,0 +1,8 @@
+{
+  "name": "UTM Coordinate Converter",
+  "description": "Convert UTM coordinates to lat/lon.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

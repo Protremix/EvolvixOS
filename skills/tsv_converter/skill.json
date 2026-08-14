@@ -1,0 +1,8 @@
+{
+  "name": "TSV Converter",
+  "description": "Convert TSV (Tab-Separated Values) to CSV or JSON.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Number Formatter",
+  "description": "Format numbers (currency, percentage, etc)",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

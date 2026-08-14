@@ -1,0 +1,8 @@
+{
+  "name": "File Finder",
+  "description": "Search directory recursively for matching files.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

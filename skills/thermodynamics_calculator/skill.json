@@ -1,0 +1,8 @@
+{
+  "name": "Thermodynamics Calculator",
+  "description": "Calculate heat transfer Q=mc*(dT).",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

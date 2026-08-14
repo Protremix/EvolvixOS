@@ -1,0 +1,8 @@
+{
+  "name": "Line Counter",
+  "description": "Count lines, code lines, blank lines in text.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

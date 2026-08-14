@@ -1,0 +1,8 @@
+{
+  "name": "IP Subnet Calculator",
+  "description": "Calculate CIDR network address and host range.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Regex Tester",
+  "description": "Test regular expressions against text and return matches and groups.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

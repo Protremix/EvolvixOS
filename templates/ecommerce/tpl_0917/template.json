@@ -1,0 +1,22 @@
+{
+  "name": "Ecommerce Template 917",
+  "category": "ecommerce",
+  "tags": [
+    "ecommerce",
+    "mono-light",
+    "georgia"
+  ],
+  "layout": "hero",
+  "colors": {
+    "name": "Mono Light",
+    "primary": "#000000",
+    "secondary": "#444444",
+    "bg": "#FFFFFF",
+    "surface": "#F5F5F5",
+    "text": "#1A1A1A",
+    "muted": "#888888"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

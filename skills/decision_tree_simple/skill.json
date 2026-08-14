@@ -1,0 +1,8 @@
+{
+  "name": "Decision Tree Evaluator",
+  "description": "Compute Gini impurity and entropy.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

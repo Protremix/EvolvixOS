@@ -1,0 +1,10 @@
+{
+  "name": "URL Encoder/Decoder",
+  "description": "Encode and decode URLs",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Kubernetes YAML Validator",
+  "description": "Check basic manifest kind.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

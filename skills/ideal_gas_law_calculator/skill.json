@@ -1,0 +1,8 @@
+{
+  "name": "Ideal Gas Law Calculator",
+  "description": "Calculate PV=nRT.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

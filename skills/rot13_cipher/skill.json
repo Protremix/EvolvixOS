@@ -1,0 +1,8 @@
+{
+  "name": "ROT13 Cipher",
+  "description": "Encode or decode text using the ROT13 cipher.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

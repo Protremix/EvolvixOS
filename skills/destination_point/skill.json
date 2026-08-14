@@ -1,0 +1,8 @@
+{
+  "name": "Destination Point Calculator",
+  "description": "Calculate destination coordinate given bearing and distance.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

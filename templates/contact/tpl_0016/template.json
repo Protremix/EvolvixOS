@@ -1,0 +1,22 @@
+{
+  "name": "Contact Template 16",
+  "category": "contact",
+  "tags": [
+    "contact",
+    "mono-dark",
+    "inter"
+  ],
+  "layout": "split",
+  "colors": {
+    "name": "Mono Dark",
+    "primary": "#FFFFFF",
+    "secondary": "#AAAAAA",
+    "bg": "#000000",
+    "surface": "#111111",
+    "text": "#FFFFFF",
+    "muted": "#555555"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

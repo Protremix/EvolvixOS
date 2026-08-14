@@ -1,0 +1,8 @@
+{
+  "name": "Text Summarizer",
+  "description": "Summarize text by extracting high-frequency key sentences.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

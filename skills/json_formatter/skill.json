@@ -1,0 +1,8 @@
+{
+  "name": "JSON Formatter",
+  "description": "Format, beautify, or minify JSON data strings.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

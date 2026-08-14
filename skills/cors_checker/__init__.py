@@ -1,0 +1,1 @@
+"""CORS Checker EvolvixOS Skill."""

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvolvixOS — Build Free. Teach. Enjoy.</title>
+    <style>
+        :root {
+            --bg: #0a0e14;
+            --card: #131820;
+            --card2: #1a2030;
+            --border: #2a3142;
+            --purple: #7c5cff;
+            --teal: #00d4aa;
+            --text: #e4e7ec;
+            --text2: #8b9099;
+            --red: #f07178;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; line-height: 1.6;
+        }
+        nav {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 40px; max-width: 1200px; margin: 0 auto;
+        }
+        .logo { font-size: 24px; font-weight: 800; }
+        .logo .a { color: var(--purple); }
+        .logo .b { color: var(--teal); }
+        .nav-links { display: flex; gap: 24px; align-items: center; }
+        .nav-links a { color: var(--text2); text-decoration: none; font-size: 15px; transition: 0.2s; }
+        .nav-links a:hover { color: var(--text); }
+        .free-badge { background: var(--teal); color: #000; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 14px; }
+
+        .hero { text-align: center; padding: 80px 20px 60px; max-width: 700px; margin: 0 auto; }
+        .hero h1 {
+            font-size: 56px; font-weight: 800; line-height: 1.1; margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--purple), var(--teal));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero .tagline { font-size: 28px; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+        .hero p { font-size: 22px; color: var(--text2); margin-bottom: 40px; }
+        .hero-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            padding: 16px 32px; border-radius: 16px; font-size: 18px; font-weight: 600;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 10px; transition: 0.2s;
+        }
+        .btn-primary { background: var(--purple); color: #fff; }
+        .btn-primary:hover { background: #6b4cef; transform: translateY(-2px); }
+        .btn-secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--teal); }
+
+        .badges { display: flex; justify-content: center; gap: 32px; padding: 20px; flex-wrap: wrap; }
+        .badge { text-align: center; }
+        .badge-num { font-size: 36px; font-weight: 800; color: var(--teal); }
+        .badge-label { font-size: 14px; color: var(--text2); margin-top: 4px; }
+
+        .ecosystem { max-width: 1000px; margin: 0 auto; padding: 40px 32px; }
+        .ecosystem h2 { text-align: center; font-size: 32px; font-weight: 700; margin-bottom: 40px; }
+        .eco-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .eco-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 32px; transition: 0.2s;
+        }
+        .eco-card:hover { border-color: var(--purple); transform: translateY(-4px); }
+        .eco-icon { font-size: 36px; margin-bottom: 16px; }
+        .eco-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .eco-card p { font-size: 15px; color: var(--text2); }
+        .eco-tag { display: inline-block; background: var(--card2); padding: 4px 12px; border-radius: 20px; font-size: 13px; color: var(--teal); margin-top: 12px; }
+
+        .features { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; max-width: 1000px; margin: 0 auto; padding: 20px 32px; }
+        .feature { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; transition: 0.2s; }
+        .feature:hover { border-color: var(--teal); }
+        .feature-icon { font-size: 28px; margin-bottom: 12px; }
+        .feature h3 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+        .feature p { font-size: 14px; color: var(--text2); }
+
+        .manifesto { max-width: 700px; margin: 40px auto; padding: 40px 32px; text-align: center; }
+        .manifesto h2 { font-size: 36px; font-weight: 800; margin-bottom: 24px; background: linear-gradient(135deg, var(--purple), var(--teal)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .manifesto-list { display: flex; flex-direction: column; gap: 12px; max-width: 400px; margin: 0 auto; }
+        .manifesto-item { display: flex; align-items: center; gap: 12px; justify-content: center; font-size: 20px; color: var(--text2); }
+        .manifesto-item .x { color: var(--red); font-weight: 700; }
+        .manifesto-item .check { color: var(--teal); font-weight: 700; }
+
+        .steps { max-width: 700px; margin: 0 auto; padding: 40px 32px; }
+        .steps h2 { text-align: center; font-size: 32px; font-weight: 700; margin-bottom: 40px; }
+        .step { display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start; }
+        .step-num { flex-shrink: 0; width: 44px; height: 44px; border-radius: 12px; background: var(--purple); color: #fff; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+        .step-content h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .step-content p { color: var(--text2); font-size: 15px; }
+        .step-content code { background: var(--card2); padding: 2px 8px; border-radius: 6px; font-size: 14px; }
+
+        .skills-grid { max-width: 1000px; margin: 0 auto; padding: 20px 32px 40px; }
+        .skills-grid h2 { text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 24px; }
+        .skill-tags { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .skill-tag { background: var(--card); border: 1px solid var(--border); padding: 8px 16px; border-radius: 20px; font-size: 14px; color: var(--text2); transition: 0.2s; }
+        .skill-tag:hover { border-color: var(--teal); color: var(--text); }
+
+        .templates-section { max-width: 1000px; margin: 0 auto; padding: 20px 32px 60px; }
+        .templates-section h2 { text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+        .templates-section .subtitle { text-align: center; font-size: 16px; color: var(--text2); margin-bottom: 32px; }
+        .tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+        .tpl-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; transition: 0.2s; }
+        .tpl-card:hover { border-color: var(--teal); transform: translateY(-3px); }
+        .tpl-icon { font-size: 32px; margin-bottom: 10px; }
+        .tpl-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .tpl-card .count { font-size: 24px; font-weight: 800; color: var(--teal); }
+        .tpl-card .label { font-size: 13px; color: var(--text2); }
+
+        footer { text-align: center; padding: 40px 20px; color: var(--text2); border-top: 1px solid var(--border); }
+        footer a { color: var(--teal); text-decoration: none; }
+
+        @media (max-width: 768px) {
+            nav { padding: 16px 20px; flex-direction: column; gap: 12px; }
+            .hero h1 { font-size: 36px; }
+            .hero .tagline { font-size: 20px; }
+            .hero p { font-size: 18px; }
+            .features { padding: 20px; }
+            .tpl-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo"><span class="a">Evolvix</span><span class="b">OS</span></div>
+        <div class="nav-links">
+            <a href="#genie">Genie</a>
+            <a href="#real-life">Real Life</a>
+            <a href="#ecosystem">Ecosystem</a>
+            <a href="#templates">Templates</a>
+            <a href="#features">Features</a>
+            <a href="#manifesto">Philosophy</a>
+            <a href="#how">Install</a>
+            <a href="https://github.com/Protremix/EvolvixOS">GitHub</a>
+        </div>
+        <div class="free-badge">$0 · Free Forever</div>
+    </nav>
+
+    <div class="hero">
+        <div class="tagline">Build Free. Teach Him. Enjoy.</div>
+        <h1>The AI Market Killer</h1>
+        <p>Just type what you need. EvolvixOS builds it for you. It spawns sub-agents, connects to any device or API, answers your phone calls, manages your real life — all local, all free. No coding. No cloud. No tokens. Pure AI power — forever.</p>
+        <div class="hero-buttons">
+            <a href="https://github.com/Protremix/EvolvixOS" class="btn btn-primary">⬇️ Get It Free</a>
+            <a href="#real-life" class="btn btn-secondary">🤖 See Real Life AI</a>
+        </div>
+    </div>
+
+    <div class="badges">
+        <div class="badge"><div class="badge-num">0</div><div class="badge-label">Coding Required</div></div>
+        <div class="badge"><div class="badge-num">438+</div><div class="badge-label">Skills</div></div>
+        <div class="badge"><div class="badge-num">11K</div><div class="badge-label">Templates</div></div>
+        <div class="badge"><div class="badge-num">800+</div><div class="badge-label">API Endpoints</div></div>
+        <div class="badge"><div class="badge-num">$0</div><div class="badge-label">Forever</div></div>
+    </div>
+
+    <div class="ecosystem" id="ecosystem">
+        <h2>🧬 The Ecosystem</h2>
+        <div class="eco-grid">
+            <div class="eco-card">
+                <div class="eco-icon">🧬</div>
+                <h3>EvolvixOS</h3>
+                <p>The AI brain. 434+ skills, 11,000 templates, voice, vision, code, automation. Runs entirely on your machine. Self-improving via GitHub Discovery Engine. Unlimited via Universal Adapter — wraps any of 400K+ pip packages as a skill.</p>
+                <span class="eco-tag">Core Platform</span>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">⛓️</div>
+                <h3>VerdisChain</h3>
+                <p>Verifiable AI on blockchain. Immutable audit trails for AI decisions. Zero-cost transactions. Provenance tracking. No gas fees, ever.</p>
+                <span class="eco-tag">Blockchain Layer</span>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">🌐</div>
+                <h3>Anerium</h3>
+                <p>P2P network for AI. Share skills between EvolvixOS instances. Federated learning. Encrypted mesh. No central server, no cost.</p>
+                <span class="eco-tag">Network Layer</span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="genie-section" id="genie" style="max-width:1000px;margin:0 auto;padding:40px 32px;text-align:center;">
+        <h2 style="font-size:32px;font-weight:800;margin-bottom:16px;background:linear-gradient(135deg,var(--purple),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">🧞 The Genie — Zero-Code Builder</h2>
+        <p style="font-size:20px;color:var(--text2);margin-bottom:32px;">Don't know how to code? No problem. Just type what you need and the Genie builds it.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+            <div class="eco-card">
+                <div class="eco-icon">💬</div>
+                <h3>Just Say It</h3>
+                <p>"I need a website for my bakery" — that's it. The Genie understands plain English.</p>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">🔧</div>
+                <h3>It Builds Everything</h3>
+                <p>Code, files, configuration, styling — all generated automatically. You never touch code.</p>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">🔍</div>
+                <h3>Auto-Audit</h3>
+                <p>Every project is scanned for security vulnerabilities, code quality, and best practices.</p>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">🛡️</div>
+                <h3>Auto-Fix + Security</h3>
+                <p>Issues are fixed automatically. High-level security protocol enforced on everything.</p>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">📦</div>
+                <h3>10 Project Types</h3>
+                <p>Websites, web apps, mobile apps, APIs, chatbots, dashboards, games, documents, and more.</p>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">✅</div>
+                <h3>Ready to Use</h3>
+                <p>You get a finished, security-hardened project with instructions. Just open it.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="genie-section" id="real-life" style="max-width:1000px;margin:0 auto;padding:40px 32px;text-align:center;">
+        <h2 style="font-size:32px;font-weight:800;margin-bottom:16px;background:linear-gradient(135deg,var(--purple),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">🤖 Real Life AI Assistant</h2>
+        <p style="font-size:20px;color:var(--text2);margin-bottom:32px;">EvolvixOS doesn't just build apps — it manages your entire life. Connect it to anything, and it handles the rest.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+            <div class="eco-card">
+                <div class="eco-icon">🧞</div>
+                <h3>Sub-Agents</h3>
+                <p>Spawns background AI workers to handle multiple tasks in parallel. Like having a team of assistants.</p>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">📞</div>
+                <h3>Answers Calls</h3>
+                <p>Add a VoIP API (Twilio, Vonage, SIP) and EvolvixOS answers phone calls with AI voice. Be a real human.</p>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">🔌</div>
+                <h3>Any API</h3>
+                <p>Connect any external API. EvolvixOS manages it all — calls, webhooks, chains, health checks.</p>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">🏠</div>
+                <h3>Smart Home</h3>
+                <p>Control lights, thermostats, cameras, locks. Works with Home Assistant, Hue, Nest, Ring, Tesla.</p>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">📱</div>
+                <h3>Any Device</h3>
+                <p>Connect phones, computers, wearables, IoT sensors. EvolvixOS discovers and controls them all.</p>
+            </div>
+            <div class="eco-card">
+                <div class="eco-icon">📋</div>
+                <h3>Life Manager</h3>
+                <p>Tasks, calendar, contacts, budget, goals, shopping, reminders. Daily AI briefing every morning.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="templates-section" id="templates">
+        <h2>🎨 11,000 Website Templates</h2>
+        <p class="subtitle">21 categories. 20 color palettes. 15 font families. All responsive. All free. $0 forever.</p>
+        <div class="tpl-grid">
+            <div class="tpl-card"><div class="tpl-icon">🚀</div><h3>Landing</h3><div class="count">1,000</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">💼</div><h3>Portfolio</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">📝</div><h3>Blog</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">📊</div><h3>Dashboard</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">🛒</div><h3>Ecommerce</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">📄</div><h3>Resume</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">⏳</div><h3>Coming Soon</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">🚫</div><h3>404 Pages</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">🔐</div><h3>Auth</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">💰</div><h3>Pricing</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">ℹ️</div><h3>About</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">📧</div><h3>Contact</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">🖼️</div><h3>Gallery</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">📚</div><h3>Docs</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">👤</div><h3>Profile</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">📅</div><h3>Event</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">📰</div><h3>Newsletter</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">⭐</div><h3>Testimonials</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">✨</div><h3>Features</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">📍</div><h3>Timeline</h3><div class="count">500</div><div class="label">templates</div></div>
+            <div class="tpl-card"><div class="tpl-icon">⚖️</div><h3>Comparison</h3><div class="count">500</div><div class="label">templates</div></div>
+        </div>
+    </div>
+
+    <div class="manifesto" id="manifesto">
+        <h2>No BS. Just AI.</h2>
+        <div class="manifesto-list">
+            <div class="manifesto-item"><span class="x">✕</span> No ads</div>
+            <div class="manifesto-item"><span class="x">✕</span> No marketing</div>
+            <div class="manifesto-item"><span class="x">✕</span> No subscriptions</div>
+            <div class="manifesto-item"><span class="x">✕</span> No cloud fees</div>
+            <div class="manifesto-item"><span class="x">✕</span> No API tokens</div>
+            <div class="manifesto-item"><span class="x">✕</span> No tracking</div>
+            <div class="manifesto-item"><span class="check">✓</span> 100% Free</div>
+            <div class="manifesto-item"><span class="check">✓</span> 100% Local</div>
+            <div class="manifesto-item"><span class="check">✓</span> 100% Yours</div>
+        </div>
+    </div>
+
+    <div class="features" id="features">
+        <div class="feature"><div class="feature-icon">💬</div><h3>Chat</h3><p>Talk to AI about anything</p></div>
+        <div class="feature"><div class="feature-icon">🎤</div><h3>Voice</h3><p>Speak and listen, hands-free</p></div>
+        <div class="feature"><div class="feature-icon">🔍</div><h3>Research</h3><p>Search the web, crawl sites</p></div>
+        <div class="feature"><div class="feature-icon">💻</div><h3>Code</h3><p>Write, lint, analyze code</p></div>
+        <div class="feature"><div class="feature-icon">📄</div><h3>Documents</h3><p>Parse PDF, Word, Excel</p></div>
+        <div class="feature"><div class="feature-icon">🌐</div><h3>Translate</h3><p>30+ languages, offline</p></div>
+        <div class="feature"><div class="feature-icon">🖼️</div><h3>Images</h3><p>Edit, OCR, process images</p></div>
+        <div class="feature"><div class="feature-icon">🎵</div><h3>Audio</h3><p>Cut, merge, convert audio</p></div>
+        <div class="feature"><div class="feature-icon">🎬</div><h3>Video</h3><p>Edit and create videos</p></div>
+        <div class="feature"><div class="feature-icon">🔢</div><h3>Math</h3><p>Solve equations, calculus</p></div>
+        <div class="feature"><div class="feature-icon">📊</div><h3>Data</h3><p>Analyze with SQL, ML</p></div>
+        <div class="feature"><div class="feature-icon">🔒</div><h3>Security</h3><p>Scan code for bugs</p></div>
+        <div class="feature"><div class="feature-icon">📱</div><h3>Devices</h3><p>Phone, tablet, desktop</p></div>
+        <div class="feature"><div class="feature-icon">☁️</div><h3>Deploy</h3><p>One command to any server</p></div>
+        <div class="feature"><div class="feature-icon">🧬</div><h3>Self-Learn</h3><p>Discovers new GitHub tools</p></div>
+        <div class="feature"><div class="feature-icon">💾</div><h3>Vector DB</h3><p>Search by meaning, not words</p></div>
+        <div class="feature"><div class="feature-icon">🎨</div><h3>Templates</h3><p>11,000 website templates</p></div>
+        <div class="feature"><div class="feature-icon">🧠</div><h3>Model Registry</h3><p>Version and deploy models</p></div>
+        <div class="feature"><div class="feature-icon">🧪</div><h3>Experiment Tracking</h3><p>Log, compare, reproduce</p></div>
+        <div class="feature"><div class="feature-icon">🔗</div><h3>Pipelines</h3><p>Chain skills into workflows</p></div>
+        <div class="feature"><div class="feature-icon">🧞</div><h3>Sub-Agents</h3><p>Parallel AI workers</p></div>
+        <div class="feature"><div class="feature-icon">📞</div><h3>VoIP Calls</h3><p>Answer phone calls with AI</p></div>
+        <div class="feature"><div class="feature-icon">🔌</div><h3>Any API</h3><p>Connect external APIs</p></div>
+        <div class="feature"><div class="feature-icon">🏠</div><h3>Smart Home</h3><p>Control lights, locks, cameras</p></div>
+        <div class="feature"><div class="feature-icon">📋</div><h3>Life Manager</h3><p>Tasks, calendar, budget, goals</p></div>
+        <div class="feature"><div class="feature-icon">📱</div><h3>Any Device</h3><p>Connect and control anything</p></div>
+    </div>
+
+    <div class="skills-grid">
+        <h2>434+ Skills — All Free</h2>
+        <div class="skill-tags">
+            <span class="skill-tag">💬 Chat</span>
+            <span class="skill-tag">🎤 Voice</span>
+            <span class="skill-tag">🔍 Research</span>
+            <span class="skill-tag">💻 Coding</span>
+            <span class="skill-tag">🎬 Movie Maker</span>
+            <span class="skill-tag">🕷️ Web Crawler</span>
+            <span class="skill-tag">📊 Data Analyzer</span>
+            <span class="skill-tag">📄 Doc Parser</span>
+            <span class="skill-tag">🌐 Translator</span>
+            <span class="skill-tag">👁️ OCR Scanner</span>
+            <span class="skill-tag">🖼️ Image Processor</span>
+            <span class="skill-tag">🎵 Audio Editor</span>
+            <span class="skill-tag">🎞️ Video Editor</span>
+            <span class="skill-tag">🔍 Code Linter</span>
+            <span class="skill-tag">🧮 Math Solver</span>
+            <span class="skill-tag">🤖 ML Toolkit</span>
+            <span class="skill-tag">🔐 Security Scanner</span>
+            <span class="skill-tag">📅 Scheduler</span>
+            <span class="skill-tag">💾 Vector Store</span>
+            <span class="feature-tag">🧠 NLP Processor</span>
+            <span class="skill-tag">📐 Embeddings</span>
+            <span class="skill-tag">📊 Dashboard Builder</span>
+            <span class="skill-tag">🐙 GitHub Discovery</span>
+            <span class="skill-tag">🧬 Self-Improver</span>
+            <span class="skill-tag">📱 Device Manager</span>
+            <span class="skill-tag">☁️ Hetzner Deploy</span>
+            <span class="skill-tag">🧠 Model Registry</span>
+            <span class="skill-tag">🧪 Experiment Tracker</span>
+            <span class="skill-tag">🔗 Pipeline Builder</span>
+            <span class="skill-tag">📋 File Converter</span>
+            <span class="skill-tag">📧 Email Sender</span>
+            <span class="skill-tag">🗄️ Database Manager</span>
+            <span class="skill-tag">📝 Markdown Builder</span>
+            <span class="skill-tag">🖥️ System Monitor</span>
+            <span class="skill-tag">🌐 Browser Automation</span>
+            <span class="skill-tag">📊 Visualizer</span>
+            <span class="skill-tag">🧠 Model Server</span>
+            <span class="skill-tag">📈 Evaluation</span>
+            <span class="skill-tag">📚 Project Learner</span>
+            <span class="skill-tag">🎨 Template Browser</span>
+            <span class="skill-tag">🏗️ Site Generator</span>
+            <span class="skill-tag">🔌 Universal Adapter</span>
+            <span class="skill-tag">⚙️ Skill Forge</span>
+            <span class="skill-tag">📦 Package Wrapper</span>
+            <span class="skill-tag">🏃 Code Runner</span>
+            <span class="skill-tag">🔄 Pipeline Engine</span>
+            <span class="skill-tag">🔐 TOTP Generator</span>
+            <span class="skill-tag">🔑 JWT Handler</span>
+            <span class="skill-tag">📈 ROI Calculator</span>
+            <span class="skill-tag">🧬 DNA Analyzer</span>
+            <span class="skill-tag">🌡️ Unit Converter</span>
+            <span class="skill-tag">🎨 Color Tools</span>
+            <span class="skill-tag">📊 Confusion Matrix</span>
+            <span class="skill-tag">🔤 TF-IDF</span>
+            <span class="skill-tag">✂️ Text Summarizer</span>
+            <span class="skill-tag">🔢 Base Converter</span>
+        </div>
+    </div>
+
+    <div class="steps" id="how">
+        <h2>3 Steps. That's It.</h2>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+                <h3>Install Ollama (the brain)</h3>
+                <p>Download from <a href="https://ollama.com" style="color:var(--teal)">ollama.com</a> then run <code>ollama pull deepseek-r1:7b</code></p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+                <h3>Clone EvolvixOS</h3>
+                <p><code>git clone https://github.com/Protremix/EvolvixOS.git</code> then <code>pip install -r requirements.txt</code></p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-content">
+                <h3>Start it</h3>
+                <p><code>python api_server.py</code> — open <code>http://localhost:5000</code> in your browser. Done.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>🧬 EvolvixOS · ⛓️ VerdisChain · 🌐 Anerium</p>
+        <p style="margin-top:8px;font-size:14px">Zero-code · Sub-agents · VoIP calls · Any API · Any device · Life manager · 438+ skills · 11K templates · 800+ API endpoints · Build free. Teach him. Enjoy.</p>
+        <p style="margin-top:4px;font-size:14px"><a href="https://github.com/Protremix/EvolvixOS">GitHub</a> · $0 forever · 100% local · zero BS</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "Label Encoder",
+  "description": "Encode category strings into integer indices.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

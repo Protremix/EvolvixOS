@@ -1,0 +1,8 @@
+{
+  "name": "Language Detector",
+  "description": "Identify text language using character n-grams.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

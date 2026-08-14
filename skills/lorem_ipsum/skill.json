@@ -1,0 +1,8 @@
+{
+  "name": "Lorem Ipsum Generator",
+  "description": "Generate placeholder Lorem Ipsum text.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

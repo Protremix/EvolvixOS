@@ -1,0 +1,8 @@
+{
+  "name": "Tax Estimator",
+  "description": "Estimate income tax based on simple brackets.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Matrix Calculator",
+  "description": "Perform matrix addition and multiplication.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Event Template 128",
+  "category": "event",
+  "tags": [
+    "event",
+    "golden-hour",
+    "palatino"
+  ],
+  "layout": "boxed",
+  "colors": {
+    "name": "Golden Hour",
+    "primary": "#FFB300",
+    "secondary": "#FF8F00",
+    "bg": "#1A1505",
+    "surface": "#2A2010",
+    "text": "#FFF0CC",
+    "muted": "#AA9966"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

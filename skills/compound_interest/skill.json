@@ -1,0 +1,8 @@
+{
+  "name": "Compound Interest Calculator",
+  "description": "Calculate future value with compound interest.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

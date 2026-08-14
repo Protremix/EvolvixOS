@@ -1,0 +1,8 @@
+{
+  "name": "3D Coordinate Transform",
+  "description": "Convert Cartesian (x,y,z) to Spherical (r,theta,phi).",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

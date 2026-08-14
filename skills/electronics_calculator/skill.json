@@ -1,0 +1,8 @@
+{
+  "name": "Electronics Calculator (Ohm's Law)",
+  "description": "Calculate Ohms law V=IR and Power.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

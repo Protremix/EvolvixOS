@@ -1,0 +1,22 @@
+{
+  "name": "Event Template 396",
+  "category": "event",
+  "tags": [
+    "event",
+    "mono-dark",
+    "arial"
+  ],
+  "layout": "centered",
+  "colors": {
+    "name": "Mono Dark",
+    "primary": "#FFFFFF",
+    "secondary": "#AAAAAA",
+    "bg": "#000000",
+    "surface": "#111111",
+    "text": "#FFFFFF",
+    "muted": "#555555"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

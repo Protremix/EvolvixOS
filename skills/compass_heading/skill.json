@@ -1,0 +1,8 @@
+{
+  "name": "Compass Heading Converter",
+  "description": "Convert degrees to cardinal direction.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

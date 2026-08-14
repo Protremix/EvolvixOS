@@ -1,0 +1,22 @@
+{
+  "name": "Dashboard Template 566",
+  "category": "dashboard",
+  "tags": [
+    "dashboard",
+    "crimson-red",
+    "roboto"
+  ],
+  "layout": "split",
+  "colors": {
+    "name": "Crimson Red",
+    "primary": "#DC143C",
+    "secondary": "#FF6B6B",
+    "bg": "#1A0A0A",
+    "surface": "#2A1010",
+    "text": "#FFD0D0",
+    "muted": "#AA6666"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

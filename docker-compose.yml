@@ -1,0 +1,35 @@
+# EvolvixOS — Docker Compose
+# One command to run everything: docker-compose up
+version: "3.8"
+
+services:
+  evolvix:
+    build: .
+    container_name: evolvixos
+    ports:
+      - "5000:5000"   # Web UI
+      - "5001:5001"   # API server
+    volumes:
+      - evolvix-data:/app/data
+      - evolvix-skills:/app/skills
+      - evolvix-output:/app/output
+      - evolvix-models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=http://localhost:11434
+      - EVOLVIX_MODEL=deepseek-r1:7b
+    restart: unless-stopped
+    depends_on:
+      - searxng
+
+  searxng:
+    image: searxng/searxng:latest
+    container_name: evolvix-searxng
+    ports:
+      - "8888:8080"
+    restart: unless-stopped
+
+volumes:
+  evolvix-data:
+  evolvix-skills:
+  evolvix-output:
+  evolvix-models:

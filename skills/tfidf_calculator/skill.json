@@ -1,0 +1,8 @@
+{
+  "name": "TF-IDF Calculator",
+  "description": "Calculate TF-IDF scores across documents.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

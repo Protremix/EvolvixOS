@@ -1,0 +1,22 @@
+{
+  "name": "Coming_Soon Template 127",
+  "category": "coming_soon",
+  "tags": [
+    "coming_soon",
+    "midnight",
+    "trebuchet"
+  ],
+  "layout": "split",
+  "colors": {
+    "name": "Midnight",
+    "primary": "#1976D2",
+    "secondary": "#42A5F5",
+    "bg": "#0A0A0A",
+    "surface": "#1A1A1A",
+    "text": "#E0E0E0",
+    "muted": "#666666"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

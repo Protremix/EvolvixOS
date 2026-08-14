@@ -1,0 +1,31 @@
+---
+name: New Skill
+about: Propose a new skill for EvolvixOS
+title: "[SKILL] "
+labels: skill, enhancement
+---
+
+## Skill name
+What should this skill be called? (e.g., `movie_maker`, `translator`, `analyzer`)
+
+## What it does
+Describe what this skill enables EvolvixOS to do.
+
+## Open-source tools to use
+List the open-source tools/models this skill would use (must be free and open-source):
+- [ ] Tool 1: [name] — [what it does]
+- [ ] Tool 2: [name] — [what it does]
+
+## Is everything 100% local?
+- [ ] Yes — no internet needed after setup
+- [ ] Yes — but needs to download models on first run
+- [ ] No — requires internet (explain why)
+
+## Example usage
+```
+<skill name="your_skill">{"action": "do_something", "args": {...}}</skill>
+```
+
+## Are you submitting a PR?
+- [ ] Yes, PR coming
+- [ ] No, this is a request for someone else to build

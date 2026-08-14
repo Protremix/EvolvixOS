@@ -1,0 +1,8 @@
+{
+  "name": "Color Contrast Checker (WCAG)",
+  "description": "Calculate WCAG color contrast ratio.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

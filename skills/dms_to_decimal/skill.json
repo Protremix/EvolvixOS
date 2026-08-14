@@ -1,0 +1,8 @@
+{
+  "name": "DMS to Decimal Degrees",
+  "description": "Convert DMS to decimal degrees.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

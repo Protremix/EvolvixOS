@@ -1,0 +1,8 @@
+{
+  "name": "Tokenizer",
+  "description": "Tokenize text into word and punctuation tokens.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

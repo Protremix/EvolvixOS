@@ -1,0 +1,8 @@
+{
+  "name": "Haiku Generator",
+  "description": "Generate or validate Haiku poem structure (5-7-5 syllables).",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

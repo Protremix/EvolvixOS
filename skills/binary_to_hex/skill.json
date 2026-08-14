@@ -1,0 +1,8 @@
+{
+  "name": "Binary to Hex Converter",
+  "description": "Convert raw binary string to hex representation.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

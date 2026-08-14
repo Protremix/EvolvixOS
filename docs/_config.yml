@@ -1,0 +1,4 @@
+# EvolvixOS GitHub Pages
+# This file enables GitHub Pages to serve from the /docs folder on the main branch.
+
+theme: jekyll-theme-cayman

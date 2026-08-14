@@ -1,0 +1,22 @@
+{
+  "name": "404 Template 69",
+  "category": "404",
+  "tags": [
+    "404",
+    "mint-fresh",
+    "verdana"
+  ],
+  "layout": "sidebar",
+  "colors": {
+    "name": "Mint Fresh",
+    "primary": "#00C9A7",
+    "secondary": "#00D4AA",
+    "bg": "#0A1A18",
+    "surface": "#102A28",
+    "text": "#CCF0E8",
+    "muted": "#669988"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

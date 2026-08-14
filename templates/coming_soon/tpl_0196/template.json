@@ -1,0 +1,22 @@
+{
+  "name": "Coming_Soon Template 196",
+  "category": "coming_soon",
+  "tags": [
+    "coming_soon",
+    "mono-dark",
+    "inter"
+  ],
+  "layout": "grid",
+  "colors": {
+    "name": "Mono Dark",
+    "primary": "#FFFFFF",
+    "secondary": "#AAAAAA",
+    "bg": "#000000",
+    "surface": "#111111",
+    "text": "#FFFFFF",
+    "muted": "#555555"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Black-Scholes Option Pricer",
+  "description": "Calculate European option prices.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

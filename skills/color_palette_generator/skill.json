@@ -1,0 +1,8 @@
+{
+  "name": "Color Palette Generator",
+  "description": "Generate complementary or triadic palettes.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

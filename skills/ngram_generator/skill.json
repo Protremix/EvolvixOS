@@ -1,0 +1,10 @@
+{
+  "name": "N-gram Generator",
+  "description": "Generate n-grams from text",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

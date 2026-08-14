@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vanguard — Move fast</title>
+  <meta name="description" content="Less code, more impact">
+  <style>
+:root {
+  --primary: #7C5CFF;
+  --secondary: #00D4AA;
+  --bg: #0F0F1A;
+  --surface: #1A1A2E;
+  --text: #E0E0E0;
+  --muted: #8888AA;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
+  --font: 'Roboto', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; }
+a { color: var(--primary); text-decoration: none; transition: opacity 0.2s; }
+a:hover { opacity: 0.8; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+.btn { display: inline-block; padding: 12px 28px; border-radius: var(--radius-sm); font-weight: 600; border: none; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.btn-primary { background: var(--primary); color: var(--bg); }
+.btn-secondary { background: var(--secondary); color: var(--bg); }
+.btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.card { background: var(--surface); border-radius: var(--radius); padding: 32px; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.2s, border-color 0.2s; }
+.card:hover { transform: translateY(-4px); border-color: var(--primary); }
+.grid { display: grid; gap: 24px; }
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.grid-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+section { padding: 80px 0; }
+h1 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
+h2 { font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 700; margin-bottom: 12px; }
+h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 8px; }
+p { color: var(--muted); margin-bottom: 16px; }
+.badge { display: inline-block; padding: 4px 12px; border-radius: 100px; font-size: 0.85rem; font-weight: 600; background: rgba(255,255,255,0.1); color: var(--primary); }
+.navbar { position: sticky; top: 0; z-index: 100; background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+.navbar .container { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; }
+.navbar .logo { font-weight: 800; font-size: 1.25rem; color: var(--primary); }
+.navbar nav { display: flex; gap: 32px; }
+.navbar nav a { color: var(--text); font-weight: 500; font-size: 0.95rem; }
+.hero { text-align: center; padding: 120px 0 80px; }
+.hero h1 { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero .btn { margin: 8px; }
+.footer { border-top: 1px solid rgba(255,255,255,0.05); padding: 40px 0; text-align: center; color: var(--muted); }
+.footer a { margin: 0 12px; }
+.testimonial { background: var(--surface); border-radius: var(--radius); padding: 32px; border-left: 4px solid var(--primary); }
+.testimonial .quote { font-size: 1.1rem; font-style: italic; margin-bottom: 16px; }
+.testimonial .author { font-weight: 600; color: var(--text); }
+.testimonial .role { font-size: 0.9rem; color: var(--muted); }
+.stat { text-align: center; }
+.stat .number { font-size: 3rem; font-weight: 800; color: var(--primary); }
+.stat .label { color: var(--muted); margin-top: 8px; }
+.pricing-card { background: var(--surface); border-radius: var(--radius); padding: 40px; text-align: center; border: 1px solid rgba(255,255,255,0.05); position: relative; }
+.pricing-card.featured { border-color: var(--primary); transform: scale(1.05); }
+.pricing-card .price { font-size: 3rem; font-weight: 800; color: var(--primary); }
+.pricing-card .period { color: var(--muted); }
+.pricing-card ul { list-style: none; margin: 24px 0; text-align: left; }
+.pricing-card li { padding: 8px 0; color: var(--muted); }
+.pricing-card li:before { content: "✓"; color: var(--secondary); margin-right: 12px; font-weight: 700; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 6px; font-weight: 500; }
+.form-group input, .form-group textarea { width: 100%; padding: 12px 16px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid rgba(255,255,255,0.1); color: var(--text); font-family: var(--font); }
+.form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+.faq-item { background: var(--surface); border-radius: var(--radius-sm); padding: 20px; margin-bottom: 12px; }
+.faq-item h3 { cursor: pointer; color: var(--text); }
+.faq-item p { margin-top: 8px; }
+.tag { display: inline-block; padding: 4px 12px; border-radius: var(--radius-sm); background: var(--surface); color: var(--primary); font-size: 0.85rem; margin: 4px; }
+.progress { height: 8px; border-radius: 100px; background: var(--surface); overflow: hidden; }
+.progress-bar { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+.avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: inline-flex; align-items: center; justify-content: center; font-weight: 700; color: var(--bg); }
+.team-member { text-align: center; }
+.team-member .avatar { width: 96px; height: 96px; font-size: 2rem; margin-bottom: 16px; }
+.feature-icon { width: 56px; height: 56px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 16px; }
+.screenshot { border-radius: var(--radius); overflow: hidden; border: 1px solid rgba(255,255,255,0.05); background: var(--surface); }
+.screenshot img { width: 100%; display: block; }
+.timeline-item { display: flex; gap: 24px; padding: 20px 0; border-left: 3px solid var(--primary); padding-left: 24px; position: relative; }
+.timeline-item:before { content: ""; position: absolute; left: -9px; top: 28px; width: 15px; height: 15px; border-radius: 50%; background: var(--primary); }
+@media (max-width: 768px) {
+  .navbar nav { display: none; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .pricing-card.featured { transform: none; }
+  section { padding: 48px 0; }
+  .hero { padding: 60px 0 40px; }
+}
+</style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="container">
+      <a href="#" class="logo">Forge Docs</a>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a href="#" class="btn btn-primary">Get Started</a>
+    </div>
+  </div>
+  <div class="hero" style="padding:40px 0;text-align:left;">
+    <div class="container" style="max-width:900px;">
+      <span class="badge">Documentation</span>
+      <h1 style="font-size:2.5rem;">Getting Started</h1>
+      <p>Welcome to the Forge Docs documentation. Everything you need to build with our platform.</p>
+    </div>
+  </div>
+  <section style="padding:0 0 60px;">
+    <div class="container" style="max-width:900px;">
+      <div style="display:grid;grid-template-columns:240px 1fr;gap:32px;">
+        <div style="position:sticky;top:80px;">
+          <h3 style="margin-bottom:16px;">Contents</h3>
+          <a href="#" style="display:block;padding:8px 0;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.05);">Introduction</a><a href="#" style="display:block;padding:8px 0;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.05);">Installation</a><a href="#" style="display:block;padding:8px 0;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.05);">Quick Start</a><a href="#" style="display:block;padding:8px 0;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.05);">Configuration</a><a href="#" style="display:block;padding:8px 0;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.05);">API Reference</a><a href="#" style="display:block;padding:8px 0;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.05);">Examples</a><a href="#" style="display:block;padding:8px 0;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.05);">FAQ</a>
+        </div>
+        <div>
+          <h2>Introduction</h2>
+          <p>Forge Docs is a powerful platform for building modern applications. This guide will help you get started quickly.</p>
+          <h3 style="margin-top:24px;">Installation</h3>
+          <div class="card" style="background:#0A0A0A;font-family:monospace;padding:16px;"><code>pip install forge-docs</code></div>
+          <h3 style="margin-top:24px;">Quick Start</h3>
+          <div class="card" style="background:#0A0A0A;font-family:monospace;padding:16px;"><code>import forge<br>app = forge.App()<br>app.run()</code></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="footer">
+    <div class="container">
+      <p>&copy; 2024 Forge Docs. All rights reserved.</p>
+      <p>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Docs</a>
+        <a href="#">Blog</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

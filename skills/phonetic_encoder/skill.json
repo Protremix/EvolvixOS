@@ -1,0 +1,8 @@
+{
+  "name": "Phonetic Encoder (Soundex)",
+  "description": "Encode word into Soundex code.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

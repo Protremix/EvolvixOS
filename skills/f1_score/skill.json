@@ -1,0 +1,8 @@
+{
+  "name": "F1 Score Calculator",
+  "description": "Calculate F1-Score from precision and recall.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

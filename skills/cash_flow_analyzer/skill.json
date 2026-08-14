@@ -1,0 +1,8 @@
+{
+  "name": "Cash Flow Analyzer",
+  "description": "Calculate net cash flow.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

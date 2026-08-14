@@ -1,0 +1,8 @@
+{
+  "name": "SSH Config Parser",
+  "description": "Parse Host configurations.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

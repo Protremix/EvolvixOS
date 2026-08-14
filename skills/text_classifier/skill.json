@@ -1,0 +1,8 @@
+{
+  "name": "Text Classifier",
+  "description": "Classify text into defined categories using keyword scoring.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

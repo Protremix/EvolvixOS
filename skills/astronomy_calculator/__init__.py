@@ -1,0 +1,1 @@
+"""Astronomy Calculator EvolvixOS Skill."""

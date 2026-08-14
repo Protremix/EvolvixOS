@@ -1,0 +1,8 @@
+{
+  "name": "Credential Validator",
+  "description": "Validate format rules for usernames and keys.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

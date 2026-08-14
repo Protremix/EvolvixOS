@@ -1,0 +1,22 @@
+{
+  "name": "Newsletter Template 92",
+  "category": "newsletter",
+  "tags": [
+    "newsletter",
+    "earth-brown",
+    "georgia"
+  ],
+  "layout": "centered",
+  "colors": {
+    "name": "Earth Brown",
+    "primary": "#8B4513",
+    "secondary": "#D2691E",
+    "bg": "#1A1005",
+    "surface": "#2A1A10",
+    "text": "#F0DCC0",
+    "muted": "#88664A"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

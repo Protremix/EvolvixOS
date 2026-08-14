@@ -1,0 +1,8 @@
+{
+  "name": "Readability Scorer",
+  "description": "Calculate Flesch Reading Ease and Flesch-Kincaid Grade Level.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

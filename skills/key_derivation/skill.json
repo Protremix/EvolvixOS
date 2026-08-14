@@ -1,0 +1,8 @@
+{
+  "name": "Key Derivation (PBKDF2)",
+  "description": "Derive cryptographic key using PBKDF2.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

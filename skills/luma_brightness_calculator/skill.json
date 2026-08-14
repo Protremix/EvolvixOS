@@ -1,0 +1,8 @@
+{
+  "name": "Luma Brightness Calculator",
+  "description": "Calculate perceived luminance of RGB color.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

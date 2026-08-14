@@ -1,0 +1,8 @@
+{
+  "name": "File Metadata Reader",
+  "description": "Read file size, modification time, and permissions.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Pip Package Info",
+  "description": "Get info about installed pip packages",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

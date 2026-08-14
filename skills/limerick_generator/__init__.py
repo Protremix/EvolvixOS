@@ -1,0 +1,1 @@
+"""Limerick Generator EvolvixOS Skill."""

@@ -1,0 +1,8 @@
+{
+  "name": "SVG Generator",
+  "description": "Generate valid SVG XML strings.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

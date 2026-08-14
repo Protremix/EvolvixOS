@@ -1,0 +1,8 @@
+{
+  "name": "Tempo & Delay Calculator",
+  "description": "Calculate delay times in ms based on BPM.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Pip Package Info Reader",
+  "description": "Inspect installed Python package version.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

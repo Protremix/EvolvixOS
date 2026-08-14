@@ -1,0 +1,8 @@
+{
+  "name": "ANSI Terminal Color Formatter",
+  "description": "Format text strings with ANSI color codes.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

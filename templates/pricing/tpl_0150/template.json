@@ -1,0 +1,22 @@
+{
+  "name": "Pricing Template 150",
+  "category": "pricing",
+  "tags": [
+    "pricing",
+    "rose-pink",
+    "playfair"
+  ],
+  "layout": "magazine",
+  "colors": {
+    "name": "Rose Pink",
+    "primary": "#E91E63",
+    "secondary": "#FF80AB",
+    "bg": "#1A0A10",
+    "surface": "#2A1020",
+    "text": "#FFD0E0",
+    "muted": "#AA6688"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

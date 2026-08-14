@@ -1,0 +1,8 @@
+{
+  "name": "Bearing Calculator",
+  "description": "Compute initial compass bearing between coordinates.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

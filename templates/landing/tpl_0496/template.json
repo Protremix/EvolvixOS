@@ -1,0 +1,22 @@
+{
+  "name": "Landing Template 496",
+  "category": "landing",
+  "tags": [
+    "landing",
+    "mono-dark",
+    "inter"
+  ],
+  "layout": "magazine",
+  "colors": {
+    "name": "Mono Dark",
+    "primary": "#FFFFFF",
+    "secondary": "#AAAAAA",
+    "bg": "#000000",
+    "surface": "#111111",
+    "text": "#FFFFFF",
+    "muted": "#555555"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

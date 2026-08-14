@@ -1,0 +1,123 @@
+# EvolvixOS — Docker Compose for Production
+# Deploy with: docker compose up -d
+#
+# This starts:
+#   1. Ollama (local LLM engine)
+#   2. EvolvixOS API server (port 5001)
+#   3. EvolvixOS Web UI (port 5000)
+#   4. Nginx reverse proxy (port 80/443)
+#   5. Auto-learner (GitHub Discovery Engine — continuous learning)
+
+version: "3.9"
+
+services:
+  # === Ollama — Local LLM Engine ===
+  ollama:
+    image: ollama/ollama:latest
+    container_name: evolvix-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    # Auto-pull models on startup
+    command: >
+      sh -c "
+        ollama serve &
+        sleep 5
+        ollama pull deepseek-r1:7b || true
+        ollama pull qwen2.5-coder:7b || true
+        ollama pull llama3.2:3b || true
+        wait
+      "
+
+  # === EvolvixOS Core ===
+  evolvix:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    container_name: evolvix-core
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    ports:
+      - "5001:5001"   # API
+      - "5000:5000"   # Web UI
+    volumes:
+      - ./output:/opt/evolvixos/output
+      - ./data:/opt/evolvixos/data
+      - ./logs:/opt/evolvixos/logs
+      - ./skills:/opt/evolvixos/skills
+      - ./config:/opt/evolvixos/config
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - EVOLVIX_ENV=production
+      - EVOLVIX_DOMAIN=evolvixos.com
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  # === Nginx Reverse Proxy ===
+  nginx:
+    image: nginx:alpine
+    container_name: evolvix-nginx
+    restart: unless-stopped
+    depends_on:
+      - evolvix
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deploy/certs:/etc/nginx/certs:ro
+      - ./docs:/var/www/evolvixos.com:ro
+    command: nginx -g "daemon off;"
+
+  # === Auto-Learner — Continuous GitHub Discovery ===
+  learner:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+    container_name: evolvix-learner
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    volumes:
+      - ./skills:/opt/evolvixos/skills
+      - ./data:/opt/evolvixos/data
+      - ./logs:/opt/evolvixos/logs
+      - ./config:/opt/evolvixos/config
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - EVOLVIX_ROLE=learner
+    command: >
+      python3 -c "
+      import time, sys
+      sys.path.insert(0, '.')
+      from skills.github_discovery.skill import Skill as Discovery
+      d = Discovery()
+      while True:
+          print('🧬 Auto-learning cycle starting...')
+          try:
+              d.run({'action': 'discover', 'auto_learn': True, 'limit': 20})
+              print('✅ Learning cycle complete. Sleeping 24h...')
+          except Exception as e:
+              print(f'⚠ Learning error: {e}')
+          time.sleep(86400)  # 24 hours
+      "
+
+volumes:
+  ollama_models:

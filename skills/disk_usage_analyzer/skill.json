@@ -1,0 +1,8 @@
+{
+  "name": "Disk Usage Analyzer",
+  "description": "Check disk space usage stats.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,1 @@
+"""Bearing Calculator EvolvixOS Skill."""

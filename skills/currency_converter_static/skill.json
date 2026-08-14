@@ -1,0 +1,8 @@
+{
+  "name": "Currency Converter",
+  "description": "Convert major currency exchange rates.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

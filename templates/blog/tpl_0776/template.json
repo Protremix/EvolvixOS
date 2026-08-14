@@ -1,0 +1,22 @@
+{
+  "name": "Blog Template 776",
+  "category": "blog",
+  "tags": [
+    "blog",
+    "mono-dark",
+    "roboto"
+  ],
+  "layout": "hero",
+  "colors": {
+    "name": "Mono Dark",
+    "primary": "#FFFFFF",
+    "secondary": "#AAAAAA",
+    "bg": "#000000",
+    "surface": "#111111",
+    "text": "#FFFFFF",
+    "muted": "#555555"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

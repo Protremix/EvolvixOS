@@ -1,0 +1,8 @@
+{
+  "name": "UUID Generator",
+  "description": "Generate UUID v1, v4, or v5 identifiers.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

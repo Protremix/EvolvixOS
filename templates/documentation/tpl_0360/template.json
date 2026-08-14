@@ -1,0 +1,22 @@
+{
+  "name": "Documentation Template 360",
+  "category": "documentation",
+  "tags": [
+    "documentation",
+    "coral-reef",
+    "playfair"
+  ],
+  "layout": "sidebar",
+  "colors": {
+    "name": "Coral Reef",
+    "primary": "#FF7F50",
+    "secondary": "#FF6347",
+    "bg": "#1A0A05",
+    "surface": "#2A1510",
+    "text": "#FFE0D0",
+    "muted": "#AA7755"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

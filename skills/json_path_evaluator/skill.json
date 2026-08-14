@@ -1,0 +1,8 @@
+{
+  "name": "JSON Path Evaluator",
+  "description": "Extract value from nested JSON using dot notation.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

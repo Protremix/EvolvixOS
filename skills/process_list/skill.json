@@ -1,0 +1,8 @@
+{
+  "name": "Process List Inspector",
+  "description": "Inspect system processes.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

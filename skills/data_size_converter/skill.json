@@ -1,0 +1,10 @@
+{
+  "name": "Data Size Converter",
+  "description": "Convert between data sizes (B, KB, MB, GB, TB)",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

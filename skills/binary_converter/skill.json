@@ -1,0 +1,10 @@
+{
+  "name": "Binary Converter",
+  "description": "Convert between binary, decimal, hex, octal",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

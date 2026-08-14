@@ -1,0 +1,8 @@
+{
+  "name": "Port Binding Checker",
+  "description": "Check if TCP port is already bound.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

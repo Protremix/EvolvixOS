@@ -1,0 +1,10 @@
+{
+  "name": "Vector Store",
+  "description": "Store and search by meaning. Free, local.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": "chromadb"
+}

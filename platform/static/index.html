@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvolvixOS — Your AI</title>
+    <style>
+        :root {
+            --bg: #0a0e14;
+            --card: #131820;
+            --card2: #1a2030;
+            --border: #2a3142;
+            --purple: #7c5cff;
+            --teal: #00d4aa;
+            --text: #e4e7ec;
+            --text2: #8b9099;
+            --green: #00d4aa;
+            --red: #f07178;
+            --blue: #59c2ff;
+            --yellow: #ffb454;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg); color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ===== BIG TOP BAR ===== */
+        .topbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 32px; background: var(--card);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .logo { font-size: 24px; font-weight: 800; }
+        .logo .a { color: var(--purple); }
+        .logo .b { color: var(--teal); }
+        .free-tag {
+            background: var(--teal); color: #000;
+            padding: 6px 16px; border-radius: 20px;
+            font-weight: 700; font-size: 14px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            text-align: center; padding: 60px 20px 40px;
+        }
+        .hero h1 {
+            font-size: 48px; font-weight: 800;
+            background: linear-gradient(135deg, var(--purple), var(--teal));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+        .hero p {
+            font-size: 20px; color: var(--text2);
+            max-width: 500px; margin: 0 auto 32px;
+        }
+        .hero-buttons {
+            display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+        }
+        .btn {
+            padding: 16px 32px; border-radius: 16px; font-size: 18px;
+            font-weight: 600; border: none; cursor: pointer; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 10px; transition: 0.2s;
+        }
+        .btn-primary { background: var(--purple); color: #fff; }
+        .btn-primary:hover { background: #6b4cef; transform: translateY(-2px); }
+        .btn-secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--teal); }
+
+        /* ===== STAT BAR ===== */
+        .stats {
+            display: flex; justify-content: center; gap: 40px;
+            padding: 24px; flex-wrap: wrap;
+        }
+        .stat { text-align: center; }
+        .stat-num { font-size: 32px; font-weight: 800; color: var(--teal); }
+        .stat-label { font-size: 14px; color: var(--text2); margin-top: 4px; }
+
+        /* ===== BIG CARDS ===== */
+        .big-cards {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px; max-width: 1100px; margin: 0 auto; padding: 20px 32px;
+        }
+        .big-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 32px; transition: 0.2s;
+        }
+        .big-card:hover { border-color: var(--purple); transform: translateY(-4px); }
+        .big-card-icon { font-size: 40px; margin-bottom: 16px; }
+        .big-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .big-card p { font-size: 15px; color: var(--text2); line-height: 1.6; margin-bottom: 16px; }
+        .big-card-link {
+            color: var(--teal); font-size: 15px; font-weight: 600;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .big-card-link:hover { color: var(--purple); }
+
+        /* ===== CHAT PREVIEW ===== */
+        .chat-preview {
+            max-width: 600px; margin: 40px auto; padding: 0 20px;
+        }
+        .chat-preview-title {
+            text-align: center; font-size: 24px; font-weight: 700; margin-bottom: 24px;
+        }
+        .chat-box {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 20px; padding: 24px; min-height: 300px;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .chat-msg { max-width: 80%; padding: 12px 18px; border-radius: 16px; font-size: 15px; line-height: 1.5; }
+        .chat-msg.user { background: var(--purple); color: #fff; align-self: flex-end; }
+        .chat-msg.ai { background: var(--card2); border: 1px solid var(--border); align-self: flex-start; }
+        .chat-input-bar {
+            display: flex; gap: 8px; margin-top: 16px;
+        }
+        .chat-input {
+            flex: 1; background: var(--card2); border: 1px solid var(--border);
+            color: var(--text); padding: 14px 20px; border-radius: 16px;
+            font-size: 16px; outline: none;
+        }
+        .chat-input:focus { border-color: var(--purple); }
+        .chat-send {
+            background: var(--purple); color: #fff; border: none;
+            width: 48px; height: 48px; border-radius: 16px;
+            font-size: 20px; cursor: pointer;
+        }
+        .chat-send:disabled { opacity: 0.4; }
+
+        /* ===== SIMPLE TABLE ===== */
+        .simple-table {
+            max-width: 800px; margin: 0 auto; padding: 20px 32px;
+        }
+        .simple-table h2 { font-size: 24px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+        .table-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; margin-bottom: 8px; transition: 0.2s;
+        }
+        .table-row:hover { border-color: var(--teal); }
+        .table-row-left { display: flex; align-items: center; gap: 12px; }
+        .table-row-icon { font-size: 24px; }
+        .table-row-name { font-size: 16px; font-weight: 600; }
+        .table-row-desc { font-size: 13px; color: var(--text2); }
+        .status-badge {
+            padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;
+        }
+        .status-on { background: rgba(0,212,170,0.15); color: var(--green); }
+        .status-off { background: rgba(240,113,120,0.15); color: var(--red); }
+
+        /* ===== SECTION TABS ===== */
+        .tabs {
+            display: flex; justify-content: center; gap: 8px;
+            padding: 20px; flex-wrap: wrap;
+        }
+        .tab {
+            padding: 10px 20px; border-radius: 12px; font-size: 15px;
+            font-weight: 600; border: none; cursor: pointer;
+            background: var(--card); color: var(--text2); transition: 0.2s;
+        }
+        .tab:hover { color: var(--text); }
+        .tab.active { background: var(--purple); color: #fff; }
+
+        /* ===== DEVICE/VOICE PANELS ===== */
+        .panel {
+            max-width: 800px; margin: 0 auto; padding: 20px 32px;
+        }
+        .panel h2 { font-size: 24px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+        .panel-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 24px; margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .panel-card-info { display: flex; align-items: center; gap: 16px; }
+        .panel-card-icon { font-size: 32px; }
+        .panel-card-title { font-size: 18px; font-weight: 600; }
+        .panel-card-sub { font-size: 14px; color: var(--text2); margin-top: 4px; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center; padding: 40px 20px; color: var(--text2);
+            border-top: 1px solid var(--border); margin-top: 40px;
+        }
+        .footer a { color: var(--teal); text-decoration: none; }
+
+        /* ===== LOADING ===== */
+        .loading { text-align: center; padding: 40px; color: var(--text2); }
+        .spinner {
+            display: inline-block; width: 32px; height: 32px;
+            border: 3px solid var(--border); border-top-color: var(--purple);
+            border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 768px) {
+            .topbar { padding: 16px 20px; }
+            .logo { font-size: 20px; }
+            .hero h1 { font-size: 32px; }
+            .hero p { font-size: 16px; }
+            .btn { padding: 14px 24px; font-size: 16px; }
+            .stats { gap: 24px; }
+            .stat-num { font-size: 24px; }
+            .big-cards { padding: 16px; }
+            .big-card { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <div class="logo"><span class="a">Evolvix</span><span class="b">OS</span></div>
+        <div class="free-tag">$0.00 · Forever Free</div>
+    </div>
+
+    <!-- HERO -->
+    <div class="hero">
+        <h1>Your AI, Running Locally</h1>
+        <p>Chat, talk, build, automate — all on your own machine. No cloud. No subscriptions. No tokens. Just pure AI power.</p>
+        <div class="hero-buttons">
+            <a href="/app" class="btn btn-primary">📱 Open App</a>
+            <a href="#chat" class="btn btn-secondary">💬 Try Chat</a>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="stat"><div class="stat-num" id="stat-skills">39</div><div class="stat-label">Skills</div></div>
+        <div class="stat"><div class="stat-num" id="stat-models">0</div><div class="stat-label">AI Models</div></div>
+        <div class="stat"><div class="stat-num" id="stat-devices">0</div><div class="stat-label">Devices</div></div>
+        <div class="stat"><div class="stat-num">$0</div><div class="stat-label">Cost</div></div>
+    </div>
+
+    <!-- WHAT CAN IT DO -->
+    <div class="big-cards">
+        <div class="big-card">
+            <div class="big-card-icon">💬</div>
+            <h3>Chat with AI</h3>
+            <p>Talk to a powerful AI that runs entirely on your server. Ask questions, write code, brainstorm ideas — no limits.</p>
+            <a href="#chat" class="big-card-link">Start chatting →</a>
+        </div>
+        <div class="big-card">
+            <div class="big-card-icon">🎤</div>
+            <h3>Use Your Voice</h3>
+            <p>Speak naturally and hear responses back. Full voice assistant powered by Whisper + Kokoro, running locally.</p>
+            <a href="/app" class="big-card-link">Open voice app →</a>
+        </div>
+        <div class="big-card">
+            <div class="big-card-icon">📱</div>
+            <h3>Connect Your Phone</h3>
+            <p>Open the app on Android, iPhone, Windows, or Mac. It installs as a native app — chat and voice from anywhere.</p>
+            <a href="/app" class="big-card-link">Get the app →</a>
+        </div>
+        <div class="big-card">
+            <div class="big-card-icon">🧠</div>
+            <h3>Learn New Skills</h3>
+            <p>EvolvixOS automatically discovers and learns from open-source projects on GitHub. It gets smarter over time.</p>
+            <a href="#skills" class="big-card-link">See all skills →</a>
+        </div>
+        <div class="big-card">
+            <div class="big-card-icon">🔌</div>
+            <h3>Connect Your Projects</h3>
+            <p>Use the simple REST API to plug EvolvixOS into any app or project. One endpoint, infinite possibilities.</p>
+            <a href="#api" class="big-card-link">View API →</a>
+        </div>
+        <div class="big-card">
+            <div class="big-card-icon">🔒</div>
+            <h3>100% Private</h3>
+            <p>Your data never leaves your server. No cloud, no tracking, no telemetry. Your AI, your rules, your privacy.</p>
+            <a href="https://github.com/Protremix/EvolvixOS" class="big-card-link">View source →</a>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('chat', this)">💬 Chat</button>
+        <button class="tab" onclick="showTab('skills', this)">🛠️ Skills</button>
+        <button class="tab" onclick="showTab('devices', this)">📱 Devices</button>
+        <button class="tab" onclick="showTab('voice', this)">🎤 Voice</button>
+        <button class="tab" onclick="showTab('api', this)">🔌 API</button>
+        <button class="tab" onclick="showTab('servers', this)">☁️ Server</button>
+    </div>
+
+    <!-- CHAT TAB -->
+    <div id="chat" class="chat-preview">
+        <div class="chat-preview-title">💬 Talk to EvolvixOS</div>
+        <div class="chat-box" id="chat-box">
+            <div class="chat-msg ai">Hi! I'm EvolvixOS. I run entirely on your server — no cloud needed. Ask me anything!</div>
+        </div>
+        <div class="chat-input-bar">
+            <input class="chat-input" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChat()">
+            <button class="chat-send" id="chat-send" onclick="sendChat()">↑</button>
+        </div>
+        <p style="text-align:center;color:var(--text2);font-size:13px;margin-top:12px">
+            💡 Tip: Open <a href="/app" style="color:var(--teal)">the app</a> on your phone for voice chat
+        </p>
+    </div>
+
+    <!-- SKILLS TAB -->
+    <div id="skills" class="simple-table" style="display:none">
+        <h2>🛠️ All Skills (39)</h2>
+        <div id="skills-list"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- DEVICES TAB -->
+    <div id="devices" class="panel" style="display:none">
+        <h2>📱 Connected Devices</h2>
+        <div style="text-align:center;margin-bottom:24px">
+            <a href="/app" class="btn btn-primary" style="font-size:16px;padding:12px 24px">📱 Open App on This Device</a>
+        </div>
+        <p style="text-align:center;color:var(--text2);margin-bottom:20px;font-size:15px">
+            Open the app on any device — Android, iPhone, Windows, Mac — and it connects automatically.
+        </p>
+        <div id="devices-list"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- VOICE TAB -->
+    <div id="voice" class="panel" style="display:none">
+        <h2>🎤 Voice Assistant</h2>
+        <div id="voice-list"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- API TAB -->
+    <div id="api" class="simple-table" style="display:none">
+        <h2>🔌 Simple API</h2>
+        <p style="text-align:center;color:var(--text2);margin-bottom:24px;font-size:16px">
+            One simple API to connect any project to EvolvixOS. All local, all free.
+        </p>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px">
+            <h3 style="font-size:18px;margin-bottom:16px">Quick Start</h3>
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:16px;font-family:monospace;font-size:14px;color:var(--teal);overflow-x:auto">
+                <div><span style="color:var(--text2)"># Install the SDK</span></div>
+                <div>pip install evolvix-client</div>
+                <br>
+                <div><span style="color:var(--text2)"># Use it</span></div>
+                <div><span style="color:var(--purple)">from</span> evolvix_client <span style="color:var(--purple)">import</span> EvolvixClient</div>
+                <br>
+                <div>ai = EvolvixClient(<span style="color:var(--yellow)">"http://localhost:5001"</span>)</div>
+                <div>result = ai.chat(<span style="color:var(--yellow)">"Hello!"</span>)</div>
+                <div><span style="color:var(--purple)">print</span>(result[<span style="color:var(--yellow)">"response"</span>])</div>
+            </div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px">
+            <h3 style="font-size:18px;margin-bottom:16px">What You Can Do</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:15px">
+                <div style="padding:12px;background:var(--card2);border-radius:10px">💬 <b>Chat</b> — Talk to the AI</div>
+                <div style="padding:12px;background:var(--card2);border-radius:10px">🎤 <b>Voice</b> — Speak & listen</div>
+                <div style="padding:12px;background:var(--card2);border-radius:10px">🧠 <b>Models</b> — Switch AI brains</div>
+                <div style="padding:12px;background:var(--card2);border-radius:10px">📚 <b>Learn</b> — Teach it your code</div>
+                <div style="padding:12px;background:var(--card2);border-radius:10px">🎬 <b>Create</b> — Make videos</div>
+                <div style="padding:12px;background:var(--card2);border-radius:10px">🔍 <b>Research</b> — Search the web</div>
+                <div style="padding:12px;background:var(--card2);border-radius:10px">🖼️ <b>Images</b> — Generate art</div>
+                <div style="padding:12px;background:var(--card2);border-radius:10px">⚡ <b>Automate</b> — Run tasks</div>
+            </div>
+            <p style="text-align:center;margin-top:20px">
+                <a href="https://github.com/Protremix/EvolvixOS/blob/main/evolvix_client.py" style="color:var(--teal);font-size:15px;font-weight:600">Full API docs →</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- SERVERS TAB -->
+    <div id="servers" class="panel" style="display:none">
+        <h2>☁️ Server</h2>
+        <div id="server-list"><div class="loading"><div class="spinner"></div></div></div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <p>EvolvixOS — Your AI, running locally. <a href="https://github.com/Protremix/EvolvixOS">GitHub</a></p>
+        <p style="margin-top:8px;font-size:13px">100% local · zero tokens · zero cloud · zero cost</p>
+    </div>
+
+    <script>
+        function showTab(name, btn) {
+            ['chat','skills','devices','voice','api','servers'].forEach(t => {
+                const el = document.getElementById(t);
+                if (el) el.style.display = 'none';
+            });
+            const target = document.getElementById(name);
+            if (target) target.style.display = 'block';
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        async function fetchJSON(url) {
+            try { return await (await fetch(url)).json(); } catch(e) { return null; }
+        }
+
+        // ===== CHAT =====
+        async function sendChat() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const box = document.getElementById('chat-box');
+            const msg = document.createElement('div');
+            msg.className = 'chat-msg user';
+            msg.textContent = text;
+            box.appendChild(msg);
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
+            // Typing indicator
+            const typing = document.createElement('div');
+            typing.className = 'chat-msg ai';
+            typing.id = 'typing';
+            typing.innerHTML = '<span style="color:var(--text2)">Thinking...</span>';
+            box.appendChild(typing);
+            box.scrollTop = box.scrollHeight;
+
+            try {
+                const r = await fetch('/api/v1/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: text})
+                });
+                const data = await r.json();
+                typing.remove();
+                const aiMsg = document.createElement('div');
+                aiMsg.className = 'chat-msg ai';
+                aiMsg.textContent = data.response || data.error || 'No response';
+                box.appendChild(aiMsg);
+                box.scrollTop = box.scrollHeight;
+            } catch(e) {
+                typing.remove();
+                const errMsg = document.createElement('div');
+                errMsg.className = 'chat-msg ai';
+                errMsg.innerHTML = '<span style="color:var(--red)">Cannot connect. The API server may still be starting up.</span>';
+                box.appendChild(errMsg);
+                box.scrollTop = box.scrollHeight;
+            }
+        }
+
+        // ===== LOAD OVERVIEW =====
+        async function loadOverview() {
+            const data = await fetchJSON('/api/v1/status');
+            if (!data) return;
+            if (data.skills) document.getElementById('stat-skills').textContent = data.skills.length;
+            if (data.available_models) document.getElementById('stat-models').textContent = data.available_models.length;
+        }
+
+        // ===== LOAD SKILLS =====
+        async function loadSkills() {
+            const data = await fetchJSON('/api/v1/status');
+            if (!data || !data.skills) {
+                document.getElementById('skills-list').innerHTML = '<p style="color:var(--text2);text-align:center">Could not load skills. Server may be starting.</p>';
+                return;
+            }
+
+            const icons = {
+                'research': '🔍', 'code': '💻', 'video': '🎬', 'audio': '🎵',
+                'image': '🖼️', 'voice': '🎤', 'voice_assistant': '🗣️',
+                'project_learner': '📚', 'github_discovery': '🐙', 'self_improver': '🧬',
+                'pipeline_builder': '🔗', 'model_registry': '🧠', 'experiment_tracker': '🧪',
+                'evaluation': '📊', 'hetzner_server': '☁️', 'device_manager': '📱',
+                'movie_maker': '🎥', 'web_search': '🌐',
+            };
+
+            const html = data.skills.map(name => {
+                const icon = icons[name] || '⚡';
+                const display = name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                return `
+                    <div class="table-row">
+                        <div class="table-row-left">
+                            <div class="table-row-icon">${icon}</div>
+                            <div>
+                                <div class="table-row-name">${display}</div>
+                                <div class="table-row-desc">Ready to use</div>
+                            </div>
+                        </div>
+                        <div class="status-badge status-on">✅ Active</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('skills-list').innerHTML = html;
+        }
+
+        // ===== LOAD DEVICES =====
+        async function loadDevices() {
+            const data = await fetchJSON('/api/dashboard/devices');
+            if (!data || !data.devices || data.devices.length === 0) {
+                document.getElementById('devices-list').innerHTML = `
+                    <div class="panel-card">
+                        <div class="panel-card-info">
+                            <div class="panel-card-icon">📱</div>
+                            <div>
+                                <div class="panel-card-title">No devices yet</div>
+                                <div class="panel-card-sub">Open the app on your phone or computer to connect it</div>
+                            </div>
+                        </div>
+                        <a href="/app" class="btn btn-primary" style="padding:10px 20px;font-size:14px">Open App</a>
+                    </div>
+                `;
+                return;
+            }
+
+            const html = data.devices.map(d => `
+                <div class="panel-card">
+                    <div class="panel-card-info">
+                        <div class="panel-card-icon">${d.type === 'mobile' ? '📱' : '💻'}</div>
+                        <div>
+                            <div class="panel-card-title">${d.name}</div>
+                            <div class="panel-card-sub">${d.os || 'Unknown OS'} · ${d.type || 'device'}</div>
+                        </div>
+                    </div>
+                    <div class="status-badge ${d.online ? 'status-on' : 'status-off'}">
+                        ${d.online ? '🟢 Online' : '🔴 Offline'}
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('devices-list').innerHTML = html;
+        }
+
+        // ===== LOAD VOICE =====
+        async function loadVoice() {
+            const data = await fetchJSON('/api/dashboard/voice');
+            if (!data || !data.status) {
+                document.getElementById('voice-list').innerHTML = `
+                    <div class="panel-card">
+                        <div class="panel-card-info">
+                            <div class="panel-card-icon">🎤</div>
+                            <div>
+                                <div class="panel-card-title">Voice assistant loading</div>
+                                <div class="panel-card-sub">It will be ready shortly</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            const s = data.status;
+            document.getElementById('voice-list').innerHTML = `
+                <div class="panel-card">
+                    <div class="panel-card-info">
+                        <div class="panel-card-icon">🗣️</div>
+                        <div>
+                            <div class="panel-card-title">Text to Speech</div>
+                            <div class="panel-card-sub">Engine: ${s.tts_engine || 'loading...'}</div>
+                        </div>
+                    </div>
+                    <div class="status-badge ${s.tts_engine && s.tts_engine !== 'none' ? 'status-on' : 'status-off'}">
+                        ${s.tts_engine && s.tts_engine !== 'none' ? '✅ Ready' : '⏳ Loading'}
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-card-info">
+                        <div class="panel-card-icon">👂</div>
+                        <div>
+                            <div class="panel-card-title">Speech to Text</div>
+                            <div class="panel-card-sub">Whisper (local)</div>
+                        </div>
+                    </div>
+                    <div class="status-badge ${s.whisper_loaded ? 'status-on' : 'status-off'}">
+                        ${s.whisper_loaded ? '✅ Ready' : '⏳ Loading'}
+                    </div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-card-info">
+                        <div class="panel-card-icon">🧠</div>
+                        <div>
+                            <div class="panel-card-title">AI Brain</div>
+                            <div class="panel-card-sub">${s.model || 'deepseek-r1:7b'}</div>
+                        </div>
+                    </div>
+                    <div class="status-badge status-on">✅ Active</div>
+                </div>
+                <div class="panel-card">
+                    <div class="panel-card-info">
+                        <div class="panel-card-icon">💬</div>
+                        <div>
+                            <div class="panel-card-title">Wake Word</div>
+                            <div class="panel-card-sub">Say "${s.wake_word || 'hey evolvix'}" to activate</div>
+                        </div>
+                    </div>
+                    <div class="status-badge status-on">✅ Ready</div>
+                </div>
+                <div style="text-align:center;margin-top:20px">
+                    <a href="/app" class="btn btn-primary" style="font-size:16px;padding:12px 24px">📱 Try Voice in the App</a>
+                </div>
+            `;
+        }
+
+        // ===== LOAD SERVERS =====
+        async function loadServers() {
+            const data = await fetchJSON('/api/dashboard/servers');
+            if (!data || !data.servers || data.servers.length === 0) {
+                document.getElementById('server-list').innerHTML = '<p style="color:var(--text2);text-align:center">No servers found.</p>';
+                return;
+            }
+            const html = data.servers.map(s => `
+                <div class="panel-card">
+                    <div class="panel-card-info">
+                        <div class="panel-card-icon">🖥️</div>
+                        <div>
+                            <div class="panel-card-title">${s.name}</div>
+                            <div class="panel-card-sub">${s.server_type.name} · ${s.public_net?.ipv4?.ip || '—'}</div>
+                        </div>
+                    </div>
+                    <div class="status-badge ${s.status==='running' ? 'status-on' : 'status-off'}">
+                        ${s.status === 'running' ? '🟢 Running' : '🔴 Stopped'}
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('server-list').innerHTML = html;
+        }
+
+        // ===== LOAD ALL =====
+        loadOverview();
+        loadSkills();
+        loadDevices();
+        loadVoice();
+        loadServers();
+
+        // Refresh devices every 30s
+        setInterval(loadDevices, 30000);
+    </script>
+</body>
+</html>

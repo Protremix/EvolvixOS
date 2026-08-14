@@ -1,0 +1,8 @@
+{
+  "name": "Point in Polygon Test",
+  "description": "Check if point lies inside polygon.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

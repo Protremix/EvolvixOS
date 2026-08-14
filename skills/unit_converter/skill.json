@@ -1,0 +1,8 @@
+{
+  "name": "Unit Converter",
+  "description": "Convert measurements across length, mass, volume, temperature.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

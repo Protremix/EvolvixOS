@@ -1,0 +1,10 @@
+{
+  "name": "Speed Calculator",
+  "description": "Calculate speed, distance, or time",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Video Editor",
+  "description": "Cut, merge, extract audio from video. Free.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": "moviepy"
+}

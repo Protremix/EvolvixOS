@@ -1,0 +1,8 @@
+{
+  "name": "Unicode Converter",
+  "description": "Convert text to Unicode code points, UTF-8 hex bytes, and HTML entities.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

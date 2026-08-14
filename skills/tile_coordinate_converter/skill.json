@@ -1,0 +1,8 @@
+{
+  "name": "Map Tile Coordinate Converter",
+  "description": "Convert Lat/Lon to map tile numbers.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

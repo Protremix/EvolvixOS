@@ -1,0 +1,8 @@
+{
+  "name": "Sales Tax Calculator",
+  "description": "Calculate sales tax and combined price.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

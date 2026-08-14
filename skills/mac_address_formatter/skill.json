@@ -1,0 +1,8 @@
+{
+  "name": "MAC Address Formatter",
+  "description": "Format and normalize MAC addresses.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

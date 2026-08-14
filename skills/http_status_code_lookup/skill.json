@@ -1,0 +1,8 @@
+{
+  "name": "HTTP Status Code Lookup",
+  "description": "Look up HTTP status codes.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

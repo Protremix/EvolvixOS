@@ -1,0 +1,8 @@
+{
+  "name": "Git Log Parser",
+  "description": "Parse git log output into JSON commit objects.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

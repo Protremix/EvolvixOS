@@ -1,0 +1,8 @@
+{
+  "name": "Base32 Encoder/Decoder",
+  "description": "Encode and decode Base32.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

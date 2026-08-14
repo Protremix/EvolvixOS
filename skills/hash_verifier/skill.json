@@ -1,0 +1,8 @@
+{
+  "name": "Hash Verifier",
+  "description": "Verify text against target hash string.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

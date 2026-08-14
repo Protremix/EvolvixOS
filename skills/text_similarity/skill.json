@@ -1,0 +1,8 @@
+{
+  "name": "Text Similarity Calculator",
+  "description": "Calculate Jaccard and Levenshtein similarity.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

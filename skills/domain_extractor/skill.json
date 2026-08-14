@@ -1,0 +1,8 @@
+{
+  "name": "Domain Extractor",
+  "description": "Extract TLD and domain from URL.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

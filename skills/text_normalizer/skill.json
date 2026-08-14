@@ -1,0 +1,8 @@
+{
+  "name": "Text Normalizer",
+  "description": "Normalize text lowercase and strip punctuation.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

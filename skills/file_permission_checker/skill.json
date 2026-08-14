@@ -1,0 +1,8 @@
+{
+  "name": "File Permission Checker",
+  "description": "Check read/write/execute permissions.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Geographic Midpoint Calculator",
+  "description": "Calculate midpoint coordinate between two points.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

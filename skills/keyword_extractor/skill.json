@@ -1,0 +1,8 @@
+{
+  "name": "Keyword Extractor",
+  "description": "Extract top keywords based on term frequency.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

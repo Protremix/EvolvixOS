@@ -1,0 +1,8 @@
+{
+  "name": "Musical Scale Generator",
+  "description": "Generate note list for scales.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

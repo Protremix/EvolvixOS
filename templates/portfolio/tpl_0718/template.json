@@ -1,0 +1,22 @@
+{
+  "name": "Portfolio Template 718",
+  "category": "portfolio",
+  "tags": [
+    "portfolio",
+    "teal-deep",
+    "lato"
+  ],
+  "layout": "sidebar",
+  "colors": {
+    "name": "Teal Deep",
+    "primary": "#008080",
+    "secondary": "#40E0D0",
+    "bg": "#0A1A1A",
+    "surface": "#102A2A",
+    "text": "#C0E8E8",
+    "muted": "#509090"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

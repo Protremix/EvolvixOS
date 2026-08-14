@@ -1,0 +1,8 @@
+{
+  "name": "File Hasher",
+  "description": "Calculate MD5, SHA1, SHA256, SHA512 hash of string or file data.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

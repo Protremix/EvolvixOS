@@ -1,0 +1,8 @@
+{
+  "name": "Package Version Checker",
+  "description": "Compare Semantic Version strings.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

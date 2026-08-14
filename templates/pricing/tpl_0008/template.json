@@ -1,0 +1,22 @@
+{
+  "name": "Pricing Template 8",
+  "category": "pricing",
+  "tags": [
+    "pricing",
+    "golden-hour",
+    "palatino"
+  ],
+  "layout": "split",
+  "colors": {
+    "name": "Golden Hour",
+    "primary": "#FFB300",
+    "secondary": "#FF8F00",
+    "bg": "#1A1505",
+    "surface": "#2A2010",
+    "text": "#FFF0CC",
+    "muted": "#AA9966"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

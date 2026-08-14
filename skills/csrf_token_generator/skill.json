@@ -1,0 +1,8 @@
+{
+  "name": "CSRF Token Generator",
+  "description": "Create signed CSRF tokens.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Diffie-Hellman Key Exchange Helper",
+  "description": "Compute public keys and shared secrets.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Lemmatizer",
+  "description": "Reduce words to base dictionary forms.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "OTP Generator (TOTP)",
+  "description": "Generate RFC 6238 Time-based One-Time Passwords.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

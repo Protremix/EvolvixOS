@@ -1,0 +1,8 @@
+{
+  "name": "Radioactive Decay Calculator",
+  "description": "Calculate radioactive decay remaining mass.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

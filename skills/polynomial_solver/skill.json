@@ -1,0 +1,8 @@
+{
+  "name": "Polynomial Solver",
+  "description": "Solve quadratic equations ax^2 + bx + c = 0.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

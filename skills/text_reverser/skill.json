@@ -1,0 +1,8 @@
+{
+  "name": "Text Reverser",
+  "description": "Reverse text by characters, words, or lines.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

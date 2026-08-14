@@ -1,0 +1,22 @@
+{
+  "name": "404 Template 136",
+  "category": "404",
+  "tags": [
+    "404",
+    "mono-dark",
+    "inter"
+  ],
+  "layout": "centered",
+  "colors": {
+    "name": "Mono Dark",
+    "primary": "#FFFFFF",
+    "secondary": "#AAAAAA",
+    "bg": "#000000",
+    "surface": "#111111",
+    "text": "#FFFFFF",
+    "muted": "#555555"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

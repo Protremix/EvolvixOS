@@ -1,0 +1,8 @@
+{
+  "name": "XML to JSON",
+  "description": "Convert XML data into JSON string representation.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

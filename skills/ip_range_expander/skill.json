@@ -1,0 +1,8 @@
+{
+  "name": "IP Range Expander",
+  "description": "Expand CIDR notation into IP list.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Duplicate File Finder",
+  "description": "Identify duplicate files by size and SHA256.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

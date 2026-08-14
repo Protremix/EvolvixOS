@@ -1,0 +1,8 @@
+{
+  "name": "Debt-to-Income (DTI) Ratio",
+  "description": "Calculate DTI percentage.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Auth Template 210",
+  "category": "auth",
+  "tags": [
+    "auth",
+    "rose-pink",
+    "playfair"
+  ],
+  "layout": "split",
+  "colors": {
+    "name": "Rose Pink",
+    "primary": "#E91E63",
+    "secondary": "#FF80AB",
+    "bg": "#1A0A10",
+    "surface": "#2A1020",
+    "text": "#FFD0E0",
+    "muted": "#AA6688"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

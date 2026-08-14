@@ -1,0 +1,8 @@
+{
+  "name": "Grammar Checker",
+  "description": "Check text for common grammatical, capitalization, and punctuation errors.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

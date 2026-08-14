@@ -1,0 +1,8 @@
+{
+  "name": "Log Rotation Calculator",
+  "description": "Estimate total log storage over time.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

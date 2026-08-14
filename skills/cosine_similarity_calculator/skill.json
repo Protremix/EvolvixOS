@@ -1,0 +1,8 @@
+{
+  "name": "Cosine Similarity Calculator",
+  "description": "Calculate Cosine Similarity between vectors.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

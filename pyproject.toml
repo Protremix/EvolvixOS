@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "evolvix-os"
+version = "0.1.0"
+description = "100% local, open-source AI agent. Zero tokens, zero external API calls."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "EvolvixOS Contributors"}
+]
+
+[project.scripts]
+evolvix = "main:main"
+
+[tool.setuptools]
+packages = ["agent", "skills", "skills.research", "skills.coding", "skills.video", "skills.audio", "skills.image", "skills.deploy", "models", "config", "utils", "web"]

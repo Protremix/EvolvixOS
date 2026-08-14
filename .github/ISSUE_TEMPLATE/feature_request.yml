@@ -1,0 +1,27 @@
+---
+name: Feature Request
+about: Suggest a new skill or feature
+title: "[FEATURE] "
+labels: enhancement
+---
+
+## Feature description
+What do you want EvolvixOS to do?
+
+## Is this a new skill or improvement?
+- [ ] New skill (new capability)
+- [ ] Improvement to existing skill
+- [ ] Agent core improvement
+- [ ] Documentation
+- [ ] Other
+
+## Proposed approach
+How should it work? (Be as specific as possible)
+
+## Does this require external services?
+- [ ] No — fully local (preferred)
+- [ ] Yes — but free/open-source
+- [ ] Yes — requires paid service (will not be accepted)
+
+## Additional context
+Any other details, links, or examples.

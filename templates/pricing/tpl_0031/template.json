@@ -1,0 +1,22 @@
+{
+  "name": "Pricing Template 31",
+  "category": "pricing",
+  "tags": [
+    "pricing",
+    "cyber-neon",
+    "inter"
+  ],
+  "layout": "fullwidth",
+  "colors": {
+    "name": "Cyber Neon",
+    "primary": "#00FFFF",
+    "secondary": "#FF00FF",
+    "bg": "#050510",
+    "surface": "#0F0F20",
+    "text": "#E0FFFF",
+    "muted": "#506080"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

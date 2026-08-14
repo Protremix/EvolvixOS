@@ -1,0 +1,8 @@
+{
+  "name": "Moon Phase Calculator",
+  "description": "Calculate moon phase for date.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

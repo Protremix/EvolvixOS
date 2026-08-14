@@ -1,0 +1,22 @@
+{
+  "name": "404 Template 275",
+  "category": "404",
+  "tags": [
+    "404",
+    "lava-glow",
+    "times"
+  ],
+  "layout": "boxed",
+  "colors": {
+    "name": "Lava Glow",
+    "primary": "#FF4500",
+    "secondary": "#FFD700",
+    "bg": "#1A0500",
+    "surface": "#2A0F05",
+    "text": "#FFE0C0",
+    "muted": "#AA6650"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

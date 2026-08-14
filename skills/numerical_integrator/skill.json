@@ -1,0 +1,8 @@
+{
+  "name": "Numerical Integrator",
+  "description": "Approximate definite integrals using Trapezoidal rule.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

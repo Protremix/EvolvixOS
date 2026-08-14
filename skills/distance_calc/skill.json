@@ -1,0 +1,10 @@
+{
+  "name": "Distance Calculator",
+  "description": "Calculate distance between coordinates (haversine)",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Text Hasher",
+  "description": "Hash text with various algorithms",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": ""
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Color Blindness Simulator",
+  "description": "Simulate RGB color transformations.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

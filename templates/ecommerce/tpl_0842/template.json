@@ -1,0 +1,22 @@
+{
+  "name": "Ecommerce Template 842",
+  "category": "ecommerce",
+  "tags": [
+    "ecommerce",
+    "ocean-blue",
+    "georgia"
+  ],
+  "layout": "sidebar",
+  "colors": {
+    "name": "Ocean Blue",
+    "primary": "#0066FF",
+    "secondary": "#00C6FF",
+    "bg": "#001020",
+    "surface": "#002040",
+    "text": "#E0E8FF",
+    "muted": "#6080A0"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

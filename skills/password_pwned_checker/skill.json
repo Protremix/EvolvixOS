@@ -1,0 +1,8 @@
+{
+  "name": "Password Risk Checker",
+  "description": "Analyze password against common breach patterns.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

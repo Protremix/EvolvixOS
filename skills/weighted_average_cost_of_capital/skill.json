@@ -1,0 +1,8 @@
+{
+  "name": "WACC Calculator",
+  "description": "Calculate Weighted Average Cost of Capital.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

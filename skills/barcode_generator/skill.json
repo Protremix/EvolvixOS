@@ -1,0 +1,8 @@
+{
+  "name": "Barcode Generator",
+  "description": "Generate CODE-128 barcode representation.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,22 @@
+{
+  "name": "Event Template 245",
+  "category": "event",
+  "tags": [
+    "event",
+    "royal-purple",
+    "times"
+  ],
+  "layout": "grid",
+  "colors": {
+    "name": "Royal Purple",
+    "primary": "#9D00FF",
+    "secondary": "#FF00AA",
+    "bg": "#0F0A1A",
+    "surface": "#1A102A",
+    "text": "#E8D0FF",
+    "muted": "#8866AA"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

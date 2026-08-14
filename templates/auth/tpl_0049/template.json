@@ -1,0 +1,22 @@
+{
+  "name": "Auth Template 49",
+  "category": "auth",
+  "tags": [
+    "auth",
+    "mint-fresh",
+    "helvetica"
+  ],
+  "layout": "hero",
+  "colors": {
+    "name": "Mint Fresh",
+    "primary": "#00C9A7",
+    "secondary": "#00D4AA",
+    "bg": "#0A1A18",
+    "surface": "#102A28",
+    "text": "#CCF0E8",
+    "muted": "#669988"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

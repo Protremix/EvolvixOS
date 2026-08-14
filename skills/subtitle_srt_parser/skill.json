@@ -1,0 +1,8 @@
+{
+  "name": "SubRip SRT Subtitle Parser",
+  "description": "Parse .srt subtitle strings into JSON array.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

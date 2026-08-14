@@ -1,0 +1,8 @@
+{
+  "name": "Periodic Table Lookup",
+  "description": "Look up chemical element info.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

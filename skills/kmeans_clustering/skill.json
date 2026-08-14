@@ -1,0 +1,8 @@
+{
+  "name": "K-Means Clustering",
+  "description": "Perform K-Means clustering assignment.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

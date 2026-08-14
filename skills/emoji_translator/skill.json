@@ -1,0 +1,8 @@
+{
+  "name": "Emoji Translator",
+  "description": "Translate words into emojis.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,1 @@
+"""Depreciation Calculator EvolvixOS Skill."""

@@ -1,0 +1,8 @@
+{
+  "name": "Sub-Agent Manager",
+  "description": "Spawn background AI workers for parallel task execution and skill delegation.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

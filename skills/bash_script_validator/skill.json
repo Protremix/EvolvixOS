@@ -1,0 +1,8 @@
+{
+  "name": "Bash Script Validator",
+  "description": "Validate bash script shebang and braces.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

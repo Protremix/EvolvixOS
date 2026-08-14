@@ -1,0 +1,8 @@
+{
+  "name": "Timezone Lookup",
+  "description": "Lookup UTC offset for common regions.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

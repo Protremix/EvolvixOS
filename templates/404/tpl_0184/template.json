@@ -1,0 +1,22 @@
+{
+  "name": "404 Template 184",
+  "category": "404",
+  "tags": [
+    "404",
+    "forest-green",
+    "helvetica"
+  ],
+  "layout": "magazine",
+  "colors": {
+    "name": "Forest Green",
+    "primary": "#00A86B",
+    "secondary": "#7CCD7C",
+    "bg": "#0A1A0F",
+    "surface": "#102A1A",
+    "text": "#D0E8D0",
+    "muted": "#669966"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Inventory Turnover Calculator",
+  "description": "Calculate Inventory Turnover and DSI.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

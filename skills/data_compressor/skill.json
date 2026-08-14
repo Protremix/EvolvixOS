@@ -1,0 +1,8 @@
+{
+  "name": "Data Compressor",
+  "description": "Compress or decompress data using gzip/bz2/lzma.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

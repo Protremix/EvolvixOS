@@ -1,0 +1,22 @@
+{
+  "name": "Portfolio Template 939",
+  "category": "portfolio",
+  "tags": [
+    "portfolio",
+    "lavender",
+    "verdana"
+  ],
+  "layout": "centered",
+  "colors": {
+    "name": "Lavender",
+    "primary": "#9B59B6",
+    "secondary": "#E0AAFF",
+    "bg": "#100A15",
+    "surface": "#1A1025",
+    "text": "#E8D0F0",
+    "muted": "#806090"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

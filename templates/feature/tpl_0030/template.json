@@ -1,0 +1,22 @@
+{
+  "name": "Feature Template 30",
+  "category": "feature",
+  "tags": [
+    "feature",
+    "rose-pink",
+    "playfair"
+  ],
+  "layout": "hero",
+  "colors": {
+    "name": "Rose Pink",
+    "primary": "#E91E63",
+    "secondary": "#FF80AB",
+    "bg": "#1A0A10",
+    "surface": "#2A1020",
+    "text": "#FFD0E0",
+    "muted": "#AA6688"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

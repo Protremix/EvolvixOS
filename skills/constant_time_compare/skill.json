@@ -1,0 +1,8 @@
+{
+  "name": "Constant-Time String Compare",
+  "description": "Compare strings in constant time.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

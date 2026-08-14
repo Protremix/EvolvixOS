@@ -1,0 +1,8 @@
+{
+  "name": "URL-Safe Token Generator",
+  "description": "Generate URL-safe cryptographic tokens.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

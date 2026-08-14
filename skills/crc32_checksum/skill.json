@@ -1,0 +1,8 @@
+{
+  "name": "CRC32 Checksum",
+  "description": "Calculate CRC32 checksum.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

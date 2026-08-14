@@ -1,0 +1,8 @@
+{
+  "name": "CORS Checker",
+  "description": "Analyze Access-Control-Allow-Origin headers.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

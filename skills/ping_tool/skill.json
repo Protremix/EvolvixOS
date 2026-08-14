@@ -1,0 +1,8 @@
+{
+  "name": "TCP Ping Tool",
+  "description": "Measure TCP connection latency to a host.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

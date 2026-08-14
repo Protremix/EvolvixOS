@@ -1,0 +1,8 @@
+{
+  "name": "Sitemap Parser",
+  "description": "Parse sitemap.xml files to extract URLs.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

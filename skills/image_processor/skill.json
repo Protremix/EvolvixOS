@@ -1,0 +1,10 @@
+{
+  "name": "Image Processor",
+  "description": "Resize, crop, convert, filter images. Free.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cloud": false,
+  "cost": "$0.00",
+  "pip_dependencies": "Pillow opencv-python-headless"
+}

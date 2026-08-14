@@ -1,0 +1,22 @@
+{
+  "name": "Portfolio Template 23",
+  "category": "portfolio",
+  "tags": [
+    "portfolio",
+    "sunset-orange",
+    "palatino"
+  ],
+  "layout": "centered",
+  "colors": {
+    "name": "Sunset Orange",
+    "primary": "#FF6B35",
+    "secondary": "#F7931E",
+    "bg": "#1A0F0A",
+    "surface": "#2A1A10",
+    "text": "#FFE0CC",
+    "muted": "#AA8866"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

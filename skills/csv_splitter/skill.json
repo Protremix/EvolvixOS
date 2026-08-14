@@ -1,0 +1,8 @@
+{
+  "name": "CSV Splitter",
+  "description": "Split CSV text into chunks of N rows.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

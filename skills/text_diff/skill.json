@@ -1,0 +1,8 @@
+{
+  "name": "Text Diff",
+  "description": "Compare two text snippets and highlight differences.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

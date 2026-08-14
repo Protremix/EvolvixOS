@@ -1,0 +1,8 @@
+{
+  "name": "TOML Parser",
+  "description": "Parse basic TOML configuration strings into dict.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

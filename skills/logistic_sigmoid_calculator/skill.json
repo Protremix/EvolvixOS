@@ -1,0 +1,8 @@
+{
+  "name": "Sigmoid & Softmax Calculator",
+  "description": "Compute Sigmoid and Softmax probabilities.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

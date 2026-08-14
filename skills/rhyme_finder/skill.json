@@ -1,0 +1,8 @@
+{
+  "name": "Rhyme Finder",
+  "description": "Identify rhyming words based on phonetic end-sound patterns.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

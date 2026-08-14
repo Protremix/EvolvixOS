@@ -1,0 +1,8 @@
+{
+  "name": "Vigenere Cipher",
+  "description": "Encrypt or decrypt text using Vigenere cipher.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

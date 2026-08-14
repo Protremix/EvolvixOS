@@ -1,0 +1,22 @@
+{
+  "name": "Newsletter Template 440",
+  "category": "newsletter",
+  "tags": [
+    "newsletter",
+    "coral-reef",
+    "times"
+  ],
+  "layout": "centered",
+  "colors": {
+    "name": "Coral Reef",
+    "primary": "#FF7F50",
+    "secondary": "#FF6347",
+    "bg": "#1A0A05",
+    "surface": "#2A1510",
+    "text": "#FFE0D0",
+    "muted": "#AA7755"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}

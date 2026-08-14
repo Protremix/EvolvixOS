@@ -1,0 +1,8 @@
+{
+  "name": "Timezone Offset Difference",
+  "description": "Calculate hour difference between timezones.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

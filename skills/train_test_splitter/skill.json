@@ -1,0 +1,8 @@
+{
+  "name": "Train/Test Splitter",
+  "description": "Split dataset arrays into train and test subsets.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

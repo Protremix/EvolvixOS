@@ -1,0 +1,8 @@
+{
+  "name": "Discrete Fourier Transform (DFT)",
+  "description": "Compute Discrete Fourier Transform.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

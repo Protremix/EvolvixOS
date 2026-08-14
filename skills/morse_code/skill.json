@@ -1,0 +1,8 @@
+{
+  "name": "Morse Code Converter",
+  "description": "Convert text to Morse code dots and dashes, or decode Morse code.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Bandwidth Calculator",
+  "description": "Calculate download transfer time.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

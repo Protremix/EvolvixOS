@@ -1,0 +1,8 @@
+{
+  "name": "QR Code Generator",
+  "description": "Generate ASCII QR code pattern.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

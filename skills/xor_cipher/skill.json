@@ -1,0 +1,8 @@
+{
+  "name": "XOR Cipher",
+  "description": "Encrypt or decrypt data using repeating XOR.",
+  "version": "1.0.0",
+  "free": true,
+  "local": true,
+  "cost": "$0.00"
+}

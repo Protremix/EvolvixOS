@@ -1,0 +1,22 @@
+{
+  "name": "Ecommerce Template 595",
+  "category": "ecommerce",
+  "tags": [
+    "ecommerce",
+    "lava-glow",
+    "segoe"
+  ],
+  "layout": "magazine",
+  "colors": {
+    "name": "Lava Glow",
+    "primary": "#FF4500",
+    "secondary": "#FFD700",
+    "bg": "#1A0500",
+    "surface": "#2A0F05",
+    "text": "#FFE0C0",
+    "muted": "#AA6650"
+  },
+  "responsive": true,
+  "version": "1.0.0",
+  "free": true
+}
