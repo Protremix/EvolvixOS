@@ -246,6 +246,10 @@ window.fetch = function(url, opts = {}) {
 };
 
 window.JAMES_SESSION = AUTH_USER ? "user_" + AUTH_USER.id + "_" + (window.JAMES_SESSION || "default") : "default";
+
+// Mobile nav toggle
+function toggleNav(){const s=document.querySelector('.sidebar');s.classList.toggle('open')}
+
 </script>
 </head>
 <body id="main-body">
@@ -352,13 +356,23 @@ Try one of the templates below, or just tell me what you want to build.</div>
 
 
 <script>
+
+// ─── Auth Helpers (v8.1 security fix) ───
+function authHeaders(){const t=localStorage.getItem('evolvix_token');return t?{'Authorization':'Bearer '+t}:{}}
+function checkAuth(){const t=localStorage.getItem('evolvix_token');if(!t){window.location.href='/login';return false}return true}
+// 401 interception — redirect to login on auth failure
+window.addEventListener('unhandledrejection',function(e){if(e.reason&&e.reason.status===401){localStorage.removeItem('evolvix_token');localStorage.removeItem('evolvix_user');window.location.href='/login'}});
+const origFetch=window.fetch;
+window.fetch=function(){return origFetch.apply(this,arguments).then(function(res){if(res.status===401){localStorage.removeItem('evolvix_token');localStorage.removeItem('evolvix_user');window.location.href='/login'}return res})};
+checkAuth();
+
 let queryCount=0,imageCount=0,templates=[],currentCategory='All';
 const ENGINE_BADGE=document.getElementById('engine-badge');
 
 // Check health
 async function checkHealth(){
 try{
-const res=await fetch('/api/health');
+const res=await fetch('/api/health',{headers:authHeaders()});
 const d=await res.json();
 const dot=document.getElementById('status-dot');
 const txt=document.getElementById('status-text');
@@ -380,7 +394,7 @@ checkHealth();setInterval(checkHealth,30000);
 // Load templates
 async function loadTemplates(){
 try{
-const res=await fetch('/api/templates');
+const res=await fetch('/api/templates',{headers:authHeaders()});
 const d=await res.json();
 templates=d.templates;
 const cats=d.categories;
@@ -463,11 +477,13 @@ await handleChatStream(text,intent);
 }
 }
 
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 function addMessage(role,name,text){
 const msgs=document.getElementById('messages');
 const div=document.createElement('div');
 div.className='msg '+role;
-div.innerHTML=`<div class="msg-avatar">${role==='user'?'🧑':'⚡'}</div><div class="msg-content"><div class="msg-name">${name}</div><div class="msg-text">${text}</div></div>`;
+const escapedText=role==='user'?escapeHtml(text):text;
+div.innerHTML=`<div class="msg-avatar">${role==='user'?'🧑':'⚡'}</div><div class="msg-content"><div class="msg-name">${escapeHtml(name)}</div><div class="msg-text">${escapedText}</div></div>`;
 msgs.appendChild(div);
 msgs.scrollTop=msgs.scrollHeight;
 return div.querySelector('.msg-text');
@@ -491,7 +507,7 @@ sendBtn.disabled=true;
 const msgText=addLoadingMessage();
 
 try{
-const res=await fetch('/api/agent/stream',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:text,type:intent.type,session_id:window.JAMES_SESSION||'default'})});
+const res=await fetch('/api/agent/stream',{method:'POST',headers:{...authHeaders(),'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({prompt:text,type:intent.type,session_id:window.JAMES_SESSION||'default'})});
 if(!res.ok)throw new Error('Stream failed');
 
 const reader=res.body.getReader();
@@ -535,8 +551,8 @@ document.getElementById('messages').scrollTop=document.getElementById('messages'
 else if(currentEvent==='tool_call'){
 toolCalls++;
 if(firstChunk){msgText.innerHTML='';firstChunk=false}
-const argsStr=JSON.stringify(data.args||{}).slice(0,120);
-const toolHTML='<div style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:12px;color:#a78bfa;display:flex;align-items:center;gap:6px"><span style="font-size:14px">🔧</span><strong>'+data.tool+'</strong><span style="color:var(--muted)">'+argsStr+'</span></div>';
+const argsStr=JSON.stringify(data.args||{}).slice(0,120);const toolName=escapeHtml(data.tool||'');
+const toolHTML='<div style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:12px;color:#a78bfa;display:flex;align-items:center;gap:6px"><span style="font-size:14px">🔧</span><strong>'+toolName+'</strong><span style="color:var(--muted)">'+argsStr+'</span></div>';
 const temp=document.createElement('div');
 temp.innerHTML=toolHTML;
 msgText.appendChild(temp.firstChild);
@@ -570,7 +586,7 @@ document.getElementById('messages').scrollTop=document.getElementById('messages'
 }
 
 else if(currentEvent==='error'){
-msgText.innerHTML='<span style="color:var(--orange)">Error: '+(data.error||'unknown')+'</span>';
+msgText.innerHTML='<span style="color:var(--orange)">Error: '+escapeHtml(data.error||'unknown')+'</span>';
 }
 
 }catch(e){}
@@ -579,13 +595,16 @@ msgText.innerHTML='<span style="color:var(--orange)">Error: '+(data.error||'unkn
 }
 if(!fullText&&toolCalls===0){msgText.innerHTML='<span style="color:var(--muted)">No response. Try again.</span>'}
 }catch(e){
-msgText.innerHTML='<span style="color:var(--orange)">Connection error: '+e.message+'</span>';
+msgText.innerHTML='<span style="color:var(--orange)">Connection error: '+escapeHtml(e.message)+'</span>';
 }
 sendBtn.classList.remove('loading');
 sendBtn.disabled=false;
 }
 
 function formatMarkdown(text){
+// Escape HTML first to prevent XSS
+let escaped=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+text=escaped;
 // Code blocks
 text=text.replace(/```(\w+)?\n([\s\S]*?)```/g,(m,lang,code)=>{
 return `<pre><code class="language-${lang||'text'}">${code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code></pre>`;
@@ -601,7 +620,10 @@ text=text.replace(/^## (.+)$/gm,'<div style="font-size:16px;font-weight:600;marg
 text=text.replace(/^(\d+)\. (.+)$/gm,'<div style="margin-left:20px">$1. $2</div>');
 text=text.replace(/^- (.+)$/gm,'<div style="margin-left:20px">• $2</div>');
 // Links
-text=text.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" style="color:var(--accent2)">$1</a>');
+text=text.replace(/\[([^\]]+)\]\(([^)]+)\)/g,(m,txt,url)=>{
+let u=url.trim();if(u.match(/^javascript:/i)||u.match(/^data:/i)||u.match(/^vbscript:/i))return txt;
+return '<a href="'+u+'" target="_blank" rel="noopener noreferrer" style="color:var(--accent2)">'+txt+'</a>';
+});
 return text;
 }
 
@@ -621,7 +643,7 @@ msgText.innerHTML=`<div class="img-loading">
 
 try{
 // Start generation (returns job_id immediately)
-const startRes=await fetch('/api/generate/image',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:text,style:'none',steps:15})});
+const startRes=await fetch('/api/generate/image',{method:'POST',headers:{...authHeaders(),'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({prompt:text,style:'none',steps:15})});
 if(!startRes.ok)throw new Error('Failed to start generation');
 const startData=await startRes.json();
 const jobId=startData.job_id;
@@ -641,7 +663,7 @@ const elapsed=attempts*3;
 if(fill)fill.style.width=Math.min((elapsed/60)*100,95)+'%';
 if(ptext)ptext.textContent=`Generating... ${elapsed}s elapsed`;
 
-const pollRes=await fetch('/api/job/'+jobId);
+const pollRes=await fetch('/api/job/'+jobId,{headers:authHeaders()});
 if(!pollRes.ok)continue;
 const pollData=await pollRes.json();
 if(pollData.status==='done'&&pollData.image){
@@ -649,7 +671,7 @@ done=true;
 imageCount++;
 document.getElementById('stat-images').textContent=imageCount;
 if(fill)fill.style.width='100%';
-msgText.innerHTML=`<img src="${pollData.image}" style="width:100%;border-radius:12px" />
+msgText.innerHTML=`<img src="${escapeHtml(pollData.image)}" style="width:100%;border-radius:12px" />
 <div style="font-size:12px;color:var(--muted);margin-top:8px">Generated in ${pollData.generation_time}s · Stable Diffusion v1.5 (local CPU) · seed ${pollData.seed||'?'}</div>`;
 }else if(pollData.status==='error'){
 done=true;
@@ -681,6 +703,10 @@ function showModels(){window.open('/#models','_blank')}
 
 // Init
 document.getElementById('prompt').focus();
+
+// Mobile nav toggle
+function toggleNav(){const s=document.querySelector('.sidebar');s.classList.toggle('open')}
+
 </script>
 </body>
 </html>

@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """
-EvolvixOS Auth API — User registration, OTP verification, JWT sessions.
-Runs on port 5020. Uses SQLite for user storage.
+EvolvixOS Auth API v8.1 — User registration, OTP verification, JWT sessions.
+Runs on port 5022. Uses SQLite for user storage.
 OTP is sent via Telegram bot (already running).
+
+v8.1: Removed otp_display from API responses (security fix),
+      context managers for all SQLite, WAL mode, strict OTP expiry,
+      port consistency, rate limiting.
 """
 
 import json
@@ -14,15 +18,34 @@ import time
 import hashlib
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+from collections import defaultdict
 
-# ─── Config ───
 DB_PATH = "/opt/evolvixos/auth/users.db"
 AUTH_DIR = "/opt/evolvixos/auth"
 os.makedirs(AUTH_DIR, exist_ok=True)
 
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8663115714:AAHJ399PFcRc4ugNOvTew4_ucky8LFAzpt0")
-TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
+# Rate limiting
+RATE_LIMIT = defaultdict(list)  # ip -> [timestamps]
+MAX_REQUESTS = 10  # per 60 seconds per IP
+OTP_MAX_ATTEMPTS = 5  # max OTP attempts before lockout
+
+def check_rate_limit(ip):
+    now = time.time()
+    RATE_LIMIT[ip] = [t for t in RATE_LIMIT[ip] if now - t < 60]
+    if len(RATE_LIMIT[ip]) >= MAX_REQUESTS:
+        return False
+    RATE_LIMIT[ip].append(now)
+    # Clean old entries periodically
+    if len(RATE_LIMIT) > 10000:
+        for k in list(RATE_LIMIT.keys()):
+            if now - RATE_LIMIT[k][-1] > 300:
+                del RATE_LIMIT[k]
+    return True
+
+# Load token from environment or existing secret file
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}" if TELEGRAM_TOKEN else ""
 
 # JWT-like token (simplified HMAC signing)
 JWT_SECRET = secrets.token_hex(32)
@@ -34,10 +57,12 @@ else:
     with open(JWT_FILE, "w") as f:
         f.write(JWT_SECRET)
 
-# ─── Database Setup ───
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=10)
     c = conn.cursor()
+    # Enable WAL mode for better concurrent access
+    c.execute("PRAGMA journal_mode=WAL")
+    c.execute("PRAGMA busy_timeout=5000")
     c.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,6 +75,7 @@ def init_db():
             verified INTEGER DEFAULT 0,
             otp_code TEXT,
             otp_expires TEXT,
+            otp_attempts INTEGER DEFAULT 0,
             session_token TEXT,
             session_expires TEXT
         )
@@ -70,7 +96,6 @@ def init_db():
 
 init_db()
 
-# ─── Helpers ───
 def hash_password(password):
     return hashlib.sha256(password.encode() + JWT_SECRET.encode()).hexdigest()
 
@@ -84,19 +109,12 @@ def generate_token():
     return secrets.token_urlsafe(48)
 
 def send_telegram_otp(chat_id, otp_code, display_name=""):
-    """Send OTP via Telegram bot."""
+    if not TELEGRAM_TOKEN:
+        return False
     try:
         msg = f"🔐 EvolvixOS Verification Code\n\nHello {display_name}!\n\nYour verification code is:\n\n**{otp_code}**\n\nThis code expires in 10 minutes.\n\n— EvolvixOS"
-        payload = json.dumps({
-            "chat_id": chat_id,
-            "text": msg,
-            "parse_mode": "Markdown"
-        }).encode()
-        req = urllib.request.Request(
-            f"{TELEGRAM_API}/sendMessage",
-            data=payload,
-            headers={"Content-Type": "application/json"}
-        )
+        payload = json.dumps({"chat_id": chat_id, "text": msg, "parse_mode": "Markdown"}).encode()
+        req = urllib.request.Request(f"{TELEGRAM_API}/sendMessage", data=payload, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(req, timeout=10) as resp:
             return resp.status == 200
     except Exception as e:
@@ -104,31 +122,24 @@ def send_telegram_otp(chat_id, otp_code, display_name=""):
         return False
 
 def get_telegram_chat_id(username):
-    """Look up Telegram chat_id by username from the bot's database."""
     try:
         bot_db = "/opt/evolvixos-platform-git/messaging/telegram_bot.db"
         if not os.path.exists(bot_db):
-            # Try finding linked users in the bot's storage
             return None
-        conn = sqlite3.connect(bot_db)
-        c = conn.cursor()
-        # Try common table structures
-        try:
-            c.execute("SELECT chat_id FROM linked_users WHERE username = ?", (username.lstrip('@').lower(),))
-            row = c.fetchone()
-            conn.close()
-            return row[0] if row else None
-        except:
-            conn.close()
-            return None
-    except:
+        with sqlite3.connect(bot_db, timeout=5) as conn:
+            c = conn.cursor()
+            try:
+                c.execute("SELECT chat_id FROM linked_users WHERE username = ?", (username.lstrip('@').lower(),))
+                row = c.fetchone()
+                return row[0] if row else None
+            except Exception:
+                return None
+    except Exception:
         return None
 
 def is_authorized(handler):
-    """Check if request has valid Bearer token. Returns user_id or None."""
     auth_header = handler.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
-        # Also check cookie
         cookies = handler.headers.get("Cookie", "")
         token_match = re.search(r'evolvix_token=([^;]+)', cookies)
         if token_match:
@@ -137,40 +148,43 @@ def is_authorized(handler):
             return None
     else:
         token = auth_header[7:]
-    
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("""
-        SELECT user_id FROM user_sessions 
-        WHERE token = ? AND expires > datetime('now')
-    """, (token,))
-    row = c.fetchone()
-    conn.close()
+    with sqlite3.connect(DB_PATH, timeout=5) as conn:
+        c = conn.cursor()
+        c.execute("SELECT user_id FROM user_sessions WHERE token = ? AND expires > datetime('now')", (token,))
+        row = c.fetchone()
     return row[0] if row else None
 
 def get_user_by_id(user_id):
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute("SELECT id, email, display_name, telegram_username, verified FROM users WHERE id = ?", (user_id,))
-    row = c.fetchone()
-    conn.close()
+    with sqlite3.connect(DB_PATH, timeout=5) as conn:
+        c = conn.cursor()
+        c.execute("SELECT id, email, display_name, telegram_username, verified FROM users WHERE id = ?", (user_id,))
+        row = c.fetchone()
     if row:
         return {"id": row[0], "email": row[1], "display_name": row[2], "telegram_username": row[3], "verified": bool(row[4])}
     return None
 
-# ─── API Handler ───
 class AuthHandler(BaseHTTPRequestHandler):
-    def _send_json(self, code, data):
+    def _get_ip(self):
+        return self.headers.get("X-Real-IP", self.client_address[0] if self.client_address else "unknown")
+
+    def _send_json(self, code, data, set_cookie_token=None):
         self.send_response(code)
         self.send_header("Content-Type", "application/json")
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Origin", "https://evolvixos.com")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Access-Control-Allow-Credentials", "true")
+        if set_cookie_token:
+            self.send_header("Set-Cookie", "evolvix_token=" + set_cookie_token + "; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=2592000")
         self.end_headers()
         self.wfile.write(json.dumps(data).encode())
 
     def _read_body(self):
         length = int(self.headers.get("Content-Length", 0))
+        if length > 1_000_000:  # 1MB max
+            return {}
         if length:
             return json.loads(self.rfile.read(length))
         return {}
@@ -180,9 +194,8 @@ class AuthHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/auth/health":
-            self._send_json(200, {"status": "online", "service": "EvolvixOS Auth"})
+            self._send_json(200, {"status": "online", "service": "EvolvixOS Auth v9.1"})
             return
-
         if self.path == "/auth/me":
             user_id = is_authorized(self)
             if not user_id:
@@ -194,10 +207,14 @@ class AuthHandler(BaseHTTPRequestHandler):
                 return
             self._send_json(200, {"user": user})
             return
-
         self._send_json(404, {"error": "Not found"})
 
     def do_POST(self):
+        ip = self._get_ip()
+        if not check_rate_limit(ip):
+            self._send_json(429, {"error": "Too many requests. Please wait a minute."})
+            return
+
         body = self._read_body()
         path = self.path.rstrip("/")
 
@@ -218,59 +235,44 @@ class AuthHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"error": "Invalid email format"})
                 return
 
-            conn = sqlite3.connect(DB_PATH)
-            c = conn.cursor()
-            # Check if already exists
-            c.execute("SELECT id, verified FROM users WHERE email = ?", (email,))
-            existing = c.fetchone()
-            if existing and existing[1]:
-                self._send_json(409, {"error": "Email already registered. Please login."})
-                conn.close()
-                return
-
-            # Create or update
             otp = generate_otp()
-            otp_expires = datetime.now(timezone.utc).isoformat()
-            import datetime as dt
-            otp_expires = (datetime.utcnow().replace(tzinfo=None) + dt.timedelta(minutes=10)).isoformat()
+            otp_expires = (datetime.utcnow() + timedelta(minutes=10)).isoformat()
 
-            if existing and not existing[1]:
-                # Update existing unverified user
-                c.execute("""
-                    UPDATE users SET password_hash=?, display_name=?, telegram_username=?, otp_code=?, otp_expires=?
-                    WHERE email=?
-                """, (hash_password(password), display_name, telegram_username, otp, otp_expires, email))
-                user_id = existing[0]
-            else:
-                c.execute("""
-                    INSERT INTO users (email, password_hash, display_name, telegram_username, otp_code, otp_expires)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                """, (email, hash_password(password), display_name, telegram_username, otp, otp_expires))
-                user_id = c.lastrowid
+            try:
+                with sqlite3.connect(DB_PATH, timeout=10) as conn:
+                    c = conn.cursor()
+                    c.execute("SELECT id, verified FROM users WHERE email = ?", (email,))
+                    existing = c.fetchone()
+                    if existing and existing[1]:
+                        self._send_json(409, {"error": "Email already registered. Please login."})
+                        return
 
-            conn.commit()
+                    if existing and not existing[1]:
+                        c.execute("UPDATE users SET password_hash=?, display_name=?, telegram_username=?, otp_code=?, otp_expires=?, otp_attempts=0 WHERE email=?",
+                                  (hash_password(password), display_name, telegram_username, otp, otp_expires, email))
+                        user_id = existing[0]
+                    else:
+                        c.execute("INSERT INTO users (email, password_hash, display_name, telegram_username, otp_code, otp_expires) VALUES (?, ?, ?, ?, ?, ?)",
+                                  (email, hash_password(password), display_name, telegram_username, otp, otp_expires))
+                        user_id = c.lastrowid
+                    conn.commit()
+            except sqlite3.Error as e:
+                self._send_json(500, {"error": "Database error"})
+                return
 
             # Try to send OTP via Telegram
             otp_sent_via_telegram = False
-            otp_display = None
-
             if telegram_username:
                 chat_id = get_telegram_chat_id(telegram_username)
                 if chat_id:
                     otp_sent_via_telegram = send_telegram_otp(chat_id, otp, display_name or email)
 
-            if not otp_sent_via_telegram:
-                # No Telegram linked — return OTP for display (demo mode)
-                otp_display = otp
-
-            conn.close()
-
+            # FIX: Never return OTP in API response — always require Telegram or manual admin delivery
             self._send_json(200, {
                 "ok": True,
                 "user_id": user_id,
                 "otp_sent_via_telegram": otp_sent_via_telegram,
-                "otp_display": otp_display,  # Only set if Telegram delivery failed
-                "message": "OTP generated. Check Telegram or the displayed code."
+                "message": "OTP generated. Check your Telegram for the verification code." if otp_sent_via_telegram else "OTP generated. Contact admin to get your verification code (Telegram not linked)."
             })
             return
 
@@ -283,59 +285,62 @@ class AuthHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"error": "Email and OTP required"})
                 return
 
-            conn = sqlite3.connect(DB_PATH)
-            c = conn.cursor()
-            c.execute("SELECT id, otp_code, otp_expires, display_name FROM users WHERE email = ?", (email,))
-            row = c.fetchone()
-            if not row:
-                self._send_json(404, {"error": "User not found. Please register first."})
-                conn.close()
-                return
-
-            user_id, stored_otp, otp_expires_str, display_name = row
-
-            # Check OTP
-            if stored_otp != otp:
-                self._send_json(400, {"error": "Invalid OTP code"})
-                conn.close()
-                return
-
-            # Check expiry
             try:
-                expires = datetime.fromisoformat(otp_expires_str)
-                if datetime.utcnow() > expires:
-                    self._send_json(400, {"error": "OTP expired. Please register again."})
-                    conn.close()
-                    return
-            except:
-                pass  # If we can't parse, allow it
+                with sqlite3.connect(DB_PATH, timeout=10) as conn:
+                    c = conn.cursor()
+                    c.execute("SELECT id, otp_code, otp_expires, display_name FROM users WHERE email = ?", (email,))
+                    row = c.fetchone()
+                    if not row:
+                        self._send_json(404, {"error": "User not found. Please register first."})
+                        return
 
-            # Mark verified, create session
-            token = generate_token()
-            import datetime as dt
-            expires = (datetime.utcnow() + dt.timedelta(days=30)).isoformat()
+                    user_id, stored_otp, otp_expires_str, display_name = row
 
-            c.execute("UPDATE users SET verified=1, otp_code=NULL, otp_expires=NULL WHERE id=?", (user_id,))
-            c.execute("""
-                INSERT INTO user_sessions (user_id, token, expires)
-                VALUES (?, ?, ?)
-            """, (user_id, token, expires))
-            conn.commit()
-            conn.close()
+                    attempts_row = c.execute("SELECT otp_attempts FROM users WHERE id = ?", (user_id,)).fetchone()
+                    current_attempts = attempts_row[0] if attempts_row else 0
+                    if current_attempts >= OTP_MAX_ATTEMPTS:
+                        self._send_json(429, {"error": "Too many failed attempts. Register again."})
+                        return
+                    if not stored_otp or not secrets.compare_digest(str(stored_otp), str(otp)):
+                        c.execute("UPDATE users SET otp_attempts = otp_attempts + 1 WHERE id = ?", (user_id,))
+                        conn.commit()
+                        remaining = OTP_MAX_ATTEMPTS - current_attempts - 1
+                        if remaining <= 0:
+                            self._send_json(429, {"error": "Account locked. Register again for a new code."})
+                        else:
+                            self._send_json(400, {"error": "Invalid OTP. " + str(remaining) + " attempt(s) left."})
+                        return
+
+                    # FIX: Strict OTP expiry — reject on parse failure instead of allowing
+                    try:
+                        expires = datetime.fromisoformat(otp_expires_str)
+                        if datetime.utcnow() > expires:
+                            self._send_json(400, {"error": "OTP expired. Please register again to get a new code."})
+                            return
+                    except (ValueError, TypeError):
+                        self._send_json(400, {"error": "OTP record is corrupted. Please register again."})
+                        return
+
+                    token = generate_token()
+                    expires_dt = (datetime.utcnow() + timedelta(days=30)).isoformat()
+
+                    c.execute("UPDATE users SET verified=1, otp_code=NULL, otp_expires=NULL, otp_attempts=0 WHERE id=?", (user_id,))
+                    c.execute("INSERT INTO user_sessions (user_id, token, expires, ip_address) VALUES (?, ?, ?, ?)",
+                              (user_id, token, expires_dt, self._get_ip()))
+                    conn.commit()
+            except sqlite3.Error as e:
+                self._send_json(500, {"error": "Database error"})
+                return
 
             self._send_json(200, {
                 "ok": True,
                 "token": token,
-                "user": {
-                    "id": user_id,
-                    "email": email,
-                    "display_name": display_name or email.split("@")[0]
-                },
+                "user": {"id": user_id, "email": email, "display_name": display_name or email.split("@")[0]},
                 "message": "Account verified! Redirecting to Studio..."
-            })
+            }, set_cookie_token=token)
             return
 
-        # ─── Login (for returning verified users) ───
+        # ─── Login ───
         if path == "/auth/login":
             email = body.get("email", "").lower().strip()
             password = body.get("password", "")
@@ -344,97 +349,86 @@ class AuthHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"error": "Email and password required"})
                 return
 
-            conn = sqlite3.connect(DB_PATH)
-            c = conn.cursor()
-            c.execute("SELECT id, password_hash, verified, display_name FROM users WHERE email = ?", (email,))
-            row = c.fetchone()
-            if not row:
-                self._send_json(404, {"error": "No account found. Please register first."})
-                conn.close()
-                return
+            try:
+                with sqlite3.connect(DB_PATH, timeout=10) as conn:
+                    c = conn.cursor()
+                    c.execute("SELECT id, password_hash, verified, display_name FROM users WHERE email = ?", (email,))
+                    row = c.fetchone()
+                    if not row:
+                        self._send_json(404, {"error": "No account found. Please register first."})
+                        return
 
-            user_id, pw_hash, verified, display_name = row
-            if not verify_password(password, pw_hash):
-                self._send_json(401, {"error": "Invalid password"})
-                conn.close()
-                return
+                    user_id, pw_hash, verified, display_name = row
+                    if not verify_password(password, pw_hash):
+                        self._send_json(401, {"error": "Invalid password"})
+                        return
 
-            if not verified:
-                self._send_json(403, {"error": "Account not verified. Please register again to get a new OTP."})
-                conn.close()
-                return
+                    if not verified:
+                        self._send_json(403, {"error": "Account not verified. Please register again to get a new OTP."})
+                        return
 
-            # Create session
-            token = generate_token()
-            import datetime as dt
-            expires = (datetime.utcnow() + dt.timedelta(days=30)).isoformat()
-            c.execute("""
-                INSERT INTO user_sessions (user_id, token, expires)
-                VALUES (?, ?, ?)
-            """, (user_id, token, expires))
-            conn.commit()
-            conn.close()
+                    token = generate_token()
+                    expires_dt = (datetime.utcnow() + timedelta(days=30)).isoformat()
+                    c.execute("INSERT INTO user_sessions (user_id, token, expires, ip_address) VALUES (?, ?, ?, ?)",
+                              (user_id, token, expires_dt, self._get_ip()))
+                    conn.commit()
+            except sqlite3.Error:
+                self._send_json(500, {"error": "Database error"})
+                return
 
             self._send_json(200, {
                 "ok": True,
                 "token": token,
-                "user": {
-                    "id": user_id,
-                    "email": email,
-                    "display_name": display_name or email.split("@")[0]
-                }
-            })
+                "user": {"id": user_id, "email": email, "display_name": display_name or email.split("@")[0]}
+            }, set_cookie_token=token)
             return
 
         # ─── Logout ───
         if path == "/auth/logout":
             user_id = is_authorized(self)
             if user_id:
-                conn = sqlite3.connect(DB_PATH)
-                c = conn.cursor()
-                # Delete current session
                 auth_header = self.headers.get("Authorization", "")
                 token = auth_header[7:] if auth_header.startswith("Bearer ") else None
                 if token:
-                    c.execute("DELETE FROM user_sessions WHERE token = ?", (token,))
-                conn.commit()
-                conn.close()
-            self._send_json(200, {"ok": True, "message": "Logged out"})
+                    with sqlite3.connect(DB_PATH, timeout=5) as conn:
+                        c = conn.cursor()
+                        c.execute("DELETE FROM user_sessions WHERE token = ?", (token,))
+                        conn.commit()
+            self.send_response(200); self.send_header("Content-Type", "application/json"); self.send_header("Set-Cookie", "evolvix_token=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0"); self.end_headers(); self.wfile.write(json.dumps({"ok": True, "message": "Logged out"}).encode())
             return
 
         # ─── Resend OTP ───
         if path == "/auth/resend-otp":
             email = body.get("email", "").lower().strip()
-            conn = sqlite3.connect(DB_PATH)
-            c = conn.cursor()
-            c.execute("SELECT id, telegram_username, display_name FROM users WHERE email = ?", (email,))
-            row = c.fetchone()
-            if not row:
-                self._send_json(404, {"error": "User not found"})
-                conn.close()
+            try:
+                with sqlite3.connect(DB_PATH, timeout=10) as conn:
+                    c = conn.cursor()
+                    c.execute("SELECT id, telegram_username, display_name FROM users WHERE email = ?", (email,))
+                    row = c.fetchone()
+                    if not row:
+                        self._send_json(404, {"error": "User not found"})
+                        return
+
+                    user_id, tg_username, display_name = row
+                    otp = generate_otp()
+                    otp_expires = (datetime.utcnow() + timedelta(minutes=10)).isoformat()
+                    c.execute("UPDATE users SET otp_code=?, otp_expires=?, otp_attempts=0 WHERE id=?", (otp, otp_expires, user_id))
+                    conn.commit()
+            except sqlite3.Error:
+                self._send_json(500, {"error": "Database error"})
                 return
 
-            user_id, tg_username, display_name = row
-            otp = generate_otp()
-            import datetime as dt
-            otp_expires = (datetime.utcnow() + dt.timedelta(minutes=10)).isoformat()
-            c.execute("UPDATE users SET otp_code=?, otp_expires=? WHERE id=?", (otp, otp_expires, user_id))
-            conn.commit()
-
-            otp_sent_via_telegram = False
-            otp_display = None
+            otp_sent = False
             if tg_username:
                 chat_id = get_telegram_chat_id(tg_username)
                 if chat_id:
-                    otp_sent_via_telegram = send_telegram_otp(chat_id, otp, display_name or email)
-            if not otp_sent_via_telegram:
-                otp_display = otp
+                    otp_sent = send_telegram_otp(chat_id, otp, display_name or email)
 
-            conn.close()
+            # FIX: Never return OTP in API response
             self._send_json(200, {
                 "ok": True,
-                "otp_sent_via_telegram": otp_sent_via_telegram,
-                "otp_display": otp_display
+                "otp_sent_via_telegram": otp_sent,
+                "message": "New OTP sent to your Telegram." if otp_sent else "OTP regenerated. Contact admin to get your code."
             })
             return
 
@@ -446,6 +440,6 @@ class AuthHandler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     port = 5022
-    print(f"EvolvixOS Auth API starting on port 5021")
+    print(f"EvolvixOS Auth API v8.1 starting on port {port}")
     server = ThreadingHTTPServer(("0.0.0.0", port), AuthHandler)
     server.serve_forever()
