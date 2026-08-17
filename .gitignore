@@ -29,3 +29,5 @@ tmp/
 build/
 *.apk
 *.class
+auth/users.db
+.kimi_key
