@@ -21,7 +21,6 @@ Thumbs.db
 logs/
 *.gguf
 *.bin
-models/
 .cache/
 tmp/
 *.js.map
@@ -31,3 +30,5 @@ build/
 *.class
 auth/users.db
 .kimi_key
+*.gguf
+*.bin
