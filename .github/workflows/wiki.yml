@@ -1,0 +1,64 @@
+name: Initialize Wiki
+
+on:
+  workflow_dispatch:
+
+jobs:
+  init-wiki:
+    name: 📚 Initialize GitHub Wiki
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Initialize wiki
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          
+          # Configure git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Try to clone wiki repo
+          WIKI_URL="https://${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git"
+          
+          if git clone "$WIKI_URL" wiki 2>&1; then
+            echo "Wiki repo already exists, updating pages..."
+          else
+            echo "Wiki repo doesn't exist yet. Creating it..."
+            mkdir -p wiki
+            cd wiki
+            git init
+            git remote add origin "$WIKI_URL"
+            cd ..
+          fi
+          
+          # Copy wiki pages from repo
+          if [ -d "repo/docs/wiki" ]; then
+            cp repo/docs/wiki/*.md wiki/
+            echo "Copied wiki pages from docs/wiki/"
+          else
+            echo "No wiki pages found in docs/wiki/"
+            exit 1
+          fi
+          
+          # Push to wiki
+          cd wiki
+          git add -A
+          git commit -m "Wiki: Initialize with v9.2 documentation (8 pages)" || true
+          
+          git branch -M master
+          git push -u origin master 2>&1 || {
+            echo "Push failed — wiki may need manual initialization via GitHub web UI"
+            echo "Visit: https://github.com/${GITHUB_REPOSITORY}/wiki and create the first page"
+            exit 0
+          }
+          
+          echo "✅ Wiki initialized successfully!"
+          echo "Visit: https://github.com/${GITHUB_REPOSITORY}/wiki"
