@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head><title>Mr James Hard Test</title>
+<style>
+body{background:#0a0a0f;color:#fff;font-family:monospace;padding:20px;max-width:900px;margin:0 auto}
+input{width:70%;padding:10px;background:#1a1a2e;color:#fff;border:1px solid #333;border-radius:6px}
+button{padding:10px 20px;background:linear-gradient(135deg,#6c5ce7,#e84393);color:#fff;border:none;border-radius:6px;cursor:pointer}
+#output{background:#111;padding:15px;border-radius:8px;margin-top:15px;white-space:pre-wrap;max-height:600px;overflow-y:auto;line-height:1.6}
+.err{color:#e74c3c}.user{color:#6c5ce7}.ai{color:#00b894}.tool{color:#fdcb6e}
+</style></head>
+<body>
+<h2>Mr James Hard Mission Test</h2>
+<div>
+<input id="prompt" value="Write a Python function that implements Binary Search Tree insert, search, and inorder traversal. Include test cases.">
+<button onclick="sendMsg()">Send</button>
+</div>
+<div id="output">Ready. Auto-sending in 1 second...</div>
+<script>
+const TOKEN = localStorage.getItem("evolvix_token") || "";
+const SESSION = "test_hard_" + Date.now();
+
+async function sendMsg() {
+    const text = document.getElementById("prompt").value.trim();
+    if (!text) return;
+    const out = document.getElementById("output");
+    out.innerHTML = '<span class="user">You: ' + text.substring(0, 80) + '...</span>\n\n<span class="ai">Mr James: </span>';
+
+    try {
+        const res = await fetch("/api/agent/stream", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + TOKEN,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                prompt: text,
+                type: "code",
+                session_id: SESSION
+            })
+        });
+
+        if (!res.ok) {
+            out.innerHTML += '<span class="err">HTTP ' + res.status + ' ' + res.statusText + '</span>';
+            const errText = await res.text();
+            out.innerHTML += '\n<span class="err">' + errText + '</span>';
+            return;
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let fullText = "";
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value);
+            fullText += chunk;
+            let display = fullText;
+            if (display.length > 4000) display = display.substring(0, 4000) + "\n... (truncated, total: " + display.length + " chars)";
+            out.innerHTML = '<span class="user">You: ' + text.substring(0, 80) + '...</span>\n\n<span class="ai">Mr James: </span>' + display;
+            out.scrollTop = out.scrollHeight;
+        }
+
+        out.innerHTML += '\n\n--- Done. ' + fullText.length + ' chars received ---';
+    } catch (e) {
+        out.innerHTML += '<span class="err">Error: ' + e.message + '</span>';
+    }
+}
+
+window.onload = function() { setTimeout(function() { sendMsg(); }, 1000); };
+</script>
+</body>
+</html>

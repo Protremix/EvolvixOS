@@ -368,7 +368,7 @@ Try one of the templates below, or just tell me what you want to build.</div>
 </div>
 <div class="input-bar">
 <textarea id="prompt" placeholder="Describe what you want to build..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-<button class="send-btn" id="send-btn" type="button">➤</button>
+<button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
 </div>
 </div>
 
@@ -503,28 +503,8 @@ sendMessage();
 function sendQuick(msg){document.getElementById('prompt').value=msg;sendMessage()}
 
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}}
-
-// Reliable event listeners for send button (works with browser automation and real clicks)
-(function() {
-    var btn = document.getElementById("send-btn");
-    if (btn) {
-        btn.addEventListener("click", function(e) { e.preventDefault(); sendMessage(); });
-    }
-})();
 function autoResize(t){t.style.height='auto';t.style.height=Math.min(t.scrollHeight,120)+'px'}
 function focusInput(){document.getElementById('prompt').focus()}
-
-// Auto-send via URL parameter: /studio/?msg=hello
-(function() {
-    var params = new URLSearchParams(window.location.search);
-    var msg = params.get("msg");
-    if (msg) {
-        setTimeout(function() {
-            document.getElementById("prompt").value = msg;
-            sendMessage();
-        }, 500);
-    }
-})();
 
 // Detect intent
 function detectIntent(text){

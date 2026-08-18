@@ -153,9 +153,15 @@ def get_audit_log(limit: int = 100, user_id: str = None) -> list[dict]:
 
 # --- Path Validation ---
 
+# Sensitive paths that should never be accessible even within allowed dirs
+SENSITIVE_PATHS = [
+    "/root/.ssh", "/root/.bash_history", "/root/.aws", "/root/.gnupg",
+    "/etc/shadow", "/etc/gshadow", "/proc/self/environ",
+]
+
 def validate_path(path: str, allowed_bases: list, user_scope: str = None) -> tuple[bool, str]:
     """
-    Validate a filesystem path is within allowed directories.
+    Validate a filesystem path is within allowed directories and not sensitive.
     Returns (ok, resolved_path or error_message).
     """
     if not path:
@@ -165,6 +171,11 @@ def validate_path(path: str, allowed_bases: list, user_scope: str = None) -> tup
         resolved = os.path.realpath(os.path.expanduser(path))
     except Exception as e:
         return False, f"Path resolution error: {e}"
+
+    # Check sensitive paths first
+    for sp in SENSITIVE_PATHS:
+        if resolved.startswith(sp):
+            return False, f"Path '{path}' is a sensitive system path"
 
     for base in allowed_bases:
         base_resolved = os.path.realpath(base)
@@ -512,3 +523,15 @@ def init_default_tools():
     register_tool(ToolSpec("pip_install", Permission.ADMIN, timeout=120, rate_limit=5))
     register_tool(ToolSpec("skill_exec", Permission.EXECUTE, timeout=120, rate_limit=20))
     register_tool(ToolSpec("process_startup_check", Permission.READ, timeout=10, rate_limit=30))
+
+    # v10: Additional tools from EvolvixOS v9.2
+    register_tool(ToolSpec("code_analyze", Permission.READ, timeout=60, rate_limit=20))
+    register_tool(ToolSpec("gemini_vision", Permission.NETWORK, timeout=60, rate_limit=20))
+    register_tool(ToolSpec("gemini_tts", Permission.NETWORK, timeout=60, rate_limit=20))
+    register_tool(ToolSpec("ui_generate", Permission.WRITE, timeout=60, rate_limit=10))
+    register_tool(ToolSpec("team_memory_search", Permission.READ, timeout=30, rate_limit=30))
+    register_tool(ToolSpec("team_memory_save", Permission.WRITE, timeout=30, rate_limit=20))
+    register_tool(ToolSpec("search_subagents", Permission.READ, timeout=15, rate_limit=30))
+    register_tool(ToolSpec("set_persona", Permission.WRITE, timeout=10, rate_limit=10))
+    register_tool(ToolSpec("tencent_cloud", Permission.ADMIN, timeout=60, rate_limit=5))
+    register_tool(ToolSpec("sandbox_exec", Permission.EXECUTE, timeout=120, rate_limit=10))

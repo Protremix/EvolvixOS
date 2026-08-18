@@ -444,8 +444,12 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             content = args.get("content", "")
             if not path:
                 return "Error: no path"
-            if not is_path_safe(path):
-                return f"Error: path '{path}' is outside allowed directories"
+            # v10 security: validate path
+            ok, result_msg = validate_path(path, ALLOWED_BASE_DIRS)
+            if not ok:
+                log_audit("system", "file_write", "write", path[:200], "blocked", 0)
+                return f"Error: {result_msg}"
+            log_audit("system", "file_write", "write", path[:200], "success", 0)
             os.makedirs(os.path.dirname(path) if os.path.dirname(path) else ".", exist_ok=True)
             with open(path, "w") as f:
                 f.write(content)
@@ -455,18 +459,25 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             path = args.get("path", "")
             if not path:
                 return "Error: no path"
-            if not is_path_safe(path):
-                return f"Error: path '{path}' is outside allowed directories"
+            # v10 security: validate path
+            ok, result_msg = validate_path(path, ALLOWED_BASE_DIRS)
+            if not ok:
+                log_audit("system", "file_read", "read", path[:200], "blocked", 0)
+                return f"Error: {result_msg}"
             if not os.path.exists(path):
                 return f"File not found: {path}"
+            log_audit("system", "file_read", "read", path[:200], "success", 0)
             with open(path) as f:
                 return f.read()[:15000]
 
         elif name == "file_list":
             path = args.get("path", ".")
             recursive = args.get("recursive", False)
-            if not is_path_safe(path):
-                return f"Error: path '{path}' is outside allowed directories"
+            # v10 security: validate path
+            ok, result_msg = validate_path(path, ALLOWED_BASE_DIRS)
+            if not ok:
+                log_audit("system", "file_list", "read", path[:200], "blocked", 0)
+                return f"Error: {result_msg}"
             if not os.path.exists(path):
                 return f"Directory not found: {path}"
             items = []
@@ -523,6 +534,10 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
                         mime = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".gif": "image/gif", ".webp": "image/webp", ".bmp": "image/bmp"}.get(ext, "image/png")
                         vision_prompt = prompt or "Analyze this image in detail. Describe what you see, any text (OCR), charts, diagrams, UI elements, or notable features."
                         gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GOOGLE_API_KEY}"
+                        # v10 security: validate URL (SSRF protection)
+                        _ok, _msg = validate_url(gemini_url)
+                        if not _ok:
+                            return f"Error: SSRF blocked: {_msg}"
                         body = json.dumps({"contents": [{"parts": [{"text": vision_prompt}, {"inline_data": {"mime_type": mime, "data": img_data}}]}], "generationConfig": {"maxOutputTokens": 1000, "temperature": 0.4}}).encode()
                         req = urllib.request.Request(gemini_url, data=body, headers={"Content-Type": "application/json", "User-Agent": "EvolvixOS/9.2"})
                         with urllib.request.urlopen(req, timeout=60) as resp:
@@ -577,7 +592,11 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             svc = sanitize_service_name(args.get("name", ""))
             if not svc:
                 return "Error: invalid service name"
+            # v10 security: audit log
+            start = time.time()
             r = subprocess.run(["systemctl", "is-active", svc], capture_output=True, text=True)
+            duration = (time.time() - start) * 1000
+            log_audit("system", "service_check", "read", svc, "success", duration)
             return f"Service '{svc}' is {r.stdout.strip()}"
 
         elif name == "service_restart":
@@ -596,7 +615,11 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             return f"Service '{svc}' restarted" if r.returncode == 0 else f"Error: {r.stderr}"
 
         elif name == "docker_ps":
+            # v10 security: audit log
+            start = time.time()
             r = subprocess.run(["docker", "ps", "-a", "--format", "{{.Names}}\t{{.Status}}\t{{.Ports}}"], capture_output=True, text=True)
+            duration = (time.time() - start) * 1000
+            log_audit("system", "docker_ps", "read", "list", "success", duration)
             return r.stdout or "No containers"
 
         elif name == "docker_restart":
@@ -639,6 +662,11 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             headers = args.get("headers", {})
             if not url or not url.startswith(("http://", "https://")):
                 return "Error: invalid URL"
+            # v10 security: SSRF protection
+            ok, result_msg = validate_url(url)
+            if not ok:
+                log_audit("system", "http_request", "network", url[:200], "blocked", 0)
+                return f"Error: {result_msg}"
             data = json.dumps(body).encode() if body else None
             req_headers = {"Content-Type": "application/json"}
             req_headers.update(headers)
@@ -1046,6 +1074,10 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
                 ext = image_path.split(".")[-1].lower() if "." in image_path else "png"
                 mime = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png", "gif": "image/gif", "webp": "image/webp"}.get(ext, "image/png")
                 gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key={GOOGLE_API_KEY}"
+                # v10 security: validate URL (SSRF protection)
+                _ok, _msg = validate_url(gemini_url)
+                if not _ok:
+                    return f"Error: SSRF blocked: {_msg}"
                 body = json.dumps({"contents": [{"parts": [{"text": prompt}, {"inline_data": {"mime_type": mime, "data": img_data}}]}], "generationConfig": {"maxOutputTokens": 500, "temperature": 0.7}}).encode()
                 req = urllib.request.Request(gemini_url, data=body, headers={"Content-Type": "application/json", "User-Agent": "EvolvixOS/9.2"})
                 with urllib.request.urlopen(req, timeout=30) as resp:
@@ -1943,8 +1975,13 @@ def agentic_loop(prompt, session_id="default", model="qwen2.5:14b", max_turns=10
                                 "max_tokens": 4096,
                                 "temperature": 0.7
                             }).encode()
+                            # v10 security: validate URL (SSRF protection)
+                            _groq_url = "https://api.groq.com/openai/v1/chat/completions"
+                            _ok, _msg = validate_url(_groq_url)
+                            if not _ok:
+                                raise Exception(f"SSRF blocked: {_msg}")
                             fl_req = urllib.request.Request(
-                                "https://api.groq.com/openai/v1/chat/completions",
+                                _groq_url,
                                 data=fl_body,
                                 headers={"Content-Type": "application/json", "Authorization": f"Bearer {groq_key}", "User-Agent": "EvolvixOS/9.2"}
                             )
