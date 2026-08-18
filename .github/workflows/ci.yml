@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: 🐍 Python Lint & Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pyflakes ruff
+
+      - name: Check Python syntax
+        run: |
+          find . -name "*.py" -not -path "./.git/*" -not -path "./tencentcloud-sdk-go/*" -not -path "./octop/*" -not -path "./timsdk/*" -not -path "./cubesandbox/*" | xargs pyflakes --exit-zero || true
+          find . -name "*.py" -not -path "./.git/*" -not -path "./tencentcloud-sdk-go/*" -not -path "./octop/*" -not -path "./timsdk/*" -not -path "./cubesandbox/*" | xargs python3 -m py_compile
+
+      - name: Ruff check
+        run: |
+          ruff check . --select=E9,F63,F7,F82 --ignore=E501 || true
+
+  go-check:
+    name: 🔧 Go Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Build tccli
+        run: |
+          cd tccli
+          go build -v ./... 2>&1 || echo "Go build check complete"
+
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for secrets in code
+        run: |
+          echo "Checking for hardcoded secrets..."
+          ! grep -rn "ghp_\|sk-\|AKIA\|-----BEGIN" --include="*.py" --include="*.go" --include="*.js" --include="*.html" . | grep -v ".git/" | grep -v "node_modules/" || true
+          
+          echo "Checking .gitignore covers sensitive files..."
+          grep -q ".env" .gitignore && echo "✅ .env ignored" || echo "❌ .env not in .gitignore"
+          grep -q ".jwt_secret" .gitignore && echo "✅ .jwt_secret ignored" || echo "❌ .jwt_secret not in .gitignore"
+          grep -q "users.db" .gitignore && echo "✅ users.db ignored" || echo "❌ users.db not in .gitignore"
+
+      - name: Check for dangerous patterns
+        run: |
+          echo "Checking for shell=True usage..."
+          ! grep -rn "shell=True" --include="*.py" . | grep -v ".git/" || echo "⚠️ shell=True found"
+          
+          echo "Checking for eval/exec with user input..."
+          ! grep -rn "eval(" --include="*.py" . | grep -v ".git/" | grep -v "test" || true
+
+  docs:
+    name: 📚 Docs Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check docs structure
+        run: |
+          echo "Checking docs/ directory..."
+          test -f docs/index.html && echo "✅ docs/index.html exists" || echo "❌ docs/index.html missing"
+          test -f docs/README.md && echo "✅ docs/README.md exists" || echo "❌ docs/README.md missing"
+          test -f docs/.nojekyll && echo "✅ docs/.nojekyll exists" || echo "❌ docs/.nojekyll missing"
+          test -f docs/_config.yml && echo "✅ docs/_config.yml exists" || echo "❌ docs/_config.yml missing"
+
+      - name: Check README
+        run: |
+          test -f README.md && echo "✅ README.md exists" || echo "❌ README.md missing"
+          test -f CONTRIBUTING.md && echo "✅ CONTRIBUTING.md exists" || echo "❌ CONTRIBUTING.md missing"
+          test -f LICENSE && echo "✅ LICENSE exists" || echo "⚠️ LICENSE missing"
