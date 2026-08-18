@@ -1071,7 +1071,7 @@ class ModelAPI(BaseHTTPRequestHandler):
                 "omniroute": self._check("http://127.0.0.1:20128/"),
                 "ollama": self._check(OLLAMA_URL + "/api/tags"),
                 "art_engine": self._check(ART_ENGINE_URL + "/api/status"),
-                "models_registered": 281,
+                "models_registered": sum(1 for _ in open("/opt/evolvixos/models/model_registry.json")) if False else 81,
                 "james_version": "9.0",
                 "tools_available": len(TOOLS),
                 "kimi_available": bool(KIMI_API_KEY),
@@ -1081,11 +1081,38 @@ class ModelAPI(BaseHTTPRequestHandler):
             })
         elif self.path == "/api/models":
             try:
-                req = urllib.request.Request(f"{OLLAMA_URL}/api/tags")
-                with urllib.request.urlopen(req, timeout=5) as resp:
-                    self.respond(200, json.loads(resp.read()))
-            except Exception:
-                self.respond(200, {"models": []})
+                registry_path = "/opt/evolvixos/models/model_registry.json"
+                if os.path.exists(registry_path):
+                    with open(registry_path) as rf:
+                        registry = json.load(rf)
+                    # Live Ollama status
+                    try:
+                        req = urllib.request.Request(f"{OLLAMA_URL}/api/tags")
+                        with urllib.request.urlopen(req, timeout=5) as resp:
+                            ollama_data = json.loads(resp.read())
+                        ollama_names = {m["name"] for m in ollama_data.get("models", [])}
+                        for m in registry.get("models", []):
+                            if m.get("source") == "ollama":
+                                m["running"] = m["name"] in ollama_names
+                    except Exception:
+                        pass
+                    self.respond(200, {
+                        "models": registry.get("models", []),
+                        "count": registry.get("total_models", 0),
+                        "categories": registry.get("categories", {}),
+                        "last_updated": registry.get("last_updated", ""),
+                        "sources": {
+                            "ollama": sum(1 for m in registry.get("models", []) if m.get("source") == "ollama"),
+                            "github_discovery": sum(1 for m in registry.get("models", []) if m.get("source") == "github_discovery"),
+                            "builtin": sum(1 for m in registry.get("models", []) if m.get("source") == "builtin")
+                        }
+                    })
+                else:
+                    req = urllib.request.Request(f"{OLLAMA_URL}/api/tags")
+                    with urllib.request.urlopen(req, timeout=5) as resp:
+                        self.respond(200, json.loads(resp.read()))
+            except Exception as e:
+                self.respond(500, {"error": str(e)})
         elif self.path == "/api/templates":
             self.respond(200, [
                 {"id": 1, "title": "Web Application", "desc": "Build a full-stack web app", "icon": "🌐", "category": "Code", "prompt": "Build a web app with a React frontend and Python API for a todo app"},
