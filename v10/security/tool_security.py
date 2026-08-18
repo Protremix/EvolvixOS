@@ -406,3 +406,8 @@ def init_default_tools():
     register_tool(ToolSpec("git", Permission.ADMIN, timeout=30, rate_limit=10,
                            allowed_commands=["status", "log", "add", "commit", "push", "pull",
                                              "diff", "branch", "checkout", "fetch", "show"]))
+
+    # Additional admin/system tools
+    register_tool(ToolSpec("pip_install", Permission.ADMIN, timeout=120, rate_limit=5))
+    register_tool(ToolSpec("skill_exec", Permission.EXECUTE, timeout=120, rate_limit=20))
+    register_tool(ToolSpec("process_startup_check", Permission.READ, timeout=10, rate_limit=30))

@@ -581,10 +581,18 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             return f"Service '{svc}' is {r.stdout.strip()}"
 
         elif name == "service_restart":
+            # v10 security: admin permission required
+            ok, msg = check_permission("service_restart", user_role="admin")
+            if not ok:
+                log_audit("system", "service_restart", "execute", str(args), "blocked", 0)
+                return f"Error: {msg}"
             svc = sanitize_service_name(args.get("name", ""))
             if not svc:
                 return "Error: invalid service name"
+            start = time.time()
             r = subprocess.run(["systemctl", "restart", svc], capture_output=True, text=True)
+            duration = (time.time() - start) * 1000
+            log_audit("admin", "service_restart", "execute", svc, "success" if r.returncode == 0 else "error", duration)
             return f"Service '{svc}' restarted" if r.returncode == 0 else f"Error: {r.stderr}"
 
         elif name == "docker_ps":
@@ -592,20 +600,36 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             return r.stdout or "No containers"
 
         elif name == "docker_restart":
+            # v10 security: admin permission required
+            ok, msg = check_permission("docker_restart", user_role="admin")
+            if not ok:
+                log_audit("system", "docker_restart", "execute", str(args), "blocked", 0)
+                return f"Error: {msg}"
             cname = sanitize_service_name(args.get("name", ""))
             if not cname:
                 return "Error: invalid container name"
+            start = time.time()
             r = subprocess.run(["docker", "restart", cname], capture_output=True, text=True)
+            duration = (time.time() - start) * 1000
+            log_audit("admin", "docker_restart", "execute", cname, "success" if r.returncode == 0 else "error", duration)
             return f"Container '{cname}' restarted" if r.returncode == 0 else f"Error: {r.stderr}"
 
         elif name == "git":
+            # v10 security: admin permission required
+            ok, msg = check_permission("git", user_role="admin")
+            if not ok:
+                log_audit("system", "git", "execute", str(args), "blocked", 0)
+                return f"Error: {msg}"
             repo = args.get("repo", "/opt/evolvixos")
             cmd = sanitize_git_command(args.get("command", ""))
             if not cmd:
                 return "Error: invalid git command. Allowed: status, log, add, commit, push, pull, diff, branch, checkout, fetch, clone, init, remote, show"
             if not is_path_safe(repo):
                 return "Error: repo path not allowed"
+            start = time.time()
             r = subprocess.run(["git", "-C", repo] + cmd.split(), capture_output=True, text=True, timeout=30)
+            duration = (time.time() - start) * 1000
+            log_audit("admin", "git", "execute", cmd, "success" if r.returncode == 0 else "error", duration)
             return (r.stdout + r.stderr)[:5000] or "(no output)"
 
         elif name == "http_request":
@@ -627,6 +651,11 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             if not query:
                 return "Error: no query"
             url = f"https://api.duckduckgo.com/?q={urllib.parse.quote(query)}&format=json&no_html=1"
+            # v10 security: validate search URL
+            ok, result_msg = validate_url(url)
+            if not ok:
+                log_audit("system", "web_search", "network", query[:200], "blocked", 0)
+                return f"Error: {result_msg}"
             req = urllib.request.Request(url, headers={"User-Agent": "MrJames/9.0"})
             with urllib.request.urlopen(req, timeout=15) as resp:
                 data = json.loads(resp.read())
@@ -649,6 +678,11 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             max_chars = args.get("max_chars", 5000)
             if not url or not url.startswith(("http://", "https://")):
                 return "Error: invalid URL"
+            # v10 security: SSRF protection
+            ok, result_msg = validate_url(url)
+            if not ok:
+                log_audit("system", "web_fetch", "network", url[:200], "blocked", 0)
+                return f"Error: {result_msg}"
             req = urllib.request.Request(url, headers={"User-Agent": "MrJames/9.0"})
             with urllib.request.urlopen(req, timeout=20) as resp:
                 content = resp.read().decode(errors='replace')
@@ -825,7 +859,11 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
                 return f"Skill '{skill_name}' not found. Available: {', '.join(available)}"
             if not os.access(skill_path, os.X_OK):
                 os.chmod(skill_path, 0o755)
+            # v10 security: audit skill execution
+            start = time.time()
             r = subprocess.run(["bash", skill_path, skill_input], capture_output=True, text=True, timeout=120)
+            duration = (time.time() - start) * 1000
+            log_audit("system", "skill_exec", "execute", skill_name, "success" if r.returncode == 0 else "error", duration)
             output = r.stdout
             if r.stderr:
                 output += f"\n[STDERR]\n{r.stderr}"
@@ -938,10 +976,18 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             return "\n\n".join(info_parts)
 
         elif name == "pip_install":
+            # v10 security: admin permission required (installs system packages)
+            ok, msg = check_permission("pip_install", user_role="admin")
+            if not ok:
+                log_audit("system", "pip_install", "execute", str(args), "blocked", 0)
+                return f"Error: {msg}"
             package = re.sub(r'[^a-zA-Z0-9_.>=<\-]', '', args.get("package", ""))[:100]
             if not package:
                 return "Error: package name required"
+            start = time.time()
             r = subprocess.run(["pip3", "install", package], capture_output=True, text=True, timeout=120)
+            duration = (time.time() - start) * 1000
+            log_audit("admin", "pip_install", "execute", package, "success" if r.returncode == 0 else "error", duration)
             output = r.stdout + r.stderr
             if r.returncode == 0:
                 return f"Successfully installed {package}\n{output[-500:]}"
@@ -1199,6 +1245,18 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             model_override = args.get("model", "")
             if not prompt_text:
                 return "Error: prompt is required"
+            # v10 security: validate provider URL before calling
+            provider_urls = {
+                "groq": "https://api.groq.com/openai/v1/chat/completions",
+                "gemini": "https://generativelanguage.googleapis.com/v1beta/models",
+                "kimi": "https://api.moonshot.ai/v1/chat/completions",
+            }
+            prov_lower = provider.lower() if provider != "auto" else ""
+            if prov_lower in provider_urls:
+                ok, result_msg = validate_url(provider_urls[prov_lower])
+                if not ok:
+                    log_audit("system", "call_free_llm", "network", provider, "blocked", 0)
+                    return f"Error: {result_msg}"
 
             # Load free LLM providers
             try:
@@ -2469,11 +2527,10 @@ class ModelAPI(BaseHTTPRequestHandler):
     def _handle_stream_chat(self, body):
         prompt = body.get("prompt", "")
         system = body.get("system", build_system_prompt(uploads_dir=user_dir(self, UPLOADS_DIR)))
-        intent, sel_engine, sel_model, reason = select_engine(prompt)
-        model = sel_model if not body.get("model") else body.get("model")
-        # If engine is groq, ensure we use a Groq model
-        if sel_engine == "groq" and not body.get("model"):
-            model = sel_model  # Use the Groq model from classify_intent
+        # v10: Route through unified ModelRouter
+        _init_v10()
+        decision = _v10_router.route(prompt)
+        model = body.get("model") or decision.model
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream")
         self.send_header("Cache-Control", "no-cache")
@@ -2483,29 +2540,68 @@ class ModelAPI(BaseHTTPRequestHandler):
         self._add_security_headers()
         self.end_headers()
         self.close_connection = True
+
+        # v10: Log routing decision
+        log_audit("system", "stream_chat", "route", prompt[:200], "success", 0)
+
+        # v10: Select provider based on routing decision
+        provider = _v10_registry.get(decision.provider)
+        use_ollama = provider and provider.is_local
+
         try:
-            data = json.dumps({"model": model, "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}], "stream": True}).encode()
-            req = urllib.request.Request(f"{OLLAMA_URL}/api/chat", data=data, headers={"Content-Type": "application/json"})
-            with urllib.request.urlopen(req, timeout=180) as resp:
-                for line in resp:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    try:
-                        chunk = json.loads(line)
-                        if chunk.get("message", {}).get("content"):
-                            self._sse("text", {"text": chunk["message"]["content"], "done": False})
-                        if chunk.get("done"):
-                            self._sse("text", {"text": "", "done": True})
-                    except json.JSONDecodeError:
-                        continue
+            if use_ollama:
+                # Stream from Ollama directly (Ollama supports streaming natively)
+                data = json.dumps({"model": model, "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}], "stream": True}).encode()
+                req = urllib.request.Request(f"{OLLAMA_URL}/api/chat", data=data, headers={"Content-Type": "application/json"})
+                with urllib.request.urlopen(req, timeout=180) as resp:
+                    for line in resp:
+                        line = line.strip()
+                        if not line:
+                            continue
+                        try:
+                            chunk = json.loads(line)
+                            if chunk.get("message", {}).get("content"):
+                                self._sse("text", {"text": chunk["message"]["content"], "done": False})
+                            if chunk.get("done"):
+                                self._sse("text", {"text": "", "done": True})
+                        except json.JSONDecodeError:
+                            continue
+            else:
+                # Cloud provider: use non-streaming, emit as SSE
+                messages = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
+                resp = provider.chat(messages, tools=None, stream=False)
+                if resp.content:
+                    self._sse("text", {"text": resp.content, "done": False})
+                self._sse("text", {"text": "", "done": True})
         except (BrokenPipeError, ConnectionResetError):
             return
         except Exception as e:
+            # v10: Fallback to Ollama if cloud provider fails
             try:
-                self._sse("error", {"error": str(e)})
+                ollama_provider = _v10_registry.get("ollama")
+                if ollama_provider and ollama_provider.is_available():
+                    data = json.dumps({"model": "qwen2.5:14b", "messages": [{"role": "system", "content": system}, {"role": "user", "content": prompt}], "stream": True}).encode()
+                    req = urllib.request.Request(f"{OLLAMA_URL}/api/chat", data=data, headers={"Content-Type": "application/json"})
+                    with urllib.request.urlopen(req, timeout=180) as resp:
+                        for line in resp:
+                            line = line.strip()
+                            if not line:
+                                continue
+                            try:
+                                chunk = json.loads(line)
+                                if chunk.get("message", {}).get("content"):
+                                    self._sse("text", {"text": chunk["message"]["content"], "done": False})
+                                if chunk.get("done"):
+                                    self._sse("text", {"text": "", "done": True})
+                            except json.JSONDecodeError:
+                                continue
+                else:
+                    self._sse("error", {"error": str(e)})
             except Exception:
-                return
+                try:
+                    self._sse("error", {"error": str(e)})
+                except Exception:
+                    return
         finally:
             self._end_chunks()
 
