@@ -184,6 +184,17 @@ background-size:40px 40px;animation:gradient 20s linear infinite}
 .suggestion-chip:hover{border-color:var(--accent);color:var(--accent2)}
 
 .cursor{display:inline-block;width:2px;height:16px;background:var(--accent2);animation:blink 1s infinite;vertical-align:middle;margin-left:2px}
+
+.model-breakdown{margin-top:16px;animation:fadeIn .6s ease}
+.model-breakdown-title{font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.model-breakdown-title a{font-size:12px;color:var(--accent2);text-decoration:none}
+.model-bd-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.model-bd-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all .2s}
+.model-bd-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.model-bd-card .bd-icon{font-size:18px;margin-bottom:6px}
+.model-bd-card .bd-count{font-size:20px;font-weight:700}
+.model-bd-card .bd-label{font-size:11px;color:var(--muted);text-transform:capitalize}
+.model-bd-card .bd-source{font-size:9px;color:var(--muted);margin-top:4px}
 </style>
 <script>
 // ─── Auth Guard (runs in head, no DOM access yet) ───
@@ -305,6 +316,17 @@ function toggleNav(){const s=document.querySelector('.sidebar');s.classList.togg
 <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-value" id="stat-categories">12</div><div class="stat-label">Categories</div></div>
 </div>
 
+<!-- Model Breakdown -->
+<div class="model-breakdown" id="model-breakdown">
+<div class="model-breakdown-title">
+<span>🧠 Model Registry</span>
+<a href="/models" target="_blank">Browse all →</a>
+</div>
+<div class="model-bd-grid" id="model-bd-grid">
+<div class="model-bd-card"><div class="bd-icon">⏳</div><div class="bd-count">...</div><div class="bd-label">Loading</div></div>
+</div>
+</div>
+
 <!-- Quick actions -->
 <div class="quick-actions">
 <button class="quick-btn" onclick="quickAction('chat')">💬 Chat</button>
@@ -327,7 +349,7 @@ function toggleNav(){const s=document.querySelector('.sidebar');s.classList.togg
 <div class="msg-avatar">⚡</div>
 <div class="msg-content">
 <div class="msg-name">Mr James</div>
-<div class="msg-text">Hey! I'm Mr James, your AI builder. I can help you build apps, write code, generate images, create videos, and more — all powered by 281 local AI models.
+<div class="msg-text">Hey! I'm Mr James, your AI builder. I can help you build apps, write code, generate images, create videos, and more — all powered by 81 AI models across 8 categories.
 
 Try one of the templates below, or just tell me what you want to build.</div>
 <div class="suggestions">
@@ -390,6 +412,45 @@ document.getElementById('status-dot').classList.add('offline');
 }
 }
 checkHealth();setInterval(checkHealth,30000);
+
+// Load model breakdown
+async function loadModelBreakdown(){
+try{
+const res=await fetch('/api/models',{headers:authHeaders()});
+const d=await res.json();
+document.getElementById('stat-models').textContent=d.count;
+document.getElementById('stat-categories').textContent=Object.keys(d.categories||{}).length;
+
+// Source icons and labels
+const sourceInfo={
+'llm_text':{icon:'💬',label:'LLM / Text'},
+'speech_voice':{icon:'🎤',label:'Speech & Voice'},
+'image_generation':{icon:'🎨',label:'Image Gen'},
+'vision_multimodal':{icon:'👁️',label:'Vision / Multimodal'},
+'local_engines':{icon:'🔧',label:'Local Engines'},
+'rag_agents':{icon:'🤖',label:'RAG / Agents'},
+'video_generation':{icon:'🎬',label:'Video Gen'},
+'frameworks':{icon:'⚡',label:'Frameworks'}
+};
+
+// Sort categories by count descending
+const sortedCats=Object.entries(d.categories||{}).sort((a,b)=>b[1]-a[1]);
+
+document.getElementById('model-bd-grid').innerHTML=sortedCats.map(([cat,count])=>{
+const info=sourceInfo[cat]||{icon:'📦',label:cat.replace(/_/g,' ')};
+return `<div class="model-bd-card" onclick="window.open('/models','_blank')">
+<div class="bd-icon">${info.icon}</div>
+<div class="bd-count">${count}</div>
+<div class="bd-label">${info.label}</div>
+</div>`;
+}).join('');
+
+// Update sidebar version text
+const sidebarVer=document.querySelector('.sidebar div[style*="text-align:center"]');
+if(sidebarVer) sidebarVer.textContent='Mr James v9.0 · '+d.count+' models';
+}catch(e){console.error('Model breakdown failed:',e)}
+}
+loadModelBreakdown();
 
 // Load templates
 async function loadTemplates(){
