@@ -1,14 +1,65 @@
+<div align="center">
+
+<img src="docs/assets/og-image.png" width="100%" alt="EvolvixOS v9.2 Banner" />
+
 # 🧬 EvolvixOS v9.2
 
 **The open-source, self-hosted AI engineering platform.**
 
-100% local core. Zero paid tokens. 44 tools. 81 models. 35,277 searchable APIs. Triple-brain routing.
+`100% local core` · `zero paid tokens` · `44 tools` · `81 models` · `35K APIs`
 
-🌐 **[evolvixos.com](https://evolvixos.com)** · 📦 **[GitHub](https://github.com/Protremix/EvolvixOS)** · 📚 **[Docs](https://protremix.github.io/EvolvixOS/)**
+[![GitHub stars](https://img.shields.io/github/stars/Protremix/EvolvixOS?style=for-the-badge&color=b266ff)](https://github.com/Protremix/EvolvixOS/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Protremix/EvolvixOS?style=for-the-badge&color=ff5edb)](https://github.com/Protremix/EvolvixOS/network/members)
+[![License](https://img.shields.io/github/license/Protremix/EvolvixOS?style=for-the-badge&color=5ed4ff)](LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/Protremix/EvolvixOS?style=for-the-badge&color=5effa0)](https://github.com/Protremix/EvolvixOS/issues)
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Protremix/EvolvixOS?style=for-the-badge&color=ffd95e)](https://github.com/Protremix/EvolvixOS/commits)
+
+[🌐 Live Platform](https://evolvixos.com) · [📚 Docs](https://protremix.github.io/EvolvixOS/) · [🎨 Studio](https://evolvixos.com/studio) · [📦 Models](https://evolvixos.com/models) · [🔑 Developer Portal](https://evolvixos.com/developer)
+
+</div>
 
 ---
 
-## Architecture Overview
+## ✨ What is EvolvixOS?
+
+EvolvixOS is a fully self-hosted AI engineering platform that runs on a single server. It features **Mr James** — an autonomous AI agent with 44 tools, triple-brain routing (Groq + Gemini + Kimi), and access to 35,277 searchable APIs. Zero paid tokens for core logic. Everything runs locally with optional external AI engines for speed and multimodal capabilities.
+
+## 🧠 Triple-Brain Routing
+
+Mr James automatically selects the best AI engine for each task:
+
+<div align="center">
+
+| Engine | Model | Speed | Context | Primary Use |
+|:------:|:------|:------:|:-------:|:------------|
+| 🟢 Groq | `gpt-oss-120b` | **467 tok/s** | 128K | Tool-use precision, agentic execution |
+| 🔵 Gemini | `gemini-3.6-flash` | Fast | 1M | Vision, multimodal, TTS, large context |
+| 🟡 Kimi | `moonshot-v1-32k` | Medium | 32K | Complex reasoning fallback |
+| ⚪ Ollama | `qwen2.5:14b/7b/3b` | CPU | 32K | Local, offline, zero-cost fallback |
+
+</div>
+
+## 🔧 44 Tools
+
+<details open>
+<summary><b>Click to expand full tool list</b></summary>
+
+| Category | Count | Tools |
+|:---------|:-----:|:------|
+| 📁 File Operations | 6 | `file_read`, `file_write`, `file_edit`, `file_list`, `file_delete`, `code_analyze` |
+| 💻 Code Execution | 3 | `python_exec`, `bash_exec`, `sandbox_exec` (CubeSandbox MicroVM) |
+| 🤖 AI / LLM | 4 | `call_free_llm`, `gemini_vision`, `gemini_tts`, `file_upload` |
+| 🌐 Smart API | 3 | `api_auto_route` (35K APIs), `smart_api_call`, `http_request` |
+| ☁️ Tencent Cloud | 1 | `tencent_cloud` (CVM, CDB, VPC, SSL, DNSPod, CDN, Billing, CAM, Hunyuan, AIArt) |
+| 💬 TIMSDK Chat | 4 | `tim_send_message`, `tim_create_group`, `tim_send_group_message`, `tim_import_user` |
+| 🧠 Team Memory | 2 | `team_memory_search`, `team_memory_save` (TencentDB) |
+| 🎭 Agent Library | 2 | `search_subagents` (217 templates), `set_persona` (16 MBTI types) |
+| ⚙️ System | 3 | `get_system_info`, `manage_services`, `get_service_logs` |
+| 🔧 Other | 16 | `web_search`, `image_gen`, and more |
+
+</details>
+
+## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -32,7 +83,7 @@
 │ 3 containers   │ (Docker)     │  1K MAU     │  16 MBTI profiles │
 ├───────────────┴──────────────┴──────────────┴───────────────────┤
 │                   Tencent Cloud SDK                              │
-│   Go binary (tccli) + Python SDK (12 services)                   │
+│   Go binary (tccli 9.3MB) + Python SDK (12 services)             │
 │   CVM · CDB · VPC · SSL · DNSPod · CDN · Billing · CAM · Hunyuan │
 ├──────────────────────────────────────────────────────────────────┤
 │              Infrastructure (16 systemd services)                 │
@@ -41,166 +92,103 @@
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-## Mr James v9.2 — Triple-Brain Routing
+## 🔌 Integrations
 
-Mr James uses intelligent intent-based routing to select the best AI engine for each task:
-
-| Engine | Model | Speed | Context | Primary Use |
-|--------|-------|-------|---------|-------------|
-| 🟢 **Groq** | gpt-oss-120b | 467 tok/s | 128K | Tool-use precision, agentic execution |
-| 🔵 **Google Gemini** | 3.6 Flash | Fast | 1M | Vision, multimodal, TTS, large context |
-| 🟡 **Kimi** | moonshot-v1-32k | Medium | 32K | Complex reasoning fallback |
-| ⚪ **Ollama** | qwen2.5:14b/7b/3b | CPU | 32K | Local, offline, zero-cost fallback |
-
-### 44 Tools
-
-| Category | Count | Tools |
-|----------|-------|-------|
-| **File Operations** | 6 | file_read, file_write, file_edit, file_list, file_delete, code_analyze |
-| **Code Execution** | 3 | python_exec, bash_exec, sandbox_exec (CubeSandbox MicroVM) |
-| **AI/LLM** | 4 | call_free_llm, gemini_vision, gemini_tts, file_upload (with Gemini Vision) |
-| **Smart API** | 3 | api_auto_route (35K APIs), smart_api_call, http_request |
-| **Tencent Cloud** | 1 | tencent_cloud (CVM, CDB, VPC, SSL, DNSPod, CDN, Billing, CAM, Hunyuan, AIArt) |
-| **TIMSDK Chat** | 4 | tim_send_message, tim_create_group, tim_send_group_message, tim_import_user |
-| **Team Memory** | 2 | team_memory_search, team_memory_save (TencentDB Agent Memory) |
-| **Agent Library** | 2 | search_subagents (217 templates), set_persona (16 MBTI types) |
-| **System** | 3 | get_system_info, manage_services, get_service_logs |
-| **Other** | 16 | web_search, image_gen, and more |
-
----
-
-## Integrations (v9.2)
-
-### 1. Tencent Cloud SDK
-- **Go binary** (`tccli`, 9.3MB): 7 services, 14 actions — high-performance CLI
+### ☁️ Tencent Cloud SDK
+- **Go binary** (`tccli`, 9.3MB): 7 services, 14 actions
 - **Python SDK**: 12 services — comprehensive API coverage
-- **Services**: CVM (servers), CDB (MySQL), VPC (networking), SSL (certificates), DNSPod (DNS), CDN, Billing (costs), CAM (users), Hunyuan (Tencent LLM), AIArt (image generation)
-- **Config**: Requires `TENCENTCLOUD_SECRET_ID` and `TENCENTCLOUD_SECRET_KEY`
+- **Services**: CVM, CDB, VPC, SSL, DNSPod, CDN, Billing, CAM, Hunyuan, AIArt
+- **Config**: `TENCENTCLOUD_SECRET_ID` + `TENCENTCLOUD_SECRET_KEY`
 
-### 2. Octop — Self-Hosted AI Assistant
-- **217 subagent templates** across 16 categories:
-  - Engineering (33), Specialized (53), Marketing (36), Security (10)
-  - Product (15), Operations (12), Design (8), Data (11), Research (9), Finance (7), etc.
-- **16 MBTI personality profiles** with behavior mappings:
-  - Answer style, casual chat, conflict handling, creativity, emotion, planning
-- **10 expert agent templates**:
-  - General Assistant, Ops Engineer, News & Trend, WeChat Ops, CVM AI Doctor, Stock Assistant, Office Automation, Parenting Companion, CVM Cluster Doctor, Default
-- **SSRF Guard** (CWE-918 mitigation) ported from Octop
+### 🤖 Octop — Self-Hosted AI Assistant
+- **217 subagent templates** across 16 categories (Engineering: 33, Specialized: 53, Marketing: 36, Security: 10)
+- **16 MBTI personality profiles** with behavior mappings
+- **10 expert agent templates**
+- **SSRF Guard** (CWE-918 mitigation)
 
-### 3. CubeSandbox — MicroVM Execution
+### 📦 CubeSandbox — MicroVM Execution
 - Isolated code execution sandbox for AI agents
-- **Docker fallback mode** (KVM not available on Hetzner Cloud)
+- Docker fallback mode (KVM not available on Hetzner Cloud)
 - Pre-installed: numpy, pandas, scikit-learn, matplotlib
-- Full MicroVM mode on CCX dedicated CPU servers (set `SANDBOX_ENABLED=True`)
+- Full MicroVM mode on CCX dedicated CPU servers
 
-### 4. TIMSDK — Real-Time Messaging
-- Tencent IM SDK for chat integration
-- 1,000 MAU free tier
-- Server-side REST API + Web UIKit
-- 4 tools: send message, create group, send group message, import user
-- **Config**: Requires `TIM_SDK_APP_ID` and `TIM_SECRET_KEY`
+### 💬 TIMSDK — Real-Time Messaging
+- Tencent IM SDK · 1,000 MAU free tier · REST API + Web UIKit
+- **Config**: `TIM_SDK_APP_ID` + `TIM_SECRET_KEY`
 
-### 5. TencentDB Agent Memory
-- 3 Docker containers:
-  - `tdai-memory-core` (:8420) — Core memory service
-  - `tdai-memory-hub` (:8125) — Memory hub
-  - `tdai-proxy` (:8096) — Proxy (Groq-powered)
+### 🧠 TencentDB Agent Memory
+- 3 Docker containers (core:8420, hub:8125, proxy:8096)
 - Team memory with full-text search
-- Panel at `memory.evolvixos.com`
+- Powered by Groq for memory processing
 
-### 6. Google Gemini 3.6 Flash
-- 37 models available (vision, multimodal, TTS)
-- 1M token context window
-- `gemini_vision` tool: image analysis, OCR, chart reading, UI screenshots
-- `gemini_tts` tool: text-to-speech
-- File upload analysis: images, PDFs, documents
+### ✨ Google Gemini 3.6 Flash
+- 37 models · 1M context · Vision + Multimodal + TTS
+- `gemini_vision`: image analysis, OCR, chart reading
+- `gemini_tts`: text-to-speech
 
-### 7. Groq Integration
+### ⚡ Groq Integration
 - gpt-oss-120b at 467 tok/s
 - Primary execution engine for agentic tool-use
 - Auto-fallback to Ollama when overloaded
 
----
+## 🔍 Discovery Engine
 
-## Platform Features
+Hourly GitHub scans across 4 repositories — **35,277 APIs indexed**:
 
-### Frontend Pages
+| Repository | Content | Count |
+|:-----------|:--------|:-----:|
+| OpenClaw API Directory | APIs across 18 categories | 25,822 |
+| API Mega List | Public API registries | 7,000+ |
+| AI Agent Tools | Tools for AI agent development | 84 |
+| Free LLM APIs | Models across 31 providers | 442+ |
+
+## 🌐 API Reference
+
+<details>
+<summary><b>Click to expand API endpoints</b></summary>
+
+| Endpoint | Method | Auth | Description |
+|:---------|:-------|:----:|:------------|
+| `/api/health` | `GET` | — | System health check |
+| `/api/agent/stream` | `POST` | JWT/API | Streaming agent response |
+| `/api/agent` | `POST` | JWT/API | Non-streaming agent response |
+| `/api/models` | `GET` | — | List all registered models |
+| `/api/upload` | `POST` | JWT | File upload (50MB max, multipart) |
+| `/api/docs` | `GET` | — | API documentation |
+| `/auth/register` | `POST` | — | User registration (OTP) |
+| `/auth/login` | `POST` | — | User login (OTP) |
+| `/auth/api-keys/generate` | `POST` | JWT | Generate API key |
+| `/auth/api-keys/list` | `GET` | JWT | List API keys |
+| `/auth/api-keys/revoke` | `DELETE` | JWT | Revoke API key |
+| `/auth/api-keys/usage` | `GET` | JWT | API key usage stats |
+
+</details>
+
+## 🔐 Security
+
+| Feature | Details |
+|:--------|:--------|
+| Authentication | JWT tokens with OTP verification |
+| API Keys | SHA-256 hashed, `evx_` prefix, per-user |
+| Rate Limiting | 30/min per IP, 100/min per API key |
+| SSRF Guard | CWE-918 mitigation (ported from Octop) |
+| Shell Injection | shlex.split, shell=False |
+| Error Handling | 21 blocks patched |
+
+## 📦 Frontend Pages
+
 | Page | URL | Description |
-|------|-----|-------------|
-| Landing | `/` | Platform overview with architecture, capabilities |
-| Studio | `/studio` | Zero-knowledge dashboard with smart bar |
+|:-----|:---:|:------------|
+| Landing | `/` | Platform overview with architecture |
+| Studio | `/studio` | Zero-knowledge dashboard |
 | Models | `/models` | Visual model browser (81 models, 8 categories) |
-| APIs | `/apis` | Searchable API directory (35K APIs, 33 categories) |
+| APIs | `/apis` | Searchable API directory (35K APIs) |
 | Learn | `/learn` | Learning Hub (19-module full-stack course) |
-| Developer | `/developer` | API key management and documentation |
+| Developer | `/developer` | API key management & docs |
 | Auth | `/auth` | Login/signup with OTP |
 | Memory | `memory.evolvixos.com` | Team memory panel |
 
-### Model Registry
-- **81 models** across 8 categories:
-  - LLM Text (42), Vision (16), Audio (35), Video (61), Image (47), 3D (21), Coding (16), RAG/Agents (19)
-- Sources: Ollama (13 local), GitHub Discovery (58), Built-in (10)
-- Auto-rebuild via hourly cron
-
-### Discovery Engine
-Hourly GitHub scans across 4 repositories:
-1. **OpenClaw API Directory** — 25,822 APIs across 18 categories
-2. **API Mega List** — 7,000+ APIs
-3. **AI Agent Tools** — 84 tools
-4. **Free LLM APIs** — 442+ models across 31 providers
-
-Total: **35,277 searchable APIs/tools**
-
-### Security
-- JWT authentication with OTP verification
-- Per-user API keys (SHA-256 hashed, `evx_` prefix)
-- Rate limiting: 30/min per IP, 100/min per API key
-- SSRF guard (CWE-918 mitigation)
-- Shell injection protection (shlex.split, shell=False)
-- 21 error handling blocks patched
-
-### API Endpoints
-| Endpoint | Method | Auth | Description |
-|----------|-------|------|-------------|
-| `/api/health` | GET | — | System health check |
-| `/api/agent/stream` | POST | JWT/API | Streaming agent response |
-| `/api/agent` | POST | JWT/API | Non-streaming agent response |
-| `/api/models` | GET | — | List all registered models |
-| `/api/upload` | POST | JWT | File upload (50MB max, multipart) |
-| `/api/docs` | GET | — | API documentation |
-| `/auth/register` | POST | — | User registration (OTP) |
-| `/auth/login` | POST | — | User login (OTP) |
-| `/auth/api-keys/generate` | POST | JWT | Generate API key |
-| `/auth/api-keys/list` | GET | JWT | List API keys |
-| `/auth/api-keys/revoke` | DELETE | JWT | Revoke API key |
-| `/auth/api-keys/usage` | GET | JWT | API key usage stats |
-
----
-
-## Server Infrastructure
-
-| Component | Detail |
-|-----------|--------|
-| **Provider** | Hetzner Cloud (Nuremberg) |
-| **Specs** | 16 vCPU, 30GB RAM, 600GB disk |
-| **OS** | Ubuntu 22.04 |
-| **Python** | 3.14 |
-| **Go** | 1.23.4 |
-| **Services** | 16 systemd services (all stable) |
-| **SSL** | Let's Encrypt (valid until Nov 2026) |
-| **Domain** | evolvixos.com → 2.28.52.223 |
-| **Containers** | 3 (TencentDB Memory) + 1 (CubeSandbox) |
-
-## Stack
-- **Backend**: Python 3.14, FastAPI-style HTTP, SQLite
-- **AI**: Ollama (local), Groq (fast), Google Gemini (multimodal), Kimi (reasoning)
-- **Cloud**: Tencent Cloud SDK (Python + Go binary)
-- **Infrastructure**: systemd, Nginx, Let's Encrypt, Docker
-- **Frontend**: Vanilla HTML/CSS/JS with dark theme (#0a0a0f + purple/pink neon)
-
----
-
-## Quick Start
+## 🚀 Quick Start
 
 ```bash
 # Clone
@@ -218,7 +206,7 @@ python3 auth/auth_api.py &      # Auth API on :5000
 python3 dashboard/server.py &   # Dashboard on :8080
 ```
 
-## Configuration
+## ⚙️ Configuration
 
 ```bash
 # Required for core
@@ -238,5 +226,31 @@ export TIM_SDK_APP_ID="your-app-id"
 export TIM_SECRET_KEY="your-secret"
 ```
 
-## License
-MIT
+## 📊 Platform Stats
+
+<div align="center">
+
+| | |
+|:---|:---|
+| **Models** | 81 registered (Ollama + Discovery + Built-in) |
+| **APIs/Tools** | 35,277 searchable across 33 categories |
+| **Services** | 16 systemd services (all stable) |
+| **Server** | Hetzner Cloud (16 vCPU, 30GB RAM, 600GB disk) |
+| **Stack** | Python 3.14, Go 1.23.4, Nginx, Docker, systemd |
+| **SSL** | Let's Encrypt (valid until Nov 2026) |
+
+</div>
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read the [contributing guidelines](CONTRIBUTING.md) first.
+
+## 📄 License
+
+[MIT](LICENSE) — EvolvixOS is free and open-source software.
+
+<div align="center">
+
+**[⭐ Star](https://github.com/Protremix/EvolvixOS)** · **[🍴 Fork](https://github.com/Protremix/EvolvixOS/fork)** · **[📖 Docs](https://protremix.github.io/EvolvixOS/)** · **[🌐 Live](https://evolvixos.com)**
+
+</div>
