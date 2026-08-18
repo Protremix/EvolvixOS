@@ -74,33 +74,6 @@ PORT = 5010
 # ─── Allowed paths for file operations (prevent traversal) ───
 ALLOWED_BASE_DIRS = ["/opt/evolvixos", "/tmp", "/root", "/home", "/var/log"]
 
-# ─── v10 Architecture: Unified Router + Providers + Security ───
-sys.path.insert(0, '/opt/evolvixos')
-from v10.providers.base import (
-    LLMProvider, LLMRegistry, LLMResponse,
-    PrivacyMode, RoutingDecision, init_registry, get_registry
-)
-from v10.router.model_router import ModelRouter, init_router, get_router
-from v10.security.tool_security import (
-    Permission, ToolSpec, register_tool, get_tool_spec,
-    check_permission, validate_command, validate_url, validate_python_code,
-    log_audit, get_audit_log, check_tool_rate, init_default_tools, validate_path
-)
-
-# Initialize v10 architecture (HYBRID mode by default)
-V10_PRIVACY_MODE = os.environ.get("EVOLVIX_PRIVACY_MODE", "HYBRID")
-_v10_router = None
-_v10_registry = None
-
-def _init_v10():
-    global _v10_router, _v10_registry
-    if _v10_registry is None:
-        _v10_registry = init_registry(V10_PRIVACY_MODE)
-        _v10_router = ModelRouter(_v10_registry)
-        init_default_tools()
-
-_init_v10()
-
 def is_path_safe(path):
     try:
         real = os.path.realpath(os.path.expanduser(path))
@@ -422,21 +395,16 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             cmd = args.get("command", "")
             if not cmd:
                 return "Error: no command provided"
-            # v10 security: validate command
-            ok, result_msg = validate_command(cmd)
-            if not ok:
-                log_audit("system", "bash", "execute", cmd[:200], "blocked", 0)
-                return f"Error: {result_msg}"
+            dangerous = ["rm -rf /", "mkfs", "dd if=", "shutdown", "reboot", "halt", ":(){:|:&};:"]
+            if any(d in cmd.lower() for d in dangerous):
+                return "Error: command blocked (dangerous pattern detected)"
             import shlex
-            start = time.time()
             result = subprocess.run(shlex.split(cmd), shell=False, capture_output=True, text=True, timeout=120)
-            duration = (time.time() - start) * 1000
             output = result.stdout
             if result.stderr:
                 output += f"\n[STDERR]\n{result.stderr}"
             if result.returncode != 0:
                 output += f"\n[EXIT: {result.returncode}]"
-            log_audit("system", "bash", "execute", cmd[:200], "success" if result.returncode == 0 else "error", duration)
             return output[:8000] if output else "(no output)"
 
         elif name == "file_write":
@@ -536,9 +504,7 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             elif ext == '.pdf':
                 try:
                     import subprocess
-                    # v10 fix: Use safe argument passing instead of string interpolation
-                    pdf_code = 'import PyPDF2, sys; reader=PyPDF2.PdfReader(sys.argv[1]); print("\n".join([p.extract_text()[:5000] for p in reader.pages[:10]]))'
-                    result = subprocess.run(['python3', '-c', pdf_code, fpath], capture_output=True, text=True, timeout=15)
+                    result = subprocess.run(['python3', '-c', f'import PyPDF2; reader=PyPDF2.PdfReader("{fpath}"); print("\n".join([p.extract_text()[:5000] for p in reader.pages[:10]]))'], capture_output=True, text=True, timeout=15)
                     if result.returncode == 0:
                         return f"--- PDF: {filename} ({os.path.getsize(fpath)} bytes) ---\n{result.stdout[:15000]}"
                     else:
@@ -557,20 +523,12 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             code = args.get("code", "")
             if not code:
                 return "Error: no code"
-            # v10 security: validate Python code
-            ok, result_msg = validate_python_code(code)
-            if not ok:
-                log_audit("system", "python_exec", "execute", code[:200], "blocked", 0)
-                return f"Error: {result_msg}"
-            start = time.time()
             result = subprocess.run(["python3", "-c", code], capture_output=True, text=True, timeout=120)
-            duration = (time.time() - start) * 1000
             output = result.stdout
             if result.stderr:
                 output += f"\n[STDERR]\n{result.stderr}"
             if result.returncode != 0:
                 output += f"\n[EXIT: {result.returncode}]"
-            log_audit("system", "python_exec", "execute", code[:200], "success" if result.returncode == 0 else "error", duration)
             return output[:8000] if output else "(no output)"
 
         elif name == "service_check":
@@ -1160,11 +1118,6 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             timeout = min(args.get("timeout", 30), 60)
             if not url or not url.startswith("http"):
                 return "Error: valid URL required (must start with http:// or https://)"
-            # v10 security: SSRF protection
-            ok, result_msg = validate_url(url)
-            if not ok:
-                log_audit("system", "smart_api_call", "network", url[:200], "blocked", 0)
-                return f"Error: {result_msg}"
             try:
                 if method == "GET":
                     req = urllib.request.Request(url, headers=headers or None)
@@ -1738,35 +1691,67 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
 
 # ─── Intent classification (v9.0 — smarter) ───
 def classify_intent(prompt):
-    """Delegate to v10 unified router. Returns (task_type, engine, model, reason)."""
-    _init_v10()
-    decision = _v10_router.route(prompt)
-    # Map v10 provider name to old engine name
-    provider = _v10_registry.get(decision.provider)
-    engine = "ollama" if provider and provider.is_local else decision.provider
-    return (decision.task_type, engine, decision.model, decision.reason)
+    t = prompt.lower().strip()
+
+    # Tool discovery
+    if re.search(r'\b(find.+tool|search.+tool|what.+tools|available.+tool|best.+tool|ai tool|dev tool|cli tool|ide|which.+tool)\b', t):
+        return ("tool_search", "ollama", "qwen2.5:7b", "Tool discovery query")
+    # API discovery
+    if re.search(r'\b(find.+api|search.+api|what.+api|available.+api|free.+api|which.+api)\b', t):
+        return ("api_search", "ollama", "qwen2.5:7b", "API discovery query")
+    # Free LLM providers
+    if re.search(r'\b(free.+llm|free.+model|free.+gpt|free.+claude|free.+api|no.+cost.+model)\b', t):
+        return ("freellm", "ollama", "qwen2.5:7b", "Free LLM provider search")
+    # Learning hub
+    if re.search(r'\b(learn|tutorial|course|guide|how to build|teach me)\b', t):
+        return ("learning", "ollama", "qwen2.5:7b", "Learning hub query")
+
+    # Image generation
+    if re.search(r'\b(draw|paint|generate|create|design|logo|image|picture|art|portrait|landscape|render|3d model|blender)\b', t) and not re.search(r'\b(code|app|api|script|function|program|build|file|upload)\b', t):
+        return ("image", "comfyui", "stable-diffusion", "Image generation request")
+    
+    # Video generation
+    if re.search(r'\b(video|movie|film|animate|cinema|clip|wan2|video gen)\b', t):
+        return ("video", "comfyui", "wan2.1", "Video generation request")
+    
+    # Crypto/blockchain
+    if re.search(r'\b(crypto|bitcoin|ethereum|blockchain|defi|token|nft|web3|smart contract|solidity|wallet|staking|liquidity)\b', t):
+        return ("crypto", "skill", "crypto-blockchain", "Crypto/blockchain analysis")
+    
+    # Code tasks — use 14b for complex reasoning
+    if re.search(r'\b(code|app|api|function|script|build|react|python|javascript|html|css|deploy|debug|refactor|sql|database|backend|frontend|server)\b', t):
+        return ("code", "groq", "openai/gpt-oss-120b", "Coding task — using Groq for speed")
+    
+    # UI generation
+    if re.search(r'\b(ui|component|button|card|modal|dashboard|landing page|retro|win95|vaporwave|magic ui|unlumen)\b', t):
+        return ("ui", "ollama", "qwen2.5:14b", "UI generation task")
+    
+    # File analysis
+    if re.search(r'\b(analyze|review|audit|check|inspect|read|file|upload|attachment)\b', t):
+        return ("analysis", "groq", "openai/gpt-oss-120b", "File analysis — using Groq for speed")
+    
+    # System management
+    if re.search(r'\b(server|service|nginx|docker|systemctl|restart|status|deploy|install|config)\b', t):
+        return ("system", "ollama", "qwen2.5:7b", "System management task")
+    
+    # Media creation
+    if re.search(r'\b(voice|audio|narrate|tts|speak|podcast|music|sound)\b', t):
+        return ("media", "skill", "create-media", "Media/voice generation")
+    
+    # Complex reasoning → Kimi if available, else 14b
+    if re.search(r'\b(why|how|explain|compare|analyze|strategy|plan|architect|design pattern|best practice)\b', t):
+        if KIMI_API_KEY:
+            return ("reasoning", "kimi", KIMI_MODEL, "Complex reasoning — using Kimi API")
+        return ("reasoning", "groq", "openai/gpt-oss-120b", "Complex reasoning — using Groq")
+    
+    # Simple chat
+    return ("chat", "groq", "qwen/qwen3.6-27b", "General chat — using Groq for speed")
 
 def select_engine(prompt):
-    """Delegate to v10 unified router."""
     return classify_intent(prompt)
 
 # ─── Model API calls ───
 def call_ollama_with_tools(model, messages, tools, stream=False):
-    """Delegate to v10 OllamaProvider."""
-    _init_v10()
-    provider = _v10_registry.get("ollama")
-    if provider and provider.is_available():
-        try:
-            resp = provider.chat(messages, tools=tools, stream=stream)
-            if stream:
-                # Return raw response object for streaming
-                data = json.dumps({"model": model, "messages": messages, "tools": tools if tools else [], "stream": True, "options": {"temperature": 0.7, "top_p": 0.9}}).encode()
-                req = urllib.request.Request(f"{OLLAMA_URL}/api/chat", data=data, headers={"Content-Type": "application/json"})
-                return urllib.request.urlopen(req, timeout=180)
-            return {"message": {"content": resp.content, "tool_calls": resp.tool_calls}}
-        except Exception as e:
-            print(f"v10 Ollama error: {e}, falling back to direct")
-    # Fallback to direct call
     data = json.dumps({"model": model, "messages": messages, "tools": tools if tools else [], "stream": stream, "options": {"temperature": 0.7, "top_p": 0.9}}).encode()
     req = urllib.request.Request(f"{OLLAMA_URL}/api/chat", data=data, headers={"Content-Type": "application/json"})
     resp = urllib.request.urlopen(req, timeout=180)
@@ -1779,37 +1764,36 @@ def call_ollama_with_tools(model, messages, tools, stream=False):
     return result
 
 def call_groq_with_tools(model, messages, tools, stream=False):
-    """Delegate to v10 GroqProvider."""
-    _init_v10()
-    provider = _v10_registry.get("groq")
-    if provider and provider.is_available():
-        try:
-            resp = provider.chat(messages, tools=tools, stream=stream)
-            if stream:
-                return None  # Streaming handled by caller
-            # Convert to old format
-            return {"choices": [{"message": {"content": resp.content, "tool_calls": resp.tool_calls}}], "usage": resp.usage}
-        except Exception as e:
-            print(f"v10 Groq error: {e}")
-    return None
+    """Call Groq API with tool calling support (OpenAI-compatible format)"""
+    GROQ_KEY = os.environ.get("GROQ_API_KEY", "")
+    if not GROQ_KEY:
+        return None
+    data = json.dumps({
+        "model": model,
+        "messages": messages,
+        "tools": tools if tools else None,
+        "stream": stream,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "max_tokens": 4096
+    }).encode()
+    req = urllib.request.Request(
+        "https://api.groq.com/openai/v1/chat/completions",
+        data=data,
+        headers={"Content-Type": "application/json", "Authorization": "Bearer " + GROQ_KEY, "User-Agent": "EvolvixOS/9.2"}
+    )
+    resp = urllib.request.urlopen(req, timeout=120)
+    if stream:
+        return resp
+    try:
+        result = json.loads(resp.read())
+    finally:
+        resp.close()
+    return result
 
 def call_kimi(prompt, system_prompt, messages=None):
-    """Delegate to v10 KimiProvider."""
-    _init_v10()
-    provider = _v10_registry.get("kimi")
-    if provider and provider.is_available():
-        try:
-            all_messages = []
-            if system_prompt:
-                all_messages.append({"role": "system", "content": system_prompt})
-            if messages:
-                all_messages.extend(messages)
-            all_messages.append({"role": "user", "content": prompt})
-            resp = provider.chat(all_messages)
-            return resp.content
-        except Exception as e:
-            print(f"v10 Kimi error: {e}")
-    return None
+    if not KIMI_API_KEY:
+        return None
     try:
         all_messages = [{"role": "system", "content": system_prompt}]
         if messages:
@@ -2047,12 +2031,8 @@ class ModelAPI(BaseHTTPRequestHandler):
                 "ollama": self._check(OLLAMA_URL + "/api/tags"),
                 "art_engine": self._check(ART_ENGINE_URL + "/api/status"),
                 "models_registered": sum(1 for _ in open("/opt/evolvixos/models/model_registry.json")) if False else 81,
-                "james_version": "10.0",
+                "james_version": "9.2",
                 "tools_available": len(TOOLS),
-                "v10_enabled": True,
-                "v10_privacy_mode": V10_PRIVACY_MODE,
-                "v10_providers": _v10_registry.list_available() if _v10_registry else [],
-                "v10_provider_details": _v10_registry.list_providers() if _v10_registry else [],
                 "kimi_available": bool(KIMI_API_KEY),
                 "memories_stored": len([f for f in os.listdir(MEMORY_DIR) if f.endswith(".json")]) if os.path.exists(MEMORY_DIR) else 0,
                 "conversations": len([f for f in os.listdir(CONVERSATION_DIR) if f.endswith(".json")]) if os.path.exists(CONVERSATION_DIR) else 0,
@@ -2580,14 +2560,12 @@ if __name__ == "__main__":
     os.makedirs(MEMORY_DIR, exist_ok=True)
     os.makedirs(CONVERSATION_DIR, exist_ok=True)
     server = ThreadingHTTPServer(("0.0.0.0", PORT), ModelAPI)
-    print(f"Mr James v10.0 — EvolvixOS Model API (v10 Hardened)")
+    print(f"Mr James v9.0 — EvolvixOS Model API")
     print(f"  Port: {PORT}")
-    print(f"  Privacy Mode: {V10_PRIVACY_MODE}")
-    print(f"  Tools: {len(TOOLS)} (with v10 security: permissions, audit, SSRF protection)")
-    print(f"  Providers: {_v10_registry.list_available() if _v10_registry else []}")
+    print(f"  Tools: {len(TOOLS)} (native Ollama tool calling)")
     print(f"  Skills: {len([f for f in os.listdir(SKILLS_DIR) if f.endswith('.sh')]) if os.path.exists(SKILLS_DIR) else 0}")
-    print(f"  Models: Ollama (local) + Groq + Gemini + Kimi (triple-brain routing)")
-    print(f"  Security: v10 framework active (permissions, audit log, SSRF guard, rate limits)")
+    print(f"  Models: Ollama (local) + HF Gateway + Kimi ({'available' if KIMI_API_KEY else 'not configured'})")
+    print(f"  New: file_upload, file_list, web_fetch, code_analyze, system_info, pip_install")
     print(f"  Uploads: {UPLOADS_DIR}")
     print(f"  Ready.")
     server.serve_forever()
