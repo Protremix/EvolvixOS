@@ -1126,8 +1126,18 @@ class ModelAPI(BaseHTTPRequestHandler):
                         name = fname.replace(".sh", "")
                         try:
                             with open(os.path.join(SKILLS_DIR, fname)) as f:
-                                first_line = f.readline().strip()
-                                desc = first_line.replace("#", "").strip() if first_line.startswith("#") else name
+                                lines = f.readlines()
+                            # Skip shebang line, get first comment line as description
+                            desc = name
+                            for line in lines:
+                                line = line.strip()
+                                if line.startswith("#!"):
+                                    continue
+                                if line.startswith("#"):
+                                    desc = line.replace("#", "").strip()
+                                    break
+                                if line:
+                                    break
                             skills.append({"name": name, "desc": desc})
                         except Exception:
                             skills.append({"name": name, "desc": name})
