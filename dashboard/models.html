@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EvolvixOS Studio — Model Registry</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<style>
+:root{
+--bg:#060608;--bg2:#0c0c12;--card:#12121a;--card2:#1a1a26;--border:#2a2a3e;
+--text:#e8e8f0;--muted:#6a6a85;--accent:#6c5ce7;--accent2:#a29bfe;--accent3:#fd79a8;
+--green:#00b894;--orange:#fdcb6e;--blue:#0984e3;--cyan:#00cec9;--red:#e74c3c;
+--radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;min-height:100vh}
+.bg-grid{position:fixed;inset:0;z-index:0;opacity:.03;background-image:linear-gradient(rgba(108,92,231,1) 1px,transparent 1px),linear-gradient(90deg,rgba(108,92,231,1) 1px,transparent 1px);background-size:40px 40px}
+.bg-blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.1;z-index:0;pointer-events:none}
+.bg-blob-1{top:-10%;left:-5%;width:500px;height:500px;background:var(--accent)}
+.bg-blob-2{bottom:-10%;right:-5%;width:400px;height:400px;background:var(--accent3)}
+.app{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:24px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;animation:fadeIn .4s ease}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-logo{font-size:28px}
+.header-title{font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+.btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--card2)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:20px;animation:fadeIn .5s ease}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center}
+.stat-value{font-size:24px;font-weight:700}
+.stat-label{font-size:11px;color:var(--muted);margin-top:2px}
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;animation:fadeIn .6s ease}
+.filter-chip{padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);transition:all .2s}
+.filter-chip:hover{border-color:var(--accent);color:var(--text)}
+.filter-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.search-bar{width:100%;padding:12px 18px;border-radius:12px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:14px;margin-bottom:16px;transition:all .2s}
+.search-bar:focus{outline:none;border-color:var(--accent)}
+.model-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.model-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;transition:all .2s;cursor:pointer;animation:fadeIn .3s ease}
+.model-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px rgba(108,92,231,.1)}
+.model-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.model-name{font-size:14px;font-weight:600;color:var(--text)}
+.model-card-body{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.model-card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.badge-ollama{background:rgba(108,92,231,.15);color:var(--accent2)}
+.badge-discovery{background:rgba(253,203,110,.15);color:var(--orange)}
+.badge-builtin{background:rgba(0,184,148,.15);color:var(--green)}
+.badge-running{background:rgba(0,184,148,.15);color:var(--green)}
+.badge-discovered{background:rgba(9,132,227,.15);color:var(--blue)}
+.cat-tag{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.stars{font-size:11px;color:var(--orange);display:flex;align-items:center;gap:3px}
+.empty{text-align:center;padding:60px;color:var(--muted)}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+.loading{text-align:center;padding:60px}
+.source-tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--card);border-radius:12px;padding:4px;animation:fadeIn .5s ease}
+.source-tab{padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s}
+.source-tab.active{background:var(--accent);color:#fff}
+.source-tab:hover:not(.active){color:var(--text)}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
+<div class="app">
+  <div class="header">
+    <div class="header-left">
+      <span class="header-logo">⚡</span>
+      <div>
+        <div class="header-title">Model Registry</div>
+        <div class="header-sub" id="header-sub">Loading models...</div>
+      </div>
+    </div>
+    <a href="/studio" class="btn btn-secondary">← Back to Studio</a>
+  </div>
+
+  <div class="stat-grid" id="stats"></div>
+
+  <div class="source-tabs" id="source-tabs">
+    <div class="source-tab active" onclick="filterSource('all')">All</div>
+    <div class="source-tab" onclick="filterSource('ollama')">🦙 Ollama</div>
+    <div class="source-tab" onclick="filterSource('github_discovery')">🔍 Discovery</div>
+    <div class="source-tab" onclick="filterSource('builtin')">⚡ Built-in</div>
+  </div>
+
+  <input class="search-bar" id="search" placeholder="Search models by name, description, or category..." oninput="render()">
+
+  <div class="filters" id="category-filters"></div>
+
+  <div id="model-container">
+    <div class="loading"><div class="spinner"></div><p style="margin-top:12px;color:var(--muted)">Loading 81 models...</p></div>
+  </div>
+</div>
+
+<script>
+let allModels = [];
+let activeSource = 'all';
+let activeCategory = 'all';
+let searchText = '';
+
+function getToken() {
+  let t = document.cookie.match(/evolvix_token=([^;]+)/);
+  if (t) return t[1];
+  t = localStorage.getItem('evolvix_token');
+  return t || '';
+}
+
+async function loadModels() {
+  try {
+    const resp = await fetch('/api/models', {
+      headers: { 'Authorization': 'Bearer ' + getToken() }
+    });
+    const data = await resp.json();
+    allModels = data.models || [];
+    
+    document.getElementById('header-sub').textContent = 
+      `${data.count} models · ${Object.keys(data.categories || {}).length} categories · Updated ${new Date(data.last_updated).toLocaleString()}`;
+    
+    // Stats
+    const sources = data.sources || {};
+    document.getElementById('stats').innerHTML = [
+      { label: 'Total Models', value: data.count },
+      { label: 'Ollama (Running)', value: sources.ollama || 0 },
+      { label: 'GitHub Discovery', value: sources.github_discovery || 0 },
+      { label: 'Built-in', value: sources.builtin || 0 }
+    ].map(s => `<div class="stat"><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>`).join('');
+    
+    // Category filters
+    const cats = Object.keys(data.categories || {}).sort();
+    document.getElementById('category-filters').innerHTML = 
+      `<div class="filter-chip active" onclick="filterCategory('all')">All</div>` +
+      cats.map(c => `<div class="filter-chip" onclick="filterCategory('${c}')">${c.replace(/_/g,' ')} (${data.categories[c]})</div>`).join('');
+    
+    render();
+  } catch(e) {
+    document.getElementById('model-container').innerHTML = '<div class="empty">Failed to load models. Make sure you are logged in.</div>';
+  }
+}
+
+function filterSource(s) {
+  activeSource = s;
+  document.querySelectorAll('.source-tab').forEach((t,i) => {
+    t.classList.toggle('active', (s==='all'&&i===0)||(s==='ollama'&&i===1)||(s==='github_discovery'&&i===2)||(s==='builtin'&&i===3));
+  });
+  render();
+}
+
+function filterCategory(c) {
+  activeCategory = c;
+  document.querySelectorAll('.filter-chip').forEach(ch => ch.classList.remove('active'));
+  event.target.classList.add('active');
+  render();
+}
+
+function render() {
+  searchText = document.getElementById('search').value.toLowerCase();
+  let filtered = allModels.filter(m => {
+    if (activeSource !== 'all' && m.source !== activeSource) return false;
+    if (activeCategory !== 'all' && m.category !== activeCategory) return false;
+    if (searchText && !m.name.toLowerCase().includes(searchText) && !m.description.toLowerCase().includes(searchText) && !m.category.toLowerCase().includes(searchText)) return false;
+    return true;
+  });
+  
+  // Sort: running first, then by stars, then alphabetical
+  filtered.sort((a,b) => {
+    if (a.running && !b.running) return -1;
+    if (!a.running && b.running) return 1;
+    return (b.stars||0) - (a.stars||0) || a.name.localeCompare(b.name);
+  });
+  
+  if (filtered.length === 0) {
+    document.getElementById('model-container').innerHTML = '<div class="empty">No models match your filters.</div>';
+    return;
+  }
+  
+  document.getElementById('model-container').innerHTML = 
+    `<div class="model-grid">${filtered.map(m => {
+      const sourceBadge = m.source === 'ollama' ? '<span class="badge badge-ollama">Ollama</span>' :
+                          m.source === 'github_discovery' ? '<span class="badge badge-discovery">Discovery</span>' :
+                          '<span class="badge badge-builtin">Built-in</span>';
+      const statusBadge = m.running ? '<span class="badge badge-running">● Running</span>' :
+                          m.status === 'discovered' ? '<span class="badge badge-discovered">Discovered</span>' : '';
+      const stars = m.stars ? `<span class="stars">★ ${m.stars.toLocaleString()}</span>` : '';
+      const size = m.size ? ` · ${(m.size/1e9).toFixed(1)}GB` : '';
+      const engine = m.engine ? ` · ${m.engine}` : '';
+      
+      return `<div class="model-card" onclick="${m.url ? `window.open('${m.url}','_blank')` : ''}">
+        <div class="model-card-head">
+          <div class="model-name">${m.name}</div>
+          ${sourceBadge}
+        </div>
+        <div class="model-card-body">${m.description}</div>
+        <div class="model-card-foot">
+          <span class="cat-tag">${m.category.replace(/_/g,' ')}${engine}${size}</span>
+          <div style="display:flex;align-items:center;gap:6px">${stars}${statusBadge}</div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
+}
+
+loadModels();
+</script>
+</body>
+</html>

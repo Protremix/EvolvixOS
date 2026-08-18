@@ -267,14 +267,14 @@ function toggleNav(){const s=document.querySelector('.sidebar');s.classList.togg
 <div class="nav-item active" onclick="showBuilder()"><span class="icon">🔨</span> Builder</div>
 <div class="nav-item" onclick="showTemplates()"><span class="icon">📋</span> Templates <span class="badge" id="template-badge">8</span></div>
 <div class="nav-item" onclick="showGallery()"><span class="icon">🖼️</span> Gallery <span class="badge" id="gallery-badge">0</span></div>
-<div class="nav-item" onclick="showModels()"><span class="icon">🧠</span> Models <span class="badge">281</span></div>
+<div class="nav-item" onclick="showModels()"><span class="icon">🧠</span> Models <span class="badge">81</span></div>
 <div class="sidebar-section">Engines</div>
 <div class="nav-item"><span class="icon">🔥</span> Ollama <span class="badge" id="ollama-status">--</span></div>
 <div class="nav-item"><span class="icon">🎨</span> ComfyUI <span class="badge" id="comfyui-status">--</span></div>
 <div class="nav-item"><span class="icon">🌐</span> OmniRoute <span class="badge" id="omniroute-status">--</span></div>
 <div class="nav-item"><span class="icon">⚡</span> Art Engine <span class="badge" id="art-status">--</span></div>
 <div style="margin-top:auto;padding-top:16px;border-top:1px solid var(--border)">
-<div style="font-size:11px;color:var(--muted);text-align:center">Mr James v4.0 · 281 models</div>
+<div style="font-size:11px;color:var(--muted);text-align:center">Mr James v4.0 · 81 models</div>
 <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:4px">evolvixos.com</div>
 </div>
 </div>
@@ -284,7 +284,7 @@ function toggleNav(){const s=document.querySelector('.sidebar');s.classList.togg
 <div class="header">
 <div>
 <h1>Studio <span class="gradient-text">Builder</span></h1>
-<div class="models-count">281 AI models · 12 categories · Build anything with local AI</div>
+<div class="models-count">81 AI models · 12 categories · Build anything with local AI</div>
 </div>
 <div class="header-actions">
 <button class="btn btn-ghost" onclick="showTemplates()">📋 Templates</button>
@@ -299,7 +299,7 @@ function toggleNav(){const s=document.querySelector('.sidebar');s.classList.togg
 
 <!-- Stats -->
 <div class="stats-row">
-<div class="stat-card"><div class="stat-icon">🧠</div><div class="stat-value" id="stat-models">281</div><div class="stat-label">AI Models</div></div>
+<div class="stat-card"><div class="stat-icon">🧠</div><div class="stat-value" id="stat-models">81</div><div class="stat-label">AI Models</div></div>
 <div class="stat-card"><div class="stat-icon">⚡</div><div class="stat-value" id="stat-queries">0</div><div class="stat-label">Builds Today</div></div>
 <div class="stat-card"><div class="stat-icon">🎨</div><div class="stat-value" id="stat-images">0</div><div class="stat-label">Images Generated</div></div>
 <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-value" id="stat-categories">12</div><div class="stat-label">Categories</div></div>
@@ -699,7 +699,7 @@ setTimeout(()=>{msgText.innerHTML='<span style="color:var(--orange)">⏳ GPU mod
 function showBuilder(){document.getElementById('builder').scrollIntoView({behavior:'smooth'});focusInput()}
 function showTemplates(){document.getElementById('templates-section').scrollIntoView({behavior:'smooth'})}
 function showGallery(){alert('Gallery coming soon — '+imageCount+' images generated so far')}
-function showModels(){window.open('/#models','_blank')}
+function showModels(){window.open('/models','_blank')}
 
 // Init
 document.getElementById('prompt').focus();
