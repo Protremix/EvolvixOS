@@ -182,26 +182,86 @@ def validate_path(path: str, allowed_bases: list, user_scope: str = None) -> tup
 
 # Dangerous command patterns (extended from v9)
 DANGEROUS_PATTERNS = [
+    # rm -rf in all forms
     r"rm\s+-rf\s+/",
+    r"rm\s+-rf\s+~",
+    r"rm\s+-rf\s+--no-preserve-root",
+    r"rm\s+-rf\s+\*",
+    r"rm\s+-rf\s+\$HOME",
+    # disk operations
     r"m\W*k\W*f\W*s",
     r"dd\s+if=",
-    r"shutdown|reboot|halt",
-    r":\(\)\{\s*:\s*\|\s*:&\s*\};:",
+    r"dd\s+.*of=\s*/dev/sd",
     r">\s*/dev/sd",
+    # system control
+    r"shutdown|reboot|halt",
+    r"\binit\s+[06]\b",
+    r"kill\s+-9\s+1\b",
+    r"killall\s+",
+    # privilege escalation
+    r"\bsudo\s",
+    r"\bsu\s+root\b",
     r"chmod\s+777\s+/",
+    r"chmod\s+\+s\s",
+    r"chown\s+.*\s+/",
+    # network exfiltration
+    r"curl\s+http",
+    r"wget\s+http",
+    r"nc\s+-e\s",
+    r"netcat\s",
+    r"bash\s+-i\s+>&\s*/dev/tcp",
+    r"/dev/tcp/",
+    # fork bomb
+    r":\(\)\{\s*:\s*\|\s*:&\s*\};:",
+    # pipe to shell
     r"curl.*\|\s*(bash|sh)",
     r"wget.*\|\s*(bash|sh)",
+    # python code injection via command
     r"python3?\s+-c\s+.*import\s+os",
+    r"python3?\s+-c\s+.*import\s+subprocess",
+    r"python3?\s+-c\s+.*__import__",
+    # dangerous functions in command context
     r"eval\s*\(",
     r"exec\s*\(",
     r"subprocess.*shell=True",
     r"os\.system\s*\(",
     r"__import__",
+    # sensitive files
     r"/etc/passwd",
     r"/etc/shadow",
+    r"/etc/sudoers",
+    r"/proc/self/environ",
+    r"\.env\b.*grep",
+    # file manipulation of system files
+    r"mv\s+/etc/",
+    r"cp\s+/etc/",
+    r"ln\s+-s\s+/etc/",
+    r"ln\s+-s\s+/proc/",
+    # persistence
     r"crontab\s+-",
+    r"echo.*\|\s*crontab",
+    # firewall flush
     r"iptables\s+-F",
+    # service management
     r"systemctl\s+(stop|disable)\s+(ssh|nginx|evolvix)",
+    # env var exfiltration
+    r"printenv\s+\w*API",
+    r"env\s+\|\s*grep\s+API",
+    r"\$\{?\w*API_KEY\}?",
+    r"grep.*-i.*key.*model_api",
+    # backslash-escaped dangerous commands
+    r"rm[\s\\]+-rf[\s\\]+/",
+    # .env file access
+    r"\.env\b.*(?:cat|grep|less|more|head|tail)",
+    r"cat\s+\S*\.env\b",
+    # hex-encoded rm -rf (\x72 = r, \x6d = m)
+    r"\\x72\\x6d",
+    # source file key extraction
+    r"grep.*key.*\.py",
+    r"grep.*-i.*key.*model_api",
+    # broader grep for API keys
+    r"\|\s*grep\s+-i.*key",
+    r"grep\s+.*\bkey\b.*\.py",
 ]
 
 _dangerous_re = [re.compile(p, re.IGNORECASE) for p in DANGEROUS_PATTERNS]
@@ -285,20 +345,61 @@ def validate_url(url: str, allowed_schemes: tuple = ("https", "http")) -> tuple[
     if host == "169.254.169.254":
         return False, "Cloud metadata endpoint blocked"
 
+    # Block cloud metadata endpoints
+    if host.lower() in ("metadata.google.internal", "metadata.azure.com",
+                        "100.100.100.200"):
+        return False, f"Cloud metadata endpoint blocked: {host}"
+
+    # Block link-local (169.254.x.x) — already caught by is_link_local above
+    # but add explicit check for DNS names that resolve to link-local
+    try:
+        import socket
+        resolved = socket.getaddrinfo(host, None, socket.AF_INET)
+        for family, _, _, _, sockaddr in resolved:
+            ip = ipaddress.ip_address(sockaddr[0])
+            if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
+                return False, f"Host {host} resolves to private/reserved IP: {sockaddr[0]}"
+    except (socket.gaierror, OSError, ValueError):
+        pass  # DNS resolution failed — allow but log
+    except Exception:
+        pass  # Don't block on resolution errors
+
     return True, url
 
 
 # --- Python Code Validation ---
 
 PYTHON_DANGEROUS = [
+    # imports of dangerous modules
     r"__import__\s*\(",
+    r"\bimport\s+os\b",
+    r"\bimport\s+subprocess\b",
+    r"\bimport\s+pickle\b",
+    r"\bimport\s+marshal\b",
+    r"\bimport\s+socket\b",
+    r"\bfrom\s+os\s+import",
+    r"\bfrom\s+subprocess\s+import",
+    # dangerous function calls
     r"os\.system\s*\(",
+    r"os\.popen\s*\(",
+    r"subprocess\.(call|run|Popen)\s*\(",
     r"subprocess\.(call|run|Popen)\s*\(.*shell\s*=\s*True",
     r"eval\s*\(",
     r"exec\s*\(",
+    r"compile\s*\(",
+    r"pickle\.loads?\s*\(",
+    r"marshal\.loads?\s*\(",
+    # file access to sensitive paths
     r"open\s*\(\s*['\"]/(etc|proc|sys)",
     r"shutil\.rmtree\s*\(\s*['\"]/",
     r"os\.remove\s*\(\s*['\"]/",
+    # network exfiltration from Python
+    r"urllib\.request\.urlopen\s*\(\s*['\"]http",
+    r"socket\.socket\s*\(",
+    r"requests\.get\s*\(\s*['\"]http",
+    # env var access
+    r"os\.environ\s*\[\s*['\"]\w*API_KEY",
+    r"os\.getenv\s*\(\s*['\"]\w*API_KEY",
 ]
 
 _python_dangerous_re = [re.compile(p, re.IGNORECASE) for p in PYTHON_DANGEROUS]
