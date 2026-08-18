@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EvolvixOS — Sign In</title>
+<style>
+:root {
+    --bg: #0a0a0c;
+    --card: #141418;
+    --border: rgba(255,255,255,0.08);
+    --text: #f0f0f5;
+    --muted: #8e8e93;
+    --primary: #8b5cf6;
+    --primary-glow: rgba(139,92,246,0.15);
+    --accent: #d946ef;
+    --success: #4ade80;
+    --danger: #f87171;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.auth-container {
+    width: 100%;
+    max-width: 440px;
+}
+.auth-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+}
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+    justify-content: center;
+}
+.logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+}
+.logo-text {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+.tagline {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+}
+.field {
+    margin-bottom: 16px;
+}
+.field label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+.field input {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: var(--font);
+    transition: all 0.2s;
+}
+.field input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.field input::placeholder { color: #555; }
+.btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-link {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: var(--muted);
+    border: none;
+    font-size: 14px;
+    font-family: var(--font);
+    cursor: pointer;
+    margin-top: 12px;
+    transition: color 0.2s;
+}
+.btn-link:hover { color: var(--primary); }
+.error-msg {
+    color: var(--danger);
+    font-size: 13px;
+    padding: 10px 14px;
+    background: rgba(248,113,113,0.1);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: none;
+}
+.error-msg.show { display: block; }
+.success-msg {
+    color: var(--success);
+    font-size: 13px;
+    padding: 10px 14px;
+    background: rgba(74,222,128,0.1);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: none;
+}
+.success-msg.show { display: block; }
+.otp-display {
+    text-align: center;
+    margin: 16px 0;
+    padding: 20px;
+    background: var(--primary-glow);
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+}
+.otp-display .code {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 8px;
+    color: var(--primary);
+    font-family: 'Courier New', monospace;
+}
+.otp-display .label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+}
+.title {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 6px;
+}
+.subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+.otp-input {
+    text-align: center;
+    letter-spacing: 8px;
+    font-size: 24px;
+    font-family: 'Courier New', monospace;
+}
+.divider {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin: 20px 0;
+    position: relative;
+}
+.divider::before, .divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 35%;
+    height: 1px;
+    background: var(--border);
+}
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+.footer-note {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 20px;
+}
+.spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.view { display: none; }
+.view.active { display: block; }
+</style>
+</head>
+<body>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">EvolvixOS</div>
+        </div>
+
+        <div id="error" class="error-msg"></div>
+        <div id="success" class="success-msg"></div>
+
+        <!-- LOGIN VIEW -->
+        <div id="view-login" class="view active">
+            <div class="title">Welcome back</div>
+            <div class="subtitle">Sign in to access your Studio</div>
+            <div class="field">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <button class="btn-primary" id="btn-login">Sign In</button>
+            <button class="btn-link" onclick="switchView('register')">No account? Create one →</button>
+        </div>
+
+        <!-- REGISTER VIEW -->
+        <div id="view-register" class="view">
+            <div class="title">Create your account</div>
+            <div class="subtitle">Get OTP-verified access to EvolvixOS</div>
+            <div class="field">
+                <label>Display Name</label>
+                <input type="text" id="reg-name" placeholder="Your name" autocomplete="name">
+            </div>
+            <div class="field">
+                <label>Email</label>
+                <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="field">
+                <label>Password (min 6 chars)</label>
+                <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password">
+            </div>
+            <div class="field">
+                <label>Telegram Username (optional — for OTP delivery)</label>
+                <input type="text" id="reg-telegram" placeholder="@username" autocomplete="off">
+            </div>
+            <button class="btn-primary" id="btn-register">Register & Send OTP</button>
+            <button class="btn-link" onclick="switchView('login')">Already have an account? Sign in →</button>
+        </div>
+
+        <!-- OTP VERIFY VIEW -->
+        <div id="view-otp" class="view">
+            <div class="title">Verify your email</div>
+            <div class="subtitle">Enter the 6-digit code we sent you</div>
+            <div id="otp-display-box" class="otp-display" style="display:none">
+                <div class="label">A verification code has been sent to your Telegram. Enter it below.</div>
+            </div>
+            <div class="field">
+                <label>OTP Code</label>
+                <input type="text" id="otp-input" class="otp-input" maxlength="6" placeholder="000000" inputmode="numeric" pattern="[0-9]*">
+            </div>
+            <input type="hidden" id="otp-email">
+            <button class="btn-primary" id="btn-verify">Verify & Enter Studio</button>
+            <button class="btn-link" id="btn-resend">Resend OTP</button>
+            <button class="btn-link" onclick="switchView('login')">← Back to login</button>
+        </div>
+    </div>
+    <div class="footer-note">
+        Each user gets isolated memory, projects, and conversation history.
+    </div>
+</div>
+
+<script>
+const API = '/auth';
+
+function showError(msg) {
+    const el = document.getElementById('error');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+function showSuccess(msg) {
+    const el = document.getElementById('success');
+    el.textContent = msg;
+    el.classList.add('show');
+}
+
+function switchView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + name).classList.add('active');
+    document.getElementById('error').classList.remove('show');
+    document.getElementById('success').classList.remove('show');
+}
+
+async function apiCall(endpoint, body) {
+    const res = await fetch(API + endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    return res.json();
+}
+
+// ─── Login ───
+document.getElementById('btn-login').addEventListener('click', async () => {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    if (!email || !password) { showError('Please fill in all fields'); return; }
+
+    const btn = document.getElementById('btn-login');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+
+    try {
+        const data = await apiCall('/login', { email, password });
+        if (data.ok) {
+            localStorage.setItem('evolvix_token', data.token);
+            localStorage.setItem('evolvix_user', JSON.stringify(data.user));
+            window.location.href = '/studio?v=9';
+        } else {
+            showError(data.error || 'Login failed');
+            btn.disabled = false;
+            btn.innerHTML = 'Sign In';
+        }
+    } catch (e) {
+        showError('Network error. Is the auth service running?');
+        btn.disabled = false;
+        btn.innerHTML = 'Sign In';
+    }
+});
+
+// ─── Register ───
+document.getElementById('btn-register').addEventListener('click', async () => {
+    const display_name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim().toLowerCase();
+    const password = document.getElementById('reg-password').value;
+    const telegram_username = document.getElementById('reg-telegram').value.trim();
+
+    if (!email || !password) { showError('Email and password required'); return; }
+
+    const btn = document.getElementById('btn-register');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+
+    try {
+        const data = await apiCall('/register', { email, password, display_name, telegram_username });
+        if (data.ok) {
+            document.getElementById('otp-email').value = email;
+            if (data.otp_display) {
+                document.getElementById('otp-display-box').style.display = 'block';
+                // OTP is never displayed on screen for security
+            } else {
+                document.getElementById('otp-display-box').style.display = 'none';
+            }
+            switchView('otp');
+            showSuccess(data.otp_sent_via_telegram ? 'OTP sent to your Telegram!' : 'OTP generated. Contact admin for your code.');
+        } else {
+            showError(data.error || 'Registration failed');
+            btn.disabled = false;
+            btn.innerHTML = 'Register & Send OTP';
+        }
+    } catch (e) {
+        showError('Network error. Is the auth service running?');
+        btn.disabled = false;
+        btn.innerHTML = 'Register & Send OTP';
+    }
+});
+
+// ─── Verify OTP ───
+document.getElementById('btn-verify').addEventListener('click', async () => {
+    const email = document.getElementById('otp-email').value;
+    const otp = document.getElementById('otp-input').value.trim();
+    if (!otp || otp.length !== 6) { showError('Enter the 6-digit code'); return; }
+
+    const btn = document.getElementById('btn-verify');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+
+    try {
+        const data = await apiCall('/verify', { email, otp });
+        if (data.ok) {
+            localStorage.setItem('evolvix_token', data.token);
+            localStorage.setItem('evolvix_user', JSON.stringify(data.user));
+            showSuccess('Verified! Redirecting...');
+            setTimeout(() => window.location.href = '/studio?v=9', 1000);
+        } else {
+            showError(data.error || 'Verification failed');
+            btn.disabled = false;
+            btn.innerHTML = 'Verify & Enter Studio';
+        }
+    } catch (e) {
+        showError('Network error');
+        btn.disabled = false;
+        btn.innerHTML = 'Verify & Enter Studio';
+    }
+});
+
+// ─── Resend OTP ───
+document.getElementById('btn-resend').addEventListener('click', async () => {
+    const email = document.getElementById('otp-email').value;
+    if (!email) return;
+    const btn = document.getElementById('btn-resend');
+    btn.textContent = 'Sending...';
+    try {
+        const data = await apiCall('/resend-otp', { email });
+        if (data.ok) {
+            if (data.otp_display) {
+                document.getElementById('otp-display-box').style.display = 'block';
+                // OTP is never displayed on screen for security
+            }
+            showSuccess('New OTP sent!');
+        } else {
+            showError(data.error || 'Failed to resend');
+        }
+    } catch (e) {
+        showError('Network error');
+    }
+    btn.textContent = 'Resend OTP';
+});
+
+// Enter key support
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        const activeView = document.querySelector('.view.active').id;
+        if (activeView === 'view-login') document.getElementById('btn-login').click();
+        else if (activeView === 'view-register') document.getElementById('btn-register').click();
+        else if (activeView === 'view-otp') document.getElementById('btn-verify').click();
+    }
+});
+
+// Check if already logged in
+const existingToken = localStorage.getItem('evolvix_token');
+if (existingToken) {
+    fetch(API + '/me', { headers: { 'Authorization': 'Bearer ' + existingToken } })
+        .then(r => r.json())
+        .then(d => { if (d.user) window.location.href = '/studio?v=9'; })
+        .catch(() => {});
+}
+</script>
+</body>
+</html>

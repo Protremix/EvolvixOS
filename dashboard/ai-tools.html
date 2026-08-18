@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Tools Directory · EvolvixOS</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+:root{--bg:#0a0a0f;--card:#12121a;--text:#e8e8f0;--muted:#6b6b80;--accent:#6c5ce7;--accent2:#fd79a8;--green:#00b894;--orange:#fdcb6e;--border:rgba(255,255,255,.06);--radius:14px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;min-height:100vh}
+.header{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;backdrop-filter:blur(12px)}
+.logo{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700}
+.logo span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.back-btn{color:var(--muted);text-decoration:none;font-size:14px;padding:8px 16px;border-radius:10px;border:1px solid var(--border);transition:all .2s}
+.back-btn:hover{color:var(--text);border-color:var(--accent)}
+.hero{padding:48px 32px 24px;text-align:center;max-width:900px;margin:0 auto}
+.hero h1{font-size:36px;font-weight:700;margin-bottom:12px}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:17px;max-width:600px;margin:0 auto 24px}
+.hero-stats{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat .num{font-size:28px;font-weight:700;color:var(--accent)}
+.hero-stat .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.toolbar{max-width:1100px;margin:0 auto;padding:0 32px 20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.search-box{flex:1;min-width:200px;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none}
+.search-box:focus{border-color:var(--accent)}
+.filter-btn{padding:8px 16px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s}
+.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.filter-btn:hover{border-color:var(--accent)}
+.tabs{max-width:1100px;margin:0 auto;padding:0 32px 20px;display:flex;gap:8px}
+.tab{padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:14px;cursor:pointer;transition:all .2s;font-weight:600}
+.tab.active{color:var(--text);border-color:var(--accent);background:rgba(108,92,231,.1)}
+.container{max-width:1100px;margin:0 auto;padding:0 32px 48px}
+.category-nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.cat-pill{padding:6px 14px;border-radius:20px;font-size:12px;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .2s}
+.cat-pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cat-pill:hover{border-color:var(--accent)}
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.tool-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:all .2s;animation:fadeIn .4s ease;cursor:pointer}
+.tool-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.tool-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:10px}
+.tool-name{font-size:16px;font-weight:600}
+.tool-cat{font-size:10px;padding:3px 10px;border-radius:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;background:rgba(108,92,231,.15);color:var(--accent)}
+.tool-desc{font-size:13px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:12px}
+.tool-pricing{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.price-badge{font-size:11px;padding:3px 10px;border-radius:8px;font-weight:600}
+.price-free{background:rgba(0,184,148,.15);color:var(--green)}
+.price-freemium{background:rgba(253,203,110,.15);color:var(--orange)}
+.price-opensource{background:rgba(108,92,231,.15);color:var(--accent)}
+.price-paid{background:rgba(253,121,168,.15);color:var(--accent2)}
+.tool-meta{display:flex;gap:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.tool-meta span{display:flex;align-items:center;gap:4px}
+.tool-models{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.model-tag{font-size:10px;padding:2px 8px;border-radius:6px;background:rgba(253,121,168,.1);color:var(--accent2)}
+.tool-features{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:none}
+.tool-card.expanded .tool-features{display:block}
+.feature-list{font-size:12px;color:var(--muted);line-height:1.8}
+.feature-list li{margin-left:16px}
+.pros-cons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.pros-list,.cons-list{font-size:12px}
+.pros-list h5{color:var(--green);margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.cons-list h5{color:var(--accent2);margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.pros-list li,.cons-list li{margin-left:14px;color:var(--muted);margin-bottom:2px}
+.tool-link{display:inline-block;margin-top:8px;font-size:13px;color:var(--accent);text-decoration:none}
+.tool-link:hover{text-decoration:underline}
+.stack-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;transition:all .2s}
+.stack-card:hover{border-color:var(--accent)}
+.stack-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:8px}
+.stack-name{font-size:18px;font-weight:600}
+.stack-cost{font-size:12px;padding:4px 12px;border-radius:8px;background:rgba(0,184,148,.15);color:var(--green);font-weight:600}
+.stack-desc{font-size:13px;color:var(--muted);margin-bottom:12px}
+.stack-layers{display:flex;flex-direction:column;gap:8px}
+.stack-layer{display:flex;align-items:start;gap:12px;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:8px}
+.layer-label{font-size:11px;font-weight:600;color:var(--accent);min-width:80px;text-transform:uppercase;letter-spacing:.5px}
+.layer-tool{font-size:13px;font-weight:600}
+.layer-reason{font-size:12px;color:var(--muted)}
+.loading{text-align:center;padding:60px;color:var(--muted)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.source-link{text-align:center;padding:24px;color:var(--muted);font-size:13px}
+.source-link a{color:var(--accent);text-decoration:none}
+.no-results{text-align:center;padding:40px;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="logo">⚡ <span>EvolvixOS</span></div>
+<a class="back-btn" href="/studio/">← Back to Studio</a>
+</div>
+
+<div class="hero">
+<h1><span>AI Tools Directory</span></h1>
+<p>Curated list of free and low-cost AI tools — LLM APIs, coding copilots, AI IDEs, agents, and infrastructure for building real AI applications.</p>
+<div class="hero-stats">
+<div class="hero-stat"><div class="num" id="stat-tools">--</div><div class="label">Tools</div></div>
+<div class="hero-stat"><div class="num" id="stat-categories">--</div><div class="label">Categories</div></div>
+<div class="hero-stat"><div class="num" id="stat-stacks">--</div><div class="label">Stacks</div></div>
+<div class="hero-stat"><div class="num" id="stat-free">--</div><div class="label">Free Tools</div></div>
+</div>
+</div>
+
+<div class="tabs">
+<div class="tab active" onclick="setTab('tools',this)">🛠️ Tools</div>
+<div class="tab" onclick="setTab('stacks',this)">🏗️ Stacks</div>
+</div>
+
+<div class="toolbar" id="toolbar">
+<input class="search-box" id="search" placeholder="Search tools, models, features..." oninput="filterTools()">
+<button class="filter-btn active" onclick="setPricingFilter('all',this)">All</button>
+<button class="filter-btn" onclick="setPricingFilter('free',this)">Free</button>
+<button class="filter-btn" onclick="setPricingFilter('freemium',this)">Freemium</button>
+<button class="filter-btn" onclick="setPricingFilter('open-source',this)">Open Source</button>
+</div>
+
+<div class="container" id="content">
+<div class="loading">Loading tools...</div>
+</div>
+
+<div class="source-link">
+Data from <a href="https://github.com/ShaikhWarsi/free-ai-tools" target="_blank">ShaikhWarsi/free-ai-tools</a> · Auto-synced via Discovery Engine
+</div>
+
+<script>
+let registry=null;
+let currentTab='tools';
+let currentCat='all';
+let currentPricing='all';
+
+async function load(){
+  try{
+    const res=await fetch('/api/ai-tools');
+    registry=await res.json();
+    document.getElementById('stat-tools').textContent=registry.total_tools;
+    document.getElementById('stat-categories').textContent=registry.total_categories;
+    document.getElementById('stat-stacks').textContent=registry.total_stacks;
+    document.getElementById('stat-free').textContent=registry.tools.filter(t=>t.pricing&&(t.pricing.type==='free'||t.pricing.type==='open-source')).length;
+    render();
+  }catch(e){
+    document.getElementById('content').innerHTML='<div class="loading">Failed to load. '+e.message+'</div>';
+  }
+}
+
+function render(){
+  if(currentTab==='tools')renderTools();
+  else renderStacks();
+}
+
+function renderTools(){
+  let tools=registry.tools;
+  if(currentCat!=='all')tools=tools.filter(t=>t.category===currentCat);
+  if(currentPricing!=='all')tools=tools.filter(t=>t.pricing&&t.pricing.type===currentPricing);
+  
+  let html='<div class="category-nav">';
+  html+='<div class="cat-pill '+(currentCat==='all'?'active':'')+'" onclick="setCategory(\'all\',this)">All ('+registry.total_tools+')</div>';
+  registry.categories.forEach(c=>{
+    const count=registry.tools.filter(t=>t.category===c.id).length;
+    if(count>0)html+='<div class="cat-pill '+(currentCat===c.id?'active':'')+'" onclick="setCategory(\''+c.id+'\',this)">'+c.name+' ('+count+')</div>';
+  });
+  html+='</div>';
+  
+  if(tools.length===0){
+    html+='<div class="no-results">No tools match your filters.</div>';
+  }else{
+    html+='<div class="tool-grid">';
+    tools.forEach((t,i)=>{
+      const pricingClass='price-'+(t.pricing?t.pricing.type.replace('open-source','opensource'):'paid');
+      const pricingLabel=t.pricing?(t.pricing.type==='open-source'?'Open Source':t.pricing.type.charAt(0).toUpperCase()+t.pricing.type.slice(1)):'Paid';
+      html+=`<div class="tool-card" data-search="${(t.name+' '+t.shortDescription+' '+(t.models||[]).join(' ')+' '+(t.tags||[]).join(' ')).toLowerCase()}" onclick="toggleExpand(this)">
+        <div class="tool-header">
+          <div class="tool-name">${t.name}</div>
+          <div class="tool-cat">${(t.category||'').replace(/-/g,' ')}</div>
+        </div>
+        <div class="tool-desc">${t.shortDescription||t.description||''}</div>
+        <div class="tool-pricing">
+          <span class="price-badge ${pricingClass}">${pricingLabel}</span>
+          ${t.pricing&&t.pricing.freeTier?`<span style="font-size:12px;color:var(--muted)">${t.pricing.freeTier.substring(0,60)}${t.pricing.freeTier.length>60?'...':''}</span>`:''}
+        </div>
+        ${t.models&&t.models.length>0?`<div class="tool-models">${t.models.slice(0,5).map(m=>`<span class="model-tag">${m}</span>`).join('')}</div>`:''}
+        <div class="tool-meta">
+          ${t.pricing&&t.pricing.creditCardRequired===false?'<span>✓ No card</span>':''}
+          ${t.openSource?'<span>📦 OSS</span>':''}
+          ${t.deployment?'<span>🚀 '+t.deployment+'</span>':''}
+          ${t.limits&&t.limits.requestsPerDay?'<span>📊 '+t.limits.requestsPerDay+' req/day</span>':''}
+        </div>
+        <div class="tool-features">
+          ${t.features&&t.features.length>0?`<div class="feature-list"><strong>Features:</strong><ul>${t.features.map(f=>'<li>'+f+'</li>').join('')}</ul></div>`:''}
+          ${(t.pros&&t.pros.length)||(t.cons&&t.cons.length)?`<div class="pros-cons">
+            ${t.pros&&t.pros.length>0?`<div class="pros-list"><h5>Pros</h5><ul>${t.pros.map(p=>'<li>'+p+'</li>').join('')}</ul></div>`:''}
+            ${t.cons&&t.cons.length>0?`<div class="cons-list"><h5>Cons</h5><ul>${t.cons.map(c=>'<li>'+c+'</li>').join('')}</ul></div>`:''}
+          </div>`:''}
+          ${t.website?`<a href="${t.website}" target="_blank" class="tool-link">Visit →</a>`:''}
+          ${t.github?`<a href="${t.github}" target="_blank" class="tool-link" style="margin-left:12px">GitHub →</a>`:''}
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  }
+  document.getElementById('content').innerHTML=html;
+  filterTools();
+}
+
+function renderStacks(){
+  let html='<div class="category-nav"><div style="font-size:14px;color:var(--muted);padding:6px 0">Recommended AI development stacks — curated combinations of tools for specific use cases.</div></div>';
+  registry.stacks.forEach(s=>{
+    html+=`<div class="stack-card">
+      <div class="stack-header">
+        <div class="stack-name">${s.name}</div>
+        <div class="stack-cost">${s.cost}</div>
+      </div>
+      <div class="stack-desc">${s.description}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px"><strong>Use case:</strong> ${s.useCase}</div>
+      <div class="stack-layers">
+        ${s.layers.map(l=>`<div class="stack-layer">
+          <div class="layer-label">${l.name}</div>
+          <div><div class="layer-tool">${l.tool}</div><div class="layer-reason">${l.reason}</div></div>
+        </div>`).join('')}
+      </div>
+      ${s.tags&&s.tags.length>0?`<div style="margin-top:12px">${s.tags.map(t=>'<span class="model-tag" style="margin-right:4px">'+t+'</span>').join('')}</div>`:''}
+    </div>`;
+  });
+  document.getElementById('content').innerHTML=html;
+}
+
+function toggleExpand(card){
+  card.classList.toggle('expanded');
+}
+
+function setTab(tab,btn){
+  currentTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('toolbar').style.display=tab==='tools'?'flex':'none';
+  render();
+}
+
+function setCategory(cat,el){
+  currentCat=cat;
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderTools();
+}
+
+function setPricingFilter(p,btn){
+  currentPricing=p;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTools();
+}
+
+function filterTools(){
+  const q=document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.tool-card').forEach(card=>{
+    const text=card.dataset.search||'';
+    card.style.display=text.includes(q)?'block':'none';
+  });
+}
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+# Secrets & credentials
+.env
+.github_token
+*.key
+*.pem
+credentials.json
+auth/.jwt_secret
+auth/users.db*
+*.db
+*.sqlite
+*.db-shm
+*.db-wal
+
+# Cloned repos (not our code)
+tencentcloud-sdk-go/
+timsdk/
+octop/
+cubesandbox/
+API-mega-list/
+ai-agent-tools/
+awesome-freellm-apis/
+free-ai-tools/
+free-image-generation-api/
+kimi-free-api/
+lovable-for-beginners/
+openclaw-api-list/
+tencent-memory/
+ui-libraries/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Go
+tccli/vendor/
+*.exe
+
+# Docker
+docker-data/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Uploads
+uploads/
+
+# Conversations (user data)
+conversations/

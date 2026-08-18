@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvolvixOS — Create Anything</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface2: #1a1a24;
+            --primary: #6c5ce7;
+            --primary2: #8b7ff0;
+            --accent: #00d4aa;
+            --warn: #fdcb6e;
+            --danger: #e74c3c;
+            --text: #e8e8f0;
+            --muted: #8a8aa0;
+            --radius: 16px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* === HEADER === */
+        .header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(10,10,15,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 16px 32px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 800;
+        }
+        .logo-text { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+        .logo-sub { font-size: 12px; color: var(--muted); }
+        .header-status { display: flex; gap: 8px; align-items: center; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
+        .status-dot.offline { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+        .status-dot.warn { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        .status-text { font-size: 13px; color: var(--muted); }
+
+        /* === HERO / SMART BAR === */
+        .hero {
+            padding: 48px 32px 32px;
+            text-align: center;
+            max-width: 900px; margin: 0 auto;
+        }
+        .hero h1 {
+            font-size: 36px; font-weight: 800; letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--text), var(--primary2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        .hero p { color: var(--muted); font-size: 16px; margin-bottom: 32px; }
+        .smart-bar {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 8px;
+            display: flex; gap: 8px;
+            box-shadow: 0 8px 32px rgba(108,92,231,0.15);
+            transition: border-color 0.3s;
+        }
+        .smart-bar:focus-within { border-color: var(--primary); box-shadow: 0 8px 32px rgba(108,92,231,0.3); }
+        .smart-input {
+            flex: 1; background: transparent; border: none; outline: none;
+            color: var(--text); font-size: 16px; padding: 16px 20px;
+        }
+        .smart-input::placeholder { color: var(--muted); }
+        .smart-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary2));
+            color: white; border: none; border-radius: 18px;
+            padding: 12px 28px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: transform 0.2s, opacity 0.2s;
+            white-space: nowrap;
+        }
+        .smart-btn:hover { transform: scale(1.03); opacity: 0.9; }
+        .smart-btn:active { transform: scale(0.97); }
+        .smart-hints { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+        .hint-chip {
+            background: var(--surface2); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px; padding: 8px 16px; font-size: 13px;
+            color: var(--muted); cursor: pointer; transition: all 0.2s;
+        }
+        .hint-chip:hover { border-color: var(--primary); color: var(--text); transform: translateY(-2px); }
+
+        /* === ENGINE SELECTOR === */
+        .engine-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(108,92,231,0.15); border: 1px solid rgba(108,92,231,0.3);
+            border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--primary2);
+            margin-top: 12px;
+        }
+        .engine-badge.auto { background: rgba(0,212,170,0.15); border-color: rgba(0,212,170,0.3); color: var(--accent); }
+
+        /* === CAPABILITY CARDS === */
+        .section { padding: 0 32px; max-width: 1200px; margin: 0 auto 48px; }
+        .section-title { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 20px; }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+
+        .card {
+            background: var(--surface); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius); padding: 24px; cursor: pointer;
+            transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        .card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent)); opacity: 0; transition: opacity 0.3s;
+        }
+        .card:hover::before { opacity: 1; }
+        .card-icon { font-size: 32px; margin-bottom: 16px; }
+        .card-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .card-desc { font-size: 14px; color: var(--muted); line-height: 1.5; margin-bottom: 16px; }
+        .card-engines { display: flex; gap: 6px; flex-wrap: wrap; }
+        .engine-tag {
+            background: var(--surface2); border-radius: 8px; padding: 4px 10px;
+            font-size: 11px; color: var(--muted); border: 1px solid rgba(255,255,255,0.04);
+        }
+        .engine-tag.active { color: var(--accent); border-color: rgba(0,212,170,0.3); background: rgba(0,212,170,0.1); }
+        .card-status {
+            position: absolute; top: 16px; right: 16px;
+            width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+        }
+        .card-status.pending { background: var(--warn); }
+
+        /* === STATUS PANEL === */
+        .status-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+        .status-item {
+            background: var(--surface); border-radius: 12px; padding: 16px;
+            display: flex; align-items: center; gap: 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .status-item-name { font-size: 14px; font-weight: 600; }
+        .status-item-desc { font-size: 12px; color: var(--muted); }
+        .status-indicator { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .status-indicator.online { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+        .status-indicator.offline { background: var(--danger); }
+        .status-indicator.pending { background: var(--warn); }
+
+        /* === ACTIVITY FEED === */
+        .activity-item {
+            background: var(--surface); border-radius: 12px; padding: 16px;
+            margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+        .activity-icon { font-size: 20px; }
+        .activity-info { flex: 1; }
+        .activity-title { font-size: 14px; font-weight: 600; }
+        .activity-meta { font-size: 12px; color: var(--muted); }
+        .activity-time { font-size: 12px; color: var(--muted); }
+
+        /* === GENERATION RESULT MODAL === */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 200;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--surface); border-radius: 24px; padding: 32px;
+            max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .modal-title { font-size: 20px; font-weight: 700; }
+        .modal-close { background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer; }
+        .modal-body { text-align: center; }
+        .modal-status { font-size: 16px; margin-bottom: 16px; }
+        .modal-spinner {
+            width: 48px; height: 48px; border: 3px solid rgba(108,92,231,0.2);
+            border-top-color: var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 24px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .modal-engine { background: var(--surface2); border-radius: 12px; padding: 16px; margin-top: 16px; text-align: left; }
+        .modal-engine-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+        .modal-engine-value { font-size: 15px; font-weight: 600; color: var(--primary2); }
+        .modal-result { margin-top: 16px; }
+        .modal-result img, .modal-result video { max-width: 100%; border-radius: 12px; }
+        .modal-result audio { width: 100%; margin-top: 12px; }
+        .modal-error { color: var(--danger); }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 28px; }
+            .header { padding: 12px 16px; }
+            .section { padding: 0 16px; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="logo">
+        <div class="logo-icon">E</div>
+        <div>
+            <div class="logo-text">EvolvixOS</div>
+            <div class="logo-sub">AI Creation Platform</div>
+        </div>
+    </div>
+    <div class="header-status">
+        <div class="status-dot" id="header-dot"></div>
+        <span class="status-text" id="header-status">Checking systems...</span>
+    </div>
+</div>
+
+<!-- HERO / SMART BAR -->
+<div class="hero">
+    <h1>What do you want to create?</h1>
+    <p>281 AI models across 12 categories. Just describe what you want.</p>
+    <div class="smart-bar">
+        <input type="text" class="smart-input" id="smart-input" placeholder="e.g. 'Make a video of a cat playing piano' or 'Generate an image of a sunset over mountains'">
+        <button class="smart-btn" onclick="smartCreate()">Create ✨</button>
+    </div>
+    <div class="smart-hints">
+        <div class="hint-chip" onclick="fillHint(this)">🎬 Make a video</div>
+        <div class="hint-chip" onclick="fillHint(this)">🖼️ Generate an image</div>
+        <div class="hint-chip" onclick="fillHint(this)">🎙️ Create a voice narration</div>
+        <div class="hint-chip" onclick="fillHint(this)">🎵 Make background music</div>
+        <div class="hint-chip" onclick="fillHint(this)">🗣️ Animate a talking head</div>
+        <div class="hint-chip" onclick="fillHint(this)">💬 Chat with AI</div>
+    </div>
+    <div id="engine-suggestion" style="display:none;" class="engine-badge auto">
+        <span>⚡</span>
+        <span id="engine-suggestion-text"></span>
+    </div>
+</div>
+
+<!-- CAPABILITY CARDS -->
+<div class="section">
+    <div class="section-title">What EvolvixOS Can Do</div>
+    <div class="cards-grid" id="cards-grid"></div>
+</div>
+
+<!-- SYSTEM STATUS -->
+<div class="section">
+    <div class="section-title">System Status</div>
+    <div class="status-grid" id="status-grid"></div>
+</div>
+
+<!-- ACTIVITY FEED -->
+<div class="section">
+    <div class="section-title">Recent Activity</div>
+    <div id="activity-feed">
+        <div class="activity-item">
+            <div class="activity-icon">🚀</div>
+            <div class="activity-info">
+                <div class="activity-title">EvolvixOS v5.0 deployed</div>
+                <div class="activity-meta">281 AI models loaded — OmniRoute gateway active</div>
+            </div>
+            <div class="activity-time">Just now</div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-title">Creating...</div>
+            <button class="modal-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div class="modal-spinner"></div>
+            <div class="modal-status" id="modal-status">Processing your request...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// EvolvixOS Dashboard — Auto Engine Selection
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const API_BASE = window.location.origin;
+const CARDS = [
+    {
+        icon: "🎬", title: "Video Generation", desc: "Create videos from text descriptions. Pick any style — realistic, animated, cinematic.",
+        engines: [
+            { name: "Wan2.2 T2V", tag: "Best quality", active: false },
+            { name: "Wan2.1 1.3B", tag: "Fast & light", active: true },
+            { name: "LTX-Video", tag: "Real-time", active: false },
+            { name: "HunyuanVideo", tag: "High detail", active: false },
+            { name: "CogVideoX", tag: "Versatile", active: false },
+            { name: "Mochi 1", tag: "Smooth motion", active: false },
+            { name: "+30 more", tag: "", active: false }
+        ],
+        status: "pending", type: "video", endpoint: "/api/generate/video"
+    },
+    {
+        icon: "🖼️", title: "Image Generation", desc: "Generate stunning images from text. Photorealistic, artistic, or any style you want.",
+        engines: [
+            { name: "FLUX", tag: "Best quality", active: false },
+            { name: "SDXL", tag: "Fast & detailed", active: true },
+            { name: "Stable Diffusion", tag: "Classic", active: false },
+            { name: "Qwen-Image", tag: "Text in images", active: false }
+        ],
+        status: "pending", type: "image", endpoint: "/api/generate/image"
+    },
+    {
+        icon: "🎨", title: "Image Control", desc: "Edit and control images — pose matching, identity preservation, style transfer.",
+        engines: [
+            { name: "ControlNet", tag: "Pose control", active: false },
+            { name: "IP-Adapter", tag: "Style transfer", active: false },
+            { name: "InstantID", tag: "Face preserve", active: false },
+            { name: "OpenPose", tag: "Body pose", active: false }
+        ],
+        status: "pending", type: "image_control", endpoint: "/api/generate/image"
+    },
+    {
+        icon: "🎭", title: "Animation & Talking Heads", desc: "Bring portraits to life. Lip-sync, dance, gesture, and full body animation.",
+        engines: [
+            { name: "LivePortrait", tag: "Fast portrait", active: false },
+            { name: "SadTalker", tag: "Talking head", active: false },
+            { name: "AnimateDiff", tag: "Image animation", active: false },
+            { name: "Hallo2", tag: "High quality", active: false },
+            { name: "OmniHuman", tag: "Full body", active: false },
+            { name: "+8 more", tag: "", active: false }
+        ],
+        status: "pending", type: "animation", endpoint: "/api/generate/video"
+    },
+    {
+        icon: "🎙️", title: "Voice & Speech", desc: "Text-to-speech in multiple voices and languages. Clone voices. Transcribe audio.",
+        engines: [
+            { name: "Whisper", tag: "Speech-to-text", active: true },
+            { name: "Piper", tag: "Fast TTS", active: true },
+            { name: "CosyVoice", tag: "Voice clone", active: false },
+            { name: "XTTS v2", tag: "Multilingual", active: false },
+            { name: "Fish Speech", tag: "Natural", active: false }
+        ],
+        status: "partial", type: "audio_tts", endpoint: "/api/generate/audio"
+    },
+    {
+        icon: "🎵", title: "Music Generation", desc: "Create original music and sound effects from text descriptions.",
+        engines: [
+            { name: "MusicGen", tag: "Full tracks", active: false },
+            { name: "AudioCraft", tag: "Sound effects", active: false },
+            { name: "ACE-Step", tag: "Step sequencing", active: false }
+        ],
+        status: "pending", type: "audio_music", endpoint: "/api/generate/audio"
+    },
+    {
+        icon: "💬", title: "AI Chat & Reasoning", desc: "Chat with multiple AI models. Mr James auto-picks the best brain for each question.",
+        engines: [
+            { name: "Qwen 2.5 14B", tag: "Local & free", active: true },
+            { name: "Kimi K3", tag: "Complex reasoning", active: true },
+            { name: "DeepSeek R1", tag: "Code & logic", active: true },
+            { name: "Llama 3.1", tag: "General", active: true },
+            { name: "Mistral", tag: "European", active: true },
+            { name: "Gemma 2", tag: "Lightweight", active: true },
+            { name: "OmniRoute", tag: "340+ models", active: true }
+        ],
+        status: "active", type: "chat", endpoint: "/api/chat"
+    },
+    {
+        icon: "🛠️", title: "Code & Build", desc: "Write, run, and fix code. Deploy apps. Manage servers. All through Mr James.",
+        engines: [
+            { name: "Mr James", tag: "58 tools", active: true },
+            { name: "Python", tag: "Execute", active: true },
+            { name: "Bash", tag: "Execute", active: true },
+            { name: "Docker", tag: "Deploy", active: true },
+            { name: "Git", tag: "Version control", active: true }
+        ],
+        status: "active", type: "code", endpoint: "/agent"
+    },
+    {
+        icon: "📈", title: "Crypto & Finance", desc: "Analyze crypto markets, track DeFi protocols, and get real-time token data.",
+        engines: [
+            { name: "CoinGecko", tag: "Market data", active: true },
+            { name: "DeFiLlama", tag: "TVL tracking", active: true },
+        // Vision & Multimodal
+        {
+            icon: "👁️",
+            title: "Vision & Multimodal",
+            desc: "Image understanding, OCR, visual QA",
+            status: "active",
+            engines: [
+                { name: "Qwen2.5-VL", tag: "local", active: true },
+                { name: "LLaVA", tag: "local" },
+                { name: "InternVL", tag: "local" },
+                { name: "CogVLM", tag: "local" }
+            ]
+        },
+        // 3D Generation
+        {
+            icon: "🎲",
+            title: "3D Generation",
+            desc: "Text-to-3D, image-to-3D, mesh generation",
+            status: "pending",
+            engines: [
+                { name: "InstantMesh", tag: "GPU" },
+                { name: "TRELLIS", tag: "GPU" },
+                { name: "Hunyuan3D", tag: "GPU" },
+                { name: "Wonder3D", tag: "GPU" }
+            ]
+        },
+        // Local Engines
+        {
+            icon: "⚙️",
+            title: "Local Engines",
+            desc: "Run AI models locally — zero cloud, zero tokens",
+            status: "active",
+            engines: [
+                { name: "Ollama", tag: "active", active: true },
+                { name: "ComfyUI", tag: "active", active: true },
+                { name: "Piper TTS", tag: "active", active: true },
+                { name: "Whisper", tag: "active", active: true }
+            ]
+        },
+        // AI Coding
+        {
+            icon: "💻",
+            title: "AI Coding",
+            desc: "Code generation, debugging, refactoring",
+            status: "active",
+            engines: [
+                { name: "Qwen2.5-Coder", tag: "local", active: true },
+                { name: "DeepSeek-Coder", tag: "local" },
+                { name: "CodeLlama", tag: "local" },
+                { name: "StarCoder", tag: "local" }
+            ]
+        },
+        // RAG & Agents
+        {
+            icon: "🧠",
+            title: "RAG & Agents",
+            desc: "Knowledge retrieval, multi-agent orchestration",
+            status: "active",
+            engines: [
+                { name: "Mr James v4.0", tag: "active", active: true },
+                { name: "RAGFlow", tag: "local" },
+                { name: "LangChain", tag: "framework" },
+                { name: "CrewAI", tag: "framework" }
+            ]
+        },
+        // Video Editing
+        {
+            icon: "🎬",
+            title: "Video Editing",
+            desc: "Edit, transform, and enhance existing videos",
+            status: "pending",
+            engines: [
+                { name: "Proteus", tag: "GPU" },
+                { name: "AnyV2V", tag: "GPU" },
+                { name: "ControlVideo", tag: "GPU" },
+                { name: "FFmpeg", tag: "active", active: true }
+            ]
+        },
+        // Crypto & Finance
+        {
+            icon: "💰",
+            title: "Crypto & Finance",
+            desc: "Market analysis, DeFi TVL, wallet tracking",
+            status: "active",
+            engines: [
+                { name: "On-chain", tag: "Wallet analysis", active: true }
+            ],
+            status: "active", type: "crypto", endpoint: "/agent"
+        }
+];
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// AUTO ENGINE SELECTOR — The brain that picks the right model
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function detectIntent(prompt) {
+    const p = prompt.toLowerCase();
+    
+    // Video generation
+    if (/\b(video|movie|film|clip|animate|animation|cinema|render|scene)\b/.test(p) && !/\b(talking|head|portrait|face|lip)\b/.test(p)) {
+        // Check for image-to-video
+        if (/\b(from image|image to|based on image|using image)\b/.test(p)) {
+            return { type: "video", engine: "Wan2.2 I2V A14B", reason: "You want to create video from an image → Wan2.2 Image-to-Video", card: 0 };
+        }
+        // Check for fast/quick
+        if (/\b(fast|quick|real.?time|instant|speed)\b/.test(p)) {
+            return { type: "video", engine: "LTX-Video", reason: "You want it fast → LTX-Video (real-time generation)", card: 0 };
+        }
+        // Default: best quality available
+        return { type: "video", engine: "Wan2.1 T2V 1.3B", reason: "Text-to-video → Wan2.1 (balanced quality & speed)", card: 0 };
+    }
+    
+    // Talking head / portrait animation
+    if (/\b(talking|head|portrait|face|lip.?sync|speak|say.+words|narrat.+face)\b/.test(p)) {
+        return { type: "animation", engine: "LivePortrait", reason: "Portrait animation → LivePortrait (fastest, best for talking heads)", card: 3 };
+    }
+    
+    // Dance / body animation
+    if (/\b(dance|dancing|body movement|gesture|pose animat)\b/.test(p)) {
+        return { type: "animation", engine: "Animate Anyone", reason: "Body animation → Animate Anyone (best for dance & movement)", card: 3 };
+    }
+    
+    // Image generation
+    if ((/\b(image|picture|photo|draw|paint|art|illustration|render.+image|generate.+image)\b/.test(p)) && !/\b(video|movie)\b/.test(p)) {
+        // Check for text in image
+        if (/\b(text|words|letters|sign|banner|poster|typography)\b/.test(p)) {
+            return { type: "image", engine: "FLUX", reason: "You want text in the image → FLUX (best at rendering text)", card: 1 };
+        }
+        // Check for face/identity
+        if (/\b(my face|same person|identity|consistent person)\b/.test(p)) {
+            return { type: "image", engine: "SDXL + InstantID", reason: "Identity preservation → SDXL + InstantID", card: 1 };
+        }
+        // Check for quality/premium
+        if (/\b(best|highest|quality|detailed|professional|4k|8k|hdr)\b/.test(p)) {
+            return { type: "image", engine: "FLUX", reason: "Best quality → FLUX (12B model, top-tier)", card: 1 };
+        }
+        // Default: SDXL (fast & good)
+        return { type: "image", engine: "SDXL", reason: "Standard image generation → SDXL (fast & detailed)", card: 1 };
+    }
+    
+    // Voice / TTS
+    if (/\b(voice|speech|narration|narrate|read|say.+text|text.?to.?speech|tts)\b/.test(p)) {
+        if (/\b(clone|my voice|copy voice|same voice)\b/.test(p)) {
+            return { type: "audio_tts", engine: "CosyVoice", reason: "Voice cloning → CosyVoice (best for voice cloning)", card: 4 };
+        }
+        if (/\b(multilingual|french|spanish|german|chinese|japanese|arabic|language)\b/.test(p)) {
+            return { type: "audio_tts", engine: "XTTS v2", reason: "Multilingual → XTTS v2 (supports 17+ languages)", card: 4 };
+        }
+        return { type: "audio_tts", engine: "Piper", reason: "Text-to-speech → Piper (fast, runs on CPU)", card: 4 };
+    }
+    
+    // Speech-to-text
+    if (/\b(transcribe|speech.?to.?text|convert audio|subtitle|caption)\b/.test(p)) {
+        return { type: "audio_stt", engine: "Whisper", reason: "Speech-to-text → Whisper (OpenAI, best in class)", card: 4 };
+    }
+    
+    // Music
+    if (/\b(music|song|melody|beat|instrumental|soundtrack|background music)\b/.test(p)) {
+        if (/\b(sound effect|sfx|ambient|noise)\b/.test(p)) {
+            return { type: "audio_music", engine: "AudioCraft", reason: "Sound effects → AudioCraft", card: 5 };
+        }
+        return { type: "audio_music", engine: "MusicGen", reason: "Music generation → MusicGen (full tracks)", card: 5 };
+    }
+    
+    // Crypto
+    if (/\b(crypto|bitcoin|ethereum|token|defi|blockchain|wallet|nft|trading|market)\b/.test(p)) {
+        return { type: "crypto", engine: "CoinGecko + DeFiLlama", reason: "Crypto analysis → CoinGecko market data + DeFiLlama TVL", card: 8 };
+    }
+    
+    // Code / Build
+    if (/\b(code|build|deploy|server|docker|api|function|script|program|app)\b/.test(p)) {
+        return { type: "code", engine: "Mr James", reason: "Code/build task → Mr James (58 tools, self-correcting)", card: 7 };
+    }
+    
+    // Vision / Image understanding
+    if (/\b(describe.+image|what.+in.+image|analyze.+image|ocr|read.+text.+image|visual|image.+understand|image.+qa)\b/.test(p)) {
+        return { type: "vision", engine: "Qwen2.5-VL", reason: "Image understanding → Qwen2.5-VL (local multimodal)", card: 9 };
+    }
+    
+    // 3D Generation
+    if (/\b(3d|three.?d|mesh|model.+3d|text.?to.?3d|3d.+model|object.+generate)\b/.test(p)) {
+        return { type: "3d", engine: "InstantMesh", reason: "3D generation → InstantMesh (GPU required)", card: 10 };
+    }
+    
+    // RAG / Knowledge retrieval
+    if (/\b(rag|retrieve|knowledge base|document.+search|semantic search|embedding)\b/.test(p)) {
+        return { type: "rag", engine: "RAGFlow", reason: "Knowledge retrieval → RAGFlow (local RAG engine)", card: 14 };
+    }
+    
+    // Video editing
+    if (/\b(edit.+video|video.+edit|transform.+video|enhance.+video|trim|cut.+video|merge.+video)\b/.test(p)) {
+        return { type: "video_edit", engine: "Proteus", reason: "Video editing → Proteus (GPU required)", card: 15 };
+    }
+    
+    // Chat / Question (default)
+    return { type: "chat", engine: "auto", reason: "Chat/reasoning → OmniRoute auto-selects best available model", card: 6 };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UI Rendering
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderCards() {
+    const grid = document.getElementById("cards-grid");
+    grid.innerHTML = CARDS.map((c, i) => `
+        <div class="card" onclick="cardClick(${i})">
+            <div class="card-status ${c.status === 'pending' ? 'pending' : ''}"></div>
+            <div class="card-icon">${c.icon}</div>
+            <div class="card-title">${c.title}</div>
+            <div class="card-desc">${c.desc}</div>
+            <div class="card-engines">
+                ${c.engines.map(e => `<span class="engine-tag ${e.active ? 'active' : ''}">${e.name}${e.tag ? ' · ' + e.tag : ''}</span>`).join("")}
+            </div>
+        </div>
+    `).join("");
+}
+
+async function checkStatus() {
+    try {
+        const resp = await fetch(`${API_BASE}/api/models`);
+        const data = await resp.json();
+        
+        // Update header
+        const dot = document.getElementById("header-dot");
+        const text = document.getElementById("header-status");
+        
+        try {
+            const healthResp = await fetch(`${API_BASE}/api/models/health`).catch(() => null);
+            if (healthResp) {
+                const health = await healthResp.json();
+                if (health.status === "online") {
+                    dot.className = "status-dot";
+                    text.textContent = "All systems online";
+                } else {
+                    dot.className = "status-dot warn";
+                    text.textContent = "Partial availability";
+                }
+            } else {
+                dot.className = "status-dot";
+                text.textContent = "281 models ready";
+            }
+        } catch {
+            dot.className = "status-dot";
+            text.textContent = "281 models ready";
+        }
+        
+        // Render status grid
+        const services = [
+            { name: "AI Gateway", desc: "OmniRoute — 340 providers", online: true },
+            { name: "ComfyUI", desc: "Image & Video engine", online: true },
+            { name: "Mr James", desc: "AI Agent — 58 tools", online: true },
+            { name: "Ollama LLMs", desc: "Qwen, Llama, DeepSeek +4", online: true },
+            { name: "Model API", desc: "281 models registered", online: true },
+            { name: "FFmpeg", desc: "Video processing", online: true },
+            { name: "GPU Server", desc: "GEX44 — pending delivery", online: false, pending: true },
+            { name: "Audio Engine", desc: "Whisper active, Piper installing", online: true }
+        ];
+        
+        document.getElementById("status-grid").innerHTML = services.map(s => `
+            <div class="status-item">
+                <div class="status-indicator ${s.pending ? 'pending' : s.online ? 'online' : 'offline'}"></div>
+                <div>
+                    <div class="status-item-name">${s.name}</div>
+                    <div class="status-item-desc">${s.desc}</div>
+                </div>
+            </div>
+        `).join("");
+        
+    } catch (e) {
+        document.getElementById("header-dot").className = "status-dot offline";
+        document.getElementById("header-status").textContent = "Connection error";
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Smart Bar — Live engine detection
+// ═══════════════════════════════════════════════════════════════════════════════
+
+document.getElementById("smart-input").addEventListener("input", (e) => {
+    const text = e.target.value.trim();
+    const suggestion = document.getElementById("engine-suggestion");
+    const suggestionText = document.getElementById("engine-suggestion-text");
+    
+    if (text.length < 3) {
+        suggestion.style.display = "none";
+        return;
+    }
+    
+    const intent = detectIntent(text);
+    suggestion.style.display = "inline-flex";
+    suggestionText.textContent = `⚡ Auto-selected: ${intent.engine} — ${intent.reason}`;
+});
+
+function fillHint(el) {
+    const text = el.textContent.replace(/^[^\s]+\s/, "");
+    const input = document.getElementById("smart-input");
+    
+    const examples = {
+        "Make a video": "Make a video of a cat playing piano in a jazz bar",
+        "Generate an image": "Generate an image of a sunset over snowy mountains",
+        "Create a voice narration": "Create a voice narration: Welcome to EvolvixOS, the future of AI creation",
+        "Make background music": "Make background music: upbeat electronic for a tech presentation",
+        "Animate a talking head": "Animate a talking head saying hello and waving",
+        "Chat with AI": "What's the difference between blockchain and a regular database?"
+    };
+    
+    input.value = examples[text] || text;
+    input.dispatchEvent(new Event("input"));
+    input.focus();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Create / Generate
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function smartCreate() {
+    const input = document.getElementById("smart-input");
+    const prompt = input.value.trim();
+    if (!prompt) { input.focus(); return; }
+    
+    const modal = document.getElementById("modal-overlay");
+    const modalTitle = document.getElementById("modal-title");
+    const modalBody = document.getElementById("modal-body");
+    
+    modal.classList.add("active");
+    modalTitle.textContent = "Processing...";
+    modalBody.innerHTML = `
+        <div class="modal-spinner"></div>
+        <div class="modal-status">Analyzing: "${prompt.substring(0, 80)}${prompt.length > 80 ? '...' : ''}"</div>
+        <div style="margin-top:12px; font-size:14px; color:var(--muted);">Mr James is selecting the best AI engine...</div>
+    `;
+    
+    try {
+        // Route EVERYTHING through Mr James agent
+        const resp = await fetch(`${API_BASE}/agent/chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: prompt })
+        });
+        
+        if (!resp.ok) {
+            throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+        }
+        
+        const result = await resp.json();
+        const intent = result.intent || {};
+        const engineUsed = result.engine_used || intent.engine || "Auto";
+        const responseText = result.response || (result.result && result.result.response) || (result.result && result.result.message) || result.message || "";
+        const status = result.status || (result.result && result.result.status) || "ok";
+        
+        let modalHTML = `
+            <div class="modal-engine">
+                <div class="modal-engine-label">⚡ Engine: ${engineUsed}</div>
+                <div style="font-size:13px; color:var(--muted); margin-top:4px;">${intent.reason || "Auto-selected"}</div>
+            </div>
+        `;
+        
+        if (status === "pending_gpu" || responseText.includes("pending") || responseText.includes("GPU")) {
+            modalHTML += `
+                <div style="margin-top:16px; padding:16px; background:rgba(253,203,110,0.1); border-radius:12px; border:1px solid rgba(253,203,110,0.2);">
+                    <div style="font-size:15px; color:var(--warn);">⏳ GPU Model Pending</div>
+                    <div style="font-size:14px; color:var(--muted); margin-top:8px;">${responseText}</div>
+                    <div style="font-size:13px; color:var(--muted2); margin-top:8px;">The GEX44 GPU server is pending delivery from Hetzner. Once provisioned, all 220+ GPU models will activate automatically.</div>
+                </div>
+            `;
+        } else if (status === "ok" && responseText) {
+            modalHTML += `
+                <div style="margin-top:16px; text-align:left; font-size:15px; line-height:1.6; color:var(--text); white-space:pre-wrap;">${responseText}</div>
+            `;
+        } else if (result.result && result.result.output) {
+            modalHTML += `
+                <div style="margin-top:16px;">
+                    <div style="font-size:15px; color:var(--accent);">✅ Audio generated!</div>
+                    <audio controls style="margin-top:12px; width:100%;" src="${result.result.output}"></audio>
+                </div>
+            `;
+        } else {
+            modalHTML += `
+                <div style="margin-top:16px; font-size:15px; color:var(--text);">${responseText || "Request processed."}</div>
+            `;
+        }
+        
+        modalBody.innerHTML = modalHTML;
+        addActivity(intent.type || "chat", prompt, engineUsed);
+        
+    } catch (e) {
+        modalBody.innerHTML = `
+            <div class="modal-error">⚠️ ${e.message}</div>
+            <div style="margin-top:12px; font-size:14px; color:var(--muted);">
+                Mr James may still be initializing. Try again in a moment.
+            </div>
+        `;
+    }
+}
+
+function cardClick(index) {
+    const card = CARDS[index];
+    const input = document.getElementById("smart-input");
+    
+    const examples = {
+        0: "Make a cinematic video of a drone flying over a futuristic city at sunset",
+        1: "Generate a photorealistic image of a Japanese garden in autumn",
+        2: "Transform this image using OpenPose body control",
+        3: "Animate a portrait with natural talking and blinking",
+        4: "Create a voice narration: Hello and welcome to the future of AI",
+        5: "Make upbeat electronic background music for a tech startup video",
+        6: "Explain quantum computing to a 10-year-old",
+        7: "Build a REST API for a todo app with Python and Flask",
+        8: "Analyze the current Bitcoin market and top DeFi protocols"
+    };
+    
+    input.value = examples[index] || "";
+    input.dispatchEvent(new Event("input"));
+    input.focus();
+    input.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function addActivity(type, prompt, engine) {
+    const feed = document.getElementById("activity-feed");
+    const icons = { video: "🎬", image: "🖼️", audio_tts: "🎙️", audio_music: "🎵", animation: "🎭", chat: "💬", code: "🛠️", crypto: "📈" };
+    const item = document.createElement("div");
+    item.className = "activity-item";
+    item.innerHTML = `
+        <div class="activity-icon">${icons[type] || "✨"}</div>
+        <div class="activity-info">
+            <div class="activity-title">${prompt.substring(0, 60)}${prompt.length > 60 ? "..." : ""}</div>
+            <div class="activity-meta">Engine: ${engine}</div>
+        </div>
+        <div class="activity-time">Just now</div>
+    `;
+    feed.prepend(item);
+}
+
+function closeModal() {
+    document.getElementById("modal-overlay").classList.remove("active");
+}
+
+// Enter key on smart bar
+document.getElementById("smart-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") smartCreate();
+});
+
+// Close modal on overlay click
+document.getElementById("modal-overlay").addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeModal();
+});
+
+// Init
+renderCards();
+checkStatus();
+setInterval(checkStatus, 30000); // Refresh status every 30s
+</script>
+</body>
+</html>

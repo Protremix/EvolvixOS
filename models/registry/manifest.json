@@ -1,0 +1,1670 @@
+{
+  "version": "6.0",
+  "last_updated": "2026-08-17",
+  "platform": "EvolvixOS",
+  "gateway": "OmniRoute",
+  "total_categories": 11,
+  "models": {
+    "speech_voice": {
+      "category": "Speech-to-Text, Text-to-Speech & Voice Cloning",
+      "requires_gpu": false,
+      "models": {
+        "whisper": {
+          "type": "stt",
+          "source": "openai/whisper",
+          "status": "active",
+          "can_run_cpu": true
+        },
+        "whisper-cpp": {
+          "type": "stt",
+          "source": "ggerganov/whisper.cpp",
+          "status": "active",
+          "can_run_cpu": true
+        },
+        "piper": {
+          "type": "tts",
+          "source": "rhasspy/piper",
+          "status": "active",
+          "can_run_cpu": true
+        },
+        "cosyvoice": {
+          "type": "tts_clone",
+          "source": "FunAudioLLM/CosyVoice",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "cosyvoice-2": {
+          "type": "tts_clone",
+          "source": "FunAudioLLM/CosyVoice2",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "cosyvoice-3": {
+          "type": "tts_clone",
+          "source": "FunAudioLLM/CosyVoice3",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "xtts": {
+          "type": "tts_multi",
+          "source": "coqui/XTTS",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "xtts-v2": {
+          "type": "tts_multi",
+          "source": "coqui/XTTS-v2",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "fish-speech": {
+          "type": "tts",
+          "source": "fishaudio/fish-speech",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "fish-speech-1.5": {
+          "type": "tts",
+          "source": "fishaudio/fish-speech-1.5",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "f5-tts": {
+          "type": "tts",
+          "source": "SWivid/F5-TTS",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "openvoice": {
+          "type": "tts_clone",
+          "source": "myshell-ai/OpenVoice",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "openvoice-2": {
+          "type": "tts_clone",
+          "source": "myshell-ai/OpenVoice-v2",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "valle-x": {
+          "type": "tts_clone",
+          "source": "lifeiteng/VALL-E-X",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "bark": {
+          "type": "tts",
+          "source": "suno-ai/bark",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "tortoise-tts": {
+          "type": "tts",
+          "source": "neonbjb/tortoise-tts",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "silero": {
+          "type": "tts",
+          "source": "snakers4/silero-models",
+          "status": "active",
+          "can_run_cpu": true
+        },
+        "coqui-tts": {
+          "type": "tts",
+          "source": "coqui-ai/TTS",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "opentts": {
+          "type": "tts",
+          "source": "OpenTTS/opentts",
+          "status": "active",
+          "can_run_cpu": true
+        },
+        "rvc": {
+          "type": "voice_conversion",
+          "source": "RVC-Project/Retrieval-based-Voice-Conversion",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "rvc-webui": {
+          "type": "voice_conversion",
+          "source": "RVC-Project/Retrieval-based-Voice-Conversion-WebUI",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        }
+      }
+    },
+    "music_audio": {
+      "category": "Music Generation & Audio Processing",
+      "requires_gpu": true,
+      "models": {
+        "musicgen": {
+          "type": "music",
+          "source": "facebook/musicgen-large",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "audiocraft": {
+          "type": "sfx",
+          "source": "facebook/audiocraft",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "stable-audio-open": {
+          "type": "music",
+          "source": "stabilityai/stable-audio-open",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "ace-step": {
+          "type": "music",
+          "source": "ACE-Step/ACE-Step",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "magnet": {
+          "type": "music",
+          "source": "facebook/magnet",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "musicldm": {
+          "type": "music",
+          "source": "laion/lcm-musicldm",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "dance-diffusion": {
+          "type": "music",
+          "source": "harmonai/dance-diffusion",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "audioldm": {
+          "type": "audio",
+          "source": "haoheliu/audioldm",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "audioldm-2": {
+          "type": "audio",
+          "source": "haoheliu/audioldm2",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "bark-audio": {
+          "type": "audio",
+          "source": "suno-ai/bark",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "encodec": {
+          "type": "codec",
+          "source": "facebook/encodec",
+          "status": "active",
+          "can_run_cpu": true
+        },
+        "demucs": {
+          "type": "separation",
+          "source": "facebookresearch/demucs",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "ultimate-vocal-remover": {
+          "type": "separation",
+          "source": "Anjok07/ultimatevocalremovergui",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "rvc-audio": {
+          "type": "voice_conversion",
+          "source": "RVC-Project/Retrieval-based-Voice-Conversion",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        }
+      }
+    },
+    "vision_multimodal": {
+      "category": "Vision-Language Models & Multimodal AI",
+      "requires_gpu": true,
+      "models": {
+        "llava": {
+          "type": "vlm",
+          "source": "haotian-liu/LLaVA",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "llava-next": {
+          "type": "vlm",
+          "source": "haotian-liu/LLaVA-NeXT",
+          "status": "pending_gpu",
+          "vram": "16GB"
+        },
+        "qwen-vl": {
+          "type": "vlm",
+          "source": "Qwen/Qwen-VL",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "qwen2-vl": {
+          "type": "vlm",
+          "source": "Qwen/Qwen2-VL",
+          "status": "pending_gpu",
+          "vram": "16GB"
+        },
+        "qwen3-vl": {
+          "type": "vlm",
+          "source": "Qwen/Qwen3-VL",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "internvl": {
+          "type": "vlm",
+          "source": "OpenGVLab/InternVL",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "internvl-2": {
+          "type": "vlm",
+          "source": "OpenGVLab/InternVL2",
+          "status": "pending_gpu",
+          "vram": "16GB"
+        },
+        "internvl-3": {
+          "type": "vlm",
+          "source": "OpenGVLab/InternVL3",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "minicpm-v": {
+          "type": "vlm",
+          "source": "OpenBMB/MiniCPM-V",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "moondream": {
+          "type": "vlm",
+          "source": "vikhyat/moondream",
+          "status": "available",
+          "can_run_cpu": true,
+          "vram": "4GB"
+        },
+        "florence-2": {
+          "type": "vlm",
+          "source": "microsoft/Florence-2",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "kosmos-2": {
+          "type": "vlm",
+          "source": "microsoft/kosmos-2",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "paligemma": {
+          "type": "vlm",
+          "source": "google/paligemma",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "pixtral": {
+          "type": "vlm",
+          "source": "mistralai/pixtral",
+          "status": "pending_gpu",
+          "vram": "16GB"
+        },
+        "molmo": {
+          "type": "vlm",
+          "source": "allenai/molmo",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "imagebind": {
+          "type": "multimodal",
+          "source": "facebook/ImageBind",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        }
+      }
+    },
+    "three_d": {
+      "category": "3D Model Generation & Reconstruction",
+      "requires_gpu": true,
+      "models": {
+        "triposr": {
+          "type": "3d",
+          "source": "VAST-AI/TripoSR",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "triposg": {
+          "type": "3d",
+          "source": "VAST-AI/TripoSG",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "instantmesh": {
+          "type": "3d",
+          "source": "TencentARC/InstantMesh",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "wonder3d": {
+          "type": "3d",
+          "source": "xxlong0/Wonder3D",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "stable-fast-3d": {
+          "type": "3d",
+          "source": "stabilityai/stable-fast-3d",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "hunyuan3d": {
+          "type": "3d",
+          "source": "Tencent/Hunyuan3D",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "hunyuan3d-2": {
+          "type": "3d",
+          "source": "Tencent/Hunyuan3D-2",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "hunyuan3d-2.1": {
+          "type": "3d",
+          "source": "Tencent/Hunyuan3D-2.1",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "trellis": {
+          "type": "3d",
+          "source": "microsoft/TRELLIS",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "trellis-2": {
+          "type": "3d",
+          "source": "microsoft/TRELLIS-2",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "shap-e": {
+          "type": "3d",
+          "source": "openai/shap-e",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "point-e": {
+          "type": "3d",
+          "source": "openai/point-e",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "dreamgaussian": {
+          "type": "3d",
+          "source": "dreamgaussian/dreamgaussian",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "zero123": {
+          "type": "3d",
+          "source": "cvlab-columbia/zero123",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "zero123-plus": {
+          "type": "3d",
+          "source": "sudo-ai/zero123plus",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "lrm": {
+          "type": "3d",
+          "source": "lrmdataset/LRM",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "crm": {
+          "type": "3d",
+          "source": "thu-ml/CRM",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "rodin": {
+          "type": "3d",
+          "source": "3DTopia/Rodin",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "meshanything": {
+          "type": "3d",
+          "source": "buaacyw/MeshAnything",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "meshanything-v2": {
+          "type": "3d",
+          "source": "buaacyw/MeshAnythingV2",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "sam-3d": {
+          "type": "3d",
+          "source": "SegmentAny3D/SAM3D",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        }
+      }
+    },
+    "local_engines": {
+      "category": "Local Inference Engines & Platforms",
+      "requires_gpu": false,
+      "models": {
+        "comfyui": {
+          "type": "framework",
+          "source": "github.com/comfyanonymous/ComfyUI",
+          "status": "active"
+        },
+        "ollama": {
+          "type": "llm_runtime",
+          "source": "ollama.com",
+          "status": "active"
+        },
+        "llama-cpp": {
+          "type": "llm_runtime",
+          "source": "ggerganov/llama.cpp",
+          "status": "available"
+        },
+        "lm-studio": {
+          "type": "platform",
+          "source": "lmstudio.ai",
+          "status": "available"
+        },
+        "jan": {
+          "type": "platform",
+          "source": "jan.ai",
+          "status": "available"
+        },
+        "localai": {
+          "type": "platform",
+          "source": "localai.io",
+          "status": "available"
+        },
+        "text-generation-webui": {
+          "type": "platform",
+          "source": "oobabooga/text-generation-webui",
+          "status": "available"
+        },
+        "open-webui": {
+          "type": "platform",
+          "source": "open-webui/open-webui",
+          "status": "available"
+        },
+        "librechat": {
+          "type": "platform",
+          "source": "danny-avila/LibreChat",
+          "status": "available"
+        },
+        "anythingllm": {
+          "type": "platform",
+          "source": "Mintplex-Labs/anything-llm",
+          "status": "available"
+        },
+        "lobechat": {
+          "type": "platform",
+          "source": "lobehub/lobe-chat",
+          "status": "available"
+        },
+        "big-agi": {
+          "type": "platform",
+          "source": "enricoros/big-AGI",
+          "status": "available"
+        },
+        "vllm": {
+          "type": "inference",
+          "source": "vllm-project/vllm",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "sglang": {
+          "type": "inference",
+          "source": "sgl-project/sglang",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "tensorrt-llm": {
+          "type": "inference",
+          "source": "NVIDIA/TensorRT-LLM",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "exllamav2": {
+          "type": "inference",
+          "source": "turboderp/exllamav2",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "koboldcpp": {
+          "type": "llm_runtime",
+          "source": "LostRuins/koboldcpp",
+          "status": "available"
+        },
+        "gpt4all": {
+          "type": "llm_runtime",
+          "source": "nomic-ai/gpt4all",
+          "status": "available"
+        }
+      }
+    },
+    "ai_coding": {
+      "category": "AI Code Assistants & Coding Models",
+      "requires_gpu": false,
+      "models": {
+        "continue": {
+          "type": "ide_plugin",
+          "source": "continue-dev/continue",
+          "status": "available"
+        },
+        "aider": {
+          "type": "cli_agent",
+          "source": "paul-gauthier/aider",
+          "status": "available"
+        },
+        "openhands": {
+          "type": "agent",
+          "source": "All-Hands-AI/OpenHands",
+          "status": "available"
+        },
+        "cline": {
+          "type": "vscode_agent",
+          "source": "cline/cline",
+          "status": "available"
+        },
+        "roo-code": {
+          "type": "vscode_agent",
+          "source": "RooCodeInc/Roo-Code",
+          "status": "available"
+        },
+        "tabby": {
+          "type": "completion",
+          "source": "TabbyML/tabby",
+          "status": "available"
+        },
+        "codegeex": {
+          "type": "code_model",
+          "source": "THUDM/CodeGeeX",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "deepseek-coder": {
+          "type": "code_model",
+          "source": "deepseek-ai/deepseek-coder",
+          "status": "available"
+        },
+        "qwen-coder": {
+          "type": "code_model",
+          "source": "Qwen/Qwen2.5-Coder",
+          "status": "available"
+        },
+        "starcoder": {
+          "type": "code_model",
+          "source": "bigcode/starcoder",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "starcoder2": {
+          "type": "code_model",
+          "source": "bigcode/starcoder2",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "code-llama": {
+          "type": "code_model",
+          "source": "meta-llama/CodeLlama",
+          "status": "available"
+        },
+        "granite-code": {
+          "type": "code_model",
+          "source": "ibm-granite/granite-code",
+          "status": "available"
+        },
+        "codestral": {
+          "type": "code_model",
+          "source": "mistralai/Codestral",
+          "status": "available"
+        },
+        "swe-agent": {
+          "type": "agent",
+          "source": "princeton-nlp/SWE-agent",
+          "status": "available"
+        },
+        "deepseek-r1-coder": {
+          "type": "code_model",
+          "source": "deepseek-ai/DeepSeek-R1",
+          "status": "available"
+        }
+      }
+    },
+    "rag_agents": {
+      "category": "RAG Frameworks, Vector Databases & Agent Systems",
+      "requires_gpu": false,
+      "models": {
+        "langchain": {
+          "type": "framework",
+          "source": "langchain-ai/langchain",
+          "status": "available"
+        },
+        "llamaindex": {
+          "type": "framework",
+          "source": "run-llama/llama_index",
+          "status": "available"
+        },
+        "haystack": {
+          "type": "framework",
+          "source": "deepset-ai/haystack",
+          "status": "available"
+        },
+        "autogen": {
+          "type": "agent_framework",
+          "source": "microsoft/autogen",
+          "status": "available"
+        },
+        "crewai": {
+          "type": "agent_framework",
+          "source": "joaomdmoura/crewAI",
+          "status": "available"
+        },
+        "langgraph": {
+          "type": "agent_framework",
+          "source": "langchain-ai/langgraph",
+          "status": "available"
+        },
+        "semantic-kernel": {
+          "type": "framework",
+          "source": "microsoft/semantic-kernel",
+          "status": "available"
+        },
+        "dify": {
+          "type": "platform",
+          "source": "langgenius/dify",
+          "status": "available"
+        },
+        "flowise": {
+          "type": "platform",
+          "source": "FlowiseAI/Flowise",
+          "status": "available"
+        },
+        "anythingllm-rag": {
+          "type": "platform",
+          "source": "Mintplex-Labs/anything-llm",
+          "status": "available"
+        },
+        "chroma": {
+          "type": "vector_db",
+          "source": "chroma-core/chroma",
+          "status": "active"
+        },
+        "qdrant": {
+          "type": "vector_db",
+          "source": "qdrant/qdrant",
+          "status": "available"
+        },
+        "milvus": {
+          "type": "vector_db",
+          "source": "milvus-io/milvus",
+          "status": "available"
+        },
+        "weaviate": {
+          "type": "vector_db",
+          "source": "weaviate/weaviate",
+          "status": "available"
+        },
+        "faiss": {
+          "type": "vector_db",
+          "source": "facebookresearch/faiss",
+          "status": "active"
+        },
+        "pgvector": {
+          "type": "vector_db",
+          "source": "pgvector/pgvector",
+          "status": "available"
+        },
+        "ollama-rag": {
+          "type": "embedding",
+          "source": "ollama.com",
+          "status": "active"
+        },
+        "open-webui-rag": {
+          "type": "platform",
+          "source": "open-webui/open-webui",
+          "status": "available"
+        },
+        "embedchain": {
+          "type": "framework",
+          "source": "mem0ai/embedchain",
+          "status": "available"
+        }
+      }
+    },
+    "video_generation": {
+      "category": "Video Generation, Animation & Editing",
+      "requires_gpu": true,
+      "models": {
+        "ffmpeg": {
+          "type": "tool",
+          "source": "ffmpeg.org",
+          "status": "active",
+          "can_run_cpu": true
+        },
+        "moviepy": {
+          "type": "tool",
+          "source": "Zulko/moviepy",
+          "status": "active",
+          "can_run_cpu": true
+        },
+        "opencv": {
+          "type": "tool",
+          "source": "opencv.org",
+          "status": "active",
+          "can_run_cpu": true
+        },
+        "vapoursynth": {
+          "type": "tool",
+          "source": "vapoursynth.com",
+          "status": "available"
+        },
+        "kdenlive": {
+          "type": "editor",
+          "source": "kdenlive.org",
+          "status": "available"
+        },
+        "blender": {
+          "type": "editor",
+          "source": "blender.org",
+          "status": "available"
+        },
+        "natron": {
+          "type": "editor",
+          "source": "natrongithub.com",
+          "status": "available"
+        },
+        "shotcut": {
+          "type": "editor",
+          "source": "shotcut.org",
+          "status": "available"
+        },
+        "wan2.1-t2v-1.3b": {
+          "type": "t2v",
+          "source": "Wan-AI/Wan2.1-T2V-1.3B",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "wan2.1-t2v-14b": {
+          "type": "t2v",
+          "source": "Wan-AI/Wan2.1-T2V-14B",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "wan2.1-i2v-14b": {
+          "type": "i2v",
+          "source": "Wan-AI/Wan2.1-I2V-14B-480P",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "wan2.2-t2v-a14b": {
+          "type": "t2v",
+          "source": "Wan-AI/Wan2.2-T2V-A14B",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "wan2.2-i2v-a14b": {
+          "type": "i2v",
+          "source": "Wan-AI/Wan2.2-I2V-A14B",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "wan2.2-ti2v-5b": {
+          "type": "ti2v",
+          "source": "Wan-AI/Wan2.2-TI2V-5B",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "wan2.2-s2v-14b": {
+          "type": "s2v",
+          "source": "Wan-AI/Wan2.2-S2V-14B",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "wan2.2-animate-14b": {
+          "type": "animate",
+          "source": "Wan-AI/Wan2.2-Animate-14B",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "wan-vace": {
+          "type": "video_editing",
+          "source": "Wan-AI/Wan-VACE",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "wan-flf2v": {
+          "type": "frame_interp",
+          "source": "Wan-AI/Wan-FLF2V",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "ltx-video": {
+          "type": "t2v",
+          "source": "Lightricks/LTX-Video",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "ltx-2": {
+          "type": "t2v",
+          "source": "Lightricks/LTX-Video-2",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "ltx-2.3": {
+          "type": "t2v",
+          "source": "Lightricks/LTX-Video-2.3",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "hunyuan-video": {
+          "type": "t2v",
+          "source": "tencent/HunyuanVideo",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "hunyuan-video-1.5": {
+          "type": "t2v",
+          "source": "tencent/HunyuanVideo-1.5",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "hunyuan-video-i2v": {
+          "type": "i2v",
+          "source": "tencent/HunyuanVideo-I2V",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "hunyuan-custom": {
+          "type": "custom_video",
+          "source": "tencent/HunyuanCustom",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "cogvideox": {
+          "type": "t2v",
+          "source": "THUDM/CogVideoX-5b",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "cogvideox-1.5": {
+          "type": "t2v",
+          "source": "THUDM/CogVideoX1.5-5B",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "mochi-1": {
+          "type": "t2v",
+          "source": "genmo/mochi-1",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "open-sora": {
+          "type": "t2v",
+          "source": "hpcaitech/Open-Sora",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "open-sora-2.0": {
+          "type": "t2v",
+          "source": "hpcaitech/Open-Sora-2.0",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "skyreels-v2": {
+          "type": "t2v",
+          "source": "SkyReels/SkyReels-V2",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "skyreels-v3": {
+          "type": "t2v",
+          "source": "SkyReels/SkyReels-V3",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "step-video": {
+          "type": "t2v",
+          "source": "stepfun-ai/Step-Video",
+          "status": "pending_gpu",
+          "vram": "40GB"
+        },
+        "magi-1": {
+          "type": "t2v",
+          "source": "MAGI-1/MAGI-1",
+          "status": "pending_gpu",
+          "vram": "16GB"
+        },
+        "helios": {
+          "type": "t2v",
+          "source": "Helios/Helios-Video",
+          "status": "pending_gpu",
+          "vram": "14GB"
+        },
+        "allegro": {
+          "type": "t2v",
+          "source": "rhymes-ai/Allegro",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "pyramid-flow": {
+          "type": "t2v",
+          "source": "rain1011/Pyramid-Flow",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "easyanimate": {
+          "type": "t2v",
+          "source": "alibaba-pai/EasyAnimate",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "videocrafter": {
+          "type": "t2v",
+          "source": "VideoCrafter/VideoCrafter2",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "videocrafter2": {
+          "type": "t2v",
+          "source": "VideoCrafter/VideoCrafter2",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "stable-video-diffusion": {
+          "type": "i2v",
+          "source": "stabilityai/stable-video-diffusion-img2vid",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "dynamicrafter": {
+          "type": "i2v",
+          "source": "Doubiiu/DynamiCrafter",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "i2vgen-xl": {
+          "type": "i2v",
+          "source": "ali-vilab/i2vgen-xl",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "animatediff": {
+          "type": "animation",
+          "source": "guoyww/AnimateDiff",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "seine": {
+          "type": "t2v",
+          "source": "SEINE/SEINE",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "framepack": {
+          "type": "t2v",
+          "source": "FramePack/FramePack",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "latte": {
+          "type": "t2v",
+          "source": "maxin-cn/Latte",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "lumiere": {
+          "type": "t2v",
+          "source": "google/lumiere",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "videocomposer": {
+          "type": "t2v",
+          "source": "damo-vilab/videocomposer",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "animate-anyone": {
+          "type": "dance",
+          "source": "HumanAIGC/AnimateAnyone",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "champ": {
+          "type": "animation",
+          "source": "fudan-generative-ai/Champ",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "musepose": {
+          "type": "animation",
+          "source": "TMElyralab/MusePose",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "mimicmotion": {
+          "type": "animation",
+          "source": "Tencent/MimicMotion",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "hallo": {
+          "type": "talking_head",
+          "source": "fudan-generative-ai/Hallo",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "hallo2": {
+          "type": "talking_head",
+          "source": "fudan-generative-ai/Hallo2",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "echomimic": {
+          "type": "talking_head",
+          "source": "antgroup/echomimic",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "aniportrait": {
+          "type": "talking_head",
+          "source": "ZJYD/AniPortrait",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "v-express": {
+          "type": "talking_head",
+          "source": "tencent-ailab/V-Express",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "omnihuman": {
+          "type": "talking_head",
+          "source": "ByteDance/OmniHuman",
+          "status": "pending_gpu",
+          "vram": "16GB"
+        },
+        "sadtalker": {
+          "type": "talking_head",
+          "source": "OpenTalker/SadTalker",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "liveportrait": {
+          "type": "portrait",
+          "source": "KwaiVGI/LivePortrait",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        }
+      }
+    },
+    "image_generation": {
+      "category": "Text-to-Image Generation",
+      "requires_gpu": true,
+      "models": {
+        "qwen-image": {
+          "type": "t2i",
+          "source": "Qwen/Qwen-Image",
+          "status": "pending_gpu",
+          "vram": "40GB"
+        },
+        "z-image": {
+          "type": "t2i",
+          "source": "Z-Image/Z-Image",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "z-image-turbo": {
+          "type": "t2i",
+          "source": "Z-Image/Z-Image-Turbo",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "flux-1": {
+          "type": "t2i",
+          "source": "black-forest-labs/FLUX.1",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "flux-2": {
+          "type": "t2i",
+          "source": "black-forest-labs/FLUX.2",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "flux-2-dev": {
+          "type": "t2i",
+          "source": "black-forest-labs/FLUX.2-dev",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "flux-1-schnell": {
+          "type": "t2i",
+          "source": "black-forest-labs/FLUX.1-schnell",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "flux-1-dev": {
+          "type": "t2i",
+          "source": "black-forest-labs/FLUX.1-dev",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "sdxl": {
+          "type": "t2i",
+          "source": "stabilityai/stable-diffusion-xl-base-1.0",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "sd-3.5": {
+          "type": "t2i",
+          "source": "stabilityai/stable-diffusion-3.5",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "sd-3": {
+          "type": "t2i",
+          "source": "stabilityai/stable-diffusion-3",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "sd-2.1": {
+          "type": "t2i",
+          "source": "stabilityai/stable-diffusion-2-1",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "sd-1.5": {
+          "type": "t2i",
+          "source": "runwayml/stable-diffusion-v1-5",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "sdxl-turbo": {
+          "type": "t2i",
+          "source": "stabilityai/sdxl-turbo",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "pixart-a": {
+          "type": "t2i",
+          "source": "PixArt-alpha/PixArt-alpha",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "pixart-sigma": {
+          "type": "t2i",
+          "source": "PixArt-alpha/PixArt-Sigma",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "lumina": {
+          "type": "t2i",
+          "source": "Alpha-VLLM/Lumina-Next",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "lumina-image": {
+          "type": "t2i",
+          "source": "Alpha-VLLM/Lumina-Image",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "auraflow": {
+          "type": "t2i",
+          "source": "fal/AuraFlow",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "kolors": {
+          "type": "t2i",
+          "source": "kwai-Kolors/Kolors",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "hunyuan-dit": {
+          "type": "t2i",
+          "source": "Tencent/Hunyuan-DiT",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "sana": {
+          "type": "t2i",
+          "source": "NVlabs/Sana",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "sana-1.5": {
+          "type": "t2i",
+          "source": "NVlabs/Sana-1.5",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "chroma": {
+          "type": "t2i",
+          "source": "Chroma/Chroma",
+          "status": "pending_gpu",
+          "vram": "10GB"
+        },
+        "dreamshaper": {
+          "type": "t2i",
+          "source": "Lykon/DreamShaper",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "realistic-vision": {
+          "type": "t2i",
+          "source": "SG1612/Realistic_Vision",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "anything": {
+          "type": "t2i",
+          "source": "andite/anything-v4.0",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "open-sora-image": {
+          "type": "t2i",
+          "source": "hpcaitech/Open-Sora-Image",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        },
+        "ernie-image": {
+          "type": "t2i",
+          "source": "Baidu/ERNIE-Image",
+          "status": "pending_gpu",
+          "vram": "20GB"
+        },
+        "ernie-image-turbo": {
+          "type": "t2i",
+          "source": "Baidu/ERNIE-Image-Turbo",
+          "status": "pending_gpu",
+          "vram": "12GB"
+        }
+      }
+    },
+    "image_control": {
+      "category": "Image Control, Character Consistency & Face Tools",
+      "requires_gpu": true,
+      "models": {
+        "controlnet": {
+          "type": "control",
+          "source": "lllyasviel/ControlNet",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "ip-adapter": {
+          "type": "adapter",
+          "source": "tencent-ailab/IP-Adapter",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "instantid": {
+          "type": "identity",
+          "source": "InstantID/InstantID",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "pulid": {
+          "type": "identity",
+          "source": "guozinan/PuLID",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "openpose": {
+          "type": "pose",
+          "source": "lllyasviel/ControlNetOpenPose",
+          "status": "pending_gpu",
+          "vram": "2GB"
+        },
+        "t2i-adapter": {
+          "type": "adapter",
+          "source": "TencentARC/T2I-Adapter",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "animatediff-controlnet": {
+          "type": "control",
+          "source": "Kosinkadink/ComfyUI-AnimateDiff-Evolved",
+          "status": "pending_gpu",
+          "vram": "8GB"
+        },
+        "facefusion": {
+          "type": "face_swap",
+          "source": "henriquecoura/facefusion",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "reactor": {
+          "type": "face_swap",
+          "source": "Gourieff/ReActor",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "roop": {
+          "type": "face_swap",
+          "source": "s0md3v/roop",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "insightface": {
+          "type": "face_detect",
+          "source": "deepinsight/insightface",
+          "status": "pending_gpu",
+          "vram": "2GB"
+        },
+        "liveportrait-control": {
+          "type": "portrait",
+          "source": "KwaiVGI/LivePortrait",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "sam": {
+          "type": "segmentation",
+          "source": "facebookresearch/segment-anything",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "sam-2": {
+          "type": "segmentation",
+          "source": "facebookresearch/sam2",
+          "status": "pending_gpu",
+          "vram": "6GB"
+        },
+        "grounding-dino": {
+          "type": "detection",
+          "source": "IDEA-Research/GroundingDINO",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        },
+        "clip": {
+          "type": "embedding",
+          "source": "openai/CLIP",
+          "status": "active",
+          "can_run_cpu": true
+        },
+        "dinov2": {
+          "type": "embedding",
+          "source": "facebookresearch/dinov2",
+          "status": "pending_gpu",
+          "vram": "4GB"
+        }
+      }
+    },
+    "llm_text": {
+      "category": "Language Models & AI Reasoning",
+      "requires_gpu": false,
+      "models": {
+        "qwen": {
+          "type": "llm",
+          "source": "Qwen/Qwen",
+          "status": "available"
+        },
+        "qwen2.5-14b": {
+          "type": "llm",
+          "source": "ollama://qwen2.5:14b",
+          "status": "active"
+        },
+        "qwen2.5-7b": {
+          "type": "llm",
+          "source": "ollama://qwen2.5:7b",
+          "status": "active"
+        },
+        "qwen2.5-3b": {
+          "type": "llm",
+          "source": "ollama://qwen2.5:3b",
+          "status": "active"
+        },
+        "qwen3": {
+          "type": "llm",
+          "source": "Qwen/Qwen3",
+          "status": "available"
+        },
+        "qwen3.5": {
+          "type": "llm",
+          "source": "Qwen/Qwen3.5",
+          "status": "available"
+        },
+        "llama-3": {
+          "type": "llm",
+          "source": "ollama://llama3.1:8b",
+          "status": "available"
+        },
+        "llama-4": {
+          "type": "llm",
+          "source": "meta-llama/Llama-4",
+          "status": "available"
+        },
+        "llama-4-scout": {
+          "type": "llm",
+          "source": "meta-llama/Llama-4-Scout",
+          "status": "available"
+        },
+        "llama-4-maverick": {
+          "type": "llm",
+          "source": "meta-llama/Llama-4-Maverick",
+          "status": "available"
+        },
+        "deepseek": {
+          "type": "llm",
+          "source": "ollama://deepseek-r1:7b",
+          "status": "available"
+        },
+        "deepseek-v3": {
+          "type": "llm",
+          "source": "deepseek-ai/DeepSeek-V3",
+          "status": "available"
+        },
+        "deepseek-v4": {
+          "type": "llm",
+          "source": "deepseek-ai/DeepSeek-V4",
+          "status": "available"
+        },
+        "deepseek-v4-flash": {
+          "type": "llm",
+          "source": "deepseek-ai/DeepSeek-V4-Flash",
+          "status": "available"
+        },
+        "mistral": {
+          "type": "llm",
+          "source": "ollama://mistral:7b",
+          "status": "available"
+        },
+        "mistral-small": {
+          "type": "llm",
+          "source": "mistralai/Mistral-Small",
+          "status": "available"
+        },
+        "mistral-small-4": {
+          "type": "llm",
+          "source": "mistralai/Mistral-Small-4",
+          "status": "available"
+        },
+        "mixtral": {
+          "type": "llm",
+          "source": "mistralai/Mixtral",
+          "status": "available"
+        },
+        "gemma": {
+          "type": "llm",
+          "source": "ollama://gemma2:2b",
+          "status": "available"
+        },
+        "gemma-3": {
+          "type": "llm",
+          "source": "google/gemma-3",
+          "status": "available"
+        },
+        "gemma-4": {
+          "type": "llm",
+          "source": "google/gemma-4",
+          "status": "available"
+        },
+        "phi-4": {
+          "type": "llm",
+          "source": "microsoft/phi-4",
+          "status": "available"
+        },
+        "glm-4": {
+          "type": "llm",
+          "source": "THUDM/glm-4",
+          "status": "available"
+        },
+        "glm-5": {
+          "type": "llm",
+          "source": "THUDM/glm-5",
+          "status": "available"
+        },
+        "kimi-k2": {
+          "type": "llm",
+          "source": "moonshot-ai/kimi-k2",
+          "status": "available"
+        },
+        "kimi-k2.6": {
+          "type": "llm",
+          "source": "moonshot-ai/kimi-k2.6",
+          "status": "available"
+        },
+        "kimi-k3": {
+          "type": "llm",
+          "source": "moonshot-ai/kimi-k3",
+          "status": "active"
+        },
+        "minimax-m3": {
+          "type": "llm",
+          "source": "MiniMax/MiniMax-M3",
+          "status": "available"
+        },
+        "internlm-3": {
+          "type": "llm",
+          "source": "InternLM/InternLM-3",
+          "status": "available"
+        },
+        "yi": {
+          "type": "llm",
+          "source": "01-ai/Yi",
+          "status": "available"
+        },
+        "falcon": {
+          "type": "llm",
+          "source": "tiiuae/falcon",
+          "status": "available"
+        },
+        "command-r": {
+          "type": "llm",
+          "source": "Cohere/command-r",
+          "status": "available"
+        },
+        "command-a": {
+          "type": "llm",
+          "source": "Cohere/command-a",
+          "status": "available"
+        },
+        "granite": {
+          "type": "llm",
+          "source": "ibm-granite/granite",
+          "status": "available"
+        },
+        "nemotron": {
+          "type": "llm",
+          "source": "nvidia/nemotron",
+          "status": "available"
+        },
+        "arctic": {
+          "type": "llm",
+          "source": "Snowflake/arctic",
+          "status": "available"
+        },
+        "hermes": {
+          "type": "llm",
+          "source": "NousResearch/Hermes",
+          "status": "available"
+        },
+        "apertus": {
+          "type": "llm",
+          "source": "NousResearch/Apertus",
+          "status": "available"
+        },
+        "trinity": {
+          "type": "llm",
+          "source": "TrinityAI/Trinity",
+          "status": "available"
+        },
+        "step": {
+          "type": "llm",
+          "source": "stepfun-ai/Step",
+          "status": "available"
+        },
+        "longcat": {
+          "type": "llm",
+          "source": "LongCat/LongCat-LLM",
+          "status": "available"
+        },
+        "mimo": {
+          "type": "llm",
+          "source": "Xiaomi/MiMo",
+          "status": "available"
+        }
+      }
+    },
+    "frameworks": {
+      "category": "Core Frameworks & Tools",
+      "requires_gpu": false,
+      "models": {
+        "comfyui-framework": {
+          "type": "framework",
+          "source": "github.com/comfyanonymous/ComfyUI",
+          "status": "active"
+        },
+        "ffmpeg-tool": {
+          "type": "tool",
+          "source": "apt",
+          "status": "active"
+        },
+        "ollama-runtime": {
+          "type": "runtime",
+          "source": "ollama.com",
+          "status": "active"
+        },
+        "omniroute-gateway": {
+          "type": "gateway",
+          "source": "github.com/diegosouzapw/OmniRoute",
+          "status": "active"
+        },
+        "mr-james": {
+          "type": "agent",
+          "source": "evolvixos/mr-james",
+          "status": "active"
+        },
+        "kimi-api": {
+          "type": "reasoning",
+          "source": "api.moonshot.ai",
+          "status": "active"
+        }
+      }
+    }
+  },
+  "total_models": 281
+}

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free LLM APIs · EvolvixOS</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+:root{--bg:#0a0a0f;--card:#12121a;--text:#e8e8f0;--muted:#6b6b80;--accent:#6c5ce7;--accent2:#fd79a8;--green:#00b894;--orange:#fdcb6e;--border:rgba(255,255,255,.06);--radius:14px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.6;min-height:100vh}
+.header{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100;backdrop-filter:blur(12px)}
+.logo{display:flex;align-items:center;gap:8px;font-size:18px;font-weight:700}
+.logo span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.back-btn{color:var(--muted);text-decoration:none;font-size:14px;padding:8px 16px;border-radius:10px;border:1px solid var(--border);transition:all .2s}
+.back-btn:hover{color:var(--text);border-color:var(--accent)}
+.hero{padding:48px 32px 24px;text-align:center;max-width:900px;margin:0 auto}
+.hero h1{font-size:36px;font-weight:700;margin-bottom:12px}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:17px;max-width:600px;margin:0 auto 24px}
+.hero-stats{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat .num{font-size:28px;font-weight:700;color:var(--accent)}
+.hero-stat .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.toolbar{max-width:1100px;margin:0 auto;padding:0 32px 20px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.search-box{flex:1;min-width:200px;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none}
+.search-box:focus{border-color:var(--accent)}
+.filter-btn{padding:8px 16px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s}
+.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.filter-btn:hover{border-color:var(--accent)}
+.container{max-width:1100px;margin:0 auto;padding:0 32px 48px}
+.section-title{font-size:20px;font-weight:600;margin:32px 0 16px;display:flex;align-items:center;gap:8px}
+.provider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.provider-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:all .2s;animation:fadeIn .4s ease}
+.provider-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.provider-header{display:flex;justify-content:space-between;align-items:start;margin-bottom:12px}
+.provider-name{font-size:16px;font-weight:600}
+.provider-tier{font-size:10px;padding:3px 10px;border-radius:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.tier-permanent{background:rgba(0,184,148,.15);color:var(--green)}
+.tier-renewable{background:rgba(253,203,110,.15);color:var(--orange)}
+.provider-stats{display:flex;gap:16px;margin-bottom:10px;font-size:13px;color:var(--muted)}
+.provider-stat{display:flex;flex-direction:column}
+.provider-stat .val{color:var(--text);font-weight:600}
+.provider-stat .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.provider-baseurl{font-size:12px;color:var(--accent);font-family:monospace;margin-bottom:8px;word-break:break-all}
+.provider-modalities{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+.modality-tag{font-size:10px;padding:2px 8px;border-radius:8px;background:rgba(108,92,231,.1);color:var(--accent)}
+.provider-actions{display:flex;gap:8px}
+.provider-actions a{font-size:12px;padding:6px 14px;border-radius:8px;text-decoration:none;font-weight:600;transition:all .2s}
+.btn-key{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-key:hover{opacity:.9}
+.btn-models{border:1px solid var(--border);color:var(--muted)}
+.btn-models:hover{border-color:var(--accent);color:var(--text)}
+.models-panel{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:none}
+.models-panel.active{display:block}
+.model-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid var(--border)}
+.model-row:last-child{border-bottom:none}
+.model-name{color:var(--text)}
+.model-id{color:var(--muted);font-family:monospace;font-size:12px}
+.model-context{color:var(--accent2);font-size:12px;white-space:nowrap}
+.local-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.local-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:all .2s}
+.local-card:hover{border-color:var(--accent)}
+.local-card h4{font-size:14px;margin-bottom:4px}
+.local-card .type{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.local-card p{font-size:12px;color:var(--muted)}
+.local-card a{color:var(--accent2);text-decoration:none;font-size:13px}
+.loading{text-align:center;padding:60px;color:var(--muted)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.source-link{text-align:center;padding:24px;color:var(--muted);font-size:13px}
+.source-link a{color:var(--accent);text-decoration:none}
+.no-results{text-align:center;padding:40px;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="logo">⚡ <span>EvolvixOS</span></div>
+<a class="back-btn" href="/studio/">← Back to Studio</a>
+</div>
+
+<div class="hero">
+<h1><span>Free LLM APIs</span></h1>
+<p>442+ free LLM APIs from 31+ providers — find, compare & configure free models in seconds. All OpenAI-compatible endpoints.</p>
+<div class="hero-stats">
+<div class="hero-stat"><div class="num" id="stat-providers">--</div><div class="label">Providers</div></div>
+<div class="hero-stat"><div class="num" id="stat-models">--</div><div class="label">Free Models</div></div>
+<div class="hero-stat"><div class="num" id="stat-best">--</div><div class="label">Featured Models</div></div>
+<div class="hero-stat"><div class="num" id="stat-local">--</div><div class="label">Local Tools</div></div>
+</div>
+</div>
+
+<div class="toolbar">
+<input class="search-box" id="search" placeholder="Search providers, models, modalities..." oninput="filterProviders()">
+<button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+<button class="filter-btn" onclick="setFilter('permanent',this)">Permanent Free</button>
+<button class="filter-btn" onclick="setFilter('renewable',this)">Renewable Credits</button>
+<button class="filter-btn" onclick="setFilter('no-card',this)">No Credit Card</button>
+</div>
+
+<div class="container" id="content">
+<div class="loading">Loading providers...</div>
+</div>
+
+<div class="source-link">
+Data from <a href="https://github.com/open-free-llm-api/awesome-freellm-apis" target="_blank">open-free-llm-api/awesome-freellm-apis</a> · Live directory at <a href="https://freellm.net" target="_blank">freellm.net</a> · Auto-synced via Discovery Engine
+</div>
+
+<script>
+let registry=null;
+let currentFilter='all';
+
+async function load(){
+  try{
+    const res=await fetch('/api/freellm');
+    registry=await res.json();
+    document.getElementById('stat-providers').textContent=registry.total_providers;
+    document.getElementById('stat-models').textContent=registry.total_free_models;
+    document.getElementById('stat-best').textContent=registry.total_models;
+    document.getElementById('stat-local').textContent=registry.local_tools_count;
+    render();
+  }catch(e){
+    document.getElementById('content').innerHTML='<div class="loading">Failed to load. '+e.message+'</div>';
+  }
+}
+
+function render(){
+  let providers=registry.providers;
+  if(currentFilter==='permanent')providers=providers.filter(p=>p.tier==='permanent_free');
+  if(currentFilter==='renewable')providers=providers.filter(p=>p.tier==='renewable_credits');
+  if(currentFilter==='no-card')providers=providers.filter(p=>p.credit_card==='No');
+  
+  let html='<div class="section-title">📡 Providers ('+providers.length+')</div><div class="provider-grid">';
+  providers.forEach((p,i)=>{
+    const tierClass=p.tier==='permanent_free'?'tier-permanent':'tier-renewable';
+    const tierLabel=p.tier==='permanent_free'?'Free':'Credits';
+    html+=`<div class="provider-card" data-search="${(p.name+' '+(p.modalities||[]).join(' ')+' '+(p.base_url||'')).toLowerCase()}">
+      <div class="provider-header">
+        <div class="provider-name">${p.name}</div>
+        <div class="provider-tier ${tierClass}">${tierLabel}</div>
+      </div>
+      <div class="provider-stats">
+        <div class="provider-stat"><span class="val">${p.free_models}</span><span class="lbl">Models</span></div>
+        <div class="provider-stat"><span class="val">${p.max_context}</span><span class="lbl">Max Ctx</span></div>
+        <div class="provider-stat"><span class="val">${p.credit_card}</span><span class="lbl">Card Req</span></div>
+      </div>
+      ${p.base_url?`<div class="provider-baseurl">${p.base_url}</div>`:''}
+      <div class="provider-modalities">
+        ${(p.modalities||[]).map(m=>`<span class="modality-tag">${m}</span>`).join('')}
+      </div>
+      <div class="provider-actions">
+        ${p.key_url?`<a href="${p.key_url}" target="_blank" class="btn-key">Get API Key</a>`:''}
+        ${p.models&&p.models.length?`<button class="btn-models" onclick="toggleModels(${i})">${p.models.length} Models ▾</button>`:''}
+      </div>
+      ${p.models&&p.models.length?`<div class="models-panel" id="models-${i}">
+        ${p.models.map(m=>`<div class="model-row">
+          <span class="model-name">${m.model_name}</span>
+          <span class="model-id">${m.model_id}</span>
+          <span class="model-context">${m.context} · ${m.rate_limit||''}</span>
+        </div>`).join('')}
+      </div>`:''}
+    </div>`;
+  });
+  html+='</div>';
+  
+  // Local tools
+  if(registry.local_tools&&registry.local_tools.length){
+    html+=`<div class="section-title">🖥️ Local / Self-Hosted (${registry.local_tools.length})</div><div class="local-grid">`;
+    registry.local_tools.forEach(t=>{
+      html+=`<div class="local-card">
+        <h4>${t.name}</h4>
+        <div class="type">${t.type}</div>
+        <p>${t.highlights}</p>
+        ${t.url?`<a href="${t.url}" target="_blank">Visit →</a>`:''}
+      </div>`;
+    });
+    html+='</div>';
+  }
+  
+  document.getElementById('content').innerHTML=html;
+}
+
+function toggleModels(idx){
+  const panel=document.getElementById('models-'+idx);
+  if(panel)panel.classList.toggle('active');
+}
+
+function setFilter(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+  // Reapply search
+  filterProviders();
+}
+
+function filterProviders(){
+  const q=document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('.provider-card').forEach(card=>{
+    const text=card.dataset.search||'';
+    card.style.display=text.includes(q)?'block':'none';
+  });
+}
+
+load();
+</script>
+</body>
+</html>

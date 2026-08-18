@@ -1,0 +1,1957 @@
+{
+  "title": "Awesome Free LLM APIs",
+  "subtitle": "442+ free LLM APIs from 31 providers \u2014 find, compare & configure free models in seconds",
+  "source": "https://github.com/open-free-llm-api/awesome-freellm-apis",
+  "website": "https://freellm.net",
+  "total_providers": 33,
+  "total_models": 85,
+  "total_free_models": 442,
+  "permanent_free_count": 31,
+  "renewable_credits_count": 2,
+  "local_tools_count": 7,
+  "providers": [
+    {
+      "name": "Provider",
+      "free_models": "Free Models",
+      "credit_card": "Credit Card?",
+      "max_context": "Max Context",
+      "modalities": [
+        "Modalities"
+      ],
+      "key_url": "",
+      "tier": "permanent_free",
+      "base_url": "Base URL",
+      "models": []
+    },
+    {
+      "name": "NVIDIA NIM",
+      "free_models": 125,
+      "credit_card": "Phone verification",
+      "max_context": "1M",
+      "modalities": [
+        "audio",
+        "embedding",
+        "image",
+        "reasoning",
+        "rerank",
+        "text",
+        "video",
+        "vision"
+      ],
+      "key_url": "https://build.nvidia.com/settings/api-keys",
+      "tier": "permanent_free",
+      "base_url": "https://integrate.api.nvidia.com/v1",
+      "models": [
+        {
+          "provider": "NVIDIA NIM",
+          "model_name": "z-ai/glm-5.2",
+          "model_url": "https://freellm.net/models/nvidia-nim/z-ai-glm-5-2/",
+          "model_id": "z-ai/glm-5.2",
+          "context": "1M",
+          "rate_limit": "Up to 40 RPM"
+        },
+        {
+          "provider": "NVIDIA NIM",
+          "model_name": "poolside/laguna-xs-2.1",
+          "model_url": "https://freellm.net/models/nvidia-nim/poolside-laguna-xs-2-1/",
+          "model_id": "poolside/laguna-xs-2.1",
+          "context": "262K",
+          "rate_limit": "Up to 40 RPM"
+        },
+        {
+          "provider": "NVIDIA NIM",
+          "model_name": "z-ai/glm-5.1",
+          "model_url": "https://freellm.net/models/nvidia-nim/z-ai-glm-5-1/",
+          "model_id": "z-ai/glm-5.1",
+          "context": "202K",
+          "rate_limit": "Up to 40 RPM"
+        }
+      ]
+    },
+    {
+      "name": "ModelScope",
+      "free_models": 55,
+      "credit_card": "Registration",
+      "max_context": "1M",
+      "modalities": [
+        "audio",
+        "image",
+        "reasoning",
+        "text",
+        "video",
+        "vision"
+      ],
+      "key_url": "https://modelscope.cn/my/myaccesstoken",
+      "tier": "permanent_free",
+      "base_url": "https://api-inference.modelscope.cn/v1",
+      "models": [
+        {
+          "provider": "ModelScope",
+          "model_name": "MiniMax-M2.5-highspeed",
+          "model_url": "https://freellm.net/models/modelscope/minimax-minimax-m2-5/",
+          "model_id": "MiniMax/MiniMax-M2.5",
+          "context": "204K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "ModelScope",
+          "model_name": "Qwen/Qwen3.5-35B-A3B",
+          "model_url": "https://freellm.net/models/modelscope/qwen-qwen3-5-35b-a3b/",
+          "model_id": "qwen-qwen3-5-35b-a3b",
+          "context": "131K",
+          "rate_limit": "2,000 RPD total; <=500 .."
+        },
+        {
+          "provider": "ModelScope",
+          "model_name": "Qwen/Qwen3.5-27B",
+          "model_url": "https://freellm.net/models/modelscope/qwen-qwen3-5-27b/",
+          "model_id": "qwen-qwen3-5-27b",
+          "context": "131K",
+          "rate_limit": "2,000 RPD total; <=500 .."
+        }
+      ]
+    },
+    {
+      "name": "Cloudflare Workers AI",
+      "free_models": 39,
+      "credit_card": "No",
+      "max_context": "10M",
+      "modalities": [
+        "code",
+        "image",
+        "reasoning",
+        "text",
+        "video"
+      ],
+      "key_url": "https://dash.cloudflare.com/profile/api-tokens",
+      "tier": "permanent_free",
+      "base_url": "https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run",
+      "models": [
+        {
+          "provider": "Cloudflare Workers AI",
+          "model_name": "Mistral 7B",
+          "model_url": "https://freellm.net/models/cloudflare-workers-ai/mistral-mistral-7b-instruct-v0-1/",
+          "model_id": "@cf/mistral/mistral-7b-instruct-v0.1",
+          "context": "32K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "Cloudflare Workers AI",
+          "model_name": "Qwen 1.5 7B",
+          "model_url": "https://freellm.net/models/cloudflare-workers-ai/qwen-qwen1-5-7b-chat/",
+          "model_id": "@cf/qwen/qwen1.5-7b-chat",
+          "context": "32K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "Cloudflare Workers AI",
+          "model_name": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "model_url": "https://freellm.net/models/cloudflare-workers-ai/cf-meta-llama-3-3-70b-instruct-fp8-fast/",
+          "model_id": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+          "context": "131K",
+          "rate_limit": "10K neurons/day (shared)"
+        }
+      ]
+    },
+    {
+      "name": "Google Gemini",
+      "free_models": 17,
+      "credit_card": "No",
+      "max_context": "1M",
+      "modalities": [
+        "audio",
+        "image",
+        "pdf",
+        "reasoning",
+        "text",
+        "video",
+        "vision"
+      ],
+      "key_url": "https://aistudio.google.com/app/apikey",
+      "tier": "permanent_free",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta",
+      "models": [
+        {
+          "provider": "Google Gemini",
+          "model_name": "Gemini 3.6 Flash",
+          "model_url": "https://freellm.net/models/google-gemini/gemini-3-6-flash/",
+          "model_id": "gemini-3.6-flash",
+          "context": "1M",
+          "rate_limit": "15 RPM, 1,500 RPD"
+        },
+        {
+          "provider": "Google Gemini",
+          "model_name": "Gemini 3.5 Flash",
+          "model_url": "https://freellm.net/models/google-gemini/gemini-3-5-flash/",
+          "model_id": "gemini-3.5-flash",
+          "context": "1M",
+          "rate_limit": "15 RPM, 1,500 RPD"
+        },
+        {
+          "provider": "Google Gemini",
+          "model_name": "Gemini 3.5 Flash-Lite",
+          "model_url": "https://freellm.net/models/google-gemini/gemini-3-5-flash-lite/",
+          "model_id": "gemini-3.5-flash-lite",
+          "context": "1M",
+          "rate_limit": "30 RPM, 1,500 RPD"
+        }
+      ]
+    },
+    {
+      "name": "GitHub Models",
+      "free_models": 16,
+      "credit_card": "No",
+      "max_context": "1M",
+      "modalities": [
+        "image",
+        "pdf",
+        "reasoning",
+        "text"
+      ],
+      "key_url": "https://github.com/marketplace/models",
+      "tier": "permanent_free",
+      "base_url": "https://models.github.ai/inference",
+      "models": [
+        {
+          "provider": "GitHub Models",
+          "model_name": "Phi-4",
+          "model_url": "https://freellm.net/models/github-models/phi-4/",
+          "model_id": "Phi-4",
+          "context": "131K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "GitHub Models",
+          "model_name": "Mistral Large (24.11)",
+          "model_url": "https://freellm.net/models/github-models/mistral-large-2411/",
+          "model_id": "Mistral-large-2411",
+          "context": "131K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "GitHub Models",
+          "model_name": "AI21 Jamba 1.5 Large",
+          "model_url": "https://freellm.net/models/github-models/ai21-jamba-1-5-large/",
+          "model_id": "AI21-Jamba-1.5-Large",
+          "context": "256K",
+          "rate_limit": "See provider"
+        }
+      ]
+    },
+    {
+      "name": "LLM7.io",
+      "free_models": 16,
+      "credit_card": "No",
+      "max_context": "1M",
+      "modalities": [
+        "audio",
+        "code",
+        "image",
+        "pdf",
+        "reasoning",
+        "text",
+        "video",
+        "vision"
+      ],
+      "key_url": "https://token.llm7.io",
+      "tier": "permanent_free",
+      "base_url": "https://api.llm7.io/v1",
+      "models": [
+        {
+          "provider": "LLM7.io",
+          "model_name": "deepseek-r1-0528",
+          "model_url": "https://freellm.net/models/llm7-io/deepseek-r1-0528/",
+          "model_id": "deepseek-r1-0528",
+          "context": "131K",
+          "rate_limit": "30 RPM (120 with token)"
+        },
+        {
+          "provider": "LLM7.io",
+          "model_name": "deepseek-v3-0324",
+          "model_url": "https://freellm.net/models/llm7-io/deepseek-v3-0324/",
+          "model_id": "deepseek-v3",
+          "context": "131K",
+          "rate_limit": "30 RPM (120 with token)"
+        },
+        {
+          "provider": "LLM7.io",
+          "model_name": "gpt-4o-mini",
+          "model_url": "https://freellm.net/models/llm7-io/gpt-4o-mini/",
+          "model_id": "gpt-4o-mini",
+          "context": "131K",
+          "rate_limit": "30 RPM (120 with token)"
+        }
+      ]
+    },
+    {
+      "name": "OVHcloud AI Endpoints",
+      "free_models": 14,
+      "credit_card": "Registration",
+      "max_context": "262K",
+      "modalities": [
+        "audio",
+        "code",
+        "image",
+        "reasoning",
+        "text",
+        "video"
+      ],
+      "key_url": "https://www.ovhcloud.com/en/public-cloud/ai-endpoints/catalog/",
+      "tier": "permanent_free",
+      "base_url": "https://oai.endpoints.kepler.ai.cloud.ovh.net/v1",
+      "models": [
+        {
+          "provider": "OVHcloud AI Endpoints",
+          "model_name": "Qwen3.5-397B-A17B",
+          "model_url": "https://freellm.net/models/ovhcloud-ai-endpoints/qwen3-5-397b-a17b/",
+          "model_id": "qwen3.5-397b-a17b",
+          "context": "131K",
+          "rate_limit": "2 RPM (anonymous)"
+        },
+        {
+          "provider": "OVHcloud AI Endpoints",
+          "model_name": "Meta-Llama-3_3-70B-Instruct",
+          "model_url": "https://freellm.net/models/ovhcloud-ai-endpoints/meta-llama-3-3-70b-instruct/",
+          "model_id": "meta-llama-3_3-70b-instruct",
+          "context": "131K",
+          "rate_limit": "2 RPM (anonymous)"
+        },
+        {
+          "provider": "OVHcloud AI Endpoints",
+          "model_name": "Qwen3.6-27B",
+          "model_url": "https://freellm.net/models/ovhcloud-ai-endpoints/qwen3-6-27b/",
+          "model_id": "qwen3.6-27b",
+          "context": "131K",
+          "rate_limit": "2 RPM (anonymous)"
+        }
+      ]
+    },
+    {
+      "name": "Ollama Cloud",
+      "free_models": 13,
+      "credit_card": "Registration",
+      "max_context": "1M",
+      "modalities": [
+        "code",
+        "image",
+        "reasoning",
+        "text",
+        "video",
+        "vision"
+      ],
+      "key_url": "https://ollama.com/settings/keys",
+      "tier": "permanent_free",
+      "base_url": "https://api.ollama.com",
+      "models": [
+        {
+          "provider": "Ollama Cloud",
+          "model_name": "minimax-m3",
+          "model_url": "https://freellm.net/models/ollama-cloud/minimax-m3/",
+          "model_id": "minimax-m3",
+          "context": "1M",
+          "rate_limit": "Session/weekly limits (.."
+        },
+        {
+          "provider": "Ollama Cloud",
+          "model_name": "gpt-oss:20b",
+          "model_url": "https://freellm.net/models/ollama-cloud/gpt-oss-20b/",
+          "model_id": "gpt-oss:20b",
+          "context": "131K",
+          "rate_limit": "Session/weekly limits (.."
+        },
+        {
+          "provider": "Ollama Cloud",
+          "model_name": "nemotron-3-ultra",
+          "model_url": "https://freellm.net/models/ollama-cloud/nemotron-3-ultra/",
+          "model_id": "nemotron-3-ultra",
+          "context": "262K",
+          "rate_limit": "Session/weekly limits (.."
+        }
+      ]
+    },
+    {
+      "name": "Groq",
+      "free_models": 12,
+      "credit_card": "No",
+      "max_context": "262K",
+      "modalities": [
+        "image",
+        "reasoning",
+        "text"
+      ],
+      "key_url": "https://console.groq.com/keys",
+      "tier": "permanent_free",
+      "base_url": "https://api.groq.com/openai/v1",
+      "models": [
+        {
+          "provider": "Groq",
+          "model_name": "Moonshot Kimi K2",
+          "model_url": "https://freellm.net/models/groq/moonshotai-kimi-k2-instruct/",
+          "model_id": "moonshotai/kimi-k2-instruct",
+          "context": "131K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "Groq",
+          "model_name": "Moonshot Kimi K2 0905",
+          "model_url": "https://freellm.net/models/groq/moonshotai-kimi-k2-instruct-0905/",
+          "model_id": "moonshotai/kimi-k2-instruct-0905",
+          "context": "131K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "Groq",
+          "model_name": "groq/compound",
+          "model_url": "https://freellm.net/models/groq/groq-compound/",
+          "model_id": "groq/compound",
+          "context": "131K",
+          "rate_limit": "30 RPM, 250 RPD"
+        }
+      ]
+    },
+    {
+      "name": "Mistral AI",
+      "free_models": 12,
+      "credit_card": "No",
+      "max_context": "256K",
+      "modalities": [
+        "code",
+        "image",
+        "text"
+      ],
+      "key_url": "https://console.mistral.ai/api-keys",
+      "tier": "permanent_free",
+      "base_url": "https://api.mistral.ai/v1",
+      "models": [
+        {
+          "provider": "Mistral AI",
+          "model_name": "Mistral 7B",
+          "model_url": "https://freellm.net/models/mistral-ai/open-mistral-7b/",
+          "model_id": "open-mistral-7b",
+          "context": "32K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "Mistral AI",
+          "model_name": "Mixtral 8x7B",
+          "model_url": "https://freellm.net/models/mistral-ai/open-mixtral-8x7b/",
+          "model_id": "open-mixtral-8x7b",
+          "context": "32K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "Mistral AI",
+          "model_name": "Mistral Medium 3.5 (128B)",
+          "model_url": "https://freellm.net/models/mistral-ai/mistral-medium-3-5-128b/",
+          "model_id": "mistral-medium-3-5-128b",
+          "context": "256K",
+          "rate_limit": "~1 RPS, 500K TPM"
+        }
+      ]
+    },
+    {
+      "name": "Cohere",
+      "free_models": 12,
+      "credit_card": "No",
+      "max_context": "436K",
+      "modalities": [
+        "image",
+        "text"
+      ],
+      "key_url": "https://dashboard.cohere.com/api-keys",
+      "tier": "permanent_free",
+      "base_url": "https://api.cohere.com/v2",
+      "models": [
+        {
+          "provider": "Cohere",
+          "model_name": "Command A+ (218B)",
+          "model_url": "https://freellm.net/models/cohere/command-a-218b/",
+          "model_id": "command-a-218b",
+          "context": "436K",
+          "rate_limit": "20 RPM"
+        },
+        {
+          "provider": "Cohere",
+          "model_name": "Command A (111B)",
+          "model_url": "https://freellm.net/models/cohere/command-a-111b/",
+          "model_id": "command-a-111b",
+          "context": "288K",
+          "rate_limit": "20 RPM"
+        },
+        {
+          "provider": "Cohere",
+          "model_name": "Command R+",
+          "model_url": "https://freellm.net/models/cohere/command-r/",
+          "model_id": "command-r",
+          "context": "128K",
+          "rate_limit": "20 RPM"
+        }
+      ]
+    },
+    {
+      "name": "Kilo Code",
+      "free_models": 12,
+      "credit_card": "No",
+      "max_context": "1M",
+      "modalities": [
+        "audio",
+        "code",
+        "image",
+        "reasoning",
+        "text",
+        "video"
+      ],
+      "key_url": "https://kilo.ai",
+      "tier": "permanent_free",
+      "base_url": "https://api.kilo.ai/api/gateway",
+      "models": [
+        {
+          "provider": "Kilo Code",
+          "model_name": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "model_url": "https://freellm.net/models/kilo-code/nvidia-nemotron-3-ultra-550b-a55b-free/",
+          "model_id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "context": "1M",
+          "rate_limit": "~200 req/hr"
+        },
+        {
+          "provider": "Kilo Code",
+          "model_name": "stepfun/step-3.7-flash:free",
+          "model_url": "https://freellm.net/models/kilo-code/stepfun-step-3-7-flash-free/",
+          "model_id": "stepfun/step-3.7-flash:free",
+          "context": "262K",
+          "rate_limit": "~200 req/hr"
+        },
+        {
+          "provider": "Kilo Code",
+          "model_name": "nvidia/nemotron-3-super-120b-a12b:free",
+          "model_url": "https://freellm.net/models/kilo-code/nvidia-nemotron-3-super-120b-a12b-free/",
+          "model_id": "nvidia/nemotron-3-super-120b-a12b:free",
+          "context": "262K",
+          "rate_limit": "~200 req/hr"
+        }
+      ]
+    },
+    {
+      "name": "OpenCode Zen",
+      "free_models": 11,
+      "credit_card": "Registration",
+      "max_context": "1M",
+      "modalities": [
+        "audio",
+        "reasoning",
+        "vision"
+      ],
+      "key_url": "https://opencode.ai/auth",
+      "tier": "permanent_free",
+      "base_url": "https://opencode.ai/zen/v1",
+      "models": [
+        {
+          "provider": "OpenCode Zen",
+          "model_name": "big-pickle",
+          "model_url": "https://freellm.net/models/opencode/big-pickle/",
+          "model_id": "big-pickle",
+          "context": "0",
+          "rate_limit": ""
+        },
+        {
+          "provider": "OpenCode Zen",
+          "model_name": "DeepSeek V4 Flash",
+          "model_url": "https://freellm.net/models/opencode/deepseek-v4-flash-free/",
+          "model_id": "deepseek-v4-flash-free",
+          "context": "1M",
+          "rate_limit": ""
+        },
+        {
+          "provider": "OpenCode Zen",
+          "model_name": "MiMo-V2.5",
+          "model_url": "https://freellm.net/models/opencode/mimo-v2-5-free/",
+          "model_id": "mimo-v2.5-free",
+          "context": "1M",
+          "rate_limit": ""
+        }
+      ]
+    },
+    {
+      "name": "Cerebras",
+      "free_models": 8,
+      "credit_card": "No",
+      "max_context": "131K",
+      "modalities": [
+        "image",
+        "reasoning",
+        "text"
+      ],
+      "key_url": "https://cloud.cerebras.ai/",
+      "tier": "permanent_free",
+      "base_url": "https://api.cerebras.ai/v1",
+      "models": [
+        {
+          "provider": "Cerebras",
+          "model_name": "Llama 3.1 70B",
+          "model_url": "https://freellm.net/models/cerebras/llama3-1-70b/",
+          "model_id": "llama3.1-70b",
+          "context": "131K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "Cerebras",
+          "model_name": "gpt-oss-120b",
+          "model_url": "https://freellm.net/models/cerebras/gpt-oss-120b/",
+          "model_id": "gpt-oss-120b",
+          "context": "131K",
+          "rate_limit": "5 RPM, 30K TPM, 1M TPD"
+        },
+        {
+          "provider": "Cerebras",
+          "model_name": "zai-glm-4.7 (deprecated Aug 2026)",
+          "model_url": "https://freellm.net/models/cerebras/zai-glm-4-7-deprecated-aug-2026/",
+          "model_id": "zai-glm-4.7",
+          "context": "131K",
+          "rate_limit": "5 RPM, 30K TPM, 1M TPD"
+        }
+      ]
+    },
+    {
+      "name": "Aion Labs",
+      "free_models": 7,
+      "credit_card": "Registration",
+      "max_context": "131K",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "https://www.aionlabs.ai",
+      "tier": "permanent_free",
+      "base_url": "https://api.aionlabs.ai/v1",
+      "models": [
+        {
+          "provider": "Aion Labs",
+          "model_name": "Aion 2.5",
+          "model_url": "https://freellm.net/models/aion-labs/aion-2-5/",
+          "model_id": "aion-2-5",
+          "context": "128K",
+          "rate_limit": "15 RPM, 20K TPD"
+        },
+        {
+          "provider": "Aion Labs",
+          "model_name": "Aion 2.0",
+          "model_url": "https://freellm.net/models/aion-labs/aion-2-0/",
+          "model_id": "aion-2-0",
+          "context": "128K",
+          "rate_limit": "15 RPM, 20K TPD"
+        },
+        {
+          "provider": "Aion Labs",
+          "model_name": "Aion-RP 1.0 (8B)",
+          "model_url": "https://freellm.net/models/aion-labs/aion-rp-1-0-8b/",
+          "model_id": "aion-rp-1-0-8b",
+          "context": "32K",
+          "rate_limit": "15 RPM, 20K TPD"
+        }
+      ]
+    },
+    {
+      "name": "Hugging Face",
+      "free_models": 7,
+      "credit_card": "No",
+      "max_context": "131K",
+      "modalities": [
+        "code",
+        "text"
+      ],
+      "key_url": "https://huggingface.co/settings/tokens",
+      "tier": "permanent_free",
+      "base_url": "https://router.huggingface.co/v1",
+      "models": [
+        {
+          "provider": "Hugging Face",
+          "model_name": "Meta-Llama-3.1-8B-Instruct",
+          "model_url": "https://freellm.net/models/hugging-face/meta-llama-3-1-8b-instruct/",
+          "model_id": "meta-llama-3-1-8b-instruct",
+          "context": "128K",
+          "rate_limit": "Credit-metered"
+        },
+        {
+          "provider": "Hugging Face",
+          "model_name": "gemma-3-4b-it",
+          "model_url": "https://freellm.net/models/hugging-face/gemma-3-4b-it/",
+          "model_id": "gemma-3-4b-it",
+          "context": "131K",
+          "rate_limit": "Credit-metered"
+        },
+        {
+          "provider": "Hugging Face",
+          "model_name": "Qwen2.5-Coder-7B-Instruct",
+          "model_url": "https://freellm.net/models/hugging-face/qwen2-5-coder-7b-instruct/",
+          "model_id": "qwen2-5-coder-7b-instruct",
+          "context": "131K",
+          "rate_limit": "Credit-metered"
+        }
+      ]
+    },
+    {
+      "name": "Agnes AI",
+      "free_models": 5,
+      "credit_card": "Registration",
+      "max_context": "256K",
+      "modalities": [
+        "image",
+        "text",
+        "video",
+        "vision"
+      ],
+      "key_url": "https://platform.agnes-ai.com/settings/apiKeys",
+      "tier": "permanent_free",
+      "base_url": "https://apihub.agnes-ai.com/v1",
+      "models": [
+        {
+          "provider": "Agnes AI",
+          "model_name": "agnes-1.5-flash",
+          "model_url": "https://freellm.net/models/agnes-ai/agnes-1-5-flash/",
+          "model_id": "agnes-1.5-flash",
+          "context": "256K",
+          "rate_limit": "30 RPM"
+        },
+        {
+          "provider": "Agnes AI",
+          "model_name": "agnes-2.0-flash",
+          "model_url": "https://freellm.net/models/agnes-ai/agnes-2-0-flash/",
+          "model_id": "agnes-2.0-flash",
+          "context": "256K",
+          "rate_limit": "30 RPM"
+        },
+        {
+          "provider": "Agnes AI",
+          "model_name": "agnes-image-2.0-flash",
+          "model_url": "https://freellm.net/models/agnes-ai/agnes-image-2-0-flash/",
+          "model_id": "agnes-image-2.0-flash",
+          "context": "4K",
+          "rate_limit": "30 RPM (1K)"
+        }
+      ]
+    },
+    {
+      "name": "Alibaba Cloud Model Studio",
+      "free_models": 5,
+      "credit_card": "Registration",
+      "max_context": "1M",
+      "modalities": [
+        "code",
+        "image",
+        "text"
+      ],
+      "key_url": "https://bailian.console.alibabacloud.com/?apiKey=1",
+      "tier": "permanent_free",
+      "base_url": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+      "models": [
+        {
+          "provider": "Alibaba Cloud Model Studio",
+          "model_name": "Qwen3-Max",
+          "model_url": "https://freellm.net/models/alibaba-cloud-model-studio/qwen3-max/",
+          "model_id": "qwen3-max",
+          "context": "128K",
+          "rate_limit": "Tiered by region"
+        },
+        {
+          "provider": "Alibaba Cloud Model Studio",
+          "model_name": "Qwen3-Plus",
+          "model_url": "https://freellm.net/models/alibaba-cloud-model-studio/qwen3-plus/",
+          "model_id": "qwen3-plus",
+          "context": "1M",
+          "rate_limit": "Tiered by region"
+        },
+        {
+          "provider": "Alibaba Cloud Model Studio",
+          "model_name": "Qwen3-VL-Plus",
+          "model_url": "https://freellm.net/models/alibaba-cloud-model-studio/qwen3-vl-plus/",
+          "model_id": "qwen3-vl-plus",
+          "context": "128K",
+          "rate_limit": "Tiered by region"
+        }
+      ]
+    },
+    {
+      "name": "Z AI (Zhipu AI)",
+      "free_models": 4,
+      "credit_card": "No",
+      "max_context": "200K",
+      "modalities": [
+        "image",
+        "reasoning",
+        "text",
+        "video"
+      ],
+      "key_url": "https://open.bigmodel.cn/usercenter/apikeys",
+      "tier": "permanent_free",
+      "base_url": "https://open.bigmodel.cn/api/paas/v4",
+      "models": [
+        {
+          "provider": "Z AI (Zhipu AI)",
+          "model_name": "GLM-4.7-Flash",
+          "model_url": "https://freellm.net/models/z-ai-zhipu-ai/glm-4-7-flash/",
+          "model_id": "glm-4.7",
+          "context": "200K",
+          "rate_limit": "1 concurrent request"
+        },
+        {
+          "provider": "Z AI (Zhipu AI)",
+          "model_name": "GLM-4.5-Flash",
+          "model_url": "https://freellm.net/models/z-ai-zhipu-ai/glm-4-5-flash/",
+          "model_id": "glm-4.5",
+          "context": "128K",
+          "rate_limit": "1 concurrent request"
+        },
+        {
+          "provider": "Z AI (Zhipu AI)",
+          "model_name": "GLM-4.6V-Flash",
+          "model_url": "https://freellm.net/models/z-ai-zhipu-ai/glm-4-6v-flash/",
+          "model_id": "glm-4.6",
+          "context": "128K",
+          "rate_limit": "1 concurrent request"
+        }
+      ]
+    },
+    {
+      "name": "SambaNova",
+      "free_models": 4,
+      "credit_card": "Registration",
+      "max_context": "128K",
+      "modalities": [
+        "image",
+        "reasoning",
+        "text"
+      ],
+      "key_url": "https://cloud.sambanova.ai/apis",
+      "tier": "permanent_free",
+      "base_url": "https://api.sambanova.ai/v1",
+      "models": [
+        {
+          "provider": "SambaNova",
+          "model_name": "DeepSeek-V3.1",
+          "model_url": "https://freellm.net/models/sambanova/deepseek-v3-1/",
+          "model_id": "deepseek-v3-1",
+          "context": "128K",
+          "rate_limit": "20 RPM, 20 RPD, 200K TPD"
+        },
+        {
+          "provider": "SambaNova",
+          "model_name": "DeepSeek-V3.2 (Preview)",
+          "model_url": "https://freellm.net/models/sambanova/deepseek-v3-2-preview/",
+          "model_id": "deepseek-v3-2-preview",
+          "context": "128K",
+          "rate_limit": "20 RPM, 20 RPD, 200K TPD"
+        },
+        {
+          "provider": "SambaNova",
+          "model_name": "MiniMax-M2.7",
+          "model_url": "https://freellm.net/models/sambanova/minimax-m2-7/",
+          "model_id": "minimax-m2-7",
+          "context": "128K",
+          "rate_limit": "20 RPM, 20 RPD, 200K TPD"
+        }
+      ]
+    },
+    {
+      "name": "SiliconFlow",
+      "free_models": 3,
+      "credit_card": "Registration",
+      "max_context": "131K",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "https://cloud.siliconflow.cn/account/ak",
+      "tier": "permanent_free",
+      "base_url": "https://api.siliconflow.cn/v1",
+      "models": [
+        {
+          "provider": "SiliconFlow",
+          "model_name": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+          "model_url": "https://freellm.net/models/siliconflow/deepseek-ai-deepseek-r1-distill-qwen-7b/",
+          "model_id": "deepseek-ai-deepseek-r1-distill-qwen-7b",
+          "context": "131K",
+          "rate_limit": "30 RPM, 60K TPM"
+        },
+        {
+          "provider": "SiliconFlow",
+          "model_name": "Abbreviation",
+          "model_url": "https://freellm.net/models/siliconflow/abbreviation/",
+          "model_id": "abbreviation",
+          "context": "131K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "SiliconFlow",
+          "model_name": "deepseek-ai/DeepSeek-OCR",
+          "model_url": "https://freellm.net/models/siliconflow/deepseek-ai-deepseek-ocr/",
+          "model_id": "deepseek-ai-deepseek-ocr",
+          "context": "131K",
+          "rate_limit": "30 RPM, 60K TPM"
+        }
+      ]
+    },
+    {
+      "name": "xAI",
+      "free_models": 3,
+      "credit_card": "Registration",
+      "max_context": "2M",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "https://console.x.ai",
+      "tier": "permanent_free",
+      "base_url": "https://api.x.ai/v1",
+      "models": [
+        {
+          "provider": "xAI",
+          "model_name": "grok-4.3",
+          "model_url": "https://freellm.net/models/xai/grok-4-3/",
+          "model_id": "grok-4-3",
+          "context": "1M",
+          "rate_limit": "Credit-based"
+        },
+        {
+          "provider": "xAI",
+          "model_name": "grok-4.1-fast",
+          "model_url": "https://freellm.net/models/xai/grok-4-1-fast/",
+          "model_id": "grok-4-1-fast",
+          "context": "2M",
+          "rate_limit": "Credit-based"
+        },
+        {
+          "provider": "xAI",
+          "model_name": "grok-3-mini",
+          "model_url": "https://freellm.net/models/xai/grok-3-mini/",
+          "model_id": "grok-3-mini",
+          "context": "131K",
+          "rate_limit": "Credit-based"
+        }
+      ]
+    },
+    {
+      "name": "Cline",
+      "free_models": 3,
+      "credit_card": "Registration",
+      "max_context": "0",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "",
+      "tier": "permanent_free",
+      "base_url": "",
+      "models": [
+        {
+          "provider": "Cline",
+          "model_name": "deepseek-v4-flash",
+          "model_url": "https://freellm.net/models/cline/deepseek-deepseek-v4-flash/",
+          "model_id": "deepseek/deepseek-v4-flash",
+          "context": "0",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "Cline",
+          "model_name": "nemotron-3.5-lightning",
+          "model_url": "https://freellm.net/models/cline/nvidia-nemotron-3-5-lightning/",
+          "model_id": "nvidia/nemotron-3.5-lightning",
+          "context": "0",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "Cline",
+          "model_name": "laguna-s-2.1:free",
+          "model_url": "https://freellm.net/models/cline/poolside-laguna-s-2-1/",
+          "model_id": "poolside/laguna-s-2.1:free",
+          "context": "0",
+          "rate_limit": "See provider"
+        }
+      ]
+    },
+    {
+      "name": "Chutes.ai",
+      "free_models": 2,
+      "credit_card": "Registration",
+      "max_context": "131K",
+      "modalities": [
+        "reasoning",
+        "text"
+      ],
+      "key_url": "https://chutes.ai/",
+      "tier": "permanent_free",
+      "base_url": "https://api.chutes.ai/v1",
+      "models": [
+        {
+          "provider": "Chutes.ai",
+          "model_name": "DeepSeek-R1",
+          "model_url": "https://freellm.net/models/chutes-ai/deepseek-ai-deepseek-r1/",
+          "model_id": "deepseek-ai/DeepSeek-R1",
+          "context": "131K",
+          "rate_limit": "Community-powered, no h.."
+        },
+        {
+          "provider": "Chutes.ai",
+          "model_name": "Llama 3.1 70B",
+          "model_url": "https://freellm.net/models/chutes-ai/meta-llama-meta-llama-3-1-70b-instruct/",
+          "model_id": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+          "context": "131K",
+          "rate_limit": "Community-powered, no h.."
+        }
+      ]
+    },
+    {
+      "name": "Glhf.chat",
+      "free_models": 2,
+      "credit_card": "Registration",
+      "max_context": "131K",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "https://glhf.chat/",
+      "tier": "permanent_free",
+      "base_url": "https://glhf.chat/api/openai/v1",
+      "models": [
+        {
+          "provider": "Glhf.chat",
+          "model_name": "Llama 3.1 70B",
+          "model_url": "https://freellm.net/models/glhf-chat/meta-llama-meta-llama-3-1-70b-instruct-2/",
+          "model_id": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+          "context": "131K",
+          "rate_limit": "Unlimited for free models"
+        },
+        {
+          "provider": "Glhf.chat",
+          "model_name": "Mixtral 8x7B",
+          "model_url": "https://freellm.net/models/glhf-chat/mistralai-mixtral-8x7b-instruct-v0-1/",
+          "model_id": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+          "context": "32K",
+          "rate_limit": "Unlimited for free models"
+        }
+      ]
+    },
+    {
+      "name": "Grok (xAI)",
+      "free_models": 2,
+      "credit_card": "Registration",
+      "max_context": "131K",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "https://console.x.ai/",
+      "tier": "permanent_free",
+      "base_url": "https://api.x.ai/v1",
+      "models": [
+        {
+          "provider": "Grok (xAI)",
+          "model_name": "Grok-2",
+          "model_url": "https://freellm.net/models/grok-(xai)/grok-2/",
+          "model_id": "grok-2",
+          "context": "131K",
+          "rate_limit": "$25/month free credits,.."
+        },
+        {
+          "provider": "Grok (xAI)",
+          "model_name": "Grok-2 Mini",
+          "model_url": "https://freellm.net/models/grok-(xai)/grok-2-mini/",
+          "model_id": "grok-2-mini",
+          "context": "131K",
+          "rate_limit": "$25/month free credits,.."
+        }
+      ]
+    },
+    {
+      "name": "AI21 Labs",
+      "free_models": 2,
+      "credit_card": "Registration",
+      "max_context": "256K",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "https://studio.ai21.com/account/api-key",
+      "tier": "permanent_free",
+      "base_url": "https://api.ai21.com/studio/v1",
+      "models": [
+        {
+          "provider": "AI21 Labs",
+          "model_name": "Jamba Large 1.7",
+          "model_url": "https://freellm.net/models/ai21-labs/jamba-large-1-7/",
+          "model_id": "jamba-large-1-7",
+          "context": "256K",
+          "rate_limit": "200 RPM, 10 RPS"
+        },
+        {
+          "provider": "AI21 Labs",
+          "model_name": "Jamba Mini 2",
+          "model_url": "https://freellm.net/models/ai21-labs/jamba-mini-2/",
+          "model_id": "jamba-mini-2",
+          "context": "256K",
+          "rate_limit": "200 RPM, 10 RPS"
+        }
+      ]
+    },
+    {
+      "name": "DeepSeek",
+      "free_models": 2,
+      "credit_card": "Registration",
+      "max_context": "128K",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "https://platform.deepseek.com/api_keys",
+      "tier": "permanent_free",
+      "base_url": "https://api.deepseek.com/v1",
+      "models": [
+        {
+          "provider": "DeepSeek",
+          "model_name": "deepseek-chat (V3.2)",
+          "model_url": "https://freellm.net/models/deepseek/deepseek-chat-v3-2/",
+          "model_id": "deepseek-chat-v3-2",
+          "context": "128K",
+          "rate_limit": "Dynamic"
+        },
+        {
+          "provider": "DeepSeek",
+          "model_name": "deepseek-reasoner (R1)",
+          "model_url": "https://freellm.net/models/deepseek/deepseek-reasoner-r1/",
+          "model_id": "deepseek-reasoner-r1",
+          "context": "128K",
+          "rate_limit": "Dynamic"
+        }
+      ]
+    },
+    {
+      "name": "Nscale",
+      "free_models": 2,
+      "credit_card": "Registration",
+      "max_context": "128K",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "https://console.nscale.com/",
+      "tier": "permanent_free",
+      "base_url": "https://inference.api.nscale.com/v1",
+      "models": [
+        {
+          "provider": "Nscale",
+          "model_name": "Llama-3.3-70B-Instruct",
+          "model_url": "https://freellm.net/models/nscale/llama-3-3-70b-instruct/",
+          "model_id": "llama-3-3-70b-instruct",
+          "context": "128K",
+          "rate_limit": "Fair-use"
+        },
+        {
+          "provider": "Nscale",
+          "model_name": "DeepSeek-R1-Distill-Llama-70B",
+          "model_url": "https://freellm.net/models/nscale/deepseek-r1-distill-llama-70b/",
+          "model_id": "deepseek-r1-distill-llama-70b",
+          "context": "128K",
+          "rate_limit": "Fair-use"
+        }
+      ]
+    },
+    {
+      "name": "Nebius",
+      "free_models": 1,
+      "credit_card": "Registration",
+      "max_context": "128K",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "https://studio.nebius.com/settings/api-keys",
+      "tier": "permanent_free",
+      "base_url": "https://api.studio.nebius.com/v1",
+      "models": [
+        {
+          "provider": "Nebius",
+          "model_name": "Qwen3-235B-A22B",
+          "model_url": "https://freellm.net/models/nebius/qwen3-235b-a22b/",
+          "model_id": "qwen3-235b-a22b",
+          "context": "128K",
+          "rate_limit": "Tier-based"
+        }
+      ]
+    },
+    {
+      "name": "Provider",
+      "free_models": "Free Models",
+      "credit_model": "Credit Model",
+      "max_context": "Max Context",
+      "modalities": [
+        "Modalities"
+      ],
+      "key_url": "",
+      "tier": "renewable_credits",
+      "base_url": "Base URL",
+      "models": []
+    },
+    {
+      "name": "OpenRouter",
+      "free_models": 26,
+      "credit_model": "Free tier + $10 topup \u2192 1K RPD",
+      "max_context": "1M",
+      "modalities": [
+        "audio",
+        "code",
+        "embeddings",
+        "image",
+        "reasoning",
+        "rerank",
+        "speech",
+        "text",
+        "video"
+      ],
+      "key_url": "https://openrouter.ai/workspaces/default/keys",
+      "tier": "renewable_credits",
+      "base_url": "https://openrouter.ai/api/v1",
+      "models": [
+        {
+          "provider": "OpenRouter",
+          "model_name": "NVIDIA: Nemotron 3 Ultra (free)",
+          "model_url": "https://freellm.net/models/openrouter/nvidia-nemotron-3-ultra-550b-a55b/",
+          "model_id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+          "context": "1M",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "OpenRouter",
+          "model_name": "Poolside: Laguna M.1 (free)",
+          "model_url": "https://freellm.net/models/openrouter/poolside-laguna-m-1/",
+          "model_id": "poolside/laguna-m.1:free",
+          "context": "262K",
+          "rate_limit": "See provider"
+        },
+        {
+          "provider": "OpenRouter",
+          "model_name": "NVIDIA: Nemotron 3 Super (free)",
+          "model_url": "https://freellm.net/models/openrouter/nvidia-nemotron-3-super-120b-a12b/",
+          "model_id": "nvidia/nemotron-3-super-120b-a12b:free",
+          "context": "262K",
+          "rate_limit": "See provider"
+        }
+      ]
+    }
+  ],
+  "best_models": [
+    {
+      "provider": "NVIDIA NIM",
+      "model_name": "z-ai/glm-5.2",
+      "model_url": "https://freellm.net/models/nvidia-nim/z-ai-glm-5-2/",
+      "model_id": "z-ai/glm-5.2",
+      "context": "1M",
+      "rate_limit": "Up to 40 RPM"
+    },
+    {
+      "provider": "NVIDIA NIM",
+      "model_name": "poolside/laguna-xs-2.1",
+      "model_url": "https://freellm.net/models/nvidia-nim/poolside-laguna-xs-2-1/",
+      "model_id": "poolside/laguna-xs-2.1",
+      "context": "262K",
+      "rate_limit": "Up to 40 RPM"
+    },
+    {
+      "provider": "NVIDIA NIM",
+      "model_name": "z-ai/glm-5.1",
+      "model_url": "https://freellm.net/models/nvidia-nim/z-ai-glm-5-1/",
+      "model_id": "z-ai/glm-5.1",
+      "context": "202K",
+      "rate_limit": "Up to 40 RPM"
+    },
+    {
+      "provider": "ModelScope",
+      "model_name": "MiniMax-M2.5-highspeed",
+      "model_url": "https://freellm.net/models/modelscope/minimax-minimax-m2-5/",
+      "model_id": "MiniMax/MiniMax-M2.5",
+      "context": "204K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "ModelScope",
+      "model_name": "Qwen/Qwen3.5-35B-A3B",
+      "model_url": "https://freellm.net/models/modelscope/qwen-qwen3-5-35b-a3b/",
+      "model_id": "qwen-qwen3-5-35b-a3b",
+      "context": "131K",
+      "rate_limit": "2,000 RPD total; <=500 .."
+    },
+    {
+      "provider": "ModelScope",
+      "model_name": "Qwen/Qwen3.5-27B",
+      "model_url": "https://freellm.net/models/modelscope/qwen-qwen3-5-27b/",
+      "model_id": "qwen-qwen3-5-27b",
+      "context": "131K",
+      "rate_limit": "2,000 RPD total; <=500 .."
+    },
+    {
+      "provider": "Cloudflare Workers AI",
+      "model_name": "Mistral 7B",
+      "model_url": "https://freellm.net/models/cloudflare-workers-ai/mistral-mistral-7b-instruct-v0-1/",
+      "model_id": "@cf/mistral/mistral-7b-instruct-v0.1",
+      "context": "32K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "Cloudflare Workers AI",
+      "model_name": "Qwen 1.5 7B",
+      "model_url": "https://freellm.net/models/cloudflare-workers-ai/qwen-qwen1-5-7b-chat/",
+      "model_id": "@cf/qwen/qwen1.5-7b-chat",
+      "context": "32K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "Cloudflare Workers AI",
+      "model_name": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "model_url": "https://freellm.net/models/cloudflare-workers-ai/cf-meta-llama-3-3-70b-instruct-fp8-fast/",
+      "model_id": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+      "context": "131K",
+      "rate_limit": "10K neurons/day (shared)"
+    },
+    {
+      "provider": "OpenRouter",
+      "model_name": "NVIDIA: Nemotron 3 Ultra (free)",
+      "model_url": "https://freellm.net/models/openrouter/nvidia-nemotron-3-ultra-550b-a55b/",
+      "model_id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "context": "1M",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "OpenRouter",
+      "model_name": "Poolside: Laguna M.1 (free)",
+      "model_url": "https://freellm.net/models/openrouter/poolside-laguna-m-1/",
+      "model_id": "poolside/laguna-m.1:free",
+      "context": "262K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "OpenRouter",
+      "model_name": "NVIDIA: Nemotron 3 Super (free)",
+      "model_url": "https://freellm.net/models/openrouter/nvidia-nemotron-3-super-120b-a12b/",
+      "model_id": "nvidia/nemotron-3-super-120b-a12b:free",
+      "context": "262K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "Google Gemini",
+      "model_name": "Gemini 3.6 Flash",
+      "model_url": "https://freellm.net/models/google-gemini/gemini-3-6-flash/",
+      "model_id": "gemini-3.6-flash",
+      "context": "1M",
+      "rate_limit": "15 RPM, 1,500 RPD"
+    },
+    {
+      "provider": "Google Gemini",
+      "model_name": "Gemini 3.5 Flash",
+      "model_url": "https://freellm.net/models/google-gemini/gemini-3-5-flash/",
+      "model_id": "gemini-3.5-flash",
+      "context": "1M",
+      "rate_limit": "15 RPM, 1,500 RPD"
+    },
+    {
+      "provider": "Google Gemini",
+      "model_name": "Gemini 3.5 Flash-Lite",
+      "model_url": "https://freellm.net/models/google-gemini/gemini-3-5-flash-lite/",
+      "model_id": "gemini-3.5-flash-lite",
+      "context": "1M",
+      "rate_limit": "30 RPM, 1,500 RPD"
+    },
+    {
+      "provider": "GitHub Models",
+      "model_name": "Phi-4",
+      "model_url": "https://freellm.net/models/github-models/phi-4/",
+      "model_id": "Phi-4",
+      "context": "131K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "GitHub Models",
+      "model_name": "Mistral Large (24.11)",
+      "model_url": "https://freellm.net/models/github-models/mistral-large-2411/",
+      "model_id": "Mistral-large-2411",
+      "context": "131K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "GitHub Models",
+      "model_name": "AI21 Jamba 1.5 Large",
+      "model_url": "https://freellm.net/models/github-models/ai21-jamba-1-5-large/",
+      "model_id": "AI21-Jamba-1.5-Large",
+      "context": "256K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "LLM7.io",
+      "model_name": "deepseek-r1-0528",
+      "model_url": "https://freellm.net/models/llm7-io/deepseek-r1-0528/",
+      "model_id": "deepseek-r1-0528",
+      "context": "131K",
+      "rate_limit": "30 RPM (120 with token)"
+    },
+    {
+      "provider": "LLM7.io",
+      "model_name": "deepseek-v3-0324",
+      "model_url": "https://freellm.net/models/llm7-io/deepseek-v3-0324/",
+      "model_id": "deepseek-v3",
+      "context": "131K",
+      "rate_limit": "30 RPM (120 with token)"
+    },
+    {
+      "provider": "LLM7.io",
+      "model_name": "gpt-4o-mini",
+      "model_url": "https://freellm.net/models/llm7-io/gpt-4o-mini/",
+      "model_id": "gpt-4o-mini",
+      "context": "131K",
+      "rate_limit": "30 RPM (120 with token)"
+    },
+    {
+      "provider": "OVHcloud AI Endpoints",
+      "model_name": "Qwen3.5-397B-A17B",
+      "model_url": "https://freellm.net/models/ovhcloud-ai-endpoints/qwen3-5-397b-a17b/",
+      "model_id": "qwen3.5-397b-a17b",
+      "context": "131K",
+      "rate_limit": "2 RPM (anonymous)"
+    },
+    {
+      "provider": "OVHcloud AI Endpoints",
+      "model_name": "Meta-Llama-3_3-70B-Instruct",
+      "model_url": "https://freellm.net/models/ovhcloud-ai-endpoints/meta-llama-3-3-70b-instruct/",
+      "model_id": "meta-llama-3_3-70b-instruct",
+      "context": "131K",
+      "rate_limit": "2 RPM (anonymous)"
+    },
+    {
+      "provider": "OVHcloud AI Endpoints",
+      "model_name": "Qwen3.6-27B",
+      "model_url": "https://freellm.net/models/ovhcloud-ai-endpoints/qwen3-6-27b/",
+      "model_id": "qwen3.6-27b",
+      "context": "131K",
+      "rate_limit": "2 RPM (anonymous)"
+    },
+    {
+      "provider": "Ollama Cloud",
+      "model_name": "minimax-m3",
+      "model_url": "https://freellm.net/models/ollama-cloud/minimax-m3/",
+      "model_id": "minimax-m3",
+      "context": "1M",
+      "rate_limit": "Session/weekly limits (.."
+    },
+    {
+      "provider": "Ollama Cloud",
+      "model_name": "gpt-oss:20b",
+      "model_url": "https://freellm.net/models/ollama-cloud/gpt-oss-20b/",
+      "model_id": "gpt-oss:20b",
+      "context": "131K",
+      "rate_limit": "Session/weekly limits (.."
+    },
+    {
+      "provider": "Ollama Cloud",
+      "model_name": "nemotron-3-ultra",
+      "model_url": "https://freellm.net/models/ollama-cloud/nemotron-3-ultra/",
+      "model_id": "nemotron-3-ultra",
+      "context": "262K",
+      "rate_limit": "Session/weekly limits (.."
+    },
+    {
+      "provider": "Groq",
+      "model_name": "Moonshot Kimi K2",
+      "model_url": "https://freellm.net/models/groq/moonshotai-kimi-k2-instruct/",
+      "model_id": "moonshotai/kimi-k2-instruct",
+      "context": "131K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "Groq",
+      "model_name": "Moonshot Kimi K2 0905",
+      "model_url": "https://freellm.net/models/groq/moonshotai-kimi-k2-instruct-0905/",
+      "model_id": "moonshotai/kimi-k2-instruct-0905",
+      "context": "131K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "Groq",
+      "model_name": "groq/compound",
+      "model_url": "https://freellm.net/models/groq/groq-compound/",
+      "model_id": "groq/compound",
+      "context": "131K",
+      "rate_limit": "30 RPM, 250 RPD"
+    },
+    {
+      "provider": "Mistral AI",
+      "model_name": "Mistral 7B",
+      "model_url": "https://freellm.net/models/mistral-ai/open-mistral-7b/",
+      "model_id": "open-mistral-7b",
+      "context": "32K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "Mistral AI",
+      "model_name": "Mixtral 8x7B",
+      "model_url": "https://freellm.net/models/mistral-ai/open-mixtral-8x7b/",
+      "model_id": "open-mixtral-8x7b",
+      "context": "32K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "Mistral AI",
+      "model_name": "Mistral Medium 3.5 (128B)",
+      "model_url": "https://freellm.net/models/mistral-ai/mistral-medium-3-5-128b/",
+      "model_id": "mistral-medium-3-5-128b",
+      "context": "256K",
+      "rate_limit": "~1 RPS, 500K TPM"
+    },
+    {
+      "provider": "Cohere",
+      "model_name": "Command A+ (218B)",
+      "model_url": "https://freellm.net/models/cohere/command-a-218b/",
+      "model_id": "command-a-218b",
+      "context": "436K",
+      "rate_limit": "20 RPM"
+    },
+    {
+      "provider": "Cohere",
+      "model_name": "Command A (111B)",
+      "model_url": "https://freellm.net/models/cohere/command-a-111b/",
+      "model_id": "command-a-111b",
+      "context": "288K",
+      "rate_limit": "20 RPM"
+    },
+    {
+      "provider": "Cohere",
+      "model_name": "Command R+",
+      "model_url": "https://freellm.net/models/cohere/command-r/",
+      "model_id": "command-r",
+      "context": "128K",
+      "rate_limit": "20 RPM"
+    },
+    {
+      "provider": "Kilo Code",
+      "model_name": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "model_url": "https://freellm.net/models/kilo-code/nvidia-nemotron-3-ultra-550b-a55b-free/",
+      "model_id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "context": "1M",
+      "rate_limit": "~200 req/hr"
+    },
+    {
+      "provider": "Kilo Code",
+      "model_name": "stepfun/step-3.7-flash:free",
+      "model_url": "https://freellm.net/models/kilo-code/stepfun-step-3-7-flash-free/",
+      "model_id": "stepfun/step-3.7-flash:free",
+      "context": "262K",
+      "rate_limit": "~200 req/hr"
+    },
+    {
+      "provider": "Kilo Code",
+      "model_name": "nvidia/nemotron-3-super-120b-a12b:free",
+      "model_url": "https://freellm.net/models/kilo-code/nvidia-nemotron-3-super-120b-a12b-free/",
+      "model_id": "nvidia/nemotron-3-super-120b-a12b:free",
+      "context": "262K",
+      "rate_limit": "~200 req/hr"
+    },
+    {
+      "provider": "OpenCode Zen",
+      "model_name": "big-pickle",
+      "model_url": "https://freellm.net/models/opencode/big-pickle/",
+      "model_id": "big-pickle",
+      "context": "0",
+      "rate_limit": ""
+    },
+    {
+      "provider": "OpenCode Zen",
+      "model_name": "DeepSeek V4 Flash",
+      "model_url": "https://freellm.net/models/opencode/deepseek-v4-flash-free/",
+      "model_id": "deepseek-v4-flash-free",
+      "context": "1M",
+      "rate_limit": ""
+    },
+    {
+      "provider": "OpenCode Zen",
+      "model_name": "MiMo-V2.5",
+      "model_url": "https://freellm.net/models/opencode/mimo-v2-5-free/",
+      "model_id": "mimo-v2.5-free",
+      "context": "1M",
+      "rate_limit": ""
+    },
+    {
+      "provider": "Cerebras",
+      "model_name": "Llama 3.1 70B",
+      "model_url": "https://freellm.net/models/cerebras/llama3-1-70b/",
+      "model_id": "llama3.1-70b",
+      "context": "131K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "Cerebras",
+      "model_name": "gpt-oss-120b",
+      "model_url": "https://freellm.net/models/cerebras/gpt-oss-120b/",
+      "model_id": "gpt-oss-120b",
+      "context": "131K",
+      "rate_limit": "5 RPM, 30K TPM, 1M TPD"
+    },
+    {
+      "provider": "Cerebras",
+      "model_name": "zai-glm-4.7 (deprecated Aug 2026)",
+      "model_url": "https://freellm.net/models/cerebras/zai-glm-4-7-deprecated-aug-2026/",
+      "model_id": "zai-glm-4.7",
+      "context": "131K",
+      "rate_limit": "5 RPM, 30K TPM, 1M TPD"
+    },
+    {
+      "provider": "Aion Labs",
+      "model_name": "Aion 2.5",
+      "model_url": "https://freellm.net/models/aion-labs/aion-2-5/",
+      "model_id": "aion-2-5",
+      "context": "128K",
+      "rate_limit": "15 RPM, 20K TPD"
+    },
+    {
+      "provider": "Aion Labs",
+      "model_name": "Aion 2.0",
+      "model_url": "https://freellm.net/models/aion-labs/aion-2-0/",
+      "model_id": "aion-2-0",
+      "context": "128K",
+      "rate_limit": "15 RPM, 20K TPD"
+    },
+    {
+      "provider": "Aion Labs",
+      "model_name": "Aion-RP 1.0 (8B)",
+      "model_url": "https://freellm.net/models/aion-labs/aion-rp-1-0-8b/",
+      "model_id": "aion-rp-1-0-8b",
+      "context": "32K",
+      "rate_limit": "15 RPM, 20K TPD"
+    },
+    {
+      "provider": "Hugging Face",
+      "model_name": "Meta-Llama-3.1-8B-Instruct",
+      "model_url": "https://freellm.net/models/hugging-face/meta-llama-3-1-8b-instruct/",
+      "model_id": "meta-llama-3-1-8b-instruct",
+      "context": "128K",
+      "rate_limit": "Credit-metered"
+    },
+    {
+      "provider": "Hugging Face",
+      "model_name": "gemma-3-4b-it",
+      "model_url": "https://freellm.net/models/hugging-face/gemma-3-4b-it/",
+      "model_id": "gemma-3-4b-it",
+      "context": "131K",
+      "rate_limit": "Credit-metered"
+    },
+    {
+      "provider": "Hugging Face",
+      "model_name": "Qwen2.5-Coder-7B-Instruct",
+      "model_url": "https://freellm.net/models/hugging-face/qwen2-5-coder-7b-instruct/",
+      "model_id": "qwen2-5-coder-7b-instruct",
+      "context": "131K",
+      "rate_limit": "Credit-metered"
+    },
+    {
+      "provider": "Agnes AI",
+      "model_name": "agnes-1.5-flash",
+      "model_url": "https://freellm.net/models/agnes-ai/agnes-1-5-flash/",
+      "model_id": "agnes-1.5-flash",
+      "context": "256K",
+      "rate_limit": "30 RPM"
+    },
+    {
+      "provider": "Agnes AI",
+      "model_name": "agnes-2.0-flash",
+      "model_url": "https://freellm.net/models/agnes-ai/agnes-2-0-flash/",
+      "model_id": "agnes-2.0-flash",
+      "context": "256K",
+      "rate_limit": "30 RPM"
+    },
+    {
+      "provider": "Agnes AI",
+      "model_name": "agnes-image-2.0-flash",
+      "model_url": "https://freellm.net/models/agnes-ai/agnes-image-2-0-flash/",
+      "model_id": "agnes-image-2.0-flash",
+      "context": "4K",
+      "rate_limit": "30 RPM (1K)"
+    },
+    {
+      "provider": "Alibaba Cloud Model Studio",
+      "model_name": "Qwen3-Max",
+      "model_url": "https://freellm.net/models/alibaba-cloud-model-studio/qwen3-max/",
+      "model_id": "qwen3-max",
+      "context": "128K",
+      "rate_limit": "Tiered by region"
+    },
+    {
+      "provider": "Alibaba Cloud Model Studio",
+      "model_name": "Qwen3-Plus",
+      "model_url": "https://freellm.net/models/alibaba-cloud-model-studio/qwen3-plus/",
+      "model_id": "qwen3-plus",
+      "context": "1M",
+      "rate_limit": "Tiered by region"
+    },
+    {
+      "provider": "Alibaba Cloud Model Studio",
+      "model_name": "Qwen3-VL-Plus",
+      "model_url": "https://freellm.net/models/alibaba-cloud-model-studio/qwen3-vl-plus/",
+      "model_id": "qwen3-vl-plus",
+      "context": "128K",
+      "rate_limit": "Tiered by region"
+    },
+    {
+      "provider": "Z AI (Zhipu AI)",
+      "model_name": "GLM-4.7-Flash",
+      "model_url": "https://freellm.net/models/z-ai-zhipu-ai/glm-4-7-flash/",
+      "model_id": "glm-4.7",
+      "context": "200K",
+      "rate_limit": "1 concurrent request"
+    },
+    {
+      "provider": "Z AI (Zhipu AI)",
+      "model_name": "GLM-4.5-Flash",
+      "model_url": "https://freellm.net/models/z-ai-zhipu-ai/glm-4-5-flash/",
+      "model_id": "glm-4.5",
+      "context": "128K",
+      "rate_limit": "1 concurrent request"
+    },
+    {
+      "provider": "Z AI (Zhipu AI)",
+      "model_name": "GLM-4.6V-Flash",
+      "model_url": "https://freellm.net/models/z-ai-zhipu-ai/glm-4-6v-flash/",
+      "model_id": "glm-4.6",
+      "context": "128K",
+      "rate_limit": "1 concurrent request"
+    },
+    {
+      "provider": "SambaNova",
+      "model_name": "DeepSeek-V3.1",
+      "model_url": "https://freellm.net/models/sambanova/deepseek-v3-1/",
+      "model_id": "deepseek-v3-1",
+      "context": "128K",
+      "rate_limit": "20 RPM, 20 RPD, 200K TPD"
+    },
+    {
+      "provider": "SambaNova",
+      "model_name": "DeepSeek-V3.2 (Preview)",
+      "model_url": "https://freellm.net/models/sambanova/deepseek-v3-2-preview/",
+      "model_id": "deepseek-v3-2-preview",
+      "context": "128K",
+      "rate_limit": "20 RPM, 20 RPD, 200K TPD"
+    },
+    {
+      "provider": "SambaNova",
+      "model_name": "MiniMax-M2.7",
+      "model_url": "https://freellm.net/models/sambanova/minimax-m2-7/",
+      "model_id": "minimax-m2-7",
+      "context": "128K",
+      "rate_limit": "20 RPM, 20 RPD, 200K TPD"
+    },
+    {
+      "provider": "SiliconFlow",
+      "model_name": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+      "model_url": "https://freellm.net/models/siliconflow/deepseek-ai-deepseek-r1-distill-qwen-7b/",
+      "model_id": "deepseek-ai-deepseek-r1-distill-qwen-7b",
+      "context": "131K",
+      "rate_limit": "30 RPM, 60K TPM"
+    },
+    {
+      "provider": "SiliconFlow",
+      "model_name": "Abbreviation",
+      "model_url": "https://freellm.net/models/siliconflow/abbreviation/",
+      "model_id": "abbreviation",
+      "context": "131K",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "SiliconFlow",
+      "model_name": "deepseek-ai/DeepSeek-OCR",
+      "model_url": "https://freellm.net/models/siliconflow/deepseek-ai-deepseek-ocr/",
+      "model_id": "deepseek-ai-deepseek-ocr",
+      "context": "131K",
+      "rate_limit": "30 RPM, 60K TPM"
+    },
+    {
+      "provider": "xAI",
+      "model_name": "grok-4.3",
+      "model_url": "https://freellm.net/models/xai/grok-4-3/",
+      "model_id": "grok-4-3",
+      "context": "1M",
+      "rate_limit": "Credit-based"
+    },
+    {
+      "provider": "xAI",
+      "model_name": "grok-4.1-fast",
+      "model_url": "https://freellm.net/models/xai/grok-4-1-fast/",
+      "model_id": "grok-4-1-fast",
+      "context": "2M",
+      "rate_limit": "Credit-based"
+    },
+    {
+      "provider": "xAI",
+      "model_name": "grok-3-mini",
+      "model_url": "https://freellm.net/models/xai/grok-3-mini/",
+      "model_id": "grok-3-mini",
+      "context": "131K",
+      "rate_limit": "Credit-based"
+    },
+    {
+      "provider": "Cline",
+      "model_name": "deepseek-v4-flash",
+      "model_url": "https://freellm.net/models/cline/deepseek-deepseek-v4-flash/",
+      "model_id": "deepseek/deepseek-v4-flash",
+      "context": "0",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "Cline",
+      "model_name": "nemotron-3.5-lightning",
+      "model_url": "https://freellm.net/models/cline/nvidia-nemotron-3-5-lightning/",
+      "model_id": "nvidia/nemotron-3.5-lightning",
+      "context": "0",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "Cline",
+      "model_name": "laguna-s-2.1:free",
+      "model_url": "https://freellm.net/models/cline/poolside-laguna-s-2-1/",
+      "model_id": "poolside/laguna-s-2.1:free",
+      "context": "0",
+      "rate_limit": "See provider"
+    },
+    {
+      "provider": "Chutes.ai",
+      "model_name": "DeepSeek-R1",
+      "model_url": "https://freellm.net/models/chutes-ai/deepseek-ai-deepseek-r1/",
+      "model_id": "deepseek-ai/DeepSeek-R1",
+      "context": "131K",
+      "rate_limit": "Community-powered, no h.."
+    },
+    {
+      "provider": "Chutes.ai",
+      "model_name": "Llama 3.1 70B",
+      "model_url": "https://freellm.net/models/chutes-ai/meta-llama-meta-llama-3-1-70b-instruct/",
+      "model_id": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+      "context": "131K",
+      "rate_limit": "Community-powered, no h.."
+    },
+    {
+      "provider": "Glhf.chat",
+      "model_name": "Llama 3.1 70B",
+      "model_url": "https://freellm.net/models/glhf-chat/meta-llama-meta-llama-3-1-70b-instruct-2/",
+      "model_id": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+      "context": "131K",
+      "rate_limit": "Unlimited for free models"
+    },
+    {
+      "provider": "Glhf.chat",
+      "model_name": "Mixtral 8x7B",
+      "model_url": "https://freellm.net/models/glhf-chat/mistralai-mixtral-8x7b-instruct-v0-1/",
+      "model_id": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+      "context": "32K",
+      "rate_limit": "Unlimited for free models"
+    },
+    {
+      "provider": "Grok (xAI)",
+      "model_name": "Grok-2",
+      "model_url": "https://freellm.net/models/grok-(xai)/grok-2/",
+      "model_id": "grok-2",
+      "context": "131K",
+      "rate_limit": "$25/month free credits,.."
+    },
+    {
+      "provider": "Grok (xAI)",
+      "model_name": "Grok-2 Mini",
+      "model_url": "https://freellm.net/models/grok-(xai)/grok-2-mini/",
+      "model_id": "grok-2-mini",
+      "context": "131K",
+      "rate_limit": "$25/month free credits,.."
+    },
+    {
+      "provider": "AI21 Labs",
+      "model_name": "Jamba Large 1.7",
+      "model_url": "https://freellm.net/models/ai21-labs/jamba-large-1-7/",
+      "model_id": "jamba-large-1-7",
+      "context": "256K",
+      "rate_limit": "200 RPM, 10 RPS"
+    },
+    {
+      "provider": "AI21 Labs",
+      "model_name": "Jamba Mini 2",
+      "model_url": "https://freellm.net/models/ai21-labs/jamba-mini-2/",
+      "model_id": "jamba-mini-2",
+      "context": "256K",
+      "rate_limit": "200 RPM, 10 RPS"
+    },
+    {
+      "provider": "DeepSeek",
+      "model_name": "deepseek-chat (V3.2)",
+      "model_url": "https://freellm.net/models/deepseek/deepseek-chat-v3-2/",
+      "model_id": "deepseek-chat-v3-2",
+      "context": "128K",
+      "rate_limit": "Dynamic"
+    },
+    {
+      "provider": "DeepSeek",
+      "model_name": "deepseek-reasoner (R1)",
+      "model_url": "https://freellm.net/models/deepseek/deepseek-reasoner-r1/",
+      "model_id": "deepseek-reasoner-r1",
+      "context": "128K",
+      "rate_limit": "Dynamic"
+    },
+    {
+      "provider": "Nscale",
+      "model_name": "Llama-3.3-70B-Instruct",
+      "model_url": "https://freellm.net/models/nscale/llama-3-3-70b-instruct/",
+      "model_id": "llama-3-3-70b-instruct",
+      "context": "128K",
+      "rate_limit": "Fair-use"
+    },
+    {
+      "provider": "Nscale",
+      "model_name": "DeepSeek-R1-Distill-Llama-70B",
+      "model_url": "https://freellm.net/models/nscale/deepseek-r1-distill-llama-70b/",
+      "model_id": "deepseek-r1-distill-llama-70b",
+      "context": "128K",
+      "rate_limit": "Fair-use"
+    },
+    {
+      "provider": "Nebius",
+      "model_name": "Qwen3-235B-A22B",
+      "model_url": "https://freellm.net/models/nebius/qwen3-235b-a22b/",
+      "model_id": "qwen3-235b-a22b",
+      "context": "128K",
+      "rate_limit": "Tier-based"
+    }
+  ],
+  "local_tools": [
+    {
+      "name": "Tool",
+      "url": "",
+      "type": "Type",
+      "highlights": "Highlights"
+    },
+    {
+      "name": "Ollama",
+      "url": "https://ollama.com",
+      "type": "CLI + API",
+      "highlights": "100+ models, GPU acceleration, OpenAI-compatible endpoint"
+    },
+    {
+      "name": "LM Studio",
+      "url": "https://lmstudio.ai",
+      "type": "Desktop GUI",
+      "highlights": "Any GGUF model, built-in model browser, offline"
+    },
+    {
+      "name": "llama.cpp",
+      "url": "https://github.com/ggerganov/llama.cpp",
+      "type": "C/C++ engine",
+      "highlights": "Runs any GGUF, minimal dependencies"
+    },
+    {
+      "name": "GPT4All",
+      "url": "https://gpt4all.io",
+      "type": "Desktop app",
+      "highlights": "CPU-only, no GPU required, open source"
+    },
+    {
+      "name": "Jan.ai",
+      "url": "https://jan.ai",
+      "type": "Desktop app",
+      "highlights": "Privacy-focused, 100% offline ChatGPT alternative"
+    },
+    {
+      "name": "KoboldCpp",
+      "url": "https://github.com/LostRuins/koboldcpp",
+      "type": "Single executable",
+      "highlights": "Optimized for creative writing, GGUF"
+    }
+  ],
+  "last_updated": "2026-08-18T12:53:55.909118+00:00"
+}
