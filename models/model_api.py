@@ -2175,6 +2175,15 @@ class ModelAPI(BaseHTTPRequestHandler):
                 }
             })
         elif self.path == "/api/models":
+            # v10: require auth for model list
+            token = self.headers.get("Authorization", "").replace("Bearer ", "")
+            if not token:
+                self.respond(401, {"error": "Unauthorized"})
+                return
+            user = verify_token(token)
+            if not user:
+                self.respond(401, {"error": "Invalid token"})
+                return
             try:
                 registry_path = "/opt/evolvixos/models/model_registry.json"
                 if os.path.exists(registry_path):

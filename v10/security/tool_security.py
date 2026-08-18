@@ -96,7 +96,7 @@ def check_permission(name: str, user_role: str = "user") -> tuple[bool, str]:
 
 # --- Audit Log ---
 
-@dataclass
+@dataclass(frozen=True)
 class AuditEntry:
     timestamp: float
     user_id: str
@@ -108,7 +108,33 @@ class AuditEntry:
     detail: str = ""
 
 
-_audit_log: list[AuditEntry] = []
+class _AppendOnlyLog:
+    """Append-only audit log — cannot be cleared or modified from outside."""
+    def __init__(self):
+        self._entries: list[AuditEntry] = []
+    def append(self, entry):
+        self._entries.append(entry)
+    def __len__(self):
+        return len(self._entries)
+    def __iter__(self):
+        return iter(self._entries)
+    def __getitem__(self, idx):
+        return self._entries[idx]
+    def __delitem__(self, idx):
+        # Allow internal log rotation only (slice deletion)
+        if isinstance(idx, slice):
+            self._entries.__delitem__(idx)
+        else:
+            raise PermissionError("Cannot delete individual audit entries")
+    def clear(self):
+        raise PermissionError("Audit log is append-only — cannot be cleared")
+    def pop(self, *a):
+        raise PermissionError("Audit log is append-only — cannot pop entries")
+    @property
+    def _raw(self):
+        return self._entries
+
+_audit_log = _AppendOnlyLog()
 _audit_lock = __import__("threading").Lock()
 
 
@@ -127,14 +153,21 @@ def log_audit(user_id: str, tool_name: str, permission: str,
         )
         _audit_log.append(entry)
         if len(_audit_log) > 10000:
-            del _audit_log[:5000]
+            del _audit_log[:5000]  # log rotation (slice delete allowed)
     logger.info(f"AUDIT: user={user_id} tool={tool_name} result={result} "
                 f"duration={duration_ms:.0f}ms")
+    # v10: persist to disk
+    try:
+        audit_file = "/opt/evolvixos/v10/security/audit.log"
+        with open(audit_file, "a") as af:
+            af.write(f"{time.time()}|{user_id}|{tool_name}|{permission}|{result}|{duration_ms:.0f}|{args_summary[:100]}\n")
+    except:
+        pass
 
 
 def get_audit_log(limit: int = 100, user_id: str = None) -> list[dict]:
     with _audit_lock:
-        entries = _audit_log[-limit:]
+        entries = list(_audit_log)[-limit:]
         if user_id:
             entries = [e for e in entries if e.user_id == user_id]
         return [
@@ -157,6 +190,9 @@ def get_audit_log(limit: int = 100, user_id: str = None) -> list[dict]:
 SENSITIVE_PATHS = [
     "/root/.ssh", "/root/.bash_history", "/root/.aws", "/root/.gnupg",
     "/etc/shadow", "/etc/gshadow", "/proc/self/environ",
+    "/var/log/auth.log", "/var/log/secure",
+    "/opt/evolvixos/.env", "/opt/evolvixos/models/.env", "/opt/evolvixos/auth/.env",
+    "/.env", "*/.env",
 ]
 
 def validate_path(path: str, allowed_bases: list, user_scope: str = None) -> tuple[bool, str]:
@@ -168,7 +204,7 @@ def validate_path(path: str, allowed_bases: list, user_scope: str = None) -> tup
         return False, "Empty path"
 
     try:
-        resolved = os.path.realpath(os.path.expanduser(path))
+        resolved = os.path.realpath(os.path.expanduser(urllib.parse.unquote(path)))
     except Exception as e:
         return False, f"Path resolution error: {e}"
 
@@ -176,6 +212,9 @@ def validate_path(path: str, allowed_bases: list, user_scope: str = None) -> tup
     for sp in SENSITIVE_PATHS:
         if resolved.startswith(sp):
             return False, f"Path '{path}' is a sensitive system path"
+    # v10: block .env files
+    if resolved.endswith(".env"):
+        return False, f"Path '{path}' is a protected .env file"
 
     for base in allowed_bases:
         base_resolved = os.path.realpath(base)
@@ -242,6 +281,7 @@ DANGEROUS_PATTERNS = [
     r"/etc/shadow",
     r"/etc/sudoers",
     r"/proc/self/environ",
+    "/var/log/auth.log", "/var/log/secure",
     r"\.env\b.*grep",
     # file manipulation of system files
     r"mv\s+/etc/",
@@ -273,6 +313,42 @@ DANGEROUS_PATTERNS = [
     # broader grep for API keys
     r"\|\s*grep\s+-i.*key",
     r"grep\s+.*\bkey\b.*\.py",
+    # v10 adversarial: shell metacharacters
+    r"\|\|",
+    r"\$\(",  # command substitution
+    r"`",       # backtick substitution
+    r"\$\{IFS\}",  # IFS bypass
+    r"\|",     # pipe operator
+    r"\beval\b",
+    r"base64\s+-d",
+    r"\btee\b",
+    r"heredoc",
+    r"<<\s*EOF",
+    r"PATH=\S",
+    r"\bexport\b",
+    # v10 adversarial: network tools
+    r"\bnc\b",
+    r"netcat",
+    r"\bnmap\b",
+    r"tcpdump",
+    # v10 adversarial: arbitrary code exec via interpreters
+    r"python3?\s+-c",
+    r"perl\s+-e",
+    r"ruby\s+-e",
+    # v10 adversarial: process manipulation
+    r"kill\s+-9",
+    r"kill\s+-1",
+    r"nohup\s",
+    r"\bcrontab\b",
+    r"\bbash\b", r"\bsh\s",
+    r";",
+    r">",
+    r"<\s",
+    r"#",
+    r"\bsleep\b",
+    r"\bbash\b",
+    r"\bsh\s",
+    r"\bat\s+-f",
 ]
 
 _dangerous_re = [re.compile(p, re.IGNORECASE) for p in DANGEROUS_PATTERNS]
@@ -334,7 +410,7 @@ def validate_url(url: str, allowed_schemes: tuple = ("https", "http")) -> tuple[
     if not url:
         return False, "Empty URL"
 
-    parsed = urllib.parse.urlparse(url)
+    parsed = urllib.parse.urlparse(urllib.parse.unquote(url))
     if parsed.scheme not in allowed_schemes:
         return False, f"Scheme '{parsed.scheme}' not allowed (must be {allowed_schemes})"
 
@@ -357,8 +433,10 @@ def validate_url(url: str, allowed_schemes: tuple = ("https", "http")) -> tuple[
         return False, "Cloud metadata endpoint blocked"
 
     # Block cloud metadata endpoints
-    if host.lower() in ("metadata.google.internal", "metadata.azure.com",
-                        "100.100.100.200"):
+    if host.lower() in ("metadata.google.internal", "metadata.google.internal.",
+                        "metadata.tencentyun.com", "kubernetes.default.svc",
+                        "kubernetes.default", "169.254.169.254.compute.internal",
+                        "100.100.100.200", "metadata.azure.com"):
         return False, f"Cloud metadata endpoint blocked: {host}"
 
     # Block link-local (169.254.x.x) — already caught by is_link_local above
@@ -411,6 +489,11 @@ PYTHON_DANGEROUS = [
     # env var access
     r"os\.environ\s*\[\s*['\"]\w*API_KEY",
     r"os\.getenv\s*\(\s*['\"]\w*API_KEY",
+    # v10 adversarial: sandbox escape
+    "__class__", "__bases__", "__subclasses__", "__mro__",
+    r"getattr\(__builtins__", r"vars\(__builtins__", r"globals\(\)",
+    "__builtins__", "ctypes", "import signal", "import threading",
+    "import marshal",
 ]
 
 _python_dangerous_re = [re.compile(p, re.IGNORECASE) for p in PYTHON_DANGEROUS]
