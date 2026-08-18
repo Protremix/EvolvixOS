@@ -279,6 +279,11 @@ function toggleNav(){const s=document.querySelector('.sidebar');s.classList.togg
 <div class="nav-item" onclick="showTemplates()"><span class="icon">📋</span> Templates <span class="badge" id="template-badge">8</span></div>
 <div class="nav-item" onclick="showGallery()"><span class="icon">🖼️</span> Gallery <span class="badge" id="gallery-badge">0</span></div>
 <div class="nav-item" onclick="showModels()"><span class="icon">🧠</span> Models <span class="badge">81</span></div>
+<div class="nav-item" onclick="window.open('/apis','_blank')"><span class="icon">🔌</span> API Directory <span class="badge">35K</span></div>
+<div class="nav-item" onclick="window.open(/image-gen,_blank)"><span class="icon">🎨</span> Image Gen API <span class="badge">100K</span></div>
+<div class="nav-item" onclick="window.open(/ai-tools,_blank)"><span class="icon">🧰</span> AI Tools <span class="badge">84</span></div>
+<div class="nav-item" onclick="window.open(/freellm,_blank)"><span class="icon">🔑</span> Free LLM APIs <span class="badge">442</span></div>
+<div class="nav-item" onclick="window.open('/learn','_blank')"><span class="icon">📚</span> Learn Hub <span class="badge">15</span></div>
 <div class="sidebar-section">Engines</div>
 <div class="nav-item"><span class="icon">🔥</span> Ollama <span class="badge" id="ollama-status">--</span></div>
 <div class="nav-item"><span class="icon">🎨</span> ComfyUI <span class="badge" id="comfyui-status">--</span></div>
@@ -761,6 +766,11 @@ function showBuilder(){document.getElementById('builder').scrollIntoView({behavi
 function showTemplates(){document.getElementById('templates-section').scrollIntoView({behavior:'smooth'})}
 function showGallery(){alert('Gallery coming soon — '+imageCount+' images generated so far')}
 function showModels(){window.open('/models','_blank')}
+<div class="nav-item" onclick="window.open('/apis','_blank')"><span class="icon">🔌</span> API Directory <span class="badge">35K</span></div>
+<div class="nav-item" onclick="window.open(/image-gen,_blank)"><span class="icon">🎨</span> Image Gen API <span class="badge">100K</span></div>
+<div class="nav-item" onclick="window.open(/ai-tools,_blank)"><span class="icon">🧰</span> AI Tools <span class="badge">84</span></div>
+<div class="nav-item" onclick="window.open(/freellm,_blank)"><span class="icon">🔑</span> Free LLM APIs <span class="badge">442</span></div>
+<div class="nav-item" onclick="window.open('/learn','_blank')"><span class="icon">📚</span> Learn Hub <span class="badge">15</span></div>
 
 // Init
 document.getElementById('prompt').focus();

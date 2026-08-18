@@ -1,0 +1,692 @@
+{
+  "title": "Lovable for Beginners",
+  "subtitle": "Your complete beginner's course to mastering Lovable Vibe Coding",
+  "source": "https://github.com/cporter202/lovable-for-beginners",
+  "total_modules": 15,
+  "total_supplements": 4,
+  "phases": [
+    {
+      "name": "Phase 1: Foundations",
+      "description": "Build a strong product foundation before adding backend complexity.",
+      "modules": [
+        {
+          "filename": "module-01-welcome-to-lovable.md",
+          "title": "Module 1: Welcome to Lovable",
+          "module_num": 1,
+          "phase": "Phase 1: Foundations",
+          "is_supplement": false,
+          "summary": "Lovable is a full-stack AI development platform for building, iterating on, and deploying web applications with natural-language instructions. It creates real, editable code and can manage the fronten",
+          "goals": [
+            "Explain what Lovable does and what it does not do",
+            "Distinguish an account, workspace, project, preview, and published app",
+            "Navigate the dashboard and project editor",
+            "Create a small first project",
+            "Use version history and understand that publishing is a separate step"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. How Lovable works",
+            "2. Core terms",
+            "3. The dashboard",
+            "4. Your first project",
+            "5. A reliable beginner workflow",
+            "Important boundaries",
+            "Practice checkpoint",
+            "Official references"
+          ],
+          "word_count": 888,
+          "read_time": 4,
+          "url": "/api/learn/module-01-welcome-to-lovable"
+        },
+        {
+          "filename": "module-02-starting-your-first-project.md",
+          "title": "Module 2: Starting Your First Project",
+          "module_num": 2,
+          "phase": "Phase 1: Foundations",
+          "is_supplement": false,
+          "summary": "The first build sets the architecture, design language, and scope that later prompts inherit. A good start is less about writing a giant specification and more about making the product, audience, main",
+          "goals": [
+            "Choose the right way to start a project",
+            "Write a useful initial prompt",
+            "Use design guidance and references intentionally",
+            "Evaluate the first build before adding features",
+            "Avoid copying protected content or connecting a backend too early"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. Ways to start",
+            "2. Write the initial prompt",
+            "3. Use design guidance",
+            "4. Review the first build",
+            "Hands-on project",
+            "Checklist",
+            "Official references"
+          ],
+          "word_count": 838,
+          "read_time": 4,
+          "url": "/api/learn/module-02-starting-your-first-project"
+        },
+        {
+          "filename": "module-03-understanding-lovable-modes.md",
+          "title": "Module 3: Build Mode and Plan Mode",
+          "module_num": 3,
+          "phase": "Phase 1: Foundations",
+          "is_supplement": false,
+          "summary": "Lovable has two complementary working modes. The current interface calls them Build and Plan. Some official pages and older project history may use Agent mode for Build and Chat mode for Plan.",
+          "goals": [
+            "Choose the correct mode for a task",
+            "Create, review, and approve implementation plans",
+            "Give Build mode useful constraints and verification instructions",
+            "Understand prompt queues, stopping, undo, and credit behavior"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. Plan mode",
+            "2. Build mode",
+            "3. A practical mode decision",
+            "4. Execution controls",
+            "5. Recommended operating rhythm",
+            "Practice",
+            "Checklist",
+            "Official references"
+          ],
+          "word_count": 943,
+          "read_time": 4,
+          "url": "/api/learn/module-03-understanding-lovable-modes"
+        },
+        {
+          "filename": "module-04-editing-and-refining.md",
+          "title": "Module 4: Editing, Knowledge, and Iteration",
+          "module_num": 4,
+          "phase": "Phase 1: Foundations",
+          "is_supplement": false,
+          "summary": "Good Lovable work is iterative. Use the smallest editing surface that fits the change, give the agent persistent context where useful, and keep version history as part of the workflow.",
+          "goals": [
+            "Use all four preview-toolbar modes",
+            "Distinguish workspace knowledge, project knowledge, and skills",
+            "Reference files, lines, and other projects",
+            "Use version history, bookmarks, and comments",
+            "Make focused changes without disturbing stable areas"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. The preview toolbar",
+            "2. Knowledge",
+            "3. References",
+            "4. Version history",
+            "5. Focused iteration pattern",
+            "Practice",
+            "Official references"
+          ],
+          "word_count": 836,
+          "read_time": 4,
+          "url": "/api/learn/module-04-editing-and-refining"
+        },
+        {
+          "filename": "module-05-prompt-engineering.md",
+          "title": "Module 5: Prompting for Reliable Results",
+          "module_num": 5,
+          "phase": "Phase 1: Foundations",
+          "is_supplement": false,
+          "summary": "Prompting is product specification in compact form. The most reliable prompts define the user outcome, constrain scope, name important states, and say how success will be verified.",
+          "goals": [
+            "Write prompts with outcome, context, constraints, and acceptance criteria",
+            "Build by flow and component instead of generating everything at once",
+            "Use real content and explicit UI states",
+            "Prompt for safe changes and useful verification",
+            "Recover from vague or unsuccessful prompts"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. The five-part prompt",
+            "2. Plan before implementation",
+            "3. Build by flow and component",
+            "4. Use real content",
+            "5. Prompt visual direction",
+            "6. Protect stable behavior",
+            "7. Ask for verification explicitly",
+            "8. Repair a poor result",
+            "Practice challenges",
+            "Official references"
+          ],
+          "word_count": 832,
+          "read_time": 4,
+          "url": "/api/learn/module-05-prompt-engineering"
+        },
+        {
+          "filename": "supplement-challenge-solutions.md",
+          "title": "Practice Solutions and Hints",
+          "module_num": 0,
+          "phase": "Phase 1: Foundations",
+          "is_supplement": true,
+          "summary": "These are reference approaches, not scripts to follow blindly. Try each exercise first, compare your result, and adapt the solution to your project's stack and requirements.",
+          "goals": [],
+          "sections": [
+            "Module 2: Strong first project",
+            "Module 3: Plan then build",
+            "Module 4: Focused refinement",
+            "Module 5: Repair a vague prompt",
+            "Module 6: Secure data model",
+            "Module 8: Release decision",
+            "Module 9: Invitation workflow",
+            "Module 10: Root-cause debugging",
+            "Module 11: Staged migration",
+            "Module 12: Performance review",
+            "Module 13: Reliable API action",
+            "Module 14: Git sync workflow",
+            "Module 15: External deployment",
+            "How to evaluate your work"
+          ],
+          "word_count": 1465,
+          "read_time": 7,
+          "url": "/api/learn/supplement-challenge-solutions"
+        },
+        {
+          "filename": "supplement-pricing-and-plans.md",
+          "title": "Pricing, Credits, and Plans",
+          "module_num": 0,
+          "phase": "Phase 1: Foundations",
+          "is_supplement": true,
+          "summary": "Verified against Lovable's official pricing documentation on July 18, 2026. Pricing, grants, and feature limits can change. Use the [live plan documentation](https://docs.lovable.dev/introduction/subs",
+          "goals": [],
+          "sections": [
+            "Current plan overview",
+            "One credit balance",
+            "Included usage-specific grants",
+            "Build costs",
+            "General credits and rollover",
+            "Selected plan differences",
+            "Managing usage",
+            "Cost-control habits",
+            "Official references"
+          ],
+          "word_count": 967,
+          "read_time": 4,
+          "url": "/api/learn/supplement-pricing-and-plans"
+        },
+        {
+          "filename": "supplement-quick-reference.md",
+          "title": "Lovable Quick Reference",
+          "module_num": 0,
+          "phase": "Phase 1: Foundations",
+          "is_supplement": true,
+          "summary": "Current as of July 18, 2026.",
+          "goals": [],
+          "sections": [
+            "Mode chooser",
+            "Best prompt structure",
+            "First-project prompt",
+            "Plan before a risky change",
+            "Build safely",
+            "Debugging prompt",
+            "Verification prompts",
+            "Preview toolbar",
+            "Knowledge and references",
+            "Lovable Cloud checklist",
+            "Integration chooser",
+            "Pre-publish checklist",
+            "Current navigation",
+            "Official references"
+          ],
+          "word_count": 841,
+          "read_time": 4,
+          "url": "/api/learn/supplement-quick-reference"
+        },
+        {
+          "filename": "supplement-troubleshooting.md",
+          "title": "Troubleshooting Lovable Projects",
+          "module_num": 0,
+          "phase": "Phase 1: Foundations",
+          "is_supplement": true,
+          "summary": "Use this guide to move from symptom to evidence. Menu names and plan availability are current as of July 18, 2026.",
+          "goals": [],
+          "sections": [
+            "First response to any issue",
+            "\"Lovable built the wrong thing\"",
+            "\"I cannot find Chat, Agent, Visual Edits, or Code Mode\"",
+            "\"My live site does not show the latest changes\"",
+            "\"The app works in preview but not production\"",
+            "\"A direct link returns 404\"",
+            "\"Authentication works for one user but not another\"",
+            "\"Data is missing or access is denied\"",
+            "\"Data is visible to the wrong user\"",
+            "\"An API key is visible\"",
+            "\"The API or connector fails\"",
+            "\"Payments work in preview but not live\"",
+            "\"Cloud cannot be moved to another region\"",
+            "\"Browser testing cannot complete the flow\"",
+            "\"The project is slow\"",
+            "\"Credits disappear faster than expected\"",
+            "\"GitHub changes are not appearing\"",
+            "Escalation package",
+            "Official references"
+          ],
+          "word_count": 1242,
+          "read_time": 6,
+          "url": "/api/learn/supplement-troubleshooting"
+        }
+      ]
+    },
+    {
+      "name": "Phase 2: Full-Stack Delivery",
+      "description": "Turn the interface into a secure, tested, published application.",
+      "modules": [
+        {
+          "filename": "module-06-adding-fullstack-capabilities.md",
+          "title": "Module 6: Full-Stack Apps with Lovable Cloud",
+          "module_num": 6,
+          "phase": "Phase 2: Full-Stack Delivery",
+          "is_supplement": false,
+          "summary": "Lovable Cloud is the default managed path from a frontend prototype to a working full-stack app. It provides hosting, database, authentication, storage, edge functions, jobs, AI, secrets, logs, and us",
+          "goals": [
+            "Decide between Lovable Cloud and an external Supabase project",
+            "Enable Cloud with the correct region and permissions",
+            "Design a database, authentication flow, storage rules, and server functions",
+            "Distinguish app connectors, chat connectors, and custom APIs",
+            "Protect data with authorization, RLS, and server-side secrets"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. Choose the backend path",
+            "2. Enable Cloud carefully",
+            "3. Database design",
+            "4. Authentication and authorization",
+            "5. Storage",
+            "6. Edge functions, jobs, AI, and secrets",
+            "7. Integrations: three categories",
+            "8. Built-in payments",
+            "Security gate",
+            "Official references"
+          ],
+          "word_count": 1049,
+          "read_time": 5,
+          "url": "/api/learn/module-06-adding-fullstack-capabilities"
+        },
+        {
+          "filename": "module-07-code-mode.md",
+          "title": "Module 7: Inspecting and Editing Code",
+          "module_num": 7,
+          "phase": "Phase 2: Full-Stack Delivery",
+          "is_supplement": false,
+          "summary": "The feature once commonly called Code Mode is now documented as the code editor. It provides direct access to project files for inspection, targeted manual edits, downloads, and precise references bac",
+          "goals": [
+            "Navigate the code editor and identify a project's stack",
+            "Search, inspect, edit, format, and download files",
+            "Reference files and exact lines in prompts",
+            "Make small manual changes safely",
+            "Know when Git sync or a local IDE is a better tool"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. Start by identifying the project",
+            "2. Code editor capabilities",
+            "3. Use references instead of pasting code",
+            "4. Safe manual edits",
+            "5. Environment variables and secrets",
+            "6. Download versus Git sync",
+            "Practice",
+            "Official references"
+          ],
+          "word_count": 651,
+          "read_time": 3,
+          "url": "/api/learn/module-07-code-mode"
+        },
+        {
+          "filename": "module-08-deploying-and-publishing.md",
+          "title": "Module 8: Publishing and Operating Your App",
+          "module_num": 8,
+          "phase": "Phase 2: Full-Stack Delivery",
+          "is_supplement": false,
+          "summary": "Publishing deploys a snapshot of the current project to a live URL. Later edits remain in preview until you explicitly publish an update.",
+          "goals": [
+            "Prepare a project for release",
+            "Distinguish project access from website access",
+            "Publish, update, unpublish, and connect a custom domain",
+            "Configure metadata, security checks, SEO, analytics, and monitoring",
+            "Verify production after every release"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. Preview is not production",
+            "2. Pre-publish checklist",
+            "3. Publish",
+            "4. Access settings",
+            "5. Custom domains",
+            "6. SEO and AI search",
+            "7. Analytics and monitoring",
+            "8. Release and rollback routine",
+            "Official references"
+          ],
+          "word_count": 853,
+          "read_time": 4,
+          "url": "/api/learn/module-08-deploying-and-publishing"
+        },
+        {
+          "filename": "module-09-real-world-project.md",
+          "title": "Module 9: Real-World Project - Book Club Hub",
+          "module_num": 9,
+          "phase": "Phase 2: Full-Stack Delivery",
+          "is_supplement": false,
+          "summary": "In this project you will build a complete multi-user web app with planning, design, Lovable Cloud, authentication, row-level security, testing, publishing, SEO, analytics, and monitoring.",
+          "goals": [],
+          "sections": [
+            "Product brief",
+            "Milestone 1: Product and architecture plan",
+            "Milestone 2: Design foundation",
+            "Milestone 3: Lovable Cloud and schema",
+            "Milestone 4: Authentication",
+            "Milestone 5: Core workflows",
+            "Milestone 6: Dashboard and quality states",
+            "Milestone 7: Verification",
+            "Milestone 8: Publish and operate",
+            "Completion checklist",
+            "Official references"
+          ],
+          "word_count": 1196,
+          "read_time": 5,
+          "url": "/api/learn/module-09-real-world-project"
+        },
+        {
+          "filename": "module-10-debugging-and-testing.md",
+          "title": "Module 10: Debugging, Testing, and Security",
+          "module_num": 10,
+          "phase": "Phase 2: Full-Stack Delivery",
+          "is_supplement": false,
+          "summary": "Debugging is the process of turning an observed failure into a reproducible case, finding its root cause, making the smallest correct fix, and proving the behavior stays fixed.",
+          "goals": [
+            "Investigate in Plan mode before editing fragile code",
+            "Use browser testing, frontend tests, direct edge calls, and edge tests correctly",
+            "Read console, network, build, and backend signals",
+            "Run and interpret Basic and Deep security scans",
+            "Build a repeatable incident and regression workflow"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. Describe the failure precisely",
+            "2. Investigate before changing code",
+            "3. Choose the right verification tool",
+            "4. Observe the whole request path",
+            "5. Fix and prove",
+            "6. Security scans",
+            "7. Regression and incident routine",
+            "Practice",
+            "Official references"
+          ],
+          "word_count": 954,
+          "read_time": 4,
+          "url": "/api/learn/module-10-debugging-and-testing"
+        }
+      ]
+    },
+    {
+      "name": "Phase 3: Advanced Practice",
+      "description": "Scale your workflow, integrations, collaboration, and infrastructure choices.",
+      "modules": [
+        {
+          "filename": "module-11-advanced-prompt-patterns.md",
+          "title": "Module 11: Advanced Prompt Patterns",
+          "module_num": 11,
+          "phase": "Phase 3: Advanced Practice",
+          "is_supplement": false,
+          "summary": "Advanced prompting is less about clever wording and more about structuring work so Lovable can investigate, decide, implement, and verify without losing the important constraints.",
+          "goals": [
+            "Use prompts for audits, migrations, refactors, and staged delivery",
+            "Combine knowledge, skills, references, and subagents",
+            "Define invariants and rollback points for risky work",
+            "Review AI output as evidence, not authority"
+          ],
+          "sections": [
+            "Learning goals",
+            "Pattern 1: Read-only audit",
+            "Pattern 2: Invariants for fragile changes",
+            "Pattern 3: Staged migration",
+            "Pattern 4: Vertical slices",
+            "Pattern 5: Evidence-based debugging",
+            "Pattern 6: Cross-project reuse",
+            "Pattern 7: Parallel investigation with subagents",
+            "Pattern 8: Reusable workspace skills",
+            "Pattern 9: Review against acceptance criteria",
+            "Practice",
+            "Official references"
+          ],
+          "word_count": 847,
+          "read_time": 4,
+          "url": "/api/learn/module-11-advanced-prompt-patterns"
+        },
+        {
+          "filename": "module-12-performance-and-optimization.md",
+          "title": "Module 12: Performance, SEO, and Operations",
+          "module_num": 12,
+          "phase": "Phase 3: Advanced Practice",
+          "is_supplement": false,
+          "summary": "Optimization begins with measurement. A fast preview does not prove a fast production experience, and a high pageview count does not prove users completed the key workflow.",
+          "goals": [
+            "Establish performance budgets and reproduce slow behavior",
+            "Optimize frontend, data, and Cloud usage with evidence",
+            "Use SEO and AI search review, analytics, logs, and monitoring",
+            "Avoid premature or cosmetic optimization"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. Define a measurable target",
+            "2. Frontend performance",
+            "3. Data and backend performance",
+            "4. Cloud and AI usage",
+            "5. SEO and AI search review",
+            "6. Analytics",
+            "7. Monitoring and release observation",
+            "Optimization workflow",
+            "Official references"
+          ],
+          "word_count": 846,
+          "read_time": 4,
+          "url": "/api/learn/module-12-performance-and-optimization"
+        },
+        {
+          "filename": "module-13-advanced-api-integration.md",
+          "title": "Module 13: Advanced Integrations and APIs",
+          "module_num": 13,
+          "phase": "Phase 3: Advanced Practice",
+          "is_supplement": false,
+          "summary": "An integration is secure only when credentials, authorization, rate limits, failure behavior, and data ownership are designed together. Lovable offers app connectors, app-user connectors, chat connect",
+          "goals": [
+            "Select the correct integration type",
+            "Design secure server-side API calls",
+            "Handle OAuth, rate limits, retries, webhooks, and partial failure",
+            "Test connectors and APIs without exposing credentials",
+            "Understand gateway security and runtime access"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. Choose the integration model",
+            "2. Plan the contract",
+            "3. Gateway security",
+            "4. Secure custom API pattern",
+            "5. OAuth and scopes",
+            "6. Resilience",
+            "7. Testing matrix",
+            "Official references"
+          ],
+          "word_count": 806,
+          "read_time": 4,
+          "url": "/api/learn/module-13-advanced-api-integration"
+        },
+        {
+          "filename": "module-14-version-control-github.md",
+          "title": "Module 14: Git Sync and Collaboration",
+          "module_num": 14,
+          "phase": "Phase 3: Advanced Practice",
+          "is_supplement": false,
+          "summary": "Git sync connects one Lovable project to one repository and keeps the active branch synchronized in both directions. Lovable currently supports GitHub and GitLab. This module focuses on GitHub.",
+          "goals": [
+            "Understand workspace connections and project repository links",
+            "Set up two-way GitHub sync",
+            "Work safely with branches, local development, pull requests, and CI",
+            "Avoid conflicts and distinguish Git sync from the GitHub API connector"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. How Git sync works",
+            "2. Why connect GitHub",
+            "3. Connect a project",
+            "4. Branch workflow",
+            "5. Local development",
+            "6. Avoiding sync conflicts",
+            "7. Pull requests and CI",
+            "8. Git sync versus GitHub API connector",
+            "Practice",
+            "Official references"
+          ],
+          "word_count": 779,
+          "read_time": 3,
+          "url": "/api/learn/module-14-version-control-github"
+        },
+        {
+          "filename": "module-15-deploying-to-custom-clouds.md",
+          "title": "Module 15: External Hosting and Portability",
+          "module_num": 15,
+          "phase": "Phase 3: Advanced Practice",
+          "is_supplement": false,
+          "summary": "Lovable Cloud is the recommended default for most projects. External hosting is appropriate when a real compliance, data-residency, network, infrastructure, or organizational requirement justifies the",
+          "goals": [
+            "Separate code, frontend hosting, and backend ownership",
+            "Decide whether to stay on Lovable Cloud, use a hybrid setup, or self-host",
+            "Deploy from Git with stack-aware build settings",
+            "Migrate data and backend services without assuming full portability is automatic",
+            "Plan monitoring, rollback, OAuth, secrets, and security outside Lovable"
+          ],
+          "sections": [
+            "Learning goals",
+            "1. Three independent layers",
+            "2. Recommended adoption path",
+            "3. Identify the project stack",
+            "4. External frontend with Lovable Cloud backend",
+            "5. Self-managed frontend",
+            "6. Moving the backend",
+            "7. External release checklist",
+            "8. Decision guide",
+            "Official references"
+          ],
+          "word_count": 1012,
+          "read_time": 5,
+          "url": "/api/learn/module-15-deploying-to-custom-clouds"
+        }
+      ]
+    }
+  ],
+  "supplements": [
+    {
+      "filename": "supplement-challenge-solutions.md",
+      "title": "Practice Solutions and Hints",
+      "module_num": 0,
+      "phase": "Phase 1: Foundations",
+      "is_supplement": true,
+      "summary": "These are reference approaches, not scripts to follow blindly. Try each exercise first, compare your result, and adapt the solution to your project's stack and requirements.",
+      "goals": [],
+      "sections": [
+        "Module 2: Strong first project",
+        "Module 3: Plan then build",
+        "Module 4: Focused refinement",
+        "Module 5: Repair a vague prompt",
+        "Module 6: Secure data model",
+        "Module 8: Release decision",
+        "Module 9: Invitation workflow",
+        "Module 10: Root-cause debugging",
+        "Module 11: Staged migration",
+        "Module 12: Performance review",
+        "Module 13: Reliable API action",
+        "Module 14: Git sync workflow",
+        "Module 15: External deployment",
+        "How to evaluate your work"
+      ],
+      "word_count": 1465,
+      "read_time": 7,
+      "url": "/api/learn/supplement-challenge-solutions"
+    },
+    {
+      "filename": "supplement-pricing-and-plans.md",
+      "title": "Pricing, Credits, and Plans",
+      "module_num": 0,
+      "phase": "Phase 1: Foundations",
+      "is_supplement": true,
+      "summary": "Verified against Lovable's official pricing documentation on July 18, 2026. Pricing, grants, and feature limits can change. Use the [live plan documentation](https://docs.lovable.dev/introduction/subs",
+      "goals": [],
+      "sections": [
+        "Current plan overview",
+        "One credit balance",
+        "Included usage-specific grants",
+        "Build costs",
+        "General credits and rollover",
+        "Selected plan differences",
+        "Managing usage",
+        "Cost-control habits",
+        "Official references"
+      ],
+      "word_count": 967,
+      "read_time": 4,
+      "url": "/api/learn/supplement-pricing-and-plans"
+    },
+    {
+      "filename": "supplement-quick-reference.md",
+      "title": "Lovable Quick Reference",
+      "module_num": 0,
+      "phase": "Phase 1: Foundations",
+      "is_supplement": true,
+      "summary": "Current as of July 18, 2026.",
+      "goals": [],
+      "sections": [
+        "Mode chooser",
+        "Best prompt structure",
+        "First-project prompt",
+        "Plan before a risky change",
+        "Build safely",
+        "Debugging prompt",
+        "Verification prompts",
+        "Preview toolbar",
+        "Knowledge and references",
+        "Lovable Cloud checklist",
+        "Integration chooser",
+        "Pre-publish checklist",
+        "Current navigation",
+        "Official references"
+      ],
+      "word_count": 841,
+      "read_time": 4,
+      "url": "/api/learn/supplement-quick-reference"
+    },
+    {
+      "filename": "supplement-troubleshooting.md",
+      "title": "Troubleshooting Lovable Projects",
+      "module_num": 0,
+      "phase": "Phase 1: Foundations",
+      "is_supplement": true,
+      "summary": "Use this guide to move from symptom to evidence. Menu names and plan availability are current as of July 18, 2026.",
+      "goals": [],
+      "sections": [
+        "First response to any issue",
+        "\"Lovable built the wrong thing\"",
+        "\"I cannot find Chat, Agent, Visual Edits, or Code Mode\"",
+        "\"My live site does not show the latest changes\"",
+        "\"The app works in preview but not production\"",
+        "\"A direct link returns 404\"",
+        "\"Authentication works for one user but not another\"",
+        "\"Data is missing or access is denied\"",
+        "\"Data is visible to the wrong user\"",
+        "\"An API key is visible\"",
+        "\"The API or connector fails\"",
+        "\"Payments work in preview but not live\"",
+        "\"Cloud cannot be moved to another region\"",
+        "\"Browser testing cannot complete the flow\"",
+        "\"The project is slow\"",
+        "\"Credits disappear faster than expected\"",
+        "\"GitHub changes are not appearing\"",
+        "Escalation package",
+        "Official references"
+      ],
+      "word_count": 1242,
+      "read_time": 6,
+      "url": "/api/learn/supplement-troubleshooting"
+    }
+  ],
+  "last_updated": "2026-08-18T12:48:36.072501+00:00"
+}

@@ -61,7 +61,7 @@ nav .cta{padding:8px 20px;border-radius:10px;background:linear-gradient(135deg,v
 nav .cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,92,231,.4);text-decoration:none}
 
 /* Hero */
-.hero{text-align:center;padding:100px 32px 80px;max-width:900px;margin:0 auto;position:relative}
+.hero{text-align:center;padding:100px 32px 80px;max-width:900px;margin:0 auto;position:relative;z-index:2}
 .hero .badge{display:inline-block;padding:6px 16px;border-radius:20px;background:rgba(108,92,231,.1);border:1px solid rgba(108,92,231,.3);font-size:13px;color:var(--accent2);margin-bottom:24px;animation:scaleIn .6s ease}
 .hero .badge .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:6px;animation:pulse 2s infinite}
 .hero h1{font-size:64px;font-weight:800;line-height:1.1;margin-bottom:24px;animation:fadeIn 1s ease}
@@ -81,15 +81,15 @@ nav .cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,92,231,
 .stat .label{font-size:13px;color:var(--muted);margin-top:4px}
 
 /* Floating example cards */
-.floating-examples{position:absolute;inset:0;pointer-events:none;z-index:-1}
-.float-card{position:absolute;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;width:180px;box-shadow:0 10px 40px rgba(0,0,0,.3);animation:floatSlow 8s ease-in-out infinite}
+.floating-examples{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.35}
+.float-card{position:absolute;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;width:160px;box-shadow:0 10px 40px rgba(0,0,0,.2);animation:floatSlow 8s ease-in-out infinite;opacity:.6}
 .float-card .icon{font-size:28px;margin-bottom:8px}
 .float-card .title{font-size:13px;font-weight:600}
 .float-card .desc{font-size:11px;color:var(--muted);margin-top:4px}
-.float-card-1{top:20%;left:5%;animation-delay:0s}
-.float-card-2{top:15%;right:5%;animation-delay:2s}
-.float-card-3{bottom:30%;left:8%;animation-delay:4s}
-.float-card-4{bottom:20%;right:8%;animation-delay:1s}
+.float-card-1{top:10%;left:2%;animation-delay:0s}
+.float-card-2{top:5%;right:2%;animation-delay:2s}
+.float-card-3{bottom:15%;left:3%;animation-delay:4s}
+.float-card-4{bottom:10%;right:3%;animation-delay:1s}
 
 /* Section */
 .section{max-width:1200px;margin:0 auto;padding:80px 32px}
@@ -225,17 +225,17 @@ footer .footer-links a:hover{color:var(--text)}
 
 <!-- Hero -->
 <section class="hero">
-<div class="badge"><span class="dot"></span> 281 local AI models · 12 categories · Zero cloud dependency</div>
+<div class="badge"><span class="dot"></span> 81 AI models · 8 categories · Zero cloud dependency</div>
 <h1>Build Anything with <span class="gradient">Local AI</span></h1>
-<p>Describe what you want. Mr James — your AI builder — writes code, generates images, creates videos, designs interfaces, and deploys solutions. All powered by 281 models running locally on your infrastructure.</p>
+<p>Describe what you want. Mr James — your AI builder — writes code, generates images, creates videos, designs interfaces, and deploys solutions. All powered by 81 models running locally on your infrastructure.</p>
 <div class="hero-actions">
 <a href="/studio/" class="btn btn-primary">⚡ Start Building</a>
 <a href="#build" class="btn btn-ghost">See Examples ↓</a>
 </div>
 
 <div class="stats">
-<div class="stat"><div class="num">281</div><div class="label">AI Models</div></div>
-<div class="stat"><div class="num">12</div><div class="label">Categories</div></div>
+<div class="stat"><div class="num">81</div><div class="label">AI Models</div></div>
+<div class="stat"><div class="num">8</div><div class="label">Categories</div></div>
 <div class="stat"><div class="num">6</div><div class="label">AI Engines</div></div>
 <div class="stat"><div class="num">0</div><div class="label">Cloud Costs</div></div>
 </div>
@@ -255,7 +255,7 @@ footer .footer-links a:hover{color:var(--text)}
 <section class="section" id="build">
 <div class="section-title">
 <h2>What You Can <span class="gradient">Build</span></h2>
-<p>12 categories of AI-powered creation — click any example to try it in the Studio</p>
+<p>8 categories of AI-powered creation — click any example to try it in the Studio</p>
 </div>
 
 <div class="build-grid">
@@ -361,7 +361,7 @@ footer .footer-links a:hover{color:var(--text)}
 <section class="section" id="capabilities">
 <div class="section-title">
 <h2>Platform <span class="gradient">Capabilities</span></h2>
-<p>12 categories of AI — all running locally, all accessible from one Studio</p>
+<p>8 categories of AI — all running locally, all accessible from one Studio</p>
 </div>
 
 <div class="cap-grid">
@@ -393,7 +393,7 @@ footer .footer-links a:hover{color:var(--text)}
 <div class="engine-card"><span class="engine-icon">🌐</span><div class="engine-name">OmniRoute</div><div class="engine-desc">340+ provider gateway</div><div class="engine-count">1200+</div></div>
 <div class="engine-card"><span class="engine-icon">⚡</span><div class="engine-name">Art Engine</div><div class="engine-desc">Stable Diffusion pipeline</div><div class="engine-count">30</div></div>
 <div class="engine-card"><span class="engine-icon">🧠</span><div class="engine-name">Mr James</div><div class="engine-desc">Intent-based router</div><div class="engine-count">v4.0</div></div>
-<div class="engine-card"><span class="engine-icon">📦</span><div class="engine-name">Model API</div><div class="engine-desc">Unified REST interface</div><div class="engine-count">281</div></div>
+<div class="engine-card"><span class="engine-icon">📦</span><div class="engine-name">Model API</div><div class="engine-desc">Unified REST interface</div><div class="engine-count">81</div></div>
 </div>
 </section>
 
@@ -421,7 +421,7 @@ footer .footer-links a:hover{color:var(--text)}
 <table class="compare-table">
 <thead><tr><th>Feature</th><th>EvolvixOS</th><th>Cloud AI APIs</th><th>OpenAI / Anthropic</th></tr></thead>
 <tbody>
-<tr><td>281 AI models</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+<tr><td>81 AI models</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
 <tr><td>Zero API costs</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
 <tr><td>Local inference</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
 <tr><td>Privacy-first</td><td class="check">✓</td><td class="cross">✗</td><td class="cross">✗</td></tr>
@@ -439,7 +439,7 @@ footer .footer-links a:hover{color:var(--text)}
 <!-- CTA -->
 <section class="cta-section">
 <h2>Ready to <span class="gradient">Build?</span></h2>
-<p>Open the Studio and start creating with 281 AI models. No sign-up, no API keys, no cloud costs.</p>
+<p>Open the Studio and start creating with 81 AI models. No sign-up, no API keys, no cloud costs.</p>
 <a href="/studio/" class="btn">⚡ Open Studio Builder</a>
 </section>
 
@@ -507,7 +507,7 @@ footer .footer-links a:hover{color:var(--text)}
 <a href="#engines">Engines</a>
 <a href="https://github.com/evolvixos">GitHub</a>
 </div>
-<div>EvolvixOS v6.0 · 281 AI models · 12 categories · Mr James v8.0 · evolvixos.com</div>
+<div>EvolvixOS v6.0 · 81 AI models · 8 categories · Mr James v8.0 · evolvixos.com</div>
 <div style="margin-top:8px;font-size:12px;">Created With ♡ by Protremix</div>
 </footer>
 </div>

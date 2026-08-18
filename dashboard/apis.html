@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Directory — EvolvixOS</title>
+<style>
+:root{--bg:#0a0a0f;--card:#13131a;--border:#2a2a3a;--text:#fff;--muted:#8a8a9a;--accent:#6c5ce7;--accent2:#a855f7;--accent3:#f472b6;--green:#22c55e}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+.header{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);background:rgba(10,10,15,.85);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.header .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+.header .logo .icon{font-size:24px}
+.header .logo .name{font-size:18px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header .back{padding:8px 16px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);text-decoration:none;font-size:14px;transition:.2s}
+.header .back:hover{border-color:var(--accent)}
+.stats{display:flex;gap:16px;padding:24px;flex-wrap:wrap}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;flex:1;min-width:140px;text-align:center}
+.stat .num{font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.controls{padding:0 24px 16px;display:flex;gap:12px;flex-wrap:wrap}
+.search{flex:1;min-width:200px;padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;outline:none}
+.search:focus{border-color:var(--accent)}
+.cat-select{padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;min-width:180px}
+.cat-select option{background:var(--card)}
+.results-info{padding:0 24px 12px;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:0 24px 24px}
+.api-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:.2s;cursor:pointer;position:relative;overflow:hidden}
+.api-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.api-card .cat-badge{display:inline-block;padding:3px 10px;border-radius:8px;background:rgba(108,92,231,.15);color:var(--accent2);font-size:11px;font-weight:600;margin-bottom:10px}
+.api-card .name{font-size:15px;font-weight:700;margin-bottom:6px;word-break:break-word}
+.api-card .desc{font-size:13px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.api-card .link{margin-top:10px;font-size:12px;color:var(--accent3);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.api-card .link:hover{text-decoration:underline}
+.load-more{display:block;margin:0 auto 24px;padding:12px 32px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;transition:.2s}
+.load-more:hover{border-color:var(--accent);background:rgba(108,92,231,.1)}
+.empty{text-align:center;padding:40px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="header">
+<a class="logo" href="/studio/"><span class="icon">⚡</span><span class="name">EvolvixOS</span></a>
+<a class="back" href="/studio/">← Back to Studio</a>
+</div>
+<div class="stats">
+<div class="stat"><div class="num" id="total-apis">—</div><div class="label">Total APIs</div></div>
+<div class="stat"><div class="num" id="total-cats">—</div><div class="label">Categories</div></div>
+<div class="stat"><div class="num">35,192</div><div class="label">From OpenClaw</div></div>
+<div class="stat"><div class="num">32</div><div class="label">Categories</div></div>
+</div>
+<div class="controls">
+<input class="search" id="search" placeholder="Search 35,000+ APIs by name, description, or category...">
+<select class="cat-select" id="category"><option value="all">All Categories</option></select>
+</div>
+<div class="results-info" id="results-info">Loading...</div>
+<div class="grid" id="grid"></div>
+<button class="load-more" id="load-more" style="display:none">Load More</button>
+
+<script>
+let offset=0,limit=24,searchQ='',catFilter='all',total=0;
+async function loadCategories(){
+const r=await fetch('/api/openclaw/categories');const d=await r.json();
+document.getElementById('total-apis').textContent=d.total_apis.toLocaleString();
+document.getElementById('total-cats').textContent=Object.keys(d.categories).length;
+const sel=document.getElementById('category');
+Object.entries(d.categories).sort((a,b)=>b[1]-a[1]).forEach(([c,n])=>{
+const o=document.createElement('option');o.value=c;o.textContent=`${c} (${n})`;sel.appendChild(o);
+});
+}
+async function load(reset=true){
+if(reset){offset=0;document.getElementById('grid').innerHTML='';}
+let url=`/api/openclaw?limit=${limit}&offset=${offset}`;
+if(searchQ)url+=`&q=${encodeURIComponent(searchQ)}`;
+if(catFilter!=='all')url+=`&category=${encodeURIComponent(catFilter)}`;
+const r=await fetch(url);const d=await r.json();
+total=d.total;
+document.getElementById('results-info').textContent=`Showing ${offset+d.apis.length} of ${total.toLocaleString()} APIs`;
+const grid=document.getElementById('grid');
+d.apis.forEach(api=>{
+const card=document.createElement('div');card.className='api-card';
+card.innerHTML=`<span class="cat-badge">${api.category}</span><div class="name">${api.name}</div><div class="desc">${api.description}</div><a class="link" href="${api.url}" target="_blank">Open ↗</a>`;
+grid.appendChild(card);
+});
+offset+=limit;
+document.getElementById('load-more').style.display=(offset<total)?'block':'none';
+if(d.apis.length===0&&reset)document.getElementById('grid').innerHTML='<div class="empty">No APIs found. Try a different search.</div>';
+}
+let searchTimer;
+document.getElementById('search').addEventListener('input',e=>{
+clearTimeout(searchTimer);searchQ=e.target.value;searchTimer=setTimeout(()=>load(),300);
+});
+document.getElementById('category').addEventListener('change',e=>{catFilter=e.target.value;load();});
+document.getElementById('load-more').addEventListener('click',()=>load(false));
+loadCategories();load();
+</script>
+</body>
+</html>

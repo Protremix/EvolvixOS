@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EvolvixOS Studio — AI Creation Dashboard</title>
+<style>
+:root{--bg:#08080c;--bg2:#0c0c14;--surface:#13131c;--surface2:#1a1a28;--surface3:#22222e;--primary:#6c5ce7;--primary2:#8b7ff0;--primary3:#a29bfe;--accent:#00d4aa;--accent2:#00b894;--pink:#fd79a8;--orange:#fdcb6e;--cyan:#00cec9;--text:#e8e8f0;--muted:#8a8aa0;--muted2:#5a5a70;--radius:16px;--glow:0 0 40px rgba(108,92,231,.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden;min-height:100vh}
+
+/* Animated gradient background */
+.bg-gradient{position:fixed;top:0;left:0;right:0;bottom:0;z-index:0;pointer-events:none;background:
+radial-gradient(ellipse at 20% 0%,rgba(108,92,231,.12) 0%,transparent 50%),
+radial-gradient(ellipse at 80% 100%,rgba(0,212,170,.08) 0%,transparent 50%),
+radial-gradient(ellipse at 50% 50%,rgba(253,121,168,.04) 0%,transparent 70%);
+animation:bg-shift 15s ease-in-out infinite}
+@keyframes bg-shift{0%,100%{background-position:0% 0%,100% 100%,50% 50%}50%{background-position:30% 30%,70% 70%,60% 40%}}
+
+/* Floating particles */
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* Animated blobs */
+.blob{position:fixed;border-radius:50%;filter:blur(60px);opacity:.1;z-index:0;pointer-events:none;animation:float-blob 20s ease-in-out infinite}
+.blob-1{width:300px;height:300px;background:var(--primary);top:10%;left:-50px}
+.blob-2{width:250px;height:250px;background:var(--accent);bottom:20%;right:-30px;animation-delay:-7s}
+@keyframes float-blob{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,40px) scale(1.1)}}
+
+/* Reveal animations */
+.reveal{opacity:0;transform:translateY(30px);transition:all .7s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* Navbar */
+nav{position:sticky;top:0;z-index:100;background:rgba(8,8,12,.8);backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.05);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800}
+.nav-logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;animation:logo-pulse 3s ease infinite}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 0 0 rgba(108,92,231,.3)}50%{box-shadow:0 0 15px 2px rgba(108,92,231,.2)}}
+.nav-right{display:flex;align-items:center;gap:16px}
+.status-pill{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);background:var(--surface);padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.06)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite}
+.status-dot.loading{background:var(--orange);box-shadow:0 0 8px var(--orange)}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+.nav-link{color:var(--muted);text-decoration:none;font-size:13px;transition:color .2s}
+.nav-link:hover{color:var(--text)}
+
+/* Hero / Smart Bar */
+.hero{position:relative;z-index:1;padding:60px 24px 40px;text-align:center;max-width:800px;margin:0 auto}
+.hero h1{font-size:42px;font-weight:800;letter-spacing:-2px;margin-bottom:12px;animation:hero-in .8s cubic-bezier(.16,1,.3,1)}
+@keyframes hero-in{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.hero h1 .gradient{background:linear-gradient(135deg,var(--primary3),var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% 200%;animation:gradient-shift 5s ease infinite}
+@keyframes gradient-shift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.hero p{font-size:16px;color:var(--muted);margin-bottom:32px;animation:hero-in .8s .1s both}
+
+/* Smart bar */
+.smart-bar{position:relative;max-width:700px;margin:0 auto;animation:hero-in .8s .2s both}
+.smart-bar-input{display:flex;gap:0;background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:6px;transition:all .3s;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.smart-bar-input:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,92,231,.1),0 8px 32px rgba(108,92,231,.1)}
+.smart-bar-input input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:15px;padding:14px 20px;font-family:inherit}
+.smart-bar-input input::placeholder{color:var(--muted2)}
+.create-btn{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border:none;border-radius:12px;padding:10px 24px;font-size:15px;font-weight:600;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;display:flex;align-items:center;gap:6px}
+.create-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transition:left .5s}
+.create-btn:hover::before{left:100%}
+.create-btn:hover{transform:scale(1.05);box-shadow:0 4px 20px rgba(108,92,231,.4)}
+.create-btn:active{transform:scale(.98)}
+
+/* Quick actions */
+.quick-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;animation:hero-in .8s .3s both}
+.quick-pill{background:var(--surface);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px 18px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:8px;font-weight:500}
+.quick-pill:hover{border-color:var(--primary);color:var(--text);transform:translateY(-2px);box-shadow:0 4px 16px rgba(108,92,231,.15)}
+.quick-pill .icon{font-size:16px;transition:transform .3s}
+.quick-pill:hover .icon{transform:scale(1.3)}
+
+/* Sections */
+.section{padding:48px 24px;max-width:1200px;margin:0 auto;position:relative;z-index:1}
+.section-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.04)}
+
+/* Card grid */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.cap-card{background:var(--surface);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px;transition:all .4s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;cursor:pointer;opacity:0;transform:translateY(30px)}
+.cap-card.visible{opacity:1;transform:translateY(0)}
+.cap-card:hover{border-color:var(--primary);transform:translateY(-6px) scale(1.02);box-shadow:0 16px 48px rgba(108,92,231,.1)}
+.cap-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent));opacity:0;transition:opacity .3s}
+.cap-card:hover::before{opacity:1}
+.cap-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(108,92,231,.06) 0%,transparent 50%);opacity:0;transition:opacity .3s;pointer-events:none}
+.cap-card:hover::after{opacity:1}
+.cap-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cap-icon{font-size:32px;display:inline-block;transition:transform .3s}
+.cap-card:hover .cap-icon{transform:scale(1.2) rotate(5deg)}
+.cap-status{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:3px 8px;border-radius:6px}
+.cap-status.active{background:rgba(0,212,170,.1);color:var(--accent)}
+.cap-status.pending{background:rgba(253,203,110,.1);color:var(--orange)}
+.cap-title{font-size:17px;font-weight:700;margin-bottom:6px}
+.cap-desc{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+.cap-engines{display:flex;flex-wrap:wrap;gap:4px}
+.engine-tag{background:var(--surface2);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--muted);border:1px solid rgba(255,255,255,.04);transition:all .2s}
+.engine-tag.active{color:var(--accent);border-color:rgba(0,212,170,.2);background:rgba(0,212,170,.05)}
+.engine-tag.gpu{color:var(--orange);border-color:rgba(253,203,110,.2)}
+.cap-card:hover .engine-tag{border-color:rgba(108,92,231,.15)}
+
+/* Status grid */
+.status-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.status-card{background:var(--surface);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;transition:all .3s}
+.status-card:hover{border-color:rgba(255,255,255,.1);transform:translateY(-2px)}
+.status-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.status-icon{font-size:20px}
+.status-name{font-size:14px;font-weight:600}
+.status-state{font-size:12px;color:var(--muted)}
+.status-state.online{color:var(--accent)}
+.status-state.offline{color:var(--muted2)}
+.status-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.05);overflow:hidden}
+.status-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--primary),var(--accent));transition:width 1s ease}
+.status-bar-fill.offline{background:var(--muted2)}
+
+/* Activity feed */
+.activity-item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid rgba(255,255,255,.04);border-radius:12px;padding:14px 18px;margin-bottom:8px;transition:all .3s}
+.activity-item:hover{border-color:rgba(255,255,255,.08)}
+.activity-icon{width:36px;height:36px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.activity-text{flex:1}
+.activity-title{font-size:14px;font-weight:600}
+.activity-desc{font-size:12px;color:var(--muted)}
+.activity-time{font-size:12px;color:var(--muted2)}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
+.modal-overlay.active{display:flex;animation:modal-in .3s ease}
+@keyframes modal-in{from{opacity:0}to{opacity:1}}
+.modal{background:var(--surface);border:1px solid rgba(255,255,255,.1);border-radius:24px;max-width:600px;width:100%;padding:40px;position:relative;animation:modal-pop .4s cubic-bezier(.16,1,.3,1)}
+@keyframes modal-pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;transition:color .2s}
+.modal-close:hover{color:var(--text)}
+.modal-engine{background:var(--surface2);border-radius:12px;padding:16px;margin-bottom:16px;display:flex;align-items:center;gap:12px}
+.modal-engine-icon{font-size:24px}
+.gpu-notice{border:1px solid rgba(253,203,110,.3);background:rgba(253,203,110,.05);border-radius:12px;padding:16px;margin-bottom:16px}
+.gpu-notice-title{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--orange);margin-bottom:6px}
+.gpu-notice-body{font-size:13px;color:var(--muted)}
+.modal-response{background:var(--bg2);border-radius:12px;padding:16px;font-size:14px;line-height:1.6;max-height:300px;overflow-y:auto}
+.modal-response .typing{color:var(--accent);animation:blink 1s infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.response-label{font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.modal-code{background:var(--bg2);border-radius:10px;padding:14px;font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:var(--accent);margin-top:12px;border:1px solid rgba(255,255,255,.04)}
+
+/* Loading spinner */
+.spinner{width:40px;height:40px;border:3px solid rgba(108,92,231,.2);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Typing dots */
+.typing-dots{display:flex;gap:4px;align-items:center}
+.typing-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);animation:typing 1.4s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}
+.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes typing{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-8px);opacity:1}}
+
+@media(max-width:768px){.cards-grid{grid-template-columns:1fr}.hero h1{font-size:32px}}
+</style>
+</head>
+<body>
+<div class="bg-gradient"></div>
+<canvas id="particles"></canvas>
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<nav>
+<div class="nav-logo"><div class="nav-logo-icon">E</div>EvolvixOS <span style="color:var(--muted);font-weight:400;font-size:13px">AI Creation Platform</span></div>
+<div class="nav-right">
+<div class="status-pill"><span class="status-dot" id="nav-status-dot"></span><span id="nav-status-text">Checking systems...</span></div>
+<a class="nav-link" href="/">← Home</a>
+</div>
+</nav>
+
+<div class="hero">
+<h1>What do you want to <span class="gradient">create?</span></h1>
+<p>81 AI models across 8 categories. Just describe what you want.</p>
+<div class="smart-bar">
+<div class="smart-bar-input">
+<input type="text" id="prompt" placeholder="e.g. 'Make a video of a cat playing piano' or 'Generate an image of a sunset over mountains'" autocomplete="off">
+<button class="create-btn" onclick="smartCreate()">Create ✨</button>
+</div>
+</div>
+<div class="quick-actions">
+<div class="quick-pill" onclick="document.getElementById('prompt').value='Make a video of a cat playing piano';smartCreate()"><span class="icon">🎬</span>Make a video</div>
+<div class="quick-pill" onclick="document.getElementById('prompt').value='Generate an image of a sunset over mountains';smartCreate()"><span class="icon">🖼️</span>Generate an image</div>
+<div class="quick-pill" onclick="document.getElementById('prompt').value='Create a voice narration about space';smartCreate()"><span class="icon">🎙️</span>Create a voice narration</div>
+<div class="quick-pill" onclick="document.getElementById('prompt').value='Make background music for a podcast';smartCreate()"><span class="icon">🎵</span>Make background music</div>
+<div class="quick-pill" onclick="document.getElementById('prompt').value='Animate a talking head';smartCreate()"><span class="icon">🗣️</span>Animate a talking head</div>
+<div class="quick-pill" onclick="document.getElementById('prompt').value='What is the capital of France?';smartCreate()"><span class="icon">💬</span>Chat with AI</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">What EvolvixOS Can Do</div>
+<div class="cards-grid" id="cards-grid"></div>
+</div>
+
+<div class="section">
+<div class="section-title">System Status</div>
+<div class="status-grid" id="status-grid"></div>
+</div>
+
+<div class="section">
+<div class="section-title">Recent Activity</div>
+<div id="activity-feed">
+<div class="activity-item">
+<div class="activity-icon">🚀</div>
+<div class="activity-text">
+<div class="activity-title">EvolvixOS v6.0 deployed</div>
+<div class="activity-desc">81 AI models loaded — OmniRoute gateway active</div>
+</div>
+<div class="activity-time">Just now</div>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+<div class="modal" id="modal">
+<button class="modal-close" onclick="closeModal()">✕</button>
+<div id="modal-content"></div>
+</div>
+</div>
+
+<script>
+// === PARTICLE BACKGROUND ===
+const canvas=document.getElementById('particles');const ctx=canvas.getContext('2d');
+let particles=[];function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+resize();addEventListener('resize',resize);
+function initP(){particles=[];for(let i=0;i<40;i++){particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,r:Math.random()*1.5+.5,c:Math.random()>.5?'108,92,231':'0,212,170'})}}
+initP();
+function drawP(){ctx.clearRect(0,0,canvas.width,canvas.height);
+particles.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;
+ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(${p.c},.3)`;ctx.fill();
+for(let j=i+1;j<particles.length;j++){const dx=p.x-particles[j].x,dy=p.y-particles[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<100){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(${p.c},${.1*(1-d/100)})`;ctx.lineWidth=.5;ctx.stroke()}}})
+requestAnimationFrame(drawP)}
+drawP();
+
+// === CARDS DATA ===
+const CARDS=[
+{icon:'🎬',title:'Video Generation',desc:'Text-to-video, image-to-video, cinematic shots',status:'pending',engines:[{name:'Wan2.1',tag:'GPU'},{name:'CogVideoX',tag:'GPU'},{name:'AnimateDiff',tag:'GPU'},{name:'Proteus',tag:'GPU'}]},
+{icon:'🖼️',title:'Image Generation',desc:'Photorealistic images, style transfer, inpainting',status:'active',engines:[{name:'SDXL',tag:'active',active:true},{name:'FLUX',tag:'active'},{name:'InstantID',tag:'active'},{name:'ControlNet',tag:'active'}]},
+{icon:'🎨',title:'Image Control',desc:'Pose, edge, depth control — structure-preserving generation',status:'active',engines:[{name:'ControlNet',tag:'active',active:true},{name:'InstantID',tag:'active'},{name:'IP-Adapter',tag:'active'},{name:'T2I-Adapter',tag:'active'}]},
+{icon:'🗣️',title:'Animation & Talking Heads',desc:'Animate faces, lip-sync, avatar from a single image',status:'pending',engines:[{name:'SadTalker',tag:'GPU'},{name:'GeneFace',tag:'GPU'},{name:'Wav2Lip',tag:'GPU'},{name:'EMO',tag:'GPU'}]},
+{icon:'🎙️',title:'Voice & Speech',desc:'TTS in 17+ languages, voice cloning, speech-to-text',status:'active',engines:[{name:'Piper',tag:'active',active:true},{name:'XTTS v2',tag:'active',active:true},{name:'CosyVoice',tag:'active'},{name:'Whisper',tag:'active',active:true}]},
+{icon:'🎵',title:'Music Generation',desc:'Full tracks, sound effects, ambient audio',status:'pending',engines:[{name:'MusicGen',tag:'GPU'},{name:'AudioCraft',tag:'GPU'},{name:'Bark',tag:'GPU'},{name:'Stable Audio',tag:'GPU'}]},
+{icon:'💬',title:'AI Chat & Reasoning',desc:'GPT/Claude-level reasoning via OmniRoute gateway',status:'active',engines:[{name:'Qwen2.5',tag:'active',active:true},{name:'DeepSeek',tag:'active'},{name:'Llama 3.1',tag:'active'},{name:'MiMo v2.5',tag:'active'}]},
+{icon:'💻',title:'AI Coding',desc:'Code generation, debugging, self-correction',status:'active',engines:[{name:'Qwen2.5-Coder',tag:'active',active:true},{name:'DeepSeek-Coder',tag:'active'},{name:'CodeLlama',tag:'active'},{name:'StarCoder',tag:'active'}]},
+{icon:'💰',title:'Crypto & Finance',desc:'Market analysis, DeFi TVL, wallet tracking',status:'active',engines:[{name:'CoinGecko',tag:'active',active:true},{name:'DeFiLlama',tag:'active',active:true},{name:'On-chain',tag:'active',active:true}]},
+{icon:'👁️',title:'Vision & Multimodal',desc:'Image understanding, OCR, visual QA',status:'active',engines:[{name:'Qwen2.5-VL',tag:'active',active:true},{name:'LLaVA',tag:'active'},{name:'InternVL',tag:'active'},{name:'CogVLM',tag:'active'}]},
+{icon:'🎲',title:'3D Generation',desc:'Text-to-3D, image-to-3D, mesh export',status:'pending',engines:[{name:'InstantMesh',tag:'GPU'},{name:'TRELLIS',tag:'GPU'},{name:'Hunyuan3D',tag:'GPU'},{name:'Wonder3D',tag:'GPU'}]},
+{icon:'🧠',title:'RAG & Agents',desc:'Knowledge retrieval, multi-agent orchestration',status:'active',engines:[{name:'Mr James v4.0',tag:'active',active:true},{name:'RAGFlow',tag:'active'},{name:'LangChain',tag:'active'},{name:'CrewAI',tag:'active'}]},
+{icon:'⚙️',title:'Local Engines',desc:'Run AI models locally — zero cloud, zero tokens',status:'active',engines:[{name:'Ollama',tag:'active',active:true},{name:'ComfyUI',tag:'active',active:true},{name:'Piper TTS',tag:'active',active:true},{name:'Whisper',tag:'active',active:true}]},
+{icon:'🎬',title:'Video Editing',desc:'Edit, transform, enhance existing videos',status:'pending',engines:[{name:'Proteus',tag:'GPU'},{name:'AnyV2V',tag:'GPU'},{name:'ControlVideo',tag:'GPU'},{name:'FFmpeg',tag:'active',active:true}]},
+{icon:'🌐',title:'OmniRoute Gateway',desc:'340+ model providers, auto-selects best model',status:'active',engines:[{name:'Auto-routing',tag:'active',active:true},{name:'340+ providers',tag:'active',active:true},{name:'1200+ models',tag:'active',active:true}]}
+];
+
+// === RENDER CARDS ===
+const grid=document.getElementById('cards-grid');
+CARDS.forEach((cap,i)=>{const card=document.createElement('div');card.className='cap-card';card.style.transitionDelay=(i%4*0.08)+'s';
+card.innerHTML=`<div class="cap-header"><div class="cap-icon">${cap.icon}</div><div class="cap-status ${cap.status}">${cap.status}</div></div><div class="cap-title">${cap.title}</div><div class="cap-desc">${cap.desc}</div><div class="cap-engines">${cap.engines.map(e=>`<span class="engine-tag ${e.tag==='GPU'?'gpu':e.active?'active':''}">${e.name}</span>`).join('')}</div>`;
+card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();card.style.setProperty('--mx',(e.clientX-r.left)+'px');card.style.setProperty('--my',(e.clientY-r.top)+'px')});
+card.addEventListener('click',()=>{document.getElementById('prompt').value=cap.title;smartCreate()});
+grid.appendChild(card)});
+
+// Stagger reveal cards
+const cardObserver=new IntersectionObserver((entries)=>{entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*80);cardObserver.unobserve(e.target)}})},{threshold:.1});
+document.querySelectorAll('.cap-card').forEach(c=>cardObserver.observe(c));
+
+// === STATUS CHECK ===
+const SERVICES=[
+{name:'Mr James v4.0',icon:'🧠',url:'/api/models/health',type:'agent'},
+{name:'OmniRoute Gateway',icon:'🌐',url:'/api/v1/models',type:'gateway'},
+{name:'Ollama (Local LLM)',icon:'🦙',url:'/api/ollama/tags',type:'llm'},
+{name:'ComfyUI',icon:'🎨',url:'/api/comfyui/system_stats',type:'image'},
+{name:'Piper TTS',icon:'🔊',url:'/api/tts/status',type:'audio'},
+{name:'Model API (81)',icon:'📦',url:'/api/models',type:'models'}
+];
+
+async function checkStatus(){
+const dot=document.getElementById('nav-status-dot');const text=document.getElementById('nav-status-text');
+dot.className='status-dot loading';text.textContent='Checking systems...';
+const statusGrid=document.getElementById('status-grid');statusGrid.innerHTML='';
+let allOk=0;
+for(const svc of SERVICES){
+const card=document.createElement('div');card.className='status-card';
+try{
+const res=await fetch(svc.url,{signal:AbortSignal.timeout(5000)});
+const ok=res.ok;if(ok)allOk++;
+card.innerHTML=`<div class="status-header"><div class="status-icon">${svc.icon}</div><div><div class="status-name">${svc.name}</div><div class="status-state ${ok?'online':'offline'}">${ok?'Online':'Offline'}</div></div></div><div class="status-bar"><div class="status-bar-fill ${ok?'':'offline'}" style="width:${ok?'100':'0'}%"></div></div>`;
+}catch(e){
+card.innerHTML=`<div class="status-header"><div class="status-icon">${svc.icon}</div><div><div class="status-name">${svc.name}</div><div class="status-state offline">Offline</div></div></div><div class="status-bar"><div class="status-bar-fill offline" style="width:0%"></div></div>`;
+allOk--;
+}
+statusGrid.appendChild(card);
+}
+dot.className='status-dot';text.textContent=allOk>3?'All systems operational':allOk>0?'Partial — '+allOk+'/6 services online':'Systems starting up...';
+}
+checkStatus();setInterval(checkStatus,30000);
+
+// === INTENT DETECTION ===
+function detectIntent(prompt){
+const p=prompt.toLowerCase().trim();
+if(!p)return null;
+
+// Video generation
+if(/\b(video|movie|film|clip|animate|animation|cinema|render|scene)\b/.test(p)&&!/\b(talking|head|portrait|face|lip)\b/.test(p)){
+if(/\b(image.?to.?video|img2vid|from image|animate this)\b/.test(p))return{type:'video_i2v',engine:'AnimateDiff',reason:'Image-to-video → AnimateDiff (GPU required)',gpu:true};
+if(/\b(4k|ultra.?hd|high.?quality|cinematic)\b/.test(p))return{type:'video',engine:'CogVideoX',reason:'High quality → CogVideoX (best video quality, GPU required)',gpu:true};
+return{type:'video',engine:'Wan2.1',reason:'Standard video generation → Wan2.1 (GPU required)',gpu:true};
+}
+
+// Image generation
+if(/\b(image|picture|photo|draw|paint|art|logo|illustration|render|poster|wallpaper|portrait)\b/.test(p)){
+if(/\b(style transfer|style of|in the style|like van gogh|like picasso)\b/.test(p))return{type:'image_style',engine:'SDXL + ControlNet',reason:'Style transfer → SDXL + ControlNet',gpu:false};
+if(/\b(face|identity|same person|consistent face|instantid)\b/.test(p))return{type:'image',engine:'SDXL + InstantID',reason:'Identity preservation → SDXL + InstantID',gpu:false};
+if(/\b(best|highest|quality|detailed|professional|4k|8k|hdr)\b/.test(p))return{type:'image',engine:'FLUX',reason:'Best quality → FLUX (12B model, top-tier)',gpu:false};
+return{type:'image',engine:'SDXL',reason:'Standard image generation → SDXL (fast & detailed)',gpu:false};
+}
+
+// Animation & talking heads
+if(/\b(talking head|lip.?sync|lip sync|animate face|avatar|deepfake|face animation)\b/.test(p))return{type:'animation',engine:'SadTalker',reason:'Talking head → SadTalker (GPU required)',gpu:true};
+
+// Voice / TTS
+if(/\b(voice|speech|narration|narrate|read|say.+text|text.?to.?speech|tts)\b/.test(p)){
+if(/\b(clone|my voice|copy voice)\b/.test(p))return{type:'audio_tts',engine:'CosyVoice',reason:'Voice cloning → CosyVoice',gpu:false};
+if(/\b(multilingual|french|spanish|german|chinese|japanese|arabic)\b/.test(p))return{type:'audio_tts',engine:'XTTS v2',reason:'Multilingual → XTTS v2 (17+ languages)',gpu:false};
+return{type:'audio_tts',engine:'Piper',reason:'Text-to-speech → Piper (fast, runs on CPU)',gpu:false};
+}
+
+// Speech-to-text
+if(/\b(transcribe|speech.?to.?text|convert audio|subtitle|caption)\b/.test(p))return{type:'audio_stt',engine:'Whisper',reason:'Speech-to-text → Whisper',gpu:false};
+
+// Music
+if(/\b(music|song|melody|beat|instrumental|soundtrack|background music)\b/.test(p))return{type:'audio_music',engine:'MusicGen',reason:'Music generation → MusicGen (GPU required)',gpu:true};
+
+// Crypto
+if(/\b(crypto|bitcoin|ethereum|token|defi|blockchain|wallet|nft|trading|market)\b/.test(p))return{type:'crypto',engine:'CoinGecko + DeFiLlama',reason:'Crypto analysis → CoinGecko + DeFiLlama',gpu:false};
+
+// Code
+if(/\b(code|build|deploy|server|docker|api|function|script|program|app)\b/.test(p))return{type:'code',engine:'Mr James',reason:'Code/build task → Mr James (58 tools, self-correcting)',gpu:false};
+
+// Vision
+if(/\b(describe.+image|what.+in.+image|analyze.+image|ocr|visual|image.+understand)\b/.test(p))return{type:'vision',engine:'Qwen2.5-VL',reason:'Image understanding → Qwen2.5-VL',gpu:false};
+
+// 3D
+if(/\b(3d|three.?d|mesh|text.?to.?3d|3d.+model)\b/.test(p))return{type:'3d',engine:'InstantMesh',reason:'3D generation → InstantMesh (GPU required)',gpu:true};
+
+// RAG
+if(/\b(rag|retrieve|knowledge base|document.+search|semantic search)\b/.test(p))return{type:'rag',engine:'RAGFlow',reason:'Knowledge retrieval → RAGFlow',gpu:false};
+
+// Chat / default
+return{type:'chat',engine:'auto',reason:'Chat/reasoning → OmniRoute auto-selects best available model',gpu:false};
+}
+
+// === SMART CREATE ===
+async function smartCreate(){
+const prompt=document.getElementById('prompt').value.trim();
+if(!prompt)return;
+const intent=detectIntent(prompt);
+if(!intent)return;
+showModal(prompt,intent);
+
+if(intent.gpu){
+// GPU pending
+setTimeout(()=>{
+const content=document.getElementById('modal-content');
+const respDiv=content.querySelector('#modal-response');
+if(respDiv){
+respDiv.innerHTML=`<div class="gpu-notice"><div class="gpu-notice-title">⏳ GPU Model Pending</div><div class="gpu-notice-body">${intent.engine} requires the GPU server (GEX44 pending delivery from Hetzner).<br>Once provisioned, this will work automatically — all 220+ GPU models activate on boot.</div></div><div class="response-label">What you can do now</div><div style="font-size:13px;color:var(--muted);line-height:1.6">✅ Use CPU-based models (SDXL for images, Piper for TTS, Whisper for STT)<br>✅ Chat with AI via OmniRoute (340+ models)<br>✅ Run Mr James for coding tasks<br>⏳ Wait for GEX44 GPU server delivery for video, 3D, and animation models</div>`;
+}
+},1500);
+return;
+}
+
+// Non-GPU: call the actual API
+try{
+const res=await fetch('/api/agent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,type:intent.type,engine:intent.engine}),signal:AbortSignal.timeout(120000)});
+const data=await res.json();
+const content=document.getElementById('modal-content');
+const respDiv=content.querySelector('#modal-response');
+if(respDiv&&data.response){
+respDiv.innerHTML=data.response;
+}
+}catch(e){
+const content=document.getElementById('modal-content');
+const respDiv=content.querySelector('#modal-response');
+if(respDiv)respDiv.innerHTML=`<div style="color:var(--muted)">Connection error. The engine may still be starting up. Retrying...</div>`;
+// Fallback to OmniRoute
+try{
+const res2=await fetch('/api/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'auto',messages:[{role:'user',content:prompt}],max_tokens:2000}),signal:AbortSignal.timeout(60000)});
+const data2=await res2.json();
+if(respDiv&&data2.choices){
+respDiv.innerHTML=data2.choices[0].message.content;
+}
+}catch(e2){
+if(respDiv)respDiv.innerHTML=`<div style="color:var(--orange)">Engine temporarily unavailable. Please try again in a moment.</div>`;
+}
+}
+}
+
+// === MODAL ===
+function showModal(prompt,intent){
+const overlay=document.getElementById('modal-overlay');
+const content=document.getElementById('modal-content');
+content.innerHTML=`
+<div style="margin-bottom:20px">
+<div style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Your prompt</div>
+<div style="font-size:15px;font-weight:500">${prompt}</div>
+</div>
+<div class="modal-engine">
+<div class="modal-engine-icon">⚡</div>
+<div>
+<div style="font-weight:600;font-size:15px">Engine: ${intent.engine}</div>
+<div style="font-size:13px;color:var(--muted)">${intent.reason}</div>
+</div>
+</div>
+<div id="modal-response">
+<div style="text-align:center;padding:20px">
+<div class="spinner"></div>
+<div style="font-size:13px;color:var(--muted);margin-top:8px">Processing...</div>
+</div>
+</div>`;
+overlay.classList.add('active');
+}
+
+function closeModal(){document.getElementById('modal-overlay').classList.remove('active')}
+document.getElementById('modal-overlay').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal()});
+document.getElementById('prompt').addEventListener('keydown',e=>{if(e.key==='Enter')smartCreate()});
+
+// === ADD ACTIVITY ===
+function addActivity(icon,title,desc){
+const feed=document.getElementById('activity-feed');
+const item=document.createElement('div');item.className='activity-item';
+item.innerHTML=`<div class="activity-icon">${icon}</div><div class="activity-text"><div class="activity-title">${title}</div><div class="activity-desc">${desc}</div></div><div class="activity-time">Just now</div>`;
+item.style.animation='hero-in .5s ease';
+feed.insertBefore(item,feed.firstChild);
+}
+</script>
+</body>
+</html>

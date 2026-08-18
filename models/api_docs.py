@@ -30,10 +30,45 @@ API_DOCS = {
             "description": "Simple chat without agentic tools. Faster response.",
             "params": {"prompt": "string", "session_id": "string"}
         },
+        "learn": {
+            "method": "GET",
+            "path": "/api/learn",
+            "description": "Get the course index with all 15 modules, 4 supplements, and metadata across 3 learning phases.",
+            "example": "curl https://evolvixos.com/api/learn",
+            "auth_required": False
+        },
+        "learn_module": {
+            "method": "GET",
+            "path": "/api/learn/{module_id}",
+            "description": "Get full content of a specific course module (e.g., 01-welcome-to-lovable).",
+            "params": {"module_id": "Module slug from the course index"},
+            "example": "curl https://evolvixos.com/api/learn/01-welcome-to-lovable",
+            "auth_required": False
+        },
+        "openclaw": {
+            "method": "GET",
+            "path": "/api/openclaw",
+            "description": "Browse 35,000+ APIs and AI tools from OpenClaw + API Mega List + AI Agent Tools directories. Filter by category, search by name/description.",
+            "params": {
+                "q": "Search query (optional)",
+                "category": "Filter by category (optional)",
+                "limit": "Results per page (default 50, max 500)",
+                "offset": "Pagination offset (default 0)"
+            },
+            "example": "curl https://evolvixos.com/api/openclaw?q=youtube&limit=10",
+            "auth_required": False
+        },
+        "openclaw_categories": {
+            "method": "GET",
+            "path": "/api/openclaw/categories",
+            "description": "Get summary of all API categories and counts across OpenClaw + API Mega List (35,192 APIs/tools, 32 categories).",
+            "example": "curl https://evolvixos.com/api/openclaw/categories",
+            "auth_required": False
+        },
         "models": {
             "method": "GET",
             "path": "/api/models",
-            "description": "List all available AI models (281 registered)"
+            "description": "List all available AI models (81 registered)"
         },
         "tools": {
             "method": "GET",
@@ -80,7 +115,7 @@ API_DOCS = {
         }
     },
     "rate_limit": "100 requests per minute per API key",
-    "models_available": "281 models across 12 categories (LLM, image gen, video gen, speech, music, vision, coding, RAG, 3D, local engines, frameworks)",
+    "models_available": "81 models across 8 categories (LLM, image gen, video gen, speech, music, vision, coding, RAG, 3D, local engines, frameworks)",
     "tools_available": 24,
     "code_example": {
         "python": "import requests\\n\\nAPI_KEY = 'evx_your_key_here'\\nBASE = 'https://evolvixos.com'\\n\\nresp = requests.post(f'{BASE}/api/agent',\\n    headers={'Authorization': f'Bearer {API_KEY}'},\\n    json={'prompt': 'Hello!', 'session_id': 'test'},\\n    stream=True)\\n\\nfor line in resp.iter_lines():\\n    print(line.decode())",

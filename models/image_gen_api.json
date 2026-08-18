@@ -1,0 +1,83 @@
+{
+  "title": "Free Image Generation API",
+  "subtitle": "Deploy your own free AI image generation API - 100,000 calls/day using Cloudflare Workers AI",
+  "source": "https://github.com/saurav-z/free-image-generation-api",
+  "models": [
+    "@cf/stabilityai/stable-diffusion-xl-base-1.0",
+    "@cf/bytedance/stable-diffusion-xl-lightning",
+    "@cf/lykon/dreamshaper-8-lcm",
+    "@cf/blackforestlabs/ux-1-schnell",
+    "@cf/runwayml/stable-diffusion-v1-5-img2img",
+    "@cf/runwayml/stable-diffusion-v1-5-inpainting"
+  ],
+  "features": [
+    "100,000 free API calls/day",
+    "Stable Diffusion XL model",
+    "API key authentication",
+    "Multiple model options",
+    "One-file deployment (worker.js)",
+    "Returns JPEG image directly",
+    "Text-to-image generation"
+  ],
+  "pros": [
+    "Generous free tier (100K/day)",
+    "No credit card required",
+    "Multiple SD models available",
+    "Simple single-file deployment",
+    "Open source MIT license"
+  ],
+  "cons": [
+    "Requires Cloudflare account setup",
+    "Limited to Cloudflare's available models",
+    "Need to deploy your own Worker"
+  ],
+  "pricing": {
+    "type": "free",
+    "freeTier": "100,000 API calls per day (Cloudflare Workers AI free tier)",
+    "paidTier": "Pay-per-use beyond free tier",
+    "creditCardRequired": false
+  },
+  "deployment_steps": [
+    {
+      "step": 1,
+      "title": "Get a Cloudflare Account",
+      "desc": "Sign up at Cloudflare (free)"
+    },
+    {
+      "step": 2,
+      "title": "Create a New Worker",
+      "desc": "Go to Workers dashboard > Create application > Create Worker > Deploy"
+    },
+    {
+      "step": 3,
+      "title": "Replace Worker Code",
+      "desc": "Replace the default code with worker.js from this repo, then Save and Deploy"
+    },
+    {
+      "step": 4,
+      "title": "Set API Key",
+      "desc": "Settings > Variables > Add variable: API_KEY = your-secret-key"
+    },
+    {
+      "step": 5,
+      "title": "Enable Workers AI",
+      "desc": "Go to Workers & Pages > AI > Enable Workers AI (free tier is enough)"
+    },
+    {
+      "step": 6,
+      "title": "Add AI Binding",
+      "desc": "Settings > Variables > Service bindings > Add: Variable name=AI, Service=Workers AI"
+    },
+    {
+      "step": 7,
+      "title": "Get Your URL",
+      "desc": "Your API is live at https://<worker-name>.<subdomain>.workers.dev"
+    }
+  ],
+  "usage_examples": {
+    "curl": "curl -X POST https://your-worker.workers.dev \\\n  -H \"Authorization: Bearer your-api-key\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\"prompt\": \"A cute robot cooking breakfast\"}' \\\n  --output image.jpg",
+    "python": "import requests\n\nresponse = requests.post(\n    \"https://your-worker.workers.dev\",\n    headers={\n        \"Authorization\": \"Bearer your-api-key\",\n        \"Content-Type\": \"application/json\"\n    },\n    json={\"prompt\": \"A futuristic city in the clouds\"}\n)\n\nwith open(\"image.jpg\", \"wb\") as f:\n    f.write(response.content)",
+    "javascript": "const res = await fetch(\"https://your-worker.workers.dev\", {\n  method: \"POST\",\n  headers: {\n    \"Authorization\": \"Bearer your-api-key\",\n    \"Content-Type\": \"application/json\"\n  },\n  body: JSON.stringify({ prompt: \"A dragon flying over mountains\" })\n});\nconst blob = await res.blob();\n// Use the image blob..."
+  },
+  "last_updated": "2026-08-18T13:08:52.423650+00:00"
+}

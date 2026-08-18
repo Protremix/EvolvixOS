@@ -279,8 +279,7 @@ body {
             <div class="title">Verify your email</div>
             <div class="subtitle">Enter the 6-digit code we sent you</div>
             <div id="otp-display-box" class="otp-display" style="display:none">
-                <div class="code" id="otp-code-display">------</div>
-                <div class="label">Your verification code (Telegram not linked)</div>
+                <div class="label">A verification code has been sent to your Telegram. Enter it below.</div>
             </div>
             <div class="field">
                 <label>OTP Code</label>
@@ -376,12 +375,12 @@ document.getElementById('btn-register').addEventListener('click', async () => {
             document.getElementById('otp-email').value = email;
             if (data.otp_display) {
                 document.getElementById('otp-display-box').style.display = 'block';
-                document.getElementById('otp-code-display').textContent = data.otp_display;
+                // OTP is never displayed on screen for security
             } else {
                 document.getElementById('otp-display-box').style.display = 'none';
             }
             switchView('otp');
-            showSuccess(data.otp_sent_via_telegram ? 'OTP sent to your Telegram!' : 'OTP generated. Verify below.');
+            showSuccess(data.otp_sent_via_telegram ? 'OTP sent to your Telegram!' : 'OTP generated. Contact admin for your code.');
         } else {
             showError(data.error || 'Registration failed');
             btn.disabled = false;
@@ -434,7 +433,7 @@ document.getElementById('btn-resend').addEventListener('click', async () => {
         if (data.ok) {
             if (data.otp_display) {
                 document.getElementById('otp-display-box').style.display = 'block';
-                document.getElementById('otp-code-display').textContent = data.otp_display;
+                // OTP is never displayed on screen for security
             }
             showSuccess('New OTP sent!');
         } else {

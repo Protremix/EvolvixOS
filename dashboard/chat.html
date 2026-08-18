@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvolvixOS Chat</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a0f; color: #e0e0e0; font-family: -apple-system, sans-serif; }
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px; border-bottom: 1px solid #333; }
+        .header h1 { color: #a855f7; font-size: 24px; }
+        .header p { color: #6b7280; font-size: 14px; margin-top: 4px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .chat-wrapper { background: #111118; border: 1px solid #2a2a3e; border-radius: 12px; height: 70vh; }
+        .status-bar { padding: 12px 20px; background: #111118; border-bottom: 1px solid #2a2a3e; display: flex; align-items: center; gap: 8px; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; }
+        .status-dot.connected { background: #22c55e; }
+        .config-notice { padding: 40px 20px; text-align: center; color: #6b7280; }
+        .config-notice h2 { color: #a855f7; margin-bottom: 16px; }
+        .config-notice code { background: #1a1a2e; padding: 4px 8px; border-radius: 4px; color: #a855f7; }
+        .config-notice a { color: #a855f7; text-decoration: none; }
+        .neon { text-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="neon">💬 EvolvixOS Chat</h1>
+        <p>Real-time messaging powered by Tencent IM SDK</p>
+    </div>
+    <div class="container">
+        <div class="chat-wrapper">
+            <div class="status-bar">
+                <div class="status-dot" id="status-dot"></div>
+                <span class="status-text" id="status-text">Checking TIM configuration...</span>
+            </div>
+            <div class="config-notice">
+                <h2>Chat Setup Required</h2>
+                <p>To enable in-app chat, configure Tencent IM credentials:</p>
+                <p style="margin: 16px 0;">1. Create a free app at <a href="https://console.trtc.io" target="_blank">console.trtc.io</a></p>
+                <p style="margin: 8px 0;">2. Set <code>TIM_SDK_APP_ID</code> and <code>TIM_SECRET_KEY</code> env vars</p>
+                <p style="margin: 16px 0;">3. Restart: <code>systemctl restart evolvixos-models</code></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        fetch("/api/tim/status").then(r => r.json()).then(data => {
+            if (data.configured) {
+                document.getElementById("status-dot").classList.add("connected");
+                document.getElementById("status-text").textContent = "Connected (SDKAppID: " + data.sdk_app_id + ")";
+            } else {
+                document.getElementById("status-text").textContent = "TIM not configured - see setup instructions";
+            }
+        }).catch(() => {
+            document.getElementById("status-text").textContent = "Unable to check TIM status";
+        });
+    </script>
+</body>
+</html>

@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
-HuggingFace Inference API Gateway for EvolvixOS
-Provides free OpenAI-compatible access to GPT-2, GPT-Neo, GPT-J and other HF models.
-No API key required for basic usage (rate-limited free tier).
+HuggingFace Inference API Gateway for EvolvixOS v8.1
+Provides free OpenAI-compatible access to GPT-2, GPT-Neo, GPT-J, Nemotron, etc.
+v8.1: Fixed to use ThreadingHTTPServer (was single-threaded, blocking all requests).
+      Port changed to 20129 to match Nginx config.
 """
 import json
 import urllib.request
 import urllib.error
 import os
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HF_API_URL = "https://api-inference.huggingface.co/models"
-HF_TOKEN = os.environ.get("HF_TOKEN", "")  # Optional, free tier works without it
+HF_TOKEN = os.environ.get("HF_TOKEN", "")
 
-# Model registry: OpenAI-name -> HF model id
 HF_MODELS = {
     "nemotron-340b":   "nvidia/Nemotron-4-340B-Instruct",
     "nemotron-70b":    "nvidia/Nemotron-70B-Instruct",
@@ -33,15 +33,16 @@ HF_MODELS = {
 
 class HFGatewayHandler(BaseHTTPRequestHandler):
     def _cors(self):
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Origin", "https://evolvixos.com")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-    
+        self.send_header("X-Content-Type-Options", "nosniff")
+
     def do_OPTIONS(self):
         self.send_response(200)
         self._cors()
         self.end_headers()
-    
+
     def do_GET(self):
         if self.path == "/models" or self.path == "/v1/models":
             models = [{"id": k, "object": "model", "owned_by": "huggingface"} for k in HF_MODELS]
@@ -59,24 +60,23 @@ class HFGatewayHandler(BaseHTTPRequestHandler):
         else:
             self.send_response(404)
             self.end_headers()
-    
+
     def do_POST(self):
         if self.path == "/v1/chat/completions" or self.path == "/chat/completions":
             self._handle_chat()
         else:
             self.send_response(404)
             self.end_headers()
-    
+
     def _handle_chat(self):
         try:
             body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
             messages = body.get("messages", [])
             model = body.get("model", "gpt2")
             stream = body.get("stream", False)
-            
+
             hf_model = HF_MODELS.get(model, HF_MODELS.get("gpt2"))
-            
-            # Convert messages to a single prompt for HF text-generation
+
             prompt = ""
             for msg in messages:
                 role = msg.get("role", "user")
@@ -88,12 +88,11 @@ class HFGatewayHandler(BaseHTTPRequestHandler):
                 elif role == "assistant":
                     prompt += f"[Assistant]: {content}\n"
             prompt += "[Assistant]: "
-            
-            # Call HuggingFace Inference API
+
             headers = {"Content-Type": "application/json"}
             if HF_TOKEN:
                 headers["Authorization"] = f"Bearer {HF_TOKEN}"
-            
+
             payload = json.dumps({
                 "inputs": prompt,
                 "parameters": {
@@ -103,13 +102,9 @@ class HFGatewayHandler(BaseHTTPRequestHandler):
                 },
                 "options": {"wait_for_model": True}
             }).encode()
-            
-            req = urllib.request.Request(
-                f"{HF_API_URL}/{hf_model}",
-                data=payload,
-                headers=headers
-            )
-            
+
+            req = urllib.request.Request(f"{HF_API_URL}/{hf_model}", data=payload, headers=headers)
+
             try:
                 with urllib.request.urlopen(req, timeout=60) as resp:
                     result = json.loads(resp.read())
@@ -119,7 +114,7 @@ class HFGatewayHandler(BaseHTTPRequestHandler):
                         text = result.get("generated_text", str(result))
                     else:
                         text = str(result)
-                    
+
                     response = {
                         "id": f"hf-{model}-{int(__import__('time').time())}",
                         "object": "chat.completion",
@@ -127,7 +122,7 @@ class HFGatewayHandler(BaseHTTPRequestHandler):
                         "choices": [{"index": 0, "message": {"role": "assistant", "content": text}, "finish_reason": "stop"}],
                         "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
                     }
-                    
+
                     if stream:
                         self.send_response(200)
                         self.send_header("Content-Type", "text/event-stream")
@@ -142,7 +137,7 @@ class HFGatewayHandler(BaseHTTPRequestHandler):
                         self._cors()
                         self.end_headers()
                         self.wfile.write(json.dumps(response).encode())
-                        
+
             except urllib.error.HTTPError as e:
                 error_body = e.read().decode(errors="ignore")
                 self.send_response(e.code)
@@ -150,20 +145,21 @@ class HFGatewayHandler(BaseHTTPRequestHandler):
                 self._cors()
                 self.end_headers()
                 self.wfile.write(json.dumps({"error": {"message": error_body, "type": "api_error"}}).encode())
-                
+
         except Exception as e:
             self.send_response(500)
             self.send_header("Content-Type", "application/json")
             self._cors()
             self.end_headers()
             self.wfile.write(json.dumps({"error": {"message": str(e)}}).encode())
-    
+
     def log_message(self, format, *args):
         print(f"[HF Gateway] {args[0]}")
 
 if __name__ == "__main__":
-    port = int(os.environ.get("HF_GATEWAY_PORT", 3001))
-    server = HTTPServer(("0.0.0.0", port), HFGatewayHandler)
-    print(f"🤗 HuggingFace Gateway running on port {port}")
+    # FIX: Use port 20129 to match Nginx config, and ThreadingHTTPServer
+    port = int(os.environ.get("HF_GATEWAY_PORT", "20129"))
+    server = ThreadingHTTPServer(("0.0.0.0", port), HFGatewayHandler)
+    print(f"🤗 HuggingFace Gateway v8.1 running on port {port} (threaded)")
     print(f"   Models: {', '.join(HF_MODELS.keys())}")
     server.serve_forever()

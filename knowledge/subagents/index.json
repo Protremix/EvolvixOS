@@ -1,0 +1,1304 @@
+[
+  {
+    "name": "academic-psychologist",
+    "category": "academic",
+    "description": "Psychologist Agent Personality",
+    "path": "academic/academic-psychologist.md"
+  },
+  {
+    "name": "academic-anthropologist",
+    "category": "academic",
+    "description": "Anthropologist Agent Personality",
+    "path": "academic/academic-anthropologist.md"
+  },
+  {
+    "name": "academic-narratologist",
+    "category": "academic",
+    "description": "Narratologist Agent Personality",
+    "path": "academic/academic-narratologist.md"
+  },
+  {
+    "name": "academic-historian",
+    "category": "academic",
+    "description": "Historian Agent Personality",
+    "path": "academic/academic-historian.md"
+  },
+  {
+    "name": "academic-geographer",
+    "category": "academic",
+    "description": "Geographer Agent Personality",
+    "path": "academic/academic-geographer.md"
+  },
+  {
+    "name": "support-analytics-reporter",
+    "category": "support",
+    "description": "Analytics Reporter Agent Personality",
+    "path": "support/support-analytics-reporter.md"
+  },
+  {
+    "name": "support-executive-summary-generator",
+    "category": "support",
+    "description": "Executive Summary Generator Agent Personality",
+    "path": "support/support-executive-summary-generator.md"
+  },
+  {
+    "name": "support-finance-tracker",
+    "category": "support",
+    "description": "Finance Tracker Agent Personality",
+    "path": "support/support-finance-tracker.md"
+  },
+  {
+    "name": "support-legal-compliance-checker",
+    "category": "support",
+    "description": "Legal Compliance Checker Agent Personality",
+    "path": "support/support-legal-compliance-checker.md"
+  },
+  {
+    "name": "support-support-responder",
+    "category": "support",
+    "description": "Support Responder Agent Personality",
+    "path": "support/support-support-responder.md"
+  },
+  {
+    "name": "support-infrastructure-maintainer",
+    "category": "support",
+    "description": "Infrastructure Maintainer Agent Personality",
+    "path": "support/support-infrastructure-maintainer.md"
+  },
+  {
+    "name": "marketing-book-co-author",
+    "category": "marketing",
+    "description": "Book Co-Author",
+    "path": "marketing/marketing-book-co-author.md"
+  },
+  {
+    "name": "marketing-china-market-localization-strategist",
+    "category": "marketing",
+    "description": "China Market Localization Strategist",
+    "path": "marketing/marketing-china-market-localization-strategist.md"
+  },
+  {
+    "name": "marketing-douyin-strategist",
+    "category": "marketing",
+    "description": "Marketing Douyin Strategist",
+    "path": "marketing/marketing-douyin-strategist.md"
+  },
+  {
+    "name": "marketing-podcast-strategist",
+    "category": "marketing",
+    "description": "Marketing Podcast Strategist",
+    "path": "marketing/marketing-podcast-strategist.md"
+  },
+  {
+    "name": "marketing-x-twitter-intelligence-analyst",
+    "category": "marketing",
+    "description": "Marketing X Twitter Intelligence Analyst",
+    "path": "marketing/marketing-x-twitter-intelligence-analyst.md"
+  },
+  {
+    "name": "marketing-bilibili-content-strategist",
+    "category": "marketing",
+    "description": "Marketing Bilibili Content Strategist",
+    "path": "marketing/marketing-bilibili-content-strategist.md"
+  },
+  {
+    "name": "marketing-instagram-curator",
+    "category": "marketing",
+    "description": "Marketing Instagram Curator",
+    "path": "marketing/marketing-instagram-curator.md"
+  },
+  {
+    "name": "marketing-wechat-official-account",
+    "category": "marketing",
+    "description": "Marketing WeChat Official Account Manager",
+    "path": "marketing/marketing-wechat-official-account.md"
+  },
+  {
+    "name": "marketing-china-ecommerce-operator",
+    "category": "marketing",
+    "description": "Marketing China E-Commerce Operator",
+    "path": "marketing/marketing-china-ecommerce-operator.md"
+  },
+  {
+    "name": "marketing-email-strategist",
+    "category": "marketing",
+    "description": "Email Marketing Strategist",
+    "path": "marketing/marketing-email-strategist.md"
+  },
+  {
+    "name": "marketing-pr-communications-manager",
+    "category": "marketing",
+    "description": "\ud83d\udce3 PR & Communications Manager",
+    "path": "marketing/marketing-pr-communications-manager.md"
+  },
+  {
+    "name": "marketing-twitter-engager",
+    "category": "marketing",
+    "description": "Marketing Twitter Engager",
+    "path": "marketing/marketing-twitter-engager.md"
+  },
+  {
+    "name": "marketing-xiaohongshu-specialist",
+    "category": "marketing",
+    "description": "Marketing Xiaohongshu Specialist",
+    "path": "marketing/marketing-xiaohongshu-specialist.md"
+  },
+  {
+    "name": "marketing-content-creator",
+    "category": "marketing",
+    "description": "Marketing Content Creator Agent",
+    "path": "marketing/marketing-content-creator.md"
+  },
+  {
+    "name": "marketing-reddit-community-builder",
+    "category": "marketing",
+    "description": "Marketing Reddit Community Builder",
+    "path": "marketing/marketing-reddit-community-builder.md"
+  },
+  {
+    "name": "marketing-linkedin-content-creator",
+    "category": "marketing",
+    "description": "LinkedIn Content Creator",
+    "path": "marketing/marketing-linkedin-content-creator.md"
+  },
+  {
+    "name": "marketing-carousel-growth-engine",
+    "category": "marketing",
+    "description": "Marketing Carousel Growth Engine",
+    "path": "marketing/marketing-carousel-growth-engine.md"
+  },
+  {
+    "name": "marketing-app-store-optimizer",
+    "category": "marketing",
+    "description": "App Store Optimizer Agent Personality",
+    "path": "marketing/marketing-app-store-optimizer.md"
+  },
+  {
+    "name": "marketing-livestream-commerce-coach",
+    "category": "marketing",
+    "description": "Marketing Livestream Commerce Coach",
+    "path": "marketing/marketing-livestream-commerce-coach.md"
+  },
+  {
+    "name": "marketing-ai-citation-strategist",
+    "category": "marketing",
+    "description": "Your Identity & Memory",
+    "path": "marketing/marketing-ai-citation-strategist.md"
+  },
+  {
+    "name": "marketing-cross-border-ecommerce",
+    "category": "marketing",
+    "description": "Marketing Cross-Border E-Commerce Specialist",
+    "path": "marketing/marketing-cross-border-ecommerce.md"
+  },
+  {
+    "name": "marketing-private-domain-operator",
+    "category": "marketing",
+    "description": "Marketing Private Domain Operator",
+    "path": "marketing/marketing-private-domain-operator.md"
+  },
+  {
+    "name": "marketing-weibo-strategist",
+    "category": "marketing",
+    "description": "Marketing Weibo Strategist",
+    "path": "marketing/marketing-weibo-strategist.md"
+  },
+  {
+    "name": "marketing-zhihu-strategist",
+    "category": "marketing",
+    "description": "Marketing Zhihu Strategist",
+    "path": "marketing/marketing-zhihu-strategist.md"
+  },
+  {
+    "name": "marketing-kuaishou-strategist",
+    "category": "marketing",
+    "description": "Marketing Kuaishou Strategist",
+    "path": "marketing/marketing-kuaishou-strategist.md"
+  },
+  {
+    "name": "marketing-seo-specialist",
+    "category": "marketing",
+    "description": "Marketing SEO Specialist",
+    "path": "marketing/marketing-seo-specialist.md"
+  },
+  {
+    "name": "marketing-growth-hacker",
+    "category": "marketing",
+    "description": "Marketing Growth Hacker Agent",
+    "path": "marketing/marketing-growth-hacker.md"
+  },
+  {
+    "name": "marketing-tiktok-strategist",
+    "category": "marketing",
+    "description": "Marketing TikTok Strategist",
+    "path": "marketing/marketing-tiktok-strategist.md"
+  },
+  {
+    "name": "marketing-video-optimization-specialist",
+    "category": "marketing",
+    "description": "Marketing Video Optimization Specialist Agent",
+    "path": "marketing/marketing-video-optimization-specialist.md"
+  },
+  {
+    "name": "marketing-short-video-editing-coach",
+    "category": "marketing",
+    "description": "Marketing Short-Video Editing Coach",
+    "path": "marketing/marketing-short-video-editing-coach.md"
+  },
+  {
+    "name": "marketing-agentic-search-optimizer",
+    "category": "marketing",
+    "description": "\ud83e\udde0 Your Identity & Memory",
+    "path": "marketing/marketing-agentic-search-optimizer.md"
+  },
+  {
+    "name": "marketing-social-media-strategist",
+    "category": "marketing",
+    "description": "Social Media Strategist Agent",
+    "path": "marketing/marketing-social-media-strategist.md"
+  },
+  {
+    "name": "marketing-multi-platform-publisher",
+    "category": "marketing",
+    "description": "Marketing Multi Platform Publisher",
+    "path": "marketing/marketing-multi-platform-publisher.md"
+  },
+  {
+    "name": "marketing-baidu-seo-specialist",
+    "category": "marketing",
+    "description": "Marketing Baidu SEO Specialist",
+    "path": "marketing/marketing-baidu-seo-specialist.md"
+  },
+  {
+    "name": "marketing-aeo-foundations",
+    "category": "marketing",
+    "description": "AEO Foundations Architect",
+    "path": "marketing/marketing-aeo-foundations.md"
+  },
+  {
+    "name": "marketing-global-podcast-strategist",
+    "category": "marketing",
+    "description": "Marketing Global Podcast Strategist",
+    "path": "marketing/marketing-global-podcast-strategist.md"
+  },
+  {
+    "name": "paid-media-programmatic-buyer",
+    "category": "paid-media",
+    "description": "Paid Media Programmatic Buyer",
+    "path": "paid-media/paid-media-programmatic-buyer.md"
+  },
+  {
+    "name": "paid-media-search-query-analyst",
+    "category": "paid-media",
+    "description": "Paid Media Search Query Analyst",
+    "path": "paid-media/paid-media-search-query-analyst.md"
+  },
+  {
+    "name": "paid-media-auditor",
+    "category": "paid-media",
+    "description": "Paid Media Auditor",
+    "path": "paid-media/paid-media-auditor.md"
+  },
+  {
+    "name": "paid-media-creative-strategist",
+    "category": "paid-media",
+    "description": "Paid Media Creative Strategist",
+    "path": "paid-media/paid-media-creative-strategist.md"
+  },
+  {
+    "name": "paid-media-tracking-specialist",
+    "category": "paid-media",
+    "description": "Paid Media Tracking Specialist",
+    "path": "paid-media/paid-media-tracking-specialist.md"
+  },
+  {
+    "name": "paid-media-ppc-strategist",
+    "category": "paid-media",
+    "description": "Paid Media Ppc Strategist",
+    "path": "paid-media/paid-media-ppc-strategist.md"
+  },
+  {
+    "name": "paid-media-paid-social-strategist",
+    "category": "paid-media",
+    "description": "Paid Media Paid Social Strategist",
+    "path": "paid-media/paid-media-paid-social-strategist.md"
+  },
+  {
+    "name": "project-management-studio-producer",
+    "category": "project-management",
+    "description": "Studio Producer Agent Personality",
+    "path": "project-management/project-management-studio-producer.md"
+  },
+  {
+    "name": "project-management-jira-workflow-steward",
+    "category": "project-management",
+    "description": "Jira Workflow Steward Agent",
+    "path": "project-management/project-management-jira-workflow-steward.md"
+  },
+  {
+    "name": "project-management-studio-operations",
+    "category": "project-management",
+    "description": "Studio Operations Agent Personality",
+    "path": "project-management/project-management-studio-operations.md"
+  },
+  {
+    "name": "project-manager-senior",
+    "category": "project-management",
+    "description": "Project Manager Agent Personality",
+    "path": "project-management/project-manager-senior.md"
+  },
+  {
+    "name": "project-management-meeting-notes-specialist",
+    "category": "project-management",
+    "description": "Meeting Notes Specialist",
+    "path": "project-management/project-management-meeting-notes-specialist.md"
+  },
+  {
+    "name": "project-management-experiment-tracker",
+    "category": "project-management",
+    "description": "Experiment Tracker Agent Personality",
+    "path": "project-management/project-management-experiment-tracker.md"
+  },
+  {
+    "name": "project-management-project-shepherd",
+    "category": "project-management",
+    "description": "Project Shepherd Agent Personality",
+    "path": "project-management/project-management-project-shepherd.md"
+  },
+  {
+    "name": "security-cloud-security-architect",
+    "category": "security",
+    "description": "Cloud Security Architect",
+    "path": "security/security-cloud-security-architect.md"
+  },
+  {
+    "name": "security-blockchain-security-auditor",
+    "category": "security",
+    "description": "Blockchain Security Auditor",
+    "path": "security/security-blockchain-security-auditor.md"
+  },
+  {
+    "name": "security-penetration-tester",
+    "category": "security",
+    "description": "Penetration Tester",
+    "path": "security/security-penetration-tester.md"
+  },
+  {
+    "name": "security-architect",
+    "category": "security",
+    "description": "Security Architect Agent",
+    "path": "security/security-architect.md"
+  },
+  {
+    "name": "security-senior-secops",
+    "category": "security",
+    "description": "Senior SecOps Engineer",
+    "path": "security/security-senior-secops.md"
+  },
+  {
+    "name": "security-incident-responder",
+    "category": "security",
+    "description": "Incident Responder",
+    "path": "security/security-incident-responder.md"
+  },
+  {
+    "name": "security-threat-intelligence-analyst",
+    "category": "security",
+    "description": "Threat Intelligence Analyst",
+    "path": "security/security-threat-intelligence-analyst.md"
+  },
+  {
+    "name": "security-compliance-auditor",
+    "category": "security",
+    "description": "Compliance Auditor Agent",
+    "path": "security/security-compliance-auditor.md"
+  },
+  {
+    "name": "security-threat-detection-engineer",
+    "category": "security",
+    "description": "Threat Detection Engineer Agent",
+    "path": "security/security-threat-detection-engineer.md"
+  },
+  {
+    "name": "security-appsec-engineer",
+    "category": "security",
+    "description": "Application Security Engineer",
+    "path": "security/security-appsec-engineer.md"
+  },
+  {
+    "name": "narrative-designer",
+    "category": "game-development",
+    "description": "Narrative Designer Agent Personality",
+    "path": "game-development/narrative-designer.md"
+  },
+  {
+    "name": "game-audio-engineer",
+    "category": "game-development",
+    "description": "Game Audio Engineer Agent Personality",
+    "path": "game-development/game-audio-engineer.md"
+  },
+  {
+    "name": "game-designer",
+    "category": "game-development",
+    "description": "Game Designer Agent Personality",
+    "path": "game-development/game-designer.md"
+  },
+  {
+    "name": "level-designer",
+    "category": "game-development",
+    "description": "Level Designer Agent Personality",
+    "path": "game-development/level-designer.md"
+  },
+  {
+    "name": "technical-artist",
+    "category": "game-development",
+    "description": "Technical Artist Agent Personality",
+    "path": "game-development/technical-artist.md"
+  },
+  {
+    "name": "product-sprint-prioritizer",
+    "category": "product",
+    "description": "Product Sprint Prioritizer Agent",
+    "path": "product/product-sprint-prioritizer.md"
+  },
+  {
+    "name": "product-manager",
+    "category": "product",
+    "description": "\ud83e\udded Product Manager Agent",
+    "path": "product/product-manager.md"
+  },
+  {
+    "name": "product-behavioral-nudge-engine",
+    "category": "product",
+    "description": "\ud83e\udde0 Behavioral Nudge Engine",
+    "path": "product/product-behavioral-nudge-engine.md"
+  },
+  {
+    "name": "product-trend-researcher",
+    "category": "product",
+    "description": "Product Trend Researcher Agent",
+    "path": "product/product-trend-researcher.md"
+  },
+  {
+    "name": "product-feedback-synthesizer",
+    "category": "product",
+    "description": "Product Feedback Synthesizer Agent",
+    "path": "product/product-feedback-synthesizer.md"
+  },
+  {
+    "name": "gis-geoprocessing-specialist",
+    "category": "gis",
+    "description": "GeoprocessingSpecialist Agent Personality",
+    "path": "gis/gis-geoprocessing-specialist.md"
+  },
+  {
+    "name": "gis-web-gis-developer",
+    "category": "gis",
+    "description": "WebGISDeveloper Agent Personality",
+    "path": "gis/gis-web-gis-developer.md"
+  },
+  {
+    "name": "gis-technical-consultant",
+    "category": "gis",
+    "description": "GISTechnicalConsultant Agent Personality",
+    "path": "gis/gis-technical-consultant.md"
+  },
+  {
+    "name": "gis-spatial-data-engineer",
+    "category": "gis",
+    "description": "SpatialDataEngineer Agent Personality",
+    "path": "gis/gis-spatial-data-engineer.md"
+  },
+  {
+    "name": "gis-cartography-designer",
+    "category": "gis",
+    "description": "CartographyDesigner Agent Personality",
+    "path": "gis/gis-cartography-designer.md"
+  },
+  {
+    "name": "gis-qa-engineer",
+    "category": "gis",
+    "description": "GISQAEngineer Agent Personality",
+    "path": "gis/gis-qa-engineer.md"
+  },
+  {
+    "name": "gis-spatial-data-scientist",
+    "category": "gis",
+    "description": "SpatialDataScientist Agent Personality",
+    "path": "gis/gis-spatial-data-scientist.md"
+  },
+  {
+    "name": "gis-3d-scene-developer",
+    "category": "gis",
+    "description": "3DSceneDeveloper Agent Personality",
+    "path": "gis/gis-3d-scene-developer.md"
+  },
+  {
+    "name": "gis-drone-reality-mapping",
+    "category": "gis",
+    "description": "DroneRealityMapping Agent Personality",
+    "path": "gis/gis-drone-reality-mapping.md"
+  },
+  {
+    "name": "gis-analyst",
+    "category": "gis",
+    "description": "GISAnalyst Agent Personality",
+    "path": "gis/gis-analyst.md"
+  },
+  {
+    "name": "gis-bim-specialist",
+    "category": "gis",
+    "description": "BIMGISS Specialist Agent Personality",
+    "path": "gis/gis-bim-specialist.md"
+  },
+  {
+    "name": "gis-geoai-ml-engineer",
+    "category": "gis",
+    "description": "GeoAIMLEngineer Agent Personality",
+    "path": "gis/gis-geoai-ml-engineer.md"
+  },
+  {
+    "name": "gis-solution-engineer",
+    "category": "gis",
+    "description": "GISSolutionEngineer Agent Personality",
+    "path": "gis/gis-solution-engineer.md"
+  },
+  {
+    "name": "macos-spatial-metal-engineer",
+    "category": "spatial-computing",
+    "description": "macOS Spatial/Metal Engineer Agent Personality",
+    "path": "spatial-computing/macos-spatial-metal-engineer.md"
+  },
+  {
+    "name": "xr-cockpit-interaction-specialist",
+    "category": "spatial-computing",
+    "description": "XR Cockpit Interaction Specialist Agent Personality",
+    "path": "spatial-computing/xr-cockpit-interaction-specialist.md"
+  },
+  {
+    "name": "xr-interface-architect",
+    "category": "spatial-computing",
+    "description": "XR Interface Architect Agent Personality",
+    "path": "spatial-computing/xr-interface-architect.md"
+  },
+  {
+    "name": "xr-immersive-developer",
+    "category": "spatial-computing",
+    "description": "XR Immersive Developer Agent Personality",
+    "path": "spatial-computing/xr-immersive-developer.md"
+  },
+  {
+    "name": "terminal-integration-specialist",
+    "category": "spatial-computing",
+    "description": "Terminal Integration Specialist",
+    "path": "spatial-computing/terminal-integration-specialist.md"
+  },
+  {
+    "name": "visionos-spatial-engineer",
+    "category": "spatial-computing",
+    "description": "visionOS Spatial Engineer",
+    "path": "spatial-computing/visionos-spatial-engineer.md"
+  },
+  {
+    "name": "testing-api-tester",
+    "category": "testing",
+    "description": "API Tester Agent Personality",
+    "path": "testing/testing-api-tester.md"
+  },
+  {
+    "name": "testing-reality-checker",
+    "category": "testing",
+    "description": "Integration Agent Personality",
+    "path": "testing/testing-reality-checker.md"
+  },
+  {
+    "name": "testing-accessibility-auditor",
+    "category": "testing",
+    "description": "Accessibility Auditor Agent Personality",
+    "path": "testing/testing-accessibility-auditor.md"
+  },
+  {
+    "name": "testing-test-results-analyzer",
+    "category": "testing",
+    "description": "Test Results Analyzer Agent Personality",
+    "path": "testing/testing-test-results-analyzer.md"
+  },
+  {
+    "name": "testing-workflow-optimizer",
+    "category": "testing",
+    "description": "Workflow Optimizer Agent Personality",
+    "path": "testing/testing-workflow-optimizer.md"
+  },
+  {
+    "name": "testing-tool-evaluator",
+    "category": "testing",
+    "description": "Tool Evaluator Agent Personality",
+    "path": "testing/testing-tool-evaluator.md"
+  },
+  {
+    "name": "testing-performance-benchmarker",
+    "category": "testing",
+    "description": "Performance Benchmarker Agent Personality",
+    "path": "testing/testing-performance-benchmarker.md"
+  },
+  {
+    "name": "testing-evidence-collector",
+    "category": "testing",
+    "description": "QA Agent Personality",
+    "path": "testing/testing-evidence-collector.md"
+  },
+  {
+    "name": "engineering-code-reviewer",
+    "category": "engineering",
+    "description": "Code Reviewer Agent",
+    "path": "engineering/engineering-code-reviewer.md"
+  },
+  {
+    "name": "engineering-devops-automator",
+    "category": "engineering",
+    "description": "DevOps Automator Agent Personality",
+    "path": "engineering/engineering-devops-automator.md"
+  },
+  {
+    "name": "engineering-multi-agent-systems-architect",
+    "category": "engineering",
+    "description": "\ud83d\udd78\ufe0f Multi-Agent Systems Architect Agent",
+    "path": "engineering/engineering-multi-agent-systems-architect.md"
+  },
+  {
+    "name": "engineering-embedded-firmware-engineer",
+    "category": "engineering",
+    "description": "Embedded Firmware Engineer",
+    "path": "engineering/engineering-embedded-firmware-engineer.md"
+  },
+  {
+    "name": "engineering-wordpress-shopping-cart",
+    "category": "engineering",
+    "description": "\ud83d\udecd\ufe0f WordPress Shopping Cart Engineer",
+    "path": "engineering/engineering-wordpress-shopping-cart.md"
+  },
+  {
+    "name": "engineering-autonomous-optimization-architect",
+    "category": "engineering",
+    "description": "\u2699\ufe0f Autonomous Optimization Architect",
+    "path": "engineering/engineering-autonomous-optimization-architect.md"
+  },
+  {
+    "name": "engineering-data-engineer",
+    "category": "engineering",
+    "description": "Data Engineer Agent",
+    "path": "engineering/engineering-data-engineer.md"
+  },
+  {
+    "name": "engineering-rapid-prototyper",
+    "category": "engineering",
+    "description": "Rapid Prototyper Agent Personality",
+    "path": "engineering/engineering-rapid-prototyper.md"
+  },
+  {
+    "name": "engineering-backend-architect",
+    "category": "engineering",
+    "description": "Backend Architect Agent Personality",
+    "path": "engineering/engineering-backend-architect.md"
+  },
+  {
+    "name": "engineering-minimal-change-engineer",
+    "category": "engineering",
+    "description": "Minimal Change Engineer Agent",
+    "path": "engineering/engineering-minimal-change-engineer.md"
+  },
+  {
+    "name": "engineering-voice-ai-integration-engineer",
+    "category": "engineering",
+    "description": "\ud83c\udf99\ufe0f Voice AI Integration Engineer Agent",
+    "path": "engineering/engineering-voice-ai-integration-engineer.md"
+  },
+  {
+    "name": "engineering-solidity-smart-contract-engineer",
+    "category": "engineering",
+    "description": "Solidity Smart Contract Engineer",
+    "path": "engineering/engineering-solidity-smart-contract-engineer.md"
+  },
+  {
+    "name": "engineering-software-architect",
+    "category": "engineering",
+    "description": "Software Architect Agent",
+    "path": "engineering/engineering-software-architect.md"
+  },
+  {
+    "name": "engineering-frontend-developer",
+    "category": "engineering",
+    "description": "Frontend Developer Agent Personality",
+    "path": "engineering/engineering-frontend-developer.md"
+  },
+  {
+    "name": "engineering-it-service-manager",
+    "category": "engineering",
+    "description": "\ud83d\udda7 IT Service Manager",
+    "path": "engineering/engineering-it-service-manager.md"
+  },
+  {
+    "name": "engineering-database-optimizer",
+    "category": "engineering",
+    "description": "\ud83d\uddc4\ufe0f Database Optimizer",
+    "path": "engineering/engineering-database-optimizer.md"
+  },
+  {
+    "name": "engineering-sre",
+    "category": "engineering",
+    "description": "SRE (Site Reliability Engineer) Agent",
+    "path": "engineering/engineering-sre.md"
+  },
+  {
+    "name": "engineering-technical-writer",
+    "category": "engineering",
+    "description": "Technical Writer Agent",
+    "path": "engineering/engineering-technical-writer.md"
+  },
+  {
+    "name": "engineering-filament-optimization-specialist",
+    "category": "engineering",
+    "description": "Agent Personality",
+    "path": "engineering/engineering-filament-optimization-specialist.md"
+  },
+  {
+    "name": "engineering-mobile-app-builder",
+    "category": "engineering",
+    "description": "Mobile App Builder Agent Personality",
+    "path": "engineering/engineering-mobile-app-builder.md"
+  },
+  {
+    "name": "engineering-orgscript-engineer",
+    "category": "engineering",
+    "description": "OrgScript Engineer Personality",
+    "path": "engineering/engineering-orgscript-engineer.md"
+  },
+  {
+    "name": "engineering-git-workflow-master",
+    "category": "engineering",
+    "description": "Git Workflow Master Agent",
+    "path": "engineering/engineering-git-workflow-master.md"
+  },
+  {
+    "name": "engineering-feishu-integration-developer",
+    "category": "engineering",
+    "description": "Feishu Integration Developer",
+    "path": "engineering/engineering-feishu-integration-developer.md"
+  },
+  {
+    "name": "engineering-wechat-mini-program-developer",
+    "category": "engineering",
+    "description": "WeChat Mini Program Developer Agent Personality",
+    "path": "engineering/engineering-wechat-mini-program-developer.md"
+  },
+  {
+    "name": "engineering-codebase-onboarding-engineer",
+    "category": "engineering",
+    "description": "Codebase Onboarding Engineer Agent",
+    "path": "engineering/engineering-codebase-onboarding-engineer.md"
+  },
+  {
+    "name": "engineering-prompt-engineer",
+    "category": "engineering",
+    "description": "Prompt Engineer",
+    "path": "engineering/engineering-prompt-engineer.md"
+  },
+  {
+    "name": "engineering-email-intelligence-engineer",
+    "category": "engineering",
+    "description": "Email Intelligence Engineer Agent",
+    "path": "engineering/engineering-email-intelligence-engineer.md"
+  },
+  {
+    "name": "engineering-ai-engineer",
+    "category": "engineering",
+    "description": "AI Engineer Agent",
+    "path": "engineering/engineering-ai-engineer.md"
+  },
+  {
+    "name": "engineering-incident-response-commander",
+    "category": "engineering",
+    "description": "Incident Response Commander Agent",
+    "path": "engineering/engineering-incident-response-commander.md"
+  },
+  {
+    "name": "engineering-drupal-shopping-cart",
+    "category": "engineering",
+    "description": "\ud83d\uded2 Drupal Shopping Cart Engineer",
+    "path": "engineering/engineering-drupal-shopping-cart.md"
+  },
+  {
+    "name": "engineering-senior-developer",
+    "category": "engineering",
+    "description": "Developer Agent Personality",
+    "path": "engineering/engineering-senior-developer.md"
+  },
+  {
+    "name": "engineering-ai-data-remediation-engineer",
+    "category": "engineering",
+    "description": "AI Data Remediation Engineer Agent",
+    "path": "engineering/engineering-ai-data-remediation-engineer.md"
+  },
+  {
+    "name": "engineering-cms-developer",
+    "category": "engineering",
+    "description": "\ud83e\uddf1 CMS Developer",
+    "path": "engineering/engineering-cms-developer.md"
+  },
+  {
+    "name": "corporate-training-designer",
+    "category": "specialized",
+    "description": "Corporate Training Designer",
+    "path": "specialized/corporate-training-designer.md"
+  },
+  {
+    "name": "zk-steward",
+    "category": "specialized",
+    "description": "ZK Steward Agent",
+    "path": "specialized/zk-steward.md"
+  },
+  {
+    "name": "specialized-workflow-architect",
+    "category": "specialized",
+    "description": "Workflow Architect Agent Personality",
+    "path": "specialized/specialized-workflow-architect.md"
+  },
+  {
+    "name": "automation-governance-architect",
+    "category": "specialized",
+    "description": "Automation Governance Architect",
+    "path": "specialized/automation-governance-architect.md"
+  },
+  {
+    "name": "government-digital-presales-consultant",
+    "category": "specialized",
+    "description": "Government Digital Presales Consultant",
+    "path": "specialized/government-digital-presales-consultant.md"
+  },
+  {
+    "name": "specialized-civil-engineer",
+    "category": "specialized",
+    "description": "Civil Engineer Agent",
+    "path": "specialized/specialized-civil-engineer.md"
+  },
+  {
+    "name": "report-distribution-agent",
+    "category": "specialized",
+    "description": "Report Distribution Agent",
+    "path": "specialized/report-distribution-agent.md"
+  },
+  {
+    "name": "customer-service",
+    "category": "specialized",
+    "description": "\ud83c\udfa7 Customer Service Agent",
+    "path": "specialized/customer-service.md"
+  },
+  {
+    "name": "customer-success-manager",
+    "category": "specialized",
+    "description": "\ud83c\udf1f Customer Success Manager",
+    "path": "specialized/customer-success-manager.md"
+  },
+  {
+    "name": "specialized-document-generator",
+    "category": "specialized",
+    "description": "Document Generator Agent",
+    "path": "specialized/specialized-document-generator.md"
+  },
+  {
+    "name": "change-management-consultant",
+    "category": "specialized",
+    "description": "\ud83d\udd04 Change Management Consultant",
+    "path": "specialized/change-management-consultant.md"
+  },
+  {
+    "name": "identity-graph-operator",
+    "category": "specialized",
+    "description": "Identity Graph Operator",
+    "path": "specialized/identity-graph-operator.md"
+  },
+  {
+    "name": "operations-manager",
+    "category": "specialized",
+    "description": "\u2699\ufe0f Operations Manager Agent",
+    "path": "specialized/operations-manager.md"
+  },
+  {
+    "name": "agents-orchestrator",
+    "category": "specialized",
+    "description": "AgentsOrchestrator Agent Personality",
+    "path": "specialized/agents-orchestrator.md"
+  },
+  {
+    "name": "legal-billing-time-tracking",
+    "category": "specialized",
+    "description": "\u23f1\ufe0f Legal Billing & Time Tracking Agent",
+    "path": "specialized/legal-billing-time-tracking.md"
+  },
+  {
+    "name": "personal-growth-mentor",
+    "category": "specialized",
+    "description": "\ud83c\udf31 Personal Growth Mentor",
+    "path": "specialized/personal-growth-mentor.md"
+  },
+  {
+    "name": "specialized-developer-advocate",
+    "category": "specialized",
+    "description": "Developer Advocate Agent",
+    "path": "specialized/specialized-developer-advocate.md"
+  },
+  {
+    "name": "specialized-mcp-builder",
+    "category": "specialized",
+    "description": "MCP Builder Agent",
+    "path": "specialized/specialized-mcp-builder.md"
+  },
+  {
+    "name": "specialized-model-qa",
+    "category": "specialized",
+    "description": "Model QA Specialist",
+    "path": "specialized/specialized-model-qa.md"
+  },
+  {
+    "name": "specialized-cultural-intelligence-strategist",
+    "category": "specialized",
+    "description": "\ud83c\udf0d Cultural Intelligence Strategist",
+    "path": "specialized/specialized-cultural-intelligence-strategist.md"
+  },
+  {
+    "name": "lsp-index-engineer",
+    "category": "specialized",
+    "description": "LSP/Index Engineer Agent Personality",
+    "path": "specialized/lsp-index-engineer.md"
+  },
+  {
+    "name": "legal-document-review",
+    "category": "specialized",
+    "description": "\u2696\ufe0f Legal Document Review Agent",
+    "path": "specialized/legal-document-review.md"
+  },
+  {
+    "name": "specialized-salesforce-architect",
+    "category": "specialized",
+    "description": "\ud83e\udde0 Your Identity & Memory",
+    "path": "specialized/specialized-salesforce-architect.md"
+  },
+  {
+    "name": "data-consolidation-agent",
+    "category": "specialized",
+    "description": "Data Consolidation Agent",
+    "path": "specialized/data-consolidation-agent.md"
+  },
+  {
+    "name": "healthcare-marketing-compliance",
+    "category": "specialized",
+    "description": "Healthcare Marketing Compliance Specialist",
+    "path": "specialized/healthcare-marketing-compliance.md"
+  },
+  {
+    "name": "specialized-chief-of-staff",
+    "category": "specialized",
+    "description": "\ud83e\udded Chief of Staff",
+    "path": "specialized/specialized-chief-of-staff.md"
+  },
+  {
+    "name": "chief-financial-officer",
+    "category": "specialized",
+    "description": "\ud83d\udcbc Chief Financial Officer Agent",
+    "path": "specialized/chief-financial-officer.md"
+  },
+  {
+    "name": "real-estate-buyer-seller",
+    "category": "specialized",
+    "description": "\ud83c\udfe0 Real Estate Buyer & Seller Agent",
+    "path": "specialized/real-estate-buyer-seller.md"
+  },
+  {
+    "name": "esg-sustainability-officer",
+    "category": "specialized",
+    "description": "\ud83c\udf31 ESG & Sustainability Officer Agent",
+    "path": "specialized/esg-sustainability-officer.md"
+  },
+  {
+    "name": "specialized-pricing-analyst",
+    "category": "specialized",
+    "description": "Pricing Analyst Agent",
+    "path": "specialized/specialized-pricing-analyst.md"
+  },
+  {
+    "name": "organizational-psychologist",
+    "category": "specialized",
+    "description": "\ud83e\udde0 Organizational Psychologist Agent",
+    "path": "specialized/organizational-psychologist.md"
+  },
+  {
+    "name": "retail-customer-returns",
+    "category": "specialized",
+    "description": "\ud83d\uded2 Retail Customer Returns Agent",
+    "path": "specialized/retail-customer-returns.md"
+  },
+  {
+    "name": "loan-officer-assistant",
+    "category": "specialized",
+    "description": "\ud83c\udfe6 Loan Officer Assistant Agent",
+    "path": "specialized/loan-officer-assistant.md"
+  },
+  {
+    "name": "supply-chain-strategist",
+    "category": "specialized",
+    "description": "Supply Chain Strategist Agent",
+    "path": "specialized/supply-chain-strategist.md"
+  },
+  {
+    "name": "language-translator",
+    "category": "specialized",
+    "description": "\ud83c\udf10 Language Translator",
+    "path": "specialized/language-translator.md"
+  },
+  {
+    "name": "hr-onboarding",
+    "category": "specialized",
+    "description": "\ud83e\udd1d HR Onboarding Agent",
+    "path": "specialized/hr-onboarding.md"
+  },
+  {
+    "name": "ma-integration-manager",
+    "category": "specialized",
+    "description": "\ud83e\udd1d M&A Integration Manager Agent",
+    "path": "specialized/ma-integration-manager.md"
+  },
+  {
+    "name": "sales-data-extraction-agent",
+    "category": "specialized",
+    "description": "Sales Data Extraction Agent",
+    "path": "specialized/sales-data-extraction-agent.md"
+  },
+  {
+    "name": "grant-writer",
+    "category": "specialized",
+    "description": "\ud83d\udcdd Grant Writer",
+    "path": "specialized/grant-writer.md"
+  },
+  {
+    "name": "sales-outreach",
+    "category": "specialized",
+    "description": "\ud83c\udfaf Sales Outreach Agent",
+    "path": "specialized/sales-outreach.md"
+  },
+  {
+    "name": "accounts-payable-agent",
+    "category": "specialized",
+    "description": "Accounts Payable Agent Personality",
+    "path": "specialized/accounts-payable-agent.md"
+  },
+  {
+    "name": "hospitality-guest-services",
+    "category": "specialized",
+    "description": "\ud83c\udfe8 Hospitality Guest Services Agent",
+    "path": "specialized/hospitality-guest-services.md"
+  },
+  {
+    "name": "healthcare-customer-service",
+    "category": "specialized",
+    "description": "\ud83c\udfe5 Healthcare Customer Service Agent",
+    "path": "specialized/healthcare-customer-service.md"
+  },
+  {
+    "name": "recruitment-specialist",
+    "category": "specialized",
+    "description": "Recruitment Specialist Agent",
+    "path": "specialized/recruitment-specialist.md"
+  },
+  {
+    "name": "data-privacy-officer",
+    "category": "specialized",
+    "description": "\ud83d\udd10 Data Privacy Officer Agent",
+    "path": "specialized/data-privacy-officer.md"
+  },
+  {
+    "name": "business-strategist",
+    "category": "specialized",
+    "description": "\u265f\ufe0f Business Strategist",
+    "path": "specialized/business-strategist.md"
+  },
+  {
+    "name": "agentic-identity-trust",
+    "category": "specialized",
+    "description": "Agentic Identity & Trust Architect",
+    "path": "specialized/agentic-identity-trust.md"
+  },
+  {
+    "name": "specialized-french-consulting-market",
+    "category": "specialized",
+    "description": "\ud83e\udde0 Your Identity & Memory",
+    "path": "specialized/specialized-french-consulting-market.md"
+  },
+  {
+    "name": "study-abroad-advisor",
+    "category": "specialized",
+    "description": "Study Abroad Advisor",
+    "path": "specialized/study-abroad-advisor.md"
+  },
+  {
+    "name": "specialized-korean-business-navigator",
+    "category": "specialized",
+    "description": "\ud83e\udde0 Your Identity & Memory",
+    "path": "specialized/specialized-korean-business-navigator.md"
+  },
+  {
+    "name": "medical-billing-coding-specialist",
+    "category": "specialized",
+    "description": "\ud83c\udfe5 Medical Billing & Coding Specialist",
+    "path": "specialized/medical-billing-coding-specialist.md"
+  },
+  {
+    "name": "legal-client-intake",
+    "category": "specialized",
+    "description": "\ud83d\udccb Legal Client Intake Agent",
+    "path": "specialized/legal-client-intake.md"
+  },
+  {
+    "name": "specialized-strategy-duel-agent",
+    "category": "specialized",
+    "description": "Strategy Duel Agent",
+    "path": "specialized/specialized-strategy-duel-agent.md"
+  },
+  {
+    "name": "sales-proposal-strategist",
+    "category": "sales",
+    "description": "Proposal Strategist Agent",
+    "path": "sales/sales-proposal-strategist.md"
+  },
+  {
+    "name": "sales-discovery-coach",
+    "category": "sales",
+    "description": "Discovery Coach Agent",
+    "path": "sales/sales-discovery-coach.md"
+  },
+  {
+    "name": "sales-engineer",
+    "category": "sales",
+    "description": "Sales Engineer Agent",
+    "path": "sales/sales-engineer.md"
+  },
+  {
+    "name": "sales-coach",
+    "category": "sales",
+    "description": "Sales Coach Agent",
+    "path": "sales/sales-coach.md"
+  },
+  {
+    "name": "sales-pipeline-analyst",
+    "category": "sales",
+    "description": "Pipeline Analyst Agent",
+    "path": "sales/sales-pipeline-analyst.md"
+  },
+  {
+    "name": "sales-offer-lead-gen-strategist",
+    "category": "sales",
+    "description": "Offer & Lead Gen Strategist",
+    "path": "sales/sales-offer-lead-gen-strategist.md"
+  },
+  {
+    "name": "sales-outbound-strategist",
+    "category": "sales",
+    "description": "Outbound Strategist Agent",
+    "path": "sales/sales-outbound-strategist.md"
+  },
+  {
+    "name": "sales-deal-strategist",
+    "category": "sales",
+    "description": "Deal Strategist Agent",
+    "path": "sales/sales-deal-strategist.md"
+  },
+  {
+    "name": "sales-account-strategist",
+    "category": "sales",
+    "description": "Account Strategist Agent",
+    "path": "sales/sales-account-strategist.md"
+  },
+  {
+    "name": "design-whimsy-injector",
+    "category": "design",
+    "description": "Whimsy Injector Agent Personality",
+    "path": "design/design-whimsy-injector.md"
+  },
+  {
+    "name": "design-ux-researcher",
+    "category": "design",
+    "description": "UX Researcher Agent Personality",
+    "path": "design/design-ux-researcher.md"
+  },
+  {
+    "name": "design-visual-storyteller",
+    "category": "design",
+    "description": "Visual Storyteller Agent",
+    "path": "design/design-visual-storyteller.md"
+  },
+  {
+    "name": "design-ui-designer",
+    "category": "design",
+    "description": "UI Designer Agent Personality",
+    "path": "design/design-ui-designer.md"
+  },
+  {
+    "name": "design-ux-architect",
+    "category": "design",
+    "description": "ArchitectUX Agent Personality",
+    "path": "design/design-ux-architect.md"
+  },
+  {
+    "name": "design-image-prompt-engineer",
+    "category": "design",
+    "description": "Image Prompt Engineer Agent",
+    "path": "design/design-image-prompt-engineer.md"
+  },
+  {
+    "name": "design-brand-guardian",
+    "category": "design",
+    "description": "Brand Guardian Agent Personality",
+    "path": "design/design-brand-guardian.md"
+  },
+  {
+    "name": "design-inclusive-visuals-specialist",
+    "category": "design",
+    "description": "\ud83d\udcf8 Inclusive Visuals Specialist",
+    "path": "design/design-inclusive-visuals-specialist.md"
+  },
+  {
+    "name": "design-persona-walkthrough",
+    "category": "design",
+    "description": "Persona Walkthrough Specialist",
+    "path": "design/design-persona-walkthrough.md"
+  },
+  {
+    "name": "finance-tax-strategist",
+    "category": "finance",
+    "description": "\ud83c\udfdb\ufe0f Tax Strategist Agent",
+    "path": "finance/finance-tax-strategist.md"
+  },
+  {
+    "name": "finance-investment-researcher",
+    "category": "finance",
+    "description": "\ud83d\udd0d Investment Researcher Agent",
+    "path": "finance/finance-investment-researcher.md"
+  },
+  {
+    "name": "finance-financial-analyst",
+    "category": "finance",
+    "description": "\ud83d\udcca Financial Analyst Agent",
+    "path": "finance/finance-financial-analyst.md"
+  },
+  {
+    "name": "finance-bookkeeper-controller",
+    "category": "finance",
+    "description": "\ud83d\udcd2 Bookkeeper & Controller Agent",
+    "path": "finance/finance-bookkeeper-controller.md"
+  },
+  {
+    "name": "finance-fpa-analyst",
+    "category": "finance",
+    "description": "\ud83d\udcc8 FP&A Analyst Agent",
+    "path": "finance/finance-fpa-analyst.md"
+  }
+]

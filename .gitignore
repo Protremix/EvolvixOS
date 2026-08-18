@@ -1,34 +1,60 @@
+# Secrets & credentials
+.env
+.github_token
+*.key
+*.pem
+credentials.json
+auth/.jwt_secret
+auth/users.db*
+*.db
+*.sqlite
+*.db-shm
+*.db-wal
+
+# Cloned repos (not our code)
+tencentcloud-sdk-go/
+timsdk/
+octop/
+cubesandbox/
+API-mega-list/
+ai-agent-tools/
+awesome-freellm-apis/
+free-ai-tools/
+free-image-generation-api/
+kimi-free-api/
+lovable-for-beginners/
+openclaw-api-list/
+tencent-memory/
+ui-libraries/
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
-*.egg-info/
-node_modules/
-npm-debug.log*
-data/postgres/
-data/redis/
-data/grafana/
-data/prometheus/
-data/loki/
-data/skills.db
-.env
-*.key
-*.pem
-.kimi_key
-secrets/
-.DS_Store
-Thumbs.db
+.venv/
+venv/
+
+# Go
+tccli/vendor/
+*.exe
+
+# Docker
+docker-data/
+
+# Logs
 *.log
 logs/
-*.gguf
-*.bin
-.cache/
-tmp/
-*.js.map
-.gradle/
-build/
-*.apk
-*.class
-auth/users.db
-.kimi_key
-*.gguf
-*.bin
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Uploads
+uploads/
+
+# Conversations (user data)
+conversations/
