@@ -30,7 +30,7 @@ class GeminiProvider(LLMProvider):
     default_model = "gemini-3.6-flash"
 
     def __init__(self):
-        self._api_key = os.environ.get("GEMINI_API_KEY", "")
+        self._api_key = os.environ.get("GEMINI_API_KEY", "") or os.environ.get("GOOGLE_API_KEY", "")
 
     def is_available(self) -> bool:
         return bool(self._api_key)
