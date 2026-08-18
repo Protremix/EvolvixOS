@@ -26,6 +26,10 @@ import time
 import urllib.request
 import urllib.parse
 import shutil
+import sys
+sys.path.insert(0, '/opt/evolvixos/auth')
+from api_keys_system import validate_api_key
+from api_docs import API_DOCS
 import mimetypes
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -108,6 +112,16 @@ def verify_token(auth_header):
     if not auth_header or not auth_header.startswith("Bearer "):
         return None
     token = auth_header[7:]
+    # Check if it's an API key (evx_...)
+    if token.startswith("evx_"):
+        try:
+            user_info, key_id = validate_api_key(token)
+            if user_info:
+                return str(user_info["id"])
+        except Exception:
+            pass
+        return None
+    # Regular session token
     try:
         with sqlite3.connect(AUTH_DB) as conn:
             c = conn.cursor()
@@ -1047,6 +1061,9 @@ class ModelAPI(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        if self.path == "/api/docs":
+            self.respond(200, API_DOCS)
+            return
         if self.path == "/api/health":
             self.respond(200, {
                 "status": "online",

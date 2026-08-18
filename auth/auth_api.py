@@ -18,6 +18,9 @@ import time
 import hashlib
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import sys
+sys.path.insert(0, '/opt/evolvixos/auth')
+from api_keys_system import init_api_keys_table, generate_api_key, validate_api_key, list_user_keys, revoke_key, get_usage_stats
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 
@@ -206,6 +209,23 @@ class AuthHandler(BaseHTTPRequestHandler):
                 self._send_json(401, {"error": "User not found"})
                 return
             self._send_json(200, {"user": user})
+            return
+        # ─── API Keys (GET) ───
+        if self.path == "/auth/api-keys":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            keys = list_user_keys(user_id)
+            self._send_json(200, {"keys": keys})
+            return
+        if self.path.startswith("/auth/api-keys/usage"):
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            stats = get_usage_stats(user_id)
+            self._send_json(200, {"usage": stats})
             return
         self._send_json(404, {"error": "Not found"})
 
@@ -432,11 +452,36 @@ class AuthHandler(BaseHTTPRequestHandler):
             })
             return
 
+        # ─── API Keys (POST) ───
+        if path == "/auth/api-keys/generate":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            name = body.get("name", "Default")
+            expires_days = body.get("expires_days")
+            result = generate_api_key(user_id, name, expires_days)
+            self._send_json(201, result)
+            return
+        if path == "/auth/api-keys/revoke":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            key_id = body.get("key_id", "")
+            if revoke_key(user_id, key_id):
+                self._send_json(200, {"ok": True, "message": "Key revoked"})
+            else:
+                self._send_json(404, {"error": "Key not found"})
+            return
         self._send_json(404, {"error": "Endpoint not found"})
 
     def log_message(self, format, *args):
         print(f"[Auth] {args[0]}")
 
+
+# Initialize API keys table
+init_api_keys_table()
 
 if __name__ == "__main__":
     port = 5022
