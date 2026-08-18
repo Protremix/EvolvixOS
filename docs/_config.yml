@@ -1,3 +1,7 @@
-title: EvolvixOS
-description: The AI Engineering Operating System
+title: EvolvixOS v9.2
+description: The open-source, self-hosted AI engineering platform. 44 tools, 81 models, 35K APIs.
 theme: jekyll-theme-cayman
+github:
+  repository_url: https://github.com/Protremix/EvolvixOS
+  is_project_page: true
+  owner_name: Protremix
