@@ -1310,7 +1310,7 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
                     "name_match": ["groq"],
                     "base_url": "https://api.groq.com/openai/v1/chat/completions",
                     "key_env": "GROQ_API_KEY",
-                    "default_model": "openai/gpt-oss-120b",
+                    "default_model": "openai/gpt-oss-20b",
                     "speed": "fast"
                 },
                 "gemini": {
@@ -1853,7 +1853,7 @@ def call_ollama_with_tools(model, messages, tools, stream=False):
                 data = json.dumps({"model": model, "messages": messages, "tools": tools if tools else [], "stream": True, "options": {"temperature": 0.7, "top_p": 0.9}}).encode()
                 req = urllib.request.Request(f"{OLLAMA_URL}/api/chat", data=data, headers={"Content-Type": "application/json"})
                 return urllib.request.urlopen(req, timeout=180)
-            return {"message": {"content": resp.content, "tool_calls": resp.tool_calls}}
+            return {"message": {"role": "assistant", "content": resp.content, "tool_calls": resp.tool_calls}}
         except Exception as e:
             print(f"v10 Ollama error: {e}, falling back to direct")
     # Fallback to direct call
@@ -1877,8 +1877,8 @@ def call_groq_with_tools(model, messages, tools, stream=False):
             resp = provider.chat(messages, tools=tools, stream=stream)
             if stream:
                 return None  # Streaming handled by caller
-            # Convert to old format
-            return {"choices": [{"message": {"content": resp.content, "tool_calls": resp.tool_calls}}], "usage": resp.usage}
+            # Convert to old format expected by agentic_loop: {"message": {...}}
+            return {"message": {"role": "assistant", "content": resp.content, "tool_calls": resp.tool_calls}, "usage": resp.usage}
         except Exception as e:
             print(f"v10 Groq error: {e}")
     return None
@@ -1925,7 +1925,7 @@ def agentic_loop(prompt, session_id="default", model="qwen2.5:14b", max_turns=10
     intent, engine, model_sel, reason = select_engine(prompt)
     # Use classified model for the first turn, but keep it configurable
     if engine == "groq":
-        model = model_sel if model_sel else "openai/gpt-oss-120b"
+        model = model_sel if model_sel else "openai/gpt-oss-20b"
     elif not model or model == "qwen2.5:14b":
         model = model_sel if model_sel.startswith("qwen") else "qwen2.5:14b"
     
@@ -1970,7 +1970,7 @@ def agentic_loop(prompt, session_id="default", model="qwen2.5:14b", max_turns=10
                     if groq_key:
                         try:
                             fl_body = json.dumps({
-                                "model": "openai/gpt-oss-120b",
+                                "model": "openai/gpt-oss-20b",
                                 "messages": messages,
                                 "max_tokens": 4096,
                                 "temperature": 0.7
@@ -1996,7 +1996,7 @@ def agentic_loop(prompt, session_id="default", model="qwen2.5:14b", max_turns=10
                                     history.append({"role": "assistant", "content": fl_content})
                                     save_conversation(session_id, history, conv_dir=conv_dir)
                                     on_event("done", {"response": fl_content, "tools_used": tools_used, "turns": turn + 1, "engine": "groq-fallback", "errors": errors_encountered})
-                                    return {"response": fl_content, "engine": "groq-fallback", "model": "gpt-oss-120b", "status": "success", "turns": turn + 1, "tools_used": tools_used, "intent": intent, "errors": errors_encountered}
+                                    return {"response": fl_content, "engine": "groq-fallback", "model": "gpt-oss-20b", "status": "success", "turns": turn + 1, "tools_used": tools_used, "intent": intent, "errors": errors_encountered}
                         except Exception:
                             pass
                     error_msg = f"All models failed: {e}"
@@ -2047,7 +2047,11 @@ def agentic_loop(prompt, session_id="default", model="qwen2.5:14b", max_turns=10
             
             if on_event:
                 on_event("tool_result", {"tool": tool_name, "result": result_text[:500]})
-            messages.append({"role": "tool", "content": result_text, "name": tool_name})
+            _tc_id = tc.get("id") or f"call_{tools_used}"
+            _truncated = result_text[:2000] if len(result_text) > 2000 else result_text
+            if len(result_text) > 2000:
+                _truncated += "\n... (truncated, full result: " + str(len(result_text)) + " chars)"
+            messages.append({"role": "tool", "content": _truncated, "name": tool_name, "tool_call_id": _tc_id})
     
     # Max turns reached — ask for summary
     summary_prompt = "Summarize what you've done so far. Here are the tools you used and their results:\n" + "\n".join(tool_results_summary[-10:]) + "\n\nGive the user a clear final answer."
