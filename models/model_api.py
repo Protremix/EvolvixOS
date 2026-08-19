@@ -678,27 +678,41 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
             query = args.get("query", "")
             if not query:
                 return "Error: no query"
-            url = f"https://api.duckduckgo.com/?q={urllib.parse.quote(query)}&format=json&no_html=1"
+            # Use DuckDuckGo HTML endpoint for real search results (Instant Answer API returns empty for most queries)
+            url = f"https://html.duckduckgo.com/html/?q={urllib.parse.quote(query)}"
             # v10 security: validate search URL
             ok, result_msg = validate_url(url)
             if not ok:
                 log_audit("system", "web_search", "network", query[:200], "blocked", 0)
                 return f"Error: {result_msg}"
-            req = urllib.request.Request(url, headers={"User-Agent": "MrJames/9.0"})
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"})
             with urllib.request.urlopen(req, timeout=15) as resp:
-                data = json.loads(resp.read())
+                html = resp.read().decode("utf-8", errors="replace")
+            import re as _re
+            # Parse result snippets from DDG HTML
             results = []
-            if data.get("AbstractText"):
-                results.append(data["AbstractText"])
-            if data.get("AbstractURL"):
-                results.append(f"Source: {data['AbstractURL']}")
-            for topic in data.get("RelatedTopics", [])[:8]:
-                if isinstance(topic, dict) and topic.get("Text"):
-                    results.append(topic["Text"])
-                elif isinstance(topic, dict) and topic.get("Topics"):
-                    for sub in topic["Topics"][:3]:
-                        if isinstance(sub, dict) and sub.get("Text"):
-                            results.append(sub["Text"])
+            # Extract result links and snippets
+            snippets = _re.findall(r'<a rel="nofollow" class="result__a"[^>]*>(.*?)</a>.*?<a class="result__snippet"[^>]*>(.*?)</a>', html, _re.DOTALL)
+            for title, snippet in snippets[:8]:
+                # Strip HTML tags
+                clean_title = _re.sub(r'<[^>]+>', '', title).strip()
+                clean_snippet = _re.sub(r'<[^>]+>', '', snippet).strip()
+                if clean_title and clean_snippet:
+                    results.append(f"{clean_title}: {clean_snippet}")
+            # Fallback: try DDG Instant Answer API if HTML scraping got nothing
+            if not results:
+                ia_url = f"https://api.duckduckgo.com/?q={urllib.parse.quote(query)}&format=json&no_html=1"
+                try:
+                    ia_req = urllib.request.Request(ia_url, headers={"User-Agent": "MrJames/9.0"})
+                    with urllib.request.urlopen(ia_req, timeout=10) as resp2:
+                        data = json.loads(resp2.read())
+                    if data.get("AbstractText"):
+                        results.append(data["AbstractText"])
+                    for topic in data.get("RelatedTopics", [])[:5]:
+                        if isinstance(topic, dict) and topic.get("Text"):
+                            results.append(topic["Text"])
+                except Exception:
+                    pass
             return "\n\n".join(results) if results else "No results found. Try a more specific query."
 
         elif name == "web_fetch":
