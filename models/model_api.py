@@ -2175,15 +2175,7 @@ class ModelAPI(BaseHTTPRequestHandler):
                 }
             })
         elif self.path == "/api/models":
-            # v10: require auth for model list
-            token = self.headers.get("Authorization", "").replace("Bearer ", "")
-            if not token:
-                self.respond(401, {"error": "Unauthorized"})
-                return
-            user = verify_token(token)
-            if not user:
-                self.respond(401, {"error": "Invalid token"})
-                return
+            # Public endpoint — model registry is public data
             try:
                 registry_path = "/opt/evolvixos/models/model_registry.json"
                 if os.path.exists(registry_path):
@@ -2355,7 +2347,7 @@ class ModelAPI(BaseHTTPRequestHandler):
                     return
             self.respond(404, {"error": f"Module '{module_id}' not found"})
         elif self.path == "/api/templates":
-            self.respond(200, [
+            _templates = [
                 {"id": 1, "title": "Web Application", "desc": "Build a full-stack web app", "icon": "🌐", "category": "Code", "prompt": "Build a web app with a React frontend and Python API for a todo app"},
                 {"id": 2, "title": "AI Chatbot", "desc": "Create an AI chatbot with custom personality", "icon": "🤖", "category": "AI", "prompt": "Create an AI chatbot with a friendly personality for customer support"},
                 {"id": 3, "title": "Logo & Brand Design", "desc": "Generate professional logos and brand assets", "icon": "🎨", "category": "Image", "prompt": "Generate a professional logo for a tech startup"},
@@ -2364,7 +2356,9 @@ class ModelAPI(BaseHTTPRequestHandler):
                 {"id": 6, "title": "AI Video", "desc": "Generate videos from text prompts", "icon": "🎬", "category": "Video", "prompt": "Generate a video about a futuristic city"},
                 {"id": 7, "title": "Smart Contract", "desc": "Write and deploy blockchain contracts", "icon": "⛓️", "category": "Web3", "prompt": "Write a Solidity smart contract for a voting system"},
                 {"id": 8, "title": "Code Review", "desc": "Analyze code for bugs and security issues", "icon": "🔍", "category": "Analysis", "prompt": "Analyze the code in /opt/evolvixos/models/model_api.py for security issues"},
-            ])
+            ]
+            _cats = sorted(set(t["category"] for t in _templates))
+            self.respond(200, {"templates": _templates, "categories": _cats})
         elif self.path.startswith("/api/job/"):
             if not require_auth(self): return
             job_id = self.path.split("/api/job/")[1].split("?")[0]

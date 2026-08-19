@@ -196,72 +196,7 @@ background-size:40px 40px;animation:gradient 20s linear infinite}
 .model-bd-card .bd-label{font-size:11px;color:var(--muted);text-transform:capitalize}
 .model-bd-card .bd-source{font-size:9px;color:var(--muted);margin-top:4px}
 </style>
-<script>
-// ─── Auth Guard (runs in head, no DOM access yet) ───
-const AUTH_TOKEN = localStorage.getItem("evolvix_token");
-const AUTH_USER = JSON.parse(localStorage.getItem("evolvix_user") || "null");
 
-// Redirect immediately if no token (before page renders)
-if (!AUTH_TOKEN) {
-    window.location.replace("/login");
-}
-
-// Define logout globally (called by onclick later)
-function logout() {
-    const token = localStorage.getItem("evolvix_token");
-    if (token) {
-        fetch("/auth/logout", {
-            method: "POST",
-            headers: { Authorization: "Bearer " + token }
-        }).catch(() => {});
-    }
-    localStorage.removeItem("evolvix_token");
-    localStorage.removeItem("evolvix_user");
-    window.location.href = "/login";
-}
-
-// Verify token is still valid
-fetch("/auth/me", { headers: { Authorization: "Bearer " + AUTH_TOKEN } })
-    .then(r => r.json())
-    .then(d => {
-        if (!d.user) {
-            localStorage.removeItem("evolvix_token");
-            localStorage.removeItem("evolvix_user");
-            window.location.replace("/login");
-        } else {
-            window.EVOLVIX_USER = d.user;
-            // Update UI with user name (DOM is ready now)
-            const nameEl = document.getElementById("user-name");
-            const avatarEl = document.getElementById("user-avatar");
-            if (nameEl) nameEl.textContent = d.user.display_name || d.user.email || "User";
-            if (avatarEl) avatarEl.textContent = (d.user.display_name || d.user.email || "U")[0].toUpperCase();
-        }
-    })
-    .catch(() => {});
-
-// Helper: authed fetch
-function authedFetch(url, opts = {}) {
-    opts.headers = opts.headers || {};
-    opts.headers["Authorization"] = "Bearer " + AUTH_TOKEN;
-    return fetch(url, opts);
-}
-
-// Wrap fetch to auto-include auth token for /api/ calls
-const _originalFetch = window.fetch;
-window.fetch = function(url, opts = {}) {
-    if (typeof url === "string" && url.startsWith("/api/") && AUTH_TOKEN) {
-        opts.headers = opts.headers || {};
-        opts.headers["Authorization"] = "Bearer " + AUTH_TOKEN;
-    }
-    return _originalFetch.call(this, url, opts);
-};
-
-window.JAMES_SESSION = AUTH_USER ? "user_" + AUTH_USER.id + "_" + (window.JAMES_SESSION || "default") : "default";
-
-// Mobile nav toggle
-function toggleNav(){const s=document.querySelector('.sidebar');s.classList.toggle('open')}
-
-</script>
 </head>
 <body id="main-body">
 <div class="bg-grid"></div>
@@ -383,421 +318,148 @@ Try one of the templates below, or just tell me what you want to build.</div>
 
 
 <script>
+// EvolvixOS Studio - Clean Script
+function authHeaders(){var t=localStorage.getItem("evolvix_token");return t?{"Authorization":"Bearer "+t}:{}}
+function logout(){var t=localStorage.getItem("evolvix_token");if(t){fetch("/auth/logout",{method:"POST",headers:{Authorization:"Bearer "+t}}).catch(function(){})}localStorage.removeItem("evolvix_token");localStorage.removeItem("evolvix_user");window.location.href="/login"}
 
-// ─── Auth Helpers (v8.1 security fix) ───
-function authHeaders(){const t=localStorage.getItem('evolvix_token');return t?{'Authorization':'Bearer '+t}:{}}
-function checkAuth(){const t=localStorage.getItem('evolvix_token');if(!t){window.location.href='/login';return false}return true}
-// 401 interception — redirect to login on auth failure
-window.addEventListener('unhandledrejection',function(e){if(e.reason&&e.reason.status===401){localStorage.removeItem('evolvix_token');localStorage.removeItem('evolvix_user');window.location.href='/login'}});
-const origFetch=window.fetch;
-window.fetch=function(){return origFetch.apply(this,arguments).then(function(res){if(res.status===401){localStorage.removeItem('evolvix_token');localStorage.removeItem('evolvix_user');window.location.href='/login'}return res})};
-checkAuth();
+// Check token validity in background
+var AUTH_TOKEN=localStorage.getItem("evolvix_token");
+if(AUTH_TOKEN){
+  fetch("/auth/me",{headers:{Authorization:"Bearer "+AUTH_TOKEN}}).then(function(r){return r.json()}).then(function(d){
+    if(d.user){
+      var ne=document.getElementById("user-name");var ae=document.getElementById("user-avatar");
+      if(ne)ne.textContent=d.user.display_name||d.user.email||"User";
+      if(ae)ae.textContent=(d.user.display_name||d.user.email||"U")[0].toUpperCase();
+    }
+  }).catch(function(){});
+}
 
-let queryCount=0,imageCount=0,templates=[],currentCategory='All';
-const ENGINE_BADGE=document.getElementById('engine-badge');
+var queryCount=0,imageCount=0,templates=[],currentCategory="All";
 
 // Check health
 async function checkHealth(){
-try{
-const res=await fetch('/api/health',{headers:authHeaders()});
-const d=await res.json();
-const dot=document.getElementById('status-dot');
-const txt=document.getElementById('status-text');
-if(d.status==='online'){
-txt.textContent='All engines online';
-dot.classList.remove('offline');
-document.getElementById('ollama-status').textContent=d.ollama==='online'?'✓':'✗';
-document.getElementById('comfyui-status').textContent=d.comfyui==='online'?'✓':'✗';
-document.getElementById('omniroute-status').textContent=d.omniroute==='online'?'✓':'✗';
-document.getElementById('art-status').textContent=d.art_engine==='online'?'✓':'✗';
-}else{txt.textContent='Some engines offline';dot.classList.add('offline')}
-}catch(e){
-document.getElementById('status-text').textContent='Connection error';
-document.getElementById('status-dot').classList.add('offline');
+  try{
+    var res=await fetch("/api/health");
+    var d=await res.json();
+    var txt=document.getElementById("status-text");
+    var dot=document.getElementById("status-dot");
+    if(d.status==="online"){
+      txt.textContent="All engines online";
+      dot.classList.remove("offline");
+      document.getElementById("ollama-status").textContent=d.ollama==="online"?"\u2713":"\u2717";
+      document.getElementById("comfyui-status").textContent=d.comfyui==="online"?"\u2713":"\u2717";
+      document.getElementById("omniroute-status").textContent=d.omniroute==="online"?"\u2713":"\u2717";
+      document.getElementById("art-status").textContent=d.art_engine==="online"?"\u2713":"\u2717";
+    }else{txt.textContent="Some engines offline";dot.classList.add("offline")}
+  }catch(e){
+    document.getElementById("status-text").textContent="Connection error";
+    document.getElementById("status-dot").classList.add("offline");
+  }
 }
-}
-checkHealth();setInterval(checkHealth,30000);
 
 // Load model breakdown
 async function loadModelBreakdown(){
-try{
-const res=await fetch('/api/models',{headers:authHeaders()});
-const d=await res.json();
-document.getElementById('stat-models').textContent=d.count;
-document.getElementById('stat-categories').textContent=Object.keys(d.categories||{}).length;
-
-// Source icons and labels
-const sourceInfo={
-'llm_text':{icon:'💬',label:'LLM / Text'},
-'speech_voice':{icon:'🎤',label:'Speech & Voice'},
-'image_generation':{icon:'🎨',label:'Image Gen'},
-'vision_multimodal':{icon:'👁️',label:'Vision / Multimodal'},
-'local_engines':{icon:'🔧',label:'Local Engines'},
-'rag_agents':{icon:'🤖',label:'RAG / Agents'},
-'video_generation':{icon:'🎬',label:'Video Gen'},
-'frameworks':{icon:'⚡',label:'Frameworks'}
-};
-
-// Sort categories by count descending
-const sortedCats=Object.entries(d.categories||{}).sort((a,b)=>b[1]-a[1]);
-
-document.getElementById('model-bd-grid').innerHTML=sortedCats.map(([cat,count])=>{
-const info=sourceInfo[cat]||{icon:'📦',label:cat.replace(/_/g,' ')};
-return `<div class="model-bd-card" onclick="window.open('/models','_blank')">
-<div class="bd-icon">${info.icon}</div>
-<div class="bd-count">${count}</div>
-<div class="bd-label">${info.label}</div>
-</div>`;
-}).join('');
-
-// Update sidebar version text
-const sidebarVer=document.querySelector('.sidebar div[style*="text-align:center"]');
-if(sidebarVer) sidebarVer.textContent='Mr James v9.0 · '+d.count+' models';
-}catch(e){console.error('Model breakdown failed:',e)}
+  try{
+    var res=await fetch("/api/models");
+    var d=await res.json();
+    document.getElementById("stat-models").textContent=d.count;
+    document.getElementById("stat-categories").textContent=Object.keys(d.categories||{}).length;
+    var grid=document.getElementById("model-bd-grid");
+    if(grid&&d.categories){
+      var info={
+        "llm_text":{"i":"💬","l":"LLM / Text"},
+        "image_generation":{"i":"🎨","l":"Image Gen"},
+        "video_generation":{"i":"🎬","l":"Video Gen"},
+        "speech_voice":{"i":"🎤","l":"Speech & Voice"},
+        "vision_multimodal":{"i":"👁","l":"Vision"},
+        "local_engines":{"i":"🔧","l":"Local Engines"},
+        "rag_agents":{"i":"🤖","l":"RAG / Agents"},
+        "frameworks":{"i":"⚡","l":"Frameworks"},
+        "music_audio":{"i":"🎵","l":"Music & Audio"},
+        "three_d":{"i":"📦","l":"3D"},
+        "ai_coding":{"i":"💻","l":"AI Coding"},
+        "image_control":{"i":"🎨","l":"Image Control"}
+      };
+      var sorted=Object.entries(d.categories).sort(function(a,b){return b[1]-a[1]});
+      grid.innerHTML=sorted.map(function(e){
+        var ci=info[e[0]]||{"i":"📦","l":e[0].replace(/_/g," ")};
+        return '<div class="model-bd-card"><div class="bd-icon">'+ci.i+'</div><div class="bd-count">'+e[1]+'</div><div class="bd-label">'+ci.l+'</div></div>';
+      }).join("");
+    }
+  }catch(e){console.error("Model load error:",e)}
 }
-loadModelBreakdown();
 
 // Load templates
 async function loadTemplates(){
-try{
-const res=await fetch('/api/templates',{headers:authHeaders()});
-const d=await res.json();
-templates=d.templates;
-const cats=d.categories;
-document.getElementById('template-badge').textContent=templates.length;
-// Render category filter
-const cf=document.getElementById('cat-filter');
-cf.innerHTML=cats.map(c=>`<button class="cat-btn ${c===currentCategory?'active':''}" onclick="filterCategory('${c}')">${c}</button>`).join('');
-renderTemplates();
-}catch(e){console.error('Template load failed:',e)}
+  try{
+    var res=await fetch("/api/templates");
+    var d=await res.json();
+    if(d.templates){
+      templates=d.templates;
+      document.getElementById("template-badge").textContent=templates.length;
+      var cats=d.categories||[];
+      var cf=document.getElementById("cat-filter");
+      if(cf)cf.innerHTML='<button class="cat-btn active" onclick="filterCategory(\'All\')">All</button>'+cats.map(function(c){return '<button class="cat-btn" onclick="filterCategory(\''+c+'\')">'+c+'</button>'}).join("");
+      renderTemplates();
+    }
+  }catch(e){console.error("Template load error:",e)}
 }
-
-function filterCategory(cat){currentCategory=cat;renderTemplates();document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',b.textContent===cat))}
 
 function renderTemplates(){
-const grid=document.getElementById('template-grid');
-const filtered=currentCategory==='All'?templates:templates.filter(t=>t.category===currentCategory);
-grid.innerHTML=filtered.map(t=>`
-<div class="template-card" onclick="useTemplate('${t.id}')" style="animation:fadeIn .4s ease">
-<div class="template-icon">${t.icon}</div>
-<div class="template-title">${t.title}</div>
-<div class="template-desc">${t.desc}</div>
-<div class="template-category">${t.category}</div>
-</div>`).join('');
+  var grid=document.getElementById("template-grid");
+  if(!grid)return;
+  var filtered=currentCategory==="All"?templates:templates.filter(function(t){return t.category===currentCategory});
+  grid.innerHTML=filtered.map(function(t){
+    var safePrompt=t.prompt.replace(/'/g,"\\'").replace(/</g,"&lt;");
+    return '<div class="template-card" onclick="useTemplate(\''+safePrompt+'\')"><div class="template-icon">'+t.icon+'</div><div class="template-title">'+t.title+'</div><div class="template-desc">'+t.desc+'</div><div class="template-cat">'+t.category+'</div></div>';
+  }).join("");
 }
+
+function filterCategory(cat){currentCategory=cat;document.querySelectorAll(".cat-btn").forEach(function(b){b.classList.remove("active")});event.target.classList.add("active");renderTemplates()}
+function useTemplate(prompt){document.getElementById("prompt").value=prompt;autoResize(document.getElementById("prompt"));focusInput()}
+function focusInput(){document.getElementById("prompt").focus()}
+function showBuilder(){document.getElementById("builder").scrollIntoView()}
+function showTemplates(){document.getElementById("templates-section").scrollIntoView()}
+function showGallery(){document.getElementById("templates-section").innerHTML="<p>Gallery coming soon!</p>"}
+function showModels(){window.open("/models","_blank")}
+function quickAction(type){var prompts={chat:"Let us chat",code:"Write code for",image:"Generate an image of",video:"Create a video about",crypto:"Analyze crypto data for","3d":"Create a 3D model of"};document.getElementById("prompt").value=(prompts[type]||"")+" ";focusInput()}
+function autoResize(el){el.style.height="auto";el.style.height=Math.max(el.scrollHeight,40)+"px"}
+function handleKey(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}}
+function toggleNav(){document.querySelector(".sidebar").classList.toggle("open")}
+
+// Send message to Mr James
+async function sendMessage(){
+  var promptEl=document.getElementById("prompt");
+  var prompt=promptEl.value.trim();
+  if(!prompt)return;
+  var messages=document.getElementById("messages");
+  messages.innerHTML+='<div class="msg user"><div class="msg-avatar">U</div><div class="msg-content"><div class="msg-name">You</div><div class="msg-text">'+prompt.replace(/</g,"&lt;")+'</div></div></div>';
+  promptEl.value="";autoResize(promptEl);
+  queryCount++;document.getElementById("stat-queries").textContent=queryCount;
+  messages.innerHTML+='<div class="msg ai" id="loading-msg"><div class="msg-avatar">⚡</div><div class="msg-content"><div class="msg-name">Mr James</div><div class="msg-text">Thinking...</div></div></div>';
+  messages.scrollTop=messages.scrollHeight;
+  try{
+    var res=await fetch("/api/agent/stream",{method:"POST",headers:Object.assign({"Content-Type":"application/json"},authHeaders()),body:JSON.stringify({prompt:prompt,session:window.JAMES_SESSION||"default"})});
+    var loading=document.getElementById("loading-msg");
+    if(res.status===401){window.location.href="/login";return}
+    if(!res.ok){var err=await res.json();loading.querySelector(".msg-text").textContent="Error: "+(err.error||"Unknown");return}
+    var d=await res.json();
+    loading.querySelector(".msg-text").textContent=d.response||d.text||d.output||"No response";
+    messages.scrollTop=messages.scrollHeight;
+  }catch(e){
+    document.getElementById("loading-msg").querySelector(".msg-text").textContent="Connection error: "+e.message;
+  }
+}
+
+function sendQuick(msg){document.getElementById("prompt").value=msg;sendMessage()}
+
+// Initialize
+window.JAMES_SESSION="default";
+checkHealth();setInterval(checkHealth,30000);
+loadModelBreakdown();
 loadTemplates();
 
-function useTemplate(id){
-const t=templates.find(x=>x.id===id);
-if(!t)return;
-document.getElementById('prompt').value=t.prompt;
-sendMessage();
-}
-
-function quickAction(type){
-const prompts={chat:'Hello Mr James, what can you help me with?',code:'Write a Python function that implements a binary search algorithm with tests',image:'Generate an image of a futuristic city skyline at dusk',video:'Create a cinematic video of ocean waves at sunset',crypto:'Analyze the current Bitcoin market trends','3d':'Generate a 3D model of a modern chair'};
-document.getElementById('prompt').value=prompts[type]||'';
-sendMessage();
-}
-
-function sendQuick(msg){document.getElementById('prompt').value=msg;sendMessage()}
-
-function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}}
-
-// Reliable event listeners for send button (works with browser automation and real clicks)
-(function() {
-    var btn = document.getElementById("send-btn");
-    if (btn) {
-        btn.addEventListener("click", function(e) { e.preventDefault(); sendMessage(); });
-    }
-})();
-function autoResize(t){t.style.height='auto';t.style.height=Math.min(t.scrollHeight,120)+'px'}
-function focusInput(){document.getElementById('prompt').focus()}
-
-// Auto-send via URL parameter: /studio/?msg=hello
-(function() {
-    var params = new URLSearchParams(window.location.search);
-    var msg = params.get("msg");
-    if (msg) {
-        setTimeout(function() {
-            document.getElementById("prompt").value = msg;
-            sendMessage();
-        }, 500);
-    }
-})();
-
-// Detect intent
-function detectIntent(text){
-const t=text.toLowerCase();
-if(/\b(draw|paint|generate|create|design|logo|image|picture|art|portrait|landscape|render)\b/.test(t)&&!/\b(code|app|api|script|function|program|build)\b/.test(t))return{type:'image',engine:'SDXL'};
-if(/\b(video|movie|film|animate|cinema|clip)\b/.test(t))return{type:'video',engine:'Wan2.1'};
-if(/\b(crypto|bitcoin|ethereum|blockchain|defi|token|nft|web3|smart contract)\b/.test(t))return{type:'crypto',engine:'Crypto Engine'};
-if(/\b(code|app|api|function|script|build|react|python|javascript|html|css|deploy)\b/.test(t))return{type:'code',engine:'Qwen2.5 14B'};
-return{type:'chat',engine:'Qwen2.5 7B'};
-}
-
-async function sendMessage(){
-const input=document.getElementById('prompt');
-const text=input.value.trim();
-if(!text)return;
-input.value='';
-input.style.height='auto';
-
-queryCount++;
-document.getElementById('stat-queries').textContent=queryCount;
-
-const intent=detectIntent(text);
-ENGINE_BADGE.textContent=intent.engine;
-ENGINE_BADGE.style.background='rgba(108,92,231,.15)';
-
-// Add user message
-addMessage('user','You',text);
-
-// Handle based on intent
-if(intent.type==='image'){
-await handleImageGeneration(text);
-}else if(intent.type==='video'){
-await handleVideoGeneration(text);
-}else{
-await handleChatStream(text,intent);
-}
-}
-
-function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
-function addMessage(role,name,text){
-const msgs=document.getElementById('messages');
-const div=document.createElement('div');
-div.className='msg '+role;
-const escapedText=role==='user'?escapeHtml(text):text;
-div.innerHTML=`<div class="msg-avatar">${role==='user'?'🧑':'⚡'}</div><div class="msg-content"><div class="msg-name">${escapeHtml(name)}</div><div class="msg-text">${escapedText}</div></div>`;
-msgs.appendChild(div);
-msgs.scrollTop=msgs.scrollHeight;
-return div.querySelector('.msg-text');
-}
-
-function addLoadingMessage(){
-const msgs=document.getElementById('messages');
-const div=document.createElement('div');
-div.className='msg ai';
-div.innerHTML=`<div class="msg-avatar">⚡</div><div class="msg-content"><div class="msg-name">Mr James</div><div class="msg-text"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
-msgs.appendChild(div);
-msgs.scrollTop=msgs.scrollHeight;
-return div.querySelector('.msg-text');
-}
-
-async function handleChatStream(text,intent){
-const sendBtn=document.getElementById('send-btn');
-sendBtn.classList.add('loading');
-sendBtn.disabled=true;
-
-const msgText=addLoadingMessage();
-
-try{
-const res=await fetch('/api/agent/stream',{method:'POST',headers:{...authHeaders(),'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({prompt:text,type:intent.type,session_id:window.JAMES_SESSION||'default'})});
-if(!res.ok)throw new Error('Stream failed');
-
-const reader=res.body.getReader();
-const decoder=new TextDecoder();
-let buffer='';
-let fullText='';
-let toolCalls=0;
-let firstChunk=true;
-let currentEvent='';
-
-while(true){
-const{done,value}=await reader.read();
-if(done)break;
-buffer+=decoder.decode(value);
-const lines=buffer.split('\n');
-buffer=lines.pop()||'';
-
-for(const line of lines){
-if(line.startsWith('event: ')){
-currentEvent=line.slice(7).trim();
-}else if(line.startsWith('data: ')){
-try{
-const data=JSON.parse(line.slice(6));
-
-if(currentEvent==='thinking'){
-if(firstChunk){msgText.innerHTML='';firstChunk=false}
-const thinkHTML='<div style="font-size:12px;color:var(--muted);margin:4px 0;font-style:italic">💭 thinking (turn '+data.turn+')...</div>';
-const temp=document.createElement('div');
-temp.innerHTML=thinkHTML;
-msgText.appendChild(temp.firstChild);
-document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;
-}
-
-else if(currentEvent==='text'){
-if(firstChunk){msgText.innerHTML='';firstChunk=false}
-fullText+=data.text;
-msgText.innerHTML=formatMarkdown(fullText)+'<span class="cursor"></span>';
-document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;
-}
-
-else if(currentEvent==='tool_call'){
-toolCalls++;
-if(firstChunk){msgText.innerHTML='';firstChunk=false}
-const argsStr=JSON.stringify(data.args||{}).slice(0,120);const toolName=escapeHtml(data.tool||'');
-const toolHTML='<div style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:12px;color:#a78bfa;display:flex;align-items:center;gap:6px"><span style="font-size:14px">🔧</span><strong>'+toolName+'</strong><span style="color:var(--muted)">'+argsStr+'</span></div>';
-const temp=document.createElement('div');
-temp.innerHTML=toolHTML;
-msgText.appendChild(temp.firstChild);
-document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;
-}
-
-else if(currentEvent==='tool_result'){
-const resultText=(data.result||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const resultHTML='<div style="background:rgba(0,0,0,0.25);border-left:3px solid #8b5cf6;border-radius:4px;padding:6px 10px;margin:4px 0 8px;font-size:11px;color:var(--muted);font-family:monospace;white-space:pre-wrap;max-height:100px;overflow-y:auto">'+resultText+'</div>';
-const temp=document.createElement('div');
-temp.innerHTML=resultHTML;
-msgText.appendChild(temp.firstChild);
-document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;
-}
-
-else if(currentEvent==='done'){
-if(firstChunk){msgText.innerHTML='';firstChunk=false}
-if(data.response && !fullText){
-fullText=data.response;
-msgText.innerHTML=formatMarkdown(fullText);
-}else if(fullText){
-msgText.innerHTML=formatMarkdown(fullText);
-}
-if(data.tools_used>0){
-const summary=document.createElement('div');
-summary.style.cssText='font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)';
-summary.textContent='⚡ '+data.tools_used+' tool call(s) · '+data.turns+' turn(s) · '+data.engine;
-msgText.parentElement.appendChild(summary);
-}
-document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;
-}
-
-else if(currentEvent==='error'){
-msgText.innerHTML='<span style="color:var(--orange)">Error: '+escapeHtml(data.error||'unknown')+'</span>';
-}
-
-}catch(e){}
-}
-}
-}
-if(!fullText&&toolCalls===0){msgText.innerHTML='<span style="color:var(--muted)">No response. Try again.</span>'}
-}catch(e){
-msgText.innerHTML='<span style="color:var(--orange)">Connection error: '+escapeHtml(e.message)+'</span>';
-}
-sendBtn.classList.remove('loading');
-sendBtn.disabled=false;
-}
-
-function formatMarkdown(text){
-// Escape HTML first to prevent XSS
-let escaped=text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-text=escaped;
-// Code blocks
-text=text.replace(/```(\w+)?\n([\s\S]*?)```/g,(m,lang,code)=>{
-return `<pre><code class="language-${lang||'text'}">${code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</code></pre>`;
-});
-// Inline code
-text=text.replace(/`([^`]+)`/g,'<code>$1</code>');
-// Bold
-text=text.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
-// Headers
-text=text.replace(/^### (.+)$/gm,'<div style="font-size:15px;font-weight:600;margin:10px 0 4px">$1</div>');
-text=text.replace(/^## (.+)$/gm,'<div style="font-size:16px;font-weight:600;margin:12px 0 6px">$1</div>');
-// Lists
-text=text.replace(/^(\d+)\. (.+)$/gm,'<div style="margin-left:20px">$1. $2</div>');
-text=text.replace(/^- (.+)$/gm,'<div style="margin-left:20px">• $2</div>');
-// Links
-text=text.replace(/\[([^\]]+)\]\(([^)]+)\)/g,(m,txt,url)=>{
-let u=url.trim();if(u.match(/^javascript:/i)||u.match(/^data:/i)||u.match(/^vbscript:/i))return txt;
-return '<a href="'+u+'" target="_blank" rel="noopener noreferrer" style="color:var(--accent2)">'+txt+'</a>';
-});
-return text;
-}
-
-async function handleImageGeneration(text){
-const sendBtn=document.getElementById('send-btn');
-sendBtn.classList.add('loading');
-sendBtn.disabled=true;
-
-// Add loading state with progress bar
-const msgText=addLoadingMessage();
-msgText.innerHTML=`<div class="img-loading">
-<div class="spinner"></div>
-<div style="font-size:13px;color:var(--muted)">Generating image with Stable Diffusion (local, CPU)...</div>
-<div class="progress-bar"><div class="fill" style="width:0%"></div></div>
-<div class="progress-text">Starting...</div>
-</div>`;
-
-try{
-// Start generation (returns job_id immediately)
-const startRes=await fetch('/api/generate/image',{method:'POST',headers:{...authHeaders(),'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({prompt:text,style:'none',steps:15})});
-if(!startRes.ok)throw new Error('Failed to start generation');
-const startData=await startRes.json();
-const jobId=startData.job_id;
-if(!jobId)throw new Error('No job ID returned');
-
-// Poll every 3 seconds
-let done=false;
-let attempts=0;
-const maxAttempts=80;
-const fill=msgText.querySelector('.fill');
-const ptext=msgText.querySelector('.progress-text');
-
-while(!done&&attempts<maxAttempts){
-await new Promise(r=>setTimeout(r,3000));
-attempts++;
-const elapsed=attempts*3;
-if(fill)fill.style.width=Math.min((elapsed/60)*100,95)+'%';
-if(ptext)ptext.textContent=`Generating... ${elapsed}s elapsed`;
-
-const pollRes=await fetch('/api/job/'+jobId,{headers:authHeaders()});
-if(!pollRes.ok)continue;
-const pollData=await pollRes.json();
-if(pollData.status==='done'&&pollData.image){
-done=true;
-imageCount++;
-document.getElementById('stat-images').textContent=imageCount;
-if(fill)fill.style.width='100%';
-msgText.innerHTML=`<img src="${escapeHtml(pollData.image)}" style="width:100%;border-radius:12px" />
-<div style="font-size:12px;color:var(--muted);margin-top:8px">Generated in ${pollData.generation_time}s · Stable Diffusion v1.5 (local CPU) · seed ${pollData.seed||'?'}</div>`;
-}else if(pollData.status==='error'){
-done=true;
-msgText.innerHTML=`<span style="color:var(--orange)">Image generation error: ${pollData.error||'Unknown error'}</span>`;
-}
-}
-if(!done){msgText.innerHTML='<span style="color:var(--orange)">Generation timed out. The CPU engine may be busy — try again.</span>'}
-}catch(e){
-msgText.innerHTML=`<span style="color:var(--orange)">Error: ${e.message}</span>`;
-}
-sendBtn.classList.remove('loading');
-sendBtn.disabled=false;
-}
-
-async function handleVideoGeneration(text){
-const msgText=addLoadingMessage();
-msgText.innerHTML=`<div class="img-loading">
-<div class="spinner"></div>
-<div style="font-size:13px;color:var(--muted)">Video generation requires GPU (GEX44 pending provisioning)</div>
-<div style="font-size:12px;color:var(--muted);margin-top:8px">Once the GPU server is active, all 61 video models will work automatically.</div>
-</div>`;
-setTimeout(()=>{msgText.innerHTML='<span style="color:var(--orange)">⏳ GPU model pending — GEX44 server delivery from Hetzner in progress. Video generation will be available once the GPU server is provisioned.</span>'},2000);
-}
-
-function showBuilder(){document.getElementById('builder').scrollIntoView({behavior:'smooth'});focusInput()}
-function showTemplates(){document.getElementById('templates-section').scrollIntoView({behavior:'smooth'})}
-function showGallery(){alert('Gallery coming soon — '+imageCount+' images generated so far')}
-function showModels(){window.open('/models','_blank')}
-<div class="nav-item" onclick="window.open('/apis','_blank')"><span class="icon">🔌</span> API Directory <span class="badge">35K</span></div>
-<div class="nav-item" onclick="window.open(/image-gen,_blank)"><span class="icon">🎨</span> Image Gen API <span class="badge">100K</span></div>
-<div class="nav-item" onclick="window.open(/ai-tools,_blank)"><span class="icon">🧰</span> AI Tools <span class="badge">84</span></div>
-<div class="nav-item" onclick="window.open(/freellm,_blank)"><span class="icon">🔑</span> Free LLM APIs <span class="badge">442</span></div>
-<div class="nav-item" onclick="window.open('/learn','_blank')"><span class="icon">📚</span> Learn Hub <span class="badge">15</span></div>
-
-// Init
-document.getElementById('prompt').focus();
-
-// Mobile nav toggle
-function toggleNav(){const s=document.querySelector('.sidebar');s.classList.toggle('open')}
-
+document.getElementById("send-btn").addEventListener("click",sendMessage);
 </script>
 </body>
 </html>
