@@ -1841,9 +1841,40 @@ def select_engine(prompt):
     return classify_intent(prompt)
 
 # ─── Model API calls ───
+def _normalize_messages_for_ollama(messages):
+    """Ollama expects tool_calls[].function.arguments as a native object,
+    but Groq/OpenAI-format providers return it as a JSON string. When
+    cross-provider fallback echoes those messages back into Ollama, the
+    Go JSON parser rejects the stringified arguments with a 400 error.
+    This normalizes any string arguments to parsed objects, and drops
+    None content (Ollama expects a string, not null)."""
+    fixed = []
+    for m in messages:
+        m = dict(m)
+        if m.get("content") is None:
+            m["content"] = ""
+        tcs = m.get("tool_calls")
+        if tcs:
+            new_tcs = []
+            for tc in tcs:
+                tc = dict(tc)
+                func = dict(tc.get("function", {}))
+                args = func.get("arguments")
+                if isinstance(args, str):
+                    try:
+                        func["arguments"] = json.loads(args)
+                    except Exception:
+                        func["arguments"] = {}
+                tc["function"] = func
+                new_tcs.append(tc)
+            m["tool_calls"] = new_tcs
+        fixed.append(m)
+    return fixed
+
 def call_ollama_with_tools(model, messages, tools, stream=False):
     """Delegate to v10 OllamaProvider."""
     _init_v10()
+    messages = _normalize_messages_for_ollama(messages)
     provider = _v10_registry.get("ollama")
     if provider and provider.is_available():
         try:
