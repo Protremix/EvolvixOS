@@ -432,22 +432,76 @@ async function sendMessage(){
   var promptEl=document.getElementById("prompt");
   var prompt=promptEl.value.trim();
   if(!prompt)return;
+  var token=localStorage.getItem("evolvix_token");
+  if(!token){window.location.href="/login";return}
   var messages=document.getElementById("messages");
   messages.innerHTML+='<div class="msg user"><div class="msg-avatar">U</div><div class="msg-content"><div class="msg-name">You</div><div class="msg-text">'+prompt.replace(/</g,"&lt;")+'</div></div></div>';
   promptEl.value="";autoResize(promptEl);
   queryCount++;document.getElementById("stat-queries").textContent=queryCount;
-  messages.innerHTML+='<div class="msg ai" id="loading-msg"><div class="msg-avatar">⚡</div><div class="msg-content"><div class="msg-name">Mr James</div><div class="msg-text">Thinking...</div></div></div>';
+  var msgId="msg-"+Date.now();
+  messages.innerHTML+='<div class="msg ai" id="'+msgId+'"><div class="msg-avatar">\u26A1</div><div class="msg-content"><div class="msg-name">Mr James</div><div class="msg-text">Thinking...</div></div></div>';
   messages.scrollTop=messages.scrollHeight;
+  var textEl=document.querySelector("#"+msgId+" .msg-text");
+  var accumulated="";
+  var gotText=false;
+
   try{
-    var res=await fetch("/api/agent/stream",{method:"POST",headers:Object.assign({"Content-Type":"application/json"},authHeaders()),body:JSON.stringify({prompt:prompt,session:window.JAMES_SESSION||"default"})});
-    var loading=document.getElementById("loading-msg");
+    var res=await fetch("/api/agent/stream",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
+      body:JSON.stringify({prompt:prompt,session_id:window.JAMES_SESSION||"default",model:"qwen2.5:14b"})
+    });
     if(res.status===401){window.location.href="/login";return}
-    if(!res.ok){var err=await res.json();loading.querySelector(".msg-text").textContent="Error: "+(err.error||"Unknown");return}
-    var d=await res.json();
-    loading.querySelector(".msg-text").textContent=d.response||d.text||d.output||"No response";
-    messages.scrollTop=messages.scrollHeight;
+    if(!res.ok||!res.body){
+      var ct=res.headers.get("content-type")||"";
+      if(ct.indexOf("application/json")!==-1){
+        var err=await res.json();
+        textEl.textContent="Error: "+(err.error||"Unknown");
+      }else{
+        textEl.textContent="Error: request failed ("+res.status+")";
+      }
+      return;
+    }
+
+    var reader=res.body.getReader();
+    var decoder=new TextDecoder();
+    var buffer="";
+
+    while(true){
+      var chunk=await reader.read();
+      if(chunk.done)break;
+      buffer+=decoder.decode(chunk.value,{stream:true});
+      var events=buffer.split("\n\n");
+      buffer=events.pop();
+      for(var i=0;i<events.length;i++){
+        var block=events[i];
+        var evMatch=block.match(/event:\s*(.+)/);
+        var dataMatch=block.match(/data:\s*(.+)/);
+        if(!dataMatch)continue;
+        var evType=evMatch?evMatch[1].trim():"message";
+        var payload;
+        try{payload=JSON.parse(dataMatch[1])}catch(e){continue}
+
+        if(evType==="text"){
+          accumulated+=payload.text||"";
+          textEl.textContent=accumulated;
+          gotText=true;
+          messages.scrollTop=messages.scrollHeight;
+        }else if(evType==="done"){
+          textEl.textContent=payload.response||accumulated||"No response";
+          messages.scrollTop=messages.scrollHeight;
+        }else if(evType==="tool_call"){
+          textEl.textContent=(accumulated?accumulated+"\n\n":"")+"\u2699\ufe0f Using tool: "+payload.tool+"...";
+        }else if(evType==="error"){
+          textEl.textContent="Error: "+(payload.error||"Unknown error");
+        }
+      }
+    }
+    if(!gotText&&textEl.textContent==="Thinking..."){
+      textEl.textContent=accumulated||"No response";
+    }
   }catch(e){
-    document.getElementById("loading-msg").querySelector(".msg-text").textContent="Connection error: "+e.message;
+    textEl.textContent="Connection error: "+e.message;
   }
 }
 
