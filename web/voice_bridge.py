@@ -17,13 +17,14 @@ app = FastAPI(title="EvolvixOS Voice Bridge", version="1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 PIPER_VOICES = "/opt/piper-voices"
-DEFAULT_VOICE = os.environ.get("JAMES_VOICE", "en_US-amy-medium")
+DEFAULT_VOICE = os.environ.get("JAMES_VOICE", "en_US-lessac-high")
 WHISPER_MODEL = os.environ.get("WHISPER_MODEL", "base")
 
 # Available voices
 VOICES = {
+    "lessac": "en_US-lessac-high",
     "amy": "en_US-amy-medium",
-    "lessac": "en_US-lessac-medium",
+    "lessac_med": "en_US-lessac-medium",
     "alba": "en_GB-alba-medium",
     "claude": "es_MX-claude-medium",
     "kareem": "ar_JO-kareem-medium",

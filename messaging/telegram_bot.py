@@ -115,7 +115,7 @@ async def transcribe_audio(audio_bytes, ext=".ogg"):
     finally:
         if os.path.exists(temp_path): os.unlink(temp_path)
 
-async def generate_speech(text, voice="amy"):
+async def generate_speech(text, voice="lessac"):
     async with httpx.AsyncClient(timeout=30) as client:
         resp = await client.post(f"{VOICE_BRIDGE}/tts", json={"text": text, "voice": voice})
         if resp.status_code == 200: return resp.content
@@ -128,7 +128,7 @@ def wav_to_ogg_opus(wav_bytes):
     ogg_path = wav_path.replace(".wav", ".ogg")
     try:
         subprocess.run(
-            ["ffmpeg", "-i", wav_path, "-c:a", "libopus", "-b:a", "64k", "-ar", "16000", "-ac", "1", ogg_path, "-y"],
+            ["ffmpeg", "-i", wav_path, "-c:a", "libopus", "-b:a", "128k", "-ar", "48000", "-ac", "1", ogg_path, "-y"],
             capture_output=True, timeout=30
         )
         if os.path.exists(ogg_path) and os.path.getsize(ogg_path) > 0:
