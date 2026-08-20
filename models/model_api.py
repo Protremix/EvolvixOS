@@ -415,6 +415,49 @@ def save_conversation(session_id, messages, conv_dir=None):
     with open(fpath, "w") as f:
         json.dump(trimmed, f)
 
+
+
+def is_simple_chat(prompt):
+    """Detect if this is a simple greeting or casual chat that doesn't need tools."""
+    prompt_lower = prompt.lower().strip()
+    simple_patterns = [
+        r'^(hi|hello|hey|yo|sup|howdy|salam|marhaba|ahlan)\s*[!.?]*$',
+        r'^(good\s+(morning|afternoon|evening|night))\s*[!.?]*$',
+        r'^(how\s+are\s+you|how\s+are\s+things|what\s+up|wassup)\s*[!?]*$',
+        r'^(thank|thanks|thx|ty)\s*',
+        r'^(bye|goodbye|see\s+you|cya)\s*[!.?]*$',
+        r'^.{0,20}$',  # Very short messages = probably casual
+    ]
+    for pattern in simple_patterns:
+        if re.match(pattern, prompt_lower):
+            return True
+    return False
+
+
+def build_chat_system_prompt(prompt, mem_dir=None, user_email=None, user_name=None, uploads_dir=None):
+    """Build a context-appropriate system prompt.
+    For simple greetings/casual chat: minimal prompt, no tool instructions.
+    For complex tasks: full system prompt with tool guidance."""
+    if is_simple_chat(prompt):
+        parts = []
+        soul = load_soul()
+        if soul:
+            parts.append(soul)
+        identity = load_identity()
+        if identity:
+            parts.append(identity)
+        parts.append(
+            "You are James, a warm and intelligent AI companion. Be natural, conversational, and concise. "
+            "For greetings, just greet back warmly. For questions, answer helpfully. "
+            "Keep responses to 1-3 sentences unless the user asks for detail."
+        )
+        if user_name:
+            parts.append(f"You are talking to {user_name}.")
+        return "\n\n---\n\n".join(parts)
+    else:
+        return build_system_prompt(mem_dir=mem_dir, user_email=user_email, user_name=user_name, uploads_dir=uploads_dir)
+
+
 # ─── Tool execution ───
 def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
     try:
@@ -2615,7 +2658,7 @@ class ModelAPI(BaseHTTPRequestHandler):
 
     def _handle_stream_chat(self, body):
         prompt = body.get("prompt", "")
-        system = body.get("system", build_system_prompt(uploads_dir=user_dir(self, UPLOADS_DIR)))
+        system = body.get("system", build_chat_system_prompt(prompt, mem_dir=user_dir(self, MEMORY_DIR), user_email=getattr(self, "_user_email", None), user_name=getattr(self, "_user_name", None), uploads_dir=user_dir(self, UPLOADS_DIR)))
         # v10: Route through unified ModelRouter
         _init_v10()
         decision = _v10_router.route(prompt)
@@ -2764,7 +2807,7 @@ if __name__ == "__main__":
     os.makedirs(UPLOADS_DIR, exist_ok=True)
     os.makedirs(MEMORY_DIR, exist_ok=True)
     os.makedirs(CONVERSATION_DIR, exist_ok=True)
-    server = ThreadingHTTPServer(("0.0.0.0", PORT), ModelAPI)
+    server = ThreadingHTTPServer(("127.0.0.1", PORT), ModelAPI)
     print(f"Mr James v10.0 — EvolvixOS Model API (v10 Hardened)")
     print(f"  Port: {PORT}")
     print(f"  Privacy Mode: {V10_PRIVACY_MODE}")
