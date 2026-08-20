@@ -10,6 +10,7 @@ BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 JAMES_API = os.environ.get("JAMES_API", "http://127.0.0.1:5010")
 JAMES_API_KEY = os.environ.get("JAMES_API_KEY", "evx_f0dcc65675e11329_8f7ec4195e67a07384898d80c1166089")
 VOICE_BRIDGE = os.environ.get("VOICE_BRIDGE", "http://127.0.0.1:8095")
+GROQ_KEY = os.environ.get("GROQ_API_KEY", "")
 OWNER_IDS = set()
 OWNER_USERNAMES = set()
 
@@ -89,40 +90,40 @@ def detect_intent(text):
     return ("chat", text)
 
 
-def extract_image_prompt(text):
-    """Extract a clean image generation prompt from user message"""
-    text = text.strip()
-    # Remove command words to build the prompt
-    remove_words = [
-        "create", "make", "generate", "design", "draw", "paint",
-        "produce", "build", "render", "craft", "me", "a", "an",
-        "please", "can you", "could you", "i want", "i need",
-        "for me", "of", "with"
-    ]
-    prompt = text.lower()
-    for word in remove_words:
-        prompt = prompt.replace(word, " ")
-    prompt = " ".join(prompt.split())
-    
-    # If prompt is too short, use original text
-    if len(prompt) < 5:
-        prompt = text
-    
-    # Add quality boosters
-    prompt += ", high quality, detailed, professional, 4K"
-    return prompt
+async def enhance_image_prompt(user_request):
+    """Use Groq to turn a simple request into a professional image generation prompt"""
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"},
+                json={
+                    "model": "openai/gpt-oss-120b",
+                    "messages": [
+                        {"role": "system", "content": "You are a professional image prompt engineer. Convert user requests into detailed, high-quality image generation prompts. Include style, lighting, composition, colors, mood, quality keywords. Output ONLY the prompt text, no explanation, no quotes. Keep under 200 words."},
+                        {"role": "user", "content": f"Create a professional image prompt for: {user_request}"}
+                    ],
+                    "temperature": 0.7,
+                    "max_tokens": 300
+                }
+            )
+            data = resp.json()
+            return data["choices"][0]["message"]["content"].strip()
+    except Exception as e:
+        print(f"Prompt enhancement error: {e}")
+        # Fallback to simple prompt
+        return user_request + ", high quality, detailed, professional, 4K, cinematic lighting"
 
 
-async def generate_image_pollinations(prompt, width=1024, height=1024):
-    """Generate an image using Pollinations.ai (free, no API key)"""
+async def generate_image_pollinations(prompt, width=1536, height=1536):
+    """Generate a high-quality image using Pollinations Flux"""
     encoded_prompt = quote(prompt, safe='')
-    url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&model=flux"
+    url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&model=flux&seed=42"
     
     try:
-        async with httpx.AsyncClient(timeout=90, follow_redirects=True) as client:
+        async with httpx.AsyncClient(timeout=120, follow_redirects=True, headers={"User-Agent": "Mozilla/5.0"}) as client:
             resp = await client.get(url)
-            if resp.status_code == 200 and len(resp.content) > 5000:
-                # Save to temp file
+            if resp.status_code == 200 and len(resp.content) > 10000:
                 fd, temp_path = tempfile.mkstemp(suffix=".jpg")
                 with os.fdopen(fd, "wb") as f:
                     f.write(resp.content)
@@ -404,9 +405,14 @@ async def handle_chat(chat_id, text, username):
     history = ctx.get("history", [])
 
     if intent == "image":
-        # Generate an image
+        # Generate a high-quality image
+        await telegram_request("sendChatAction", chat_id=chat_id, action="typing")
+        
+        # Step 1: Enhance prompt with Groq AI
+        prompt = await enhance_image_prompt(raw_text)
+        print(f"[IMAGE] Enhanced prompt: {repr(prompt[:100])}", flush=True)
+        
         await telegram_request("sendChatAction", chat_id=chat_id, action="upload_photo")
-        prompt = extract_image_prompt(raw_text)
         caption = f"Here's what I created for you!\n\nPrompt: {prompt[:200]}"
         
         # Try Pollinations first
@@ -512,8 +518,10 @@ async def handle_voice_message(chat_id, voice_msg, username):
     history = ctx.get("history", [])
 
     if intent == "image":
+        await telegram_request("sendChatAction", chat_id=chat_id, action="typing")
+        prompt = await enhance_image_prompt(raw_text)
+        print(f"[VOICE IMAGE] Enhanced prompt: {repr(prompt[:100])}", flush=True)
         await telegram_request("sendChatAction", chat_id=chat_id, action="upload_photo")
-        prompt = extract_image_prompt(raw_text)
         image_path = await generate_image_pollinations(prompt)
         if image_path:
             await send_photo(chat_id, image_path, f"Here's what I created!\n\nPrompt: {prompt[:200]}")
