@@ -115,7 +115,7 @@ async def transcribe_audio(audio_bytes, ext=".ogg"):
     finally:
         if os.path.exists(temp_path): os.unlink(temp_path)
 
-async def generate_speech(text, voice="ryan")
+async def generate_speech(text, voice="ryan"):
     async with httpx.AsyncClient(timeout=30) as client:
         resp = await client.post(f"{VOICE_BRIDGE}/tts", json={"text": text, "voice": voice})
         if resp.status_code == 200: return resp.content
@@ -259,7 +259,7 @@ async def handle_chat(chat_id, text, username):
 
     voice_on = ctx.get("voice_enabled", True)
     if voice_on and len(response) < 1000:
-        wav_bytes = await generate_speech(response, "amy")
+        wav_bytes = await generate_speech(response, "ryan")
         if wav_bytes:
             ogg_bytes = wav_to_ogg_opus(wav_bytes)
             if ogg_bytes:
@@ -317,7 +317,7 @@ async def handle_voice_message(chat_id, voice_msg, username):
     ctx["history"] = history[-10:]
     user_contexts[chat_id] = ctx
 
-    wav_bytes = await generate_speech(response, "amy")
+    wav_bytes = await generate_speech(response, "ryan")
     if wav_bytes:
         ogg_bytes = wav_to_ogg_opus(wav_bytes)
         if ogg_bytes:
