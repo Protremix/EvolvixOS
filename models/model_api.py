@@ -2004,6 +2004,68 @@ def call_kimi(prompt, system_prompt, messages=None):
 
 # ─── Agentic Loop v9.0 (with self-correction) ───
 def agentic_loop(prompt, session_id="default", model="qwen2.5:14b", max_turns=10, on_event=None, conv_dir=None, mem_dir=None, user_email=None, user_name=None, uploads_dir=None):
+    # FAST PATH: For simple greetings/casual chat, skip the full agentic loop
+    # and respond immediately with a lightweight prompt. Saves 5-10 seconds.
+    if is_simple_chat(prompt):
+        simple_system = build_chat_system_prompt(prompt, mem_dir=mem_dir, user_email=user_email, user_name=user_name, uploads_dir=uploads_dir)
+        history = get_conversation(session_id, conv_dir=conv_dir)
+        fast_messages = [{"role": "system", "content": simple_system}]
+        fast_messages.extend(history[-4:])  # Only last 2 exchanges for context
+        fast_messages.append({"role": "user", "content": prompt})
+        try:
+            # Try Groq first (467 tok/s) for instant responses, fall back to Ollama
+            groq_key = os.environ.get("GROQ_API_KEY", "")
+            content = ""
+            if groq_key:
+                try:
+                    fast_data = json.dumps({
+                        "model": "openai/gpt-oss-20b",
+                        "messages": fast_messages,
+                        "max_tokens": 256,
+                        "temperature": 0.7,
+                        "stream": False
+                    }).encode()
+                    _groq_url = "https://api.groq.com/openai/v1/chat/completions"
+                    _ok, _msg = validate_url(_groq_url)
+                    if _ok:
+                        fast_req = urllib.request.Request(
+                            _groq_url,
+                            data=fast_data,
+                            headers={"Content-Type": "application/json", "Authorization": f"Bearer {groq_key}", "User-Agent": "EvolvixOS/9.2"}
+                        )
+                        with urllib.request.urlopen(fast_req, timeout=10) as fast_resp:
+                            fast_result = json.loads(fast_resp.read())
+                            content = fast_result.get("choices", [{}])[0].get("message", {}).get("content", "")
+                except Exception:
+                    content = ""
+            # Fall back to Ollama if Groq failed or no key
+            if not content:
+                fast_data = json.dumps({
+                    "model": "qwen2.5:3b",
+                    "messages": fast_messages,
+                    "stream": False,
+                    "options": {"temperature": 0.7, "top_p": 0.9}
+                }).encode()
+                fast_req = urllib.request.Request(
+                    f"{OLLAMA_URL}/api/chat",
+                    data=fast_data,
+                    headers={"Content-Type": "application/json"}
+                )
+                with urllib.request.urlopen(fast_req, timeout=20) as fast_resp:
+                    fast_result = json.loads(fast_resp.read())
+                    content = fast_result.get("message", {}).get("content", "")
+            if content:
+                content = content.strip()
+                history.append({"role": "user", "content": prompt})
+                history.append({"role": "assistant", "content": content})
+                save_conversation(session_id, history, conv_dir=conv_dir)
+                if on_event:
+                    on_event("text", {"text": content})
+                    on_event("done", {"response": content, "tools_used": 0, "turns": 1, "engine": "fast-path", "errors": 0})
+                return {"response": content, "engine": "fast-path", "model": "groq-oss-20b" if groq_key else "qwen2.5:3b", "status": "success", "turns": 1, "tools_used": 0, "intent": "greeting", "errors": 0}
+        except Exception as e:
+            pass  # Fall through to full agentic loop if fast path fails
+
     system_prompt = build_system_prompt(mem_dir=mem_dir, user_email=user_email, user_name=user_name, uploads_dir=uploads_dir)
     history = get_conversation(session_id, conv_dir=conv_dir)
     messages = [{"role": "system", "content": system_prompt}]
