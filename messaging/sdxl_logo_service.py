@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 """
-EvolvixOS SDXL Logo Icon Service v2
-- 1024x1024 native resolution (was 512)
-- 8 inference steps (was 4) for sharper detail
-- Better prompt engineering with quality boosters
-- Post-processing: unsharp mask, contrast, glow
-- Better background removal with feathering
+EvolvixOS SDXL Logo Icon Service v3
+- rembg for AI background removal (perfect icon cutout)
+- 2x upscaling with Lanczos + unsharp mask
+- 768x768, 4 steps, ~28s generation
+- Enhanced post-processing
 """
-import torch, time, io, os, re, asyncio, httpx, base64, tempfile
+import torch, time, io, os, re, asyncio, httpx, tempfile
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance, ImageOps
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 from pydantic import BaseModel
 import uvicorn
 
@@ -24,17 +23,16 @@ app = FastAPI(title="EvolvixOS SDXL Logo Service")
 async def load_model():
     global pipe
     from diffusers import StableDiffusionXLPipeline
-    print("Loading SDXL Turbo (1024x1024 mode)...", flush=True)
+    print("Loading SDXL Turbo v3...", flush=True)
     pipe = StableDiffusionXLPipeline.from_single_file(
         '/opt/evolvixos/models/sdxl-turbo/sd_xl_turbo_1.0_fp16.safetensors',
         torch_dtype=torch.float32,
     )
     pipe.to('cpu')
     pipe.set_progress_bar_config(disable=True)
-    print("SDXL Turbo loaded!", flush=True)
+    print("SDXL Turbo v3 loaded!", flush=True)
 
 async def enhance_prompt_for_icon(brand_name, description, palette_colors):
-    """Use Groq to write a detailed, high-quality image prompt"""
     async with httpx.AsyncClient(timeout=45) as client:
         resp = await client.post(
             "https://api.groq.com/openai/v1/chat/completions",
@@ -46,15 +44,15 @@ async def enhance_prompt_for_icon(brand_name, description, palette_colors):
 Rules:
 1. Generate ONLY the icon/symbol — NO text, NO letters, NO words.
 2. Describe: shape, form, gradient colors, lighting, material quality, style.
-3. Include quality boosters: "ultra detailed, sharp focus, professional, premium branding, 8K quality, studio lighting"
+3. Include quality boosters: "ultra detailed, sharp focus, professional, premium branding, studio lighting"
 4. Specify material: "glossy", "metallic", "glassmorphism", or "matte" based on the brand feel.
-5. Keep under 70 words (CLIP has a 77 token limit — be concise!).
+5. Keep under 65 words (CLIP has 77 token limit).
 6. End with: "no text, no letters, icon only"
 Output ONLY the prompt text."""},
                     {"role": "user", "content": f"Brand: {brand_name}\nConcept: {description}\nColors: {palette_colors}"}
                 ],
                 "temperature": 0.85,
-                "max_tokens": 800
+                "max_tokens": 1000
             }
         )
         data = resp.json()
@@ -73,60 +71,57 @@ def hex_to_rgb(h):
     h = h.lstrip('#')
     return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
 
-def remove_bg_feather(img, threshold=235, feather=2):
-    """Remove white background with feathering for smooth edges"""
-    img = img.convert("RGBA")
-    datas = list(img.getdata())
-    new_data = []
-    for r, g, b, a in datas:
-        # Distance from white
-        dist = max(abs(255 - r), abs(255 - g), abs(255 - b))
-        if dist < threshold - 20:
-            # Very close to white -> transparent
-            new_data.append((r, g, b, 0))
-        elif dist < threshold:
-            # Transition zone -> partial alpha (feather)
-            alpha = int(255 * (dist - (threshold - 20)) / 20)
-            new_data.append((r, g, b, alpha))
-        else:
-            new_data.append((r, g, b, 255))
-    img.putdata(new_data)
+def ai_remove_bg(img):
+    """Use rembg for AI-powered background removal"""
+    from rembg import remove
+    # rembg returns RGBA with proper alpha channel
+    result = remove(img)
+    return result
+
+def upscale_icon(img, factor=2):
+    """Upscale icon with Lanczos + unsharp mask for crisp detail"""
+    w, h = img.size
+    new_size = (w * factor, h * factor)
+    img = img.resize(new_size, Image.LANCZOS)
+    # Unsharp mask for crispness
+    img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=120, threshold=2))
     return img
 
 def postprocess_icon(img):
     """Post-process the SDXL icon for professional quality"""
-    # 1. Unsharp mask for crisp edges
-    img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
-    
-    # 2. Enhance contrast slightly
+    # Unsharp mask
+    img = img.filter(ImageFilter.UnsharpMask(radius=2, percent=140, threshold=3))
+    # Contrast
     enhancer = ImageEnhance.Contrast(img)
-    img = enhancer.enhance(1.15)
-    
-    # 3. Enhance color saturation
+    img = enhancer.enhance(1.12)
+    # Color saturation
     enhancer = ImageEnhance.Color(img)
-    img = enhancer.enhance(1.1)
-    
-    # 4. Subtle brightness
-    enhancer = ImageEnhance.Brightness(img)
-    img = enhancer.enhance(1.05)
-    
+    img = enhancer.enhance(1.08)
     return img
 
 def compose_logo(icon_img, brand_name, tagline="", palette_colors="#0066FF, #7C3AED",
-                 canvas_size=(1400, 1400)):
+                 canvas_size=(1600, 1600)):
     """Composite icon + gradient typography with professional polish"""
     W, H = canvas_size
     canvas = Image.new("RGBA", canvas_size, (255, 255, 255, 0))
     
-    # Remove background with feathering
-    icon = remove_bg_feather(icon_img, threshold=238, feather=3)
+    # AI background removal (rembg)
+    icon = ai_remove_bg(icon_img)
+    icon = icon.convert("RGBA")
     
     # Trim to content
     bbox = icon.getbbox()
     if bbox:
+        # Add small padding
+        pad = 10
+        bbox = (max(0, bbox[0]-pad), max(0, bbox[1]-pad), 
+                min(icon.width, bbox[2]+pad), min(icon.height, bbox[3]+pad))
         icon = icon.crop(bbox)
     
-    # Resize icon to fit (larger now for 1600 canvas)
+    # Upscale 2x for more detail
+    icon = upscale_icon(icon, factor=2)
+    
+    # Resize to target
     icon_target_h = int(H * 0.38)
     ratio = icon_target_h / icon.height
     icon_target_w = int(icon.width * ratio)
@@ -137,19 +132,19 @@ def compose_logo(icon_img, brand_name, tagline="", palette_colors="#0066FF, #7C3
     
     # Soft drop shadow
     shadow = icon_resized.copy()
-    shadow_data = [(0, 0, 0, min(a, 50)) for r, g, b, a in shadow.getdata()]
+    shadow_data = [(0, 0, 0, min(a, 45)) for r, g, b, a in shadow.getdata()]
     shadow.putdata(shadow_data)
-    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=15))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=18))
     canvas.paste(shadow, (icon_x + 6, icon_y + 10), shadow)
     
-    # Subtle glow behind icon (using brand color)
+    # Subtle brand-colored glow behind icon
     colors = [c.strip() for c in palette_colors.split(",")]
     c1 = hex_to_rgb(colors[0])
     glow = icon_resized.copy()
-    glow_data = [(c1[0], c1[1], c1[2], min(a, 30)) for r, g, b, a in glow.getdata()]
+    glow_data = [(c1[0], c1[1], c1[2], min(a, 25)) for r, g, b, a in glow.getdata()]
     glow.putdata(glow_data)
-    glow = glow.filter(ImageFilter.GaussianBlur(radius=25))
-    canvas.paste(glow, (icon_x - 3, icon_y - 3), glow)
+    glow = glow.filter(ImageFilter.GaussianBlur(radius=30))
+    canvas.paste(glow, (icon_x - 5, icon_y - 5), glow)
     
     # Main icon
     canvas.paste(icon_resized, (icon_x, icon_y), icon_resized)
@@ -176,7 +171,6 @@ def compose_logo(icon_img, brand_name, tagline="", palette_colors="#0066FF, #7C3
     text_mask = Image.new("L", (text_w + 60, text_h + 60), 0)
     mask_draw = ImageDraw.Draw(text_mask)
     mask_draw.text((30 - bbox[0], 30 - bbox[1]), brand_name, font=wordmark_font, fill=255)
-    # Slightly blur mask for anti-aliased edges
     text_mask = text_mask.filter(ImageFilter.GaussianBlur(radius=0.5))
     
     gradient = Image.new("RGBA", (text_w + 60, text_h + 60), (0, 0, 0, 0))
@@ -219,27 +213,25 @@ def compose_logo(icon_img, brand_name, tagline="", palette_colors="#0066FF, #7C3
 
 @app.post("/generate")
 async def generate_logo(req: LogoRequest):
-    """Generate a professional logo: SDXL icon + gradient typography"""
     global pipe
     if pipe is None:
         return JSONResponse({"error": "Model not loaded yet"}, status_code=503)
     
-    # Step 1: Enhance prompt
+    # Enhance prompt
     icon_prompt = await enhance_prompt_for_icon(req.brand_name, req.description, req.palette_colors)
-    # Truncate to CLIP limit
     words = icon_prompt.split()
     if len(words) > 65:
         icon_prompt = ' '.join(words[:55]) + ' ' + ' '.join(words[-8:])
     print(f"[LOGO] Prompt: {icon_prompt[:100]}...", flush=True)
     
-    # Step 2: Generate icon with SDXL Turbo at 1024x1024, 8 steps
+    # Generate icon
     start = time.time()
     loop = asyncio.get_event_loop()
     image = await loop.run_in_executor(
         None,
         lambda: pipe(
             prompt=icon_prompt,
-            negative_prompt="text, letters, words, watermark, signature, low quality, blurry, distorted, ugly, noisy, grainy, pixelated, amateur, cartoon, childish",
+            negative_prompt="text, letters, words, watermark, signature, low quality, blurry, distorted, ugly, noisy, grainy, pixelated, amateur, cartoon, childish, deformed",
             num_inference_steps=4,
             guidance_scale=1.0,
             width=768,
@@ -247,25 +239,25 @@ async def generate_logo(req: LogoRequest):
         ).images[0]
     )
     gen_time = time.time() - start
-    print(f"[LOGO] SDXL generated in {gen_time:.1f}s (1024x1024, 8 steps)", flush=True)
+    print(f"[LOGO] SDXL generated in {gen_time:.1f}s", flush=True)
     
-    # Step 3: Post-process icon
+    # Post-process icon
     image = postprocess_icon(image)
     
-    # Step 4: Composite typography at 1600x1600
+    # Composite with AI bg removal + upscaling
     final = compose_logo(image, req.brand_name, req.tagline, req.palette_colors)
     
-    # Step 5: Save
+    # Save
     fd, temp_path = tempfile.mkstemp(suffix=".png")
     os.close(fd)
     final.save(temp_path, "PNG")
     
-    print(f"[LOGO] Final saved to {temp_path} ({os.path.getsize(temp_path)//1024}KB)", flush=True)
+    print(f"[LOGO] Final saved ({os.path.getsize(temp_path)//1024}KB)", flush=True)
     return {"path": temp_path, "generation_time": round(gen_time, 1), "prompt": icon_prompt}
 
 @app.get("/health")
 async def health():
-    return {"status": "ready" if pipe is not None else "loading", "model": "sdxl-turbo-1024"}
+    return {"status": "ready" if pipe is not None else "loading", "model": "sdxl-turbo-v3"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=5003, log_level="info")
