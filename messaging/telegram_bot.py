@@ -149,15 +149,31 @@ async def ask_james(message, sender, history=None):
                 "system": JAMES_SYSTEM + (f" You are talking to {sender}." if sender else ""),
             })
         text = resp.text
+        # Parse SSE format: extract all "data" lines and concatenate text
+        # SSE format: event: text\ndata: {"text": "...", "done": false}\n\n
+        if "event:" in text or "data:" in text:
+            import re as _re
+            data_lines = _re.findall(r'data:\s*(.+)', text)
+            full_text = ""
+            for line in data_lines:
+                try:
+                    chunk = json.loads(line)
+                    if chunk.get("text"):
+                        full_text += chunk["text"]
+                    if chunk.get("response") and not full_text:
+                        full_text = chunk["response"]
+                except:
+                    pass
+            if full_text:
+                return full_text.strip()
+        # Fallback: try plain JSON
         try:
             parsed = json.loads(text)
             if parsed.get("response"): return parsed["response"]
             if parsed.get("text"): return parsed["text"]
-            if parsed.get("choices") and parsed["choices"][0]:
-                c = parsed["choices"][0]
-                return c.get("message", {}).get("content", "") or c.get("text", "") or text
-            return text.strip()
-        except: return text.strip()
+        except:
+            pass
+        return text.strip()
     except Exception as e:
         return f"I am having trouble right now. Error: {e}"
 
@@ -220,6 +236,7 @@ async def handle_clear(chat_id):
     await send_message(chat_id, "Conversation history cleared. Starting fresh!")
 
 async def handle_chat(chat_id, text, username):
+    print(f"[CHAT] Starting chat with {username} (chat_id={chat_id}): {repr(text[:80])}", flush=True)
     # NSFW filter
     if is_nsfw(text):
         await send_message(chat_id, "I don't engage with that kind of content. Let's talk about something else!")
@@ -232,6 +249,7 @@ async def handle_chat(chat_id, text, username):
     history = history[-10:]
 
     response = await ask_james(text, username, history)
+    print(f"[CHAT] James responded: {repr(response[:80])}", flush=True)
     # Filter response too
     if is_nsfw(response):
         response = "I don't produce that kind of content. Let's talk about something else!"
@@ -329,6 +347,9 @@ async def process_update(update):
     text = message.get("text", "")
     username = message.get("from", {}).get("username", "") or message.get("from", {}).get("first_name", "User")
     user_id = message.get("from", {}).get("id", 0)
+    
+    # DEBUG: Log all incoming messages
+    print(f"[MSG] chat_id={chat_id} type={chat_type} user={username}({user_id}) text={repr(text[:80])}", flush=True)
 
     # SECURITY: Auto-leave ALL groups and supergroups
     if chat_type in ("group", "supergroup", "channel"):
@@ -342,6 +363,7 @@ async def process_update(update):
 
     # Voice message
     if message.get("voice"):
+        print(f"[VOICE] Received voice message from {username}", flush=True)
         await handle_voice_message(chat_id, message["voice"], username)
         return
 
