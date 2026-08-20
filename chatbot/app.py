@@ -154,7 +154,7 @@ typingMsg.innerHTML='<div class="msg-avatar">⚡</div><div class="msg-content"><
 messages.appendChild(typingMsg);
 messages.scrollTop=messages.scrollHeight;
 try{
-const res=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})});
+const res=await fetch('/chatbot/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})});
 const data=await res.json();
 typingMsg.querySelector('.msg-text').textContent=data.reply;
 }catch(err){
