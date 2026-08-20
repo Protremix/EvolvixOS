@@ -23,9 +23,11 @@ if not GROQ_KEY:
 
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 app = FastAPI(title="EvolvixOS Chatbot")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 SYSTEM_PROMPT = (
     "You are Aria, a friendly customer support AI for EvolvixOS.\n"
@@ -80,6 +82,13 @@ async def home():
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aria — EvolvixOS Support</title>
+<link rel="manifest" href="/chatbot/static/manifest.json">
+<meta name="theme-color" content="#6c5ce7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Aria">
+<link rel="apple-touch-icon" href="/chatbot/static/icon.png">
+<link rel="icon" href="/chatbot/static/icon.png">
 <style>
 :root{--bg:#0a0a0f;--card:#13131a;--border:#2a2a35;--accent:#6c5ce7;--accent2:#a29bfe;--accent3:#fd79a8;--text:#e8e8f0;--muted:#8888a0;--green:#00b894}
 *{margin:0;padding:0;box-sizing:border-box}
