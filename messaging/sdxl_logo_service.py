@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 """
-EvolvixOS Logo Service v4 — Professional Quality
-- Flux model via Pollinations for state-of-the-art icon quality
-- rembg for AI background removal
-- Clean minimal composition: solid typography, no cheesy effects
-- Professional card layout
+EvolvixOS Logo Service v5 — Professional Grade
+- Flux model via Pollinations (single request, reliable)
+- Improved prompt: flat vector / minimal 3D, bold and simple
+- Clean composition: white bg, solid typography, subtle shadow
+- rembg AI background removal
 """
-import time, io, os, re, asyncio, httpx, tempfile, hashlib
+import time, io, os, asyncio, httpx, tempfile
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
-from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from pydantic import BaseModel
 import uvicorn
 
 GROQ_KEY = os.environ.get("GROQ_API_KEY", "")
 FONT_DIR = "/opt/evolvixos/fonts"
 
-app = FastAPI(title="EvolvixOS Logo Service v4")
+app = FastAPI(title="EvolvixOS Logo Service v5")
 
 async def enhance_prompt_for_icon(brand_name, description, palette_colors):
     async with httpx.AsyncClient(timeout=45) as client:
@@ -26,48 +26,49 @@ async def enhance_prompt_for_icon(brand_name, description, palette_colors):
             json={
                 "model": "openai/gpt-oss-120b",
                 "messages": [
-                    {"role": "system", "content": """You write image generation prompts for PROFESSIONAL LOGO ICONS for tech companies.
-Style references: Apple, Stripe, Airbnb, Discord — simple, bold, geometric, memorable.
+                    {"role": "system", "content": """You write image generation prompts for PROFESSIONAL LOGO ICONS.
+Style references: Stripe, Airbnb, Discord, Notion — simple, bold, memorable.
 Rules:
-1. Generate ONLY the icon/symbol — NO text, NO letters, NO words.
-2. Describe shape, form, colors, material, lighting in vivid detail.
-3. Use words like: "minimalist, bold, geometric, clean lines, professional, premium, app icon style"
-4. Specify material finish: "glossy 3D render" or "flat vector" based on brand feel.
-5. Keep under 65 words.
-6. End with: "centered, white background, no text, no letters, icon only"
+1. ONLY the icon — NO text, NO letters, NO words.
+2. Pick ONE style: "flat vector design" OR "minimal 3D render".
+3. Keep it BOLD and SIMPLE — max 2-3 visual elements.
+4. Describe shape precisely, colors, finish.
+5. Under 60 words.
+6. End with: "centered composition, plain white background, app icon style, no text, no letters"
 Output ONLY the prompt text."""},
                     {"role": "user", "content": f"Brand: {brand_name}\nConcept: {description}\nColors: {palette_colors}"}
                 ],
                 "temperature": 0.9,
-                "max_tokens": 1000
+                "max_tokens": 800
             }
         )
         data = resp.json()
         content = data["choices"][0]["message"]["content"].strip()
         if not content or len(content) < 20:
-            content = f"Minimalist logo icon for {brand_name}: {description}. {palette_colors}. Bold, geometric, clean lines, professional, premium, glossy 3D render, centered, white background, no text, no letters, icon only"
+            content = f"Minimalist logo icon for {brand_name}: {description}. {palette_colors}. Bold, simple, geometric, flat vector design, centered, white background, app icon style, no text, no letters"
         return content
 
 async def generate_flux_icon(prompt, seed=None):
-    """Generate icon using Flux via Pollinations — much higher quality than SDXL Turbo"""
+    """Generate icon using Flux via Pollinations"""
+    from urllib.parse import quote
     if seed is None:
         seed = int(time.time()) % 1000000
+    url = f"https://image.pollinations.ai/prompt/{quote(prompt)}?width=1024&height=1024&seed={seed}&model=flux&nologo=true"
     
-    # Use Flux model with enhanced prompt
-    flux_prompt = f"{prompt}, high quality, detailed, professional, 4k"
-    encoded = httpx.URL(flux_prompt).path
-    url = f"https://image.pollinations.ai/prompt/{httpx.URL(flux_prompt, path='').__str__() if False else flux_prompt.replace(' ', '%20')}?width=1024&height=1024&seed={seed}&model=flux&nologo=true&nsfprompt=true"
+    # Retry up to 3 times
+    for attempt in range(3):
+        try:
+            async with httpx.AsyncClient(timeout=90, follow_redirects=True) as client:
+                resp = await client.get(url)
+                if resp.status_code == 200 and len(resp.content) > 5000:
+                    img = Image.open(io.BytesIO(resp.content))
+                    return img.convert("RGB")
+            print(f"[LOGO] Flux attempt {attempt+1} returned {resp.status_code} ({len(resp.content)} bytes)", flush=True)
+        except Exception as e:
+            print(f"[LOGO] Flux attempt {attempt+1} error: {e}", flush=True)
+        await asyncio.sleep(3)
     
-    # Actually use proper URL encoding
-    from urllib.parse import quote
-    url = f"https://image.pollinations.ai/prompt/{quote(flux_prompt)}?width=1024&height=1024&seed={seed}&model=flux&nologo=true"
-    
-    async with httpx.AsyncClient(timeout=90, follow_redirects=True) as client:
-        resp = await client.get(url)
-        if resp.status_code == 200 and len(resp.content) > 5000:
-            img = Image.open(io.BytesIO(resp.content))
-            return img.convert("RGB")
-        raise RuntimeError(f"Flux API returned {resp.status_code} ({len(resp.content)} bytes)")
+    raise RuntimeError("Flux API failed after 3 attempts")
 
 class LogoRequest(BaseModel):
     brand_name: str
@@ -80,16 +81,15 @@ def hex_to_rgb(h):
     return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
 
 def ai_remove_bg(img):
-    """AI background removal using rembg"""
     from rembg import remove
     result = remove(img)
     return result.convert("RGBA")
 
 def compose_logo(icon_img, brand_name, tagline="", palette_colors="#0066FF, #7C3AED",
                  canvas_size=(1600, 1600)):
-    """Professional composition: clean, minimal, no cheesy effects"""
+    """Professional composition — clean, balanced, minimal"""
     W, H = canvas_size
-    canvas = Image.new("RGBA", canvas_size, (255, 255, 255, 255))  # White background
+    canvas = Image.new("RGBA", canvas_size, (255, 255, 255, 255))
     
     # AI background removal
     icon = ai_remove_bg(icon_img)
@@ -97,43 +97,41 @@ def compose_logo(icon_img, brand_name, tagline="", palette_colors="#0066FF, #7C3
     # Trim to content
     bbox = icon.getbbox()
     if bbox:
-        pad = 15
+        pad = 20
         bbox = (max(0, bbox[0]-pad), max(0, bbox[1]-pad),
                 min(icon.width, bbox[2]+pad), min(icon.height, bbox[3]+pad))
         icon = icon.crop(bbox)
     
-    # Resize icon to fit — make it large and prominent
-    icon_target_h = int(H * 0.42)
+    # Resize icon — prominent but balanced
+    icon_target_h = int(H * 0.40)
     ratio = icon_target_h / icon.height
     icon_target_w = int(icon.width * ratio)
     icon_resized = icon.resize((icon_target_w, icon_target_h), Image.LANCZOS)
     
     icon_x = (W - icon_target_w) // 2
-    icon_y = int(H * 0.08)
+    icon_y = int(H * 0.10)
     
-    # Clean, subtle drop shadow (not cheesy glow)
-    shadow = Image.new("RGBA", (icon_target_w + 40, icon_target_h + 40), (0, 0, 0, 0))
-    shadow_alpha = Image.new("L", (icon_target_w + 40, icon_target_h + 40), 0)
+    # Subtle drop shadow
+    shadow = Image.new("RGBA", (icon_target_w + 60, icon_target_h + 60), (0, 0, 0, 0))
     shadow_icon = icon_resized.copy()
-    shadow_data = [(0, 0, 0, min(a, 35)) for r, g, b, a in shadow_icon.getdata()]
+    shadow_data = [(0, 0, 0, min(a, 30)) for r, g, b, a in shadow_icon.getdata()]
     shadow_icon.putdata(shadow_data)
-    shadow.paste(shadow_icon, (20, 20), shadow_icon)
-    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=12))
-    canvas.paste(shadow, (icon_x - 20, icon_y - 10), shadow)
+    shadow.paste(shadow_icon, (30, 30), shadow_icon)
+    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=15))
+    canvas.paste(shadow, (icon_x - 30, icon_y - 15), shadow)
     
     # Main icon
     canvas.paste(icon_resized, (icon_x, icon_y), icon_resized)
     
-    # Typography — SOLID color, no gradients
+    # Typography
     colors = [c.strip() for c in palette_colors.split(",")]
     c1 = hex_to_rgb(colors[0])
-    c2 = hex_to_rgb(colors[1] if len(colors) > 1 else colors[0])
     
     draw = ImageDraw.Draw(canvas)
     
-    # Brand name — solid dark color for professionalism
-    wordmark_color = (30, 30, 35)  # Near-black, not gradient
-    wordmark_font_size = int(H * 0.075)
+    # Brand name — solid near-black
+    wordmark_color = (25, 25, 30)
+    wordmark_font_size = int(H * 0.072)
     try:
         wordmark_font = ImageFont.truetype(f"{FONT_DIR}/Poppins-ExtraBold.ttf", wordmark_font_size)
     except:
@@ -143,20 +141,20 @@ def compose_logo(icon_img, brand_name, tagline="", palette_colors="#0066FF, #7C3
     text_w = bbox[2] - bbox[0]
     text_h = bbox[3] - bbox[1]
     text_x = (W - text_w) // 2
-    text_y = icon_y + icon_target_h + int(H * 0.03)
+    text_y = icon_y + icon_target_h + int(H * 0.04)
     
     draw.text((text_x, text_y), brand_name, font=wordmark_font, fill=wordmark_color)
     
     # Tagline — solid brand color, letter-spaced
     if tagline:
-        tagline_font_size = int(H * 0.024)
+        tagline_font_size = int(H * 0.022)
         try:
             tagline_font = ImageFont.truetype(f"{FONT_DIR}/Poppins-Medium.ttf", tagline_font_size)
         except:
             tagline_font = ImageFont.load_default()
         
         tagline_upper = tagline.upper()
-        letter_spacing = int(tagline_font_size * 0.35)
+        letter_spacing = int(tagline_font_size * 0.40)
         char_widths = []
         total_w = 0
         for ch in tagline_upper:
@@ -166,8 +164,8 @@ def compose_logo(icon_img, brand_name, tagline="", palette_colors="#0066FF, #7C3
         total_w -= letter_spacing
         
         cursor_x = (W - total_w) // 2
-        tagline_y = text_y + text_h + int(H * 0.02)
-        tagline_color = (*c1, 200)  # Solid brand color, slightly transparent
+        tagline_y = text_y + text_h + int(H * 0.025)
+        tagline_color = (*c1, 220)
         
         for ch, w in zip(tagline_upper, char_widths):
             draw.text((cursor_x, tagline_y), ch, font=tagline_font, fill=tagline_color)
@@ -201,7 +199,7 @@ async def generate_logo(req: LogoRequest):
 
 @app.get("/health")
 async def health():
-    return {"status": "ready", "model": "flux-via-pollinations"}
+    return {"status": "ready", "model": "flux-v5"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=5003, log_level="info")
