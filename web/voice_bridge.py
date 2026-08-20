@@ -17,11 +17,12 @@ app = FastAPI(title="EvolvixOS Voice Bridge", version="1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 PIPER_VOICES = "/opt/piper-voices"
-DEFAULT_VOICE = os.environ.get("JAMES_VOICE", "en_US-lessac-high")
+DEFAULT_VOICE = os.environ.get("JAMES_VOICE", "en_US-ryan-high")
 WHISPER_MODEL = os.environ.get("WHISPER_MODEL", "base")
 
 # Available voices
 VOICES = {
+    "ryan": "en_US-ryan-high",
     "lessac": "en_US-lessac-high",
     "amy": "en_US-amy-medium",
     "lessac_med": "en_US-lessac-medium",
@@ -156,12 +157,16 @@ async def text_to_speech(request: Request):
 
         model, config = get_voice_model(voice)
 
-        # Generate speech with Piper
+        # Generate speech with Piper — tuned for natural human prosody
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
             temp_output = f.name
 
         subprocess.run(
-            ["piper", "-m", model, "-c", config, "-f", temp_output],
+            ["piper", "-m", model, "-c", config,
+             "--length-scale", "1.15",     # slightly slower = more deliberate/natural
+             "--noise-scale", "0.85",       # more pitch variation = expressive
+             "--noise-w", "0.6",            # less timing jitter = smoother flow
+             "-f", temp_output],
             input=text,
             capture_output=True, text=True, timeout=30
         )
@@ -169,10 +174,28 @@ async def text_to_speech(request: Request):
         if not os.path.exists(temp_output) or os.path.getsize(temp_output) == 0:
             return JSONResponse({"error": "TTS generation failed"}, status_code=500)
 
-        # Read and return audio
-        with open(temp_output, "rb") as f:
+        # Post-process with ffmpeg: normalize + warm EQ + light compression
+        processed_output = temp_output.replace(".wav", "_processed.wav")
+        subprocess.run([
+            "ffmpeg", "-i", temp_output,
+            "-af", "loudnorm=I=-16:LRA=11:TP=-1.5,"    # broadcast loudness norm
+                   "bass=g=+2:f=80:w=1,"                # warm up low end (deeper male voice)
+                   "treble=g=-1:f=4000:w=1,"             # soften harsh highs
+                   "acompressor=threshold=-20dB:ratio=2:attack=5:release=80,"  # gentle compression
+                   "aresample=22050",
+            "-y", processed_output
+        ], capture_output=True, timeout=15)
+
+        # Use processed if it exists, otherwise fall back to raw
+        final_output = processed_output if os.path.exists(processed_output) and os.path.getsize(processed_output) > 0 else temp_output
+
+        with open(final_output, "rb") as f:
             audio = f.read()
-        os.unlink(temp_output)
+
+        # Cleanup
+        for p in [temp_output, processed_output]:
+            if os.path.exists(p):
+                os.unlink(p)
 
         return StreamingResponse(
             io.BytesIO(audio),

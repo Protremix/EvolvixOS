@@ -115,7 +115,7 @@ async def transcribe_audio(audio_bytes, ext=".ogg"):
     finally:
         if os.path.exists(temp_path): os.unlink(temp_path)
 
-async def generate_speech(text, voice="lessac"):
+async def generate_speech(text, voice="ryan")
     async with httpx.AsyncClient(timeout=30) as client:
         resp = await client.post(f"{VOICE_BRIDGE}/tts", json={"text": text, "voice": voice})
         if resp.status_code == 200: return resp.content
