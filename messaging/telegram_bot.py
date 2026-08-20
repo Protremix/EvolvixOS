@@ -90,8 +90,28 @@ def detect_intent(text):
     return ("chat", text)
 
 
-async def enhance_image_prompt(user_request):
-    """Use Groq to turn a simple request into a professional image generation prompt"""
+REFINEMENT_HINTS = [
+    "color", "colour", "green", "blue", "red", "purple", "pink", "orange", "yellow",
+    "black", "white", "gold", "silver", "teal", "name", "call it", "should be",
+    "has to be", "have to be", "must be", "make it", "change", "instead",
+    "bigger", "smaller", "font", "style", "background", "yes", "do it", "go ahead",
+    "go for it", "looks good", "perfect", "like that", "similar", "more", "less"
+]
+
+def looks_like_refinement(text):
+    """Detect if a follow-up message is refining an in-progress image request"""
+    t = text.lower().strip()
+    if len(t) > 150:
+        return False
+    return any(h in t for h in REFINEMENT_HINTS)
+
+
+async def enhance_image_prompt(user_request, conversation_context=None):
+    """Use Groq to turn a request (plus any accumulated context) into a specific, creative image prompt"""
+    context_note = ""
+    if conversation_context:
+        context_note = "\n\nFull conversation so far about this image (combine ALL these details, the latest messages refine/add to earlier ones):\n" + "\n".join(f"- {c}" for c in conversation_context)
+
     try:
         async with httpx.AsyncClient(timeout=30) as client:
             resp = await client.post(
@@ -100,10 +120,21 @@ async def enhance_image_prompt(user_request):
                 json={
                     "model": "openai/gpt-oss-120b",
                     "messages": [
-                        {"role": "system", "content": "You are a professional image prompt engineer. Convert user requests into detailed, high-quality image generation prompts. Include style, lighting, composition, colors, mood, quality keywords. Output ONLY the prompt text, no explanation, no quotes. Keep under 200 words."},
-                        {"role": "user", "content": f"Create a professional image prompt for: {user_request}"}
+                        {"role": "system", "content": (
+                            "You are an elite brand identity designer writing prompts for an AI image generator (Flux). "
+                            "Your job: produce a SPECIFIC, CONCRETE, CREATIVE prompt - never generic. "
+                            "HARD RULES:\n"
+                            "1. NEVER use these overused cliches: generic upward arrow, checkmark, chevron shape, generic swoosh, generic circle with gradient, 'minimalist tech blob'. These are banned - they look cheap and are what a lazy AI defaults to.\n"
+                            "2. If the user gave a brand/company name, the logo MUST include that name as clean readable typography (wordmark) alongside a distinct icon/symbol - describe the exact font style (e.g. bold geometric sans-serif, modern serif, custom lettering).\n"
+                            "3. The icon/symbol must be CONCRETE and tied to the brand meaning - e.g. for blockchain: interlocking hexagonal nodes, a chain-link motif, a crystalline network pattern - NOT an abstract arrow.\n"
+                            "4. Specify exact colors requested by the user (e.g. if they said green, use a specific shade like emerald green #10B981, not just 'green gradient').\n"
+                            "5. Specify composition: icon + wordmark lockup, on a clean background (describe exact background e.g. 'dark charcoal #0a0a0f' or 'pure white'), professional vector illustration, sharp clean edges, high contrast.\n"
+                            "6. Combine ALL details given across the conversation - do not drop earlier details when new ones are added.\n"
+                            "Output ONLY the final image prompt text, no explanation, no quotes, no markdown. Keep it under 180 words."
+                        )},
+                        {"role": "user", "content": f"Design request: {user_request}{context_note}"}
                     ],
-                    "temperature": 0.7,
+                    "temperature": 0.9,
                     "max_tokens": 300
                 }
             )
@@ -111,8 +142,7 @@ async def enhance_image_prompt(user_request):
             return data["choices"][0]["message"]["content"].strip()
     except Exception as e:
         print(f"Prompt enhancement error: {e}")
-        # Fallback to simple prompt
-        return user_request + ", high quality, detailed, professional, 4K, cinematic lighting"
+        return user_request + ", professional vector logo, concrete brand icon with wordmark, specific colors, clean composition, high quality, 4K"
 
 
 async def generate_image_pollinations(prompt, width=1536, height=1536):
@@ -387,6 +417,8 @@ async def handle_status(chat_id):
 async def handle_clear(chat_id):
     ctx = user_contexts.get(chat_id, {})
     ctx["history"] = []
+    ctx["in_image_mode"] = False
+    ctx["image_context"] = []
     user_contexts[chat_id] = ctx
     await send_message(chat_id, "Chat history cleared. Fresh start!")
 
@@ -399,21 +431,41 @@ async def handle_chat(chat_id, text, username):
 
     # === SMART INTENT DETECTION ===
     intent, raw_text = detect_intent(text)
-    print(f"[INTENT] {intent}: {repr(raw_text[:60])}", flush=True)
-
     ctx = user_contexts.get(chat_id, {"username": username})
     history = ctx.get("history", [])
 
+    # If we're already mid-image-creation, treat refinements/continuations as image intent too
+    # This is what makes James FAST - no interrogating the user, just generate and iterate
+    if intent != "image" and ctx.get("in_image_mode") and looks_like_refinement(text):
+        intent = "image"
+        raw_text = text
+        print(f"[INTENT] treating as image refinement (was in_image_mode): {repr(text[:60])}", flush=True)
+    else:
+        print(f"[INTENT] {intent}: {repr(raw_text[:60])}", flush=True)
+        if intent != "image" and ctx.get("in_image_mode"):
+            # Genuinely different topic - exit image creation mode
+            ctx["in_image_mode"] = False
+            ctx["image_context"] = []
+            user_contexts[chat_id] = ctx
+
     if intent == "image":
-        # Generate a high-quality image
+        # Accumulate all the details given across this conversation about the image
+        image_context = ctx.get("image_context", [])
+        image_context.append(text)
+        image_context = image_context[-8:]  # keep last 8 relevant messages
+        ctx["image_context"] = image_context
+        ctx["in_image_mode"] = True
+        user_contexts[chat_id] = ctx
+
+        # Generate a high-quality image immediately - no clarifying questions
         await telegram_request("sendChatAction", chat_id=chat_id, action="typing")
         
-        # Step 1: Enhance prompt with Groq AI
-        prompt = await enhance_image_prompt(raw_text)
+        # Step 1: Enhance prompt with Groq AI, using full accumulated context
+        prompt = await enhance_image_prompt(raw_text, conversation_context=image_context)
         print(f"[IMAGE] Enhanced prompt: {repr(prompt[:100])}", flush=True)
         
         await telegram_request("sendChatAction", chat_id=chat_id, action="upload_photo")
-        caption = f"Here's what I created for you!\n\nPrompt: {prompt[:200]}"
+        caption = f"Here's what I created for you!\n\nWant changes? Just tell me what to adjust."
         
         # Try Pollinations first
         image_path = await generate_image_pollinations(prompt)
