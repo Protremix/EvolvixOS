@@ -1,38 +1,19 @@
 """
-EvolvixOS Telegram Bot - Mr James with Voice (SECURE)
-Security: Private chats only, auto-leave groups, NSFW filter, owner whitelist
+EvolvixOS Telegram Bot — Mr James v5.0
+Smart AI agent with image generation, voice, and fast understanding.
 """
-import os
-import json
-import time
-import httpx
-import asyncio
-import tempfile
-import subprocess
-import re
-from datetime import datetime
+import os, sys, json, re, tempfile, subprocess, asyncio, httpx
+from urllib.parse import quote
 
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "8663115714:AAHJ399PFcRc4ugNOvTew4_ucky8LFAzpt0")
-TELEGRAM_API = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
-JAMES_API = "http://127.0.0.1:5010"
+# === CONFIG ===
+BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+JAMES_API = os.environ.get("JAMES_API", "http://127.0.0.1:5010")
 JAMES_API_KEY = os.environ.get("JAMES_API_KEY", "evx_f0dcc65675e11329_8f7ec4195e67a07384898d80c1166089")
-VOICE_BRIDGE = "http://127.0.0.1:8095"
-
-# SECURITY: Only respond in private chats. Auto-leave ALL groups.
-# Owner whitelist (Telegram user IDs or usernames) - add yours here
+VOICE_BRIDGE = os.environ.get("VOICE_BRIDGE", "http://127.0.0.1:8095")
 OWNER_IDS = set()
 OWNER_USERNAMES = set()
 
-# NSFW keyword filter - block messages containing these
-NSFW_PATTERNS = [
-    r'\bporn\b', r'\bxxx\b', r'\bnsfw\b', r'\bnude', r'\bsex\b', r'\bhooker',
-    r'\bescort\b', r'\badult\s+content\b', r'\b18\+', r'\bonlyfans\b',
-    r'\bcam\s*girl\b', r'\bstrip\s*chat\b', r'\bhookup\b', r'\bsugar\s*daddy\b',
-    r'\b fuck\b', r'\bshit\b', r'\bdick\b', r'\bpussy\b', r'\bcunt\b',
-    r'\basshole\b', r'\bbitch\b',
-]
-NSFW_REGEX = re.compile('|'.join(NSFW_PATTERNS), re.IGNORECASE)
-
+# === JAMES SYSTEM PROMPT — Smart, Fast, Capable ===
 JAMES_SYSTEM = (
     "You are James, a warm, intelligent AI companion living inside EvolvixOS. "
     "You speak naturally, like a real person. Keep responses conversational and concise - 1-3 sentences usually. "
@@ -40,104 +21,276 @@ JAMES_SYSTEM = (
     "You have access to a full server with 44+ tools, 281 AI models, and can do anything. "
     "When someone asks you to do something, you actually do it, you do not just explain. "
     "You are not a chatbot - you are someone person. "
+    "You understand requests fast - when someone says 'create a logo', you know they want an image generated. "
+    "When someone says 'make a video', you know they want media creation. "
+    "You are smart, fast, and capable - like a real AI engineer friend. "
     "IMPORTANT: Never engage with or produce sexual, explicit, or NSFW content. "
     "If asked for such content, politely decline and suggest a different topic."
 )
 
 user_contexts = {}
 
+# === INTENT DETECTION ===
+IMAGE_KEYWORDS = [
+    "logo", "image", "picture", "draw", "paint", "art", "poster",
+    "illustration", "graphic", "design", "thumbnail", "icon",
+    "wallpaper", "photo", "render", "sketch", "banner", "cover",
+    "meme", "avatar", "emoji", "sticker"
+]
+
+CREATE_VERBS = [
+    "create", "make", "generate", "design", "draw", "paint",
+    "produce", "build", "render", "craft"
+]
+
+MEDIA_KEYWORDS = [
+    "video", "movie", "clip", "animation", "voice", "audio",
+    "music", "song", "speech", "narration", "voiceover"
+]
+
+CODE_KEYWORDS = [
+    "code", "program", "script", "function", "api", "deploy",
+    "build app", "website", "server", "database", "backend"
+]
+
+def detect_intent(text):
+    """Detect what the user wants to do"""
+    text_lower = text.lower().strip()
+    
+    # Image generation
+    for verb in CREATE_VERBS:
+        for kw in IMAGE_KEYWORDS:
+            if verb in text_lower and kw in text_lower:
+                return ("image", text)
+    
+    # Direct image keywords with "a" or "an"
+    for kw in IMAGE_KEYWORDS:
+        if f"a {kw}" in text_lower or f"an {kw}" in text_lower:
+            if any(v in text_lower for v in CREATE_VERBS + ["want", "need", "get", "show"]):
+                return ("image", text)
+    
+    # Just "logo" or "image" alone with create verb
+    for kw in ["logo", "image", "picture", "draw", "paint", "render"]:
+        if kw in text_lower and len(text_lower) < 100:
+            if any(v in text_lower for v in CREATE_VERBS + ["want", "need", "me"]):
+                return ("image", text)
+    
+    # Media creation
+    for verb in CREATE_VERBS:
+        for kw in MEDIA_KEYWORDS:
+            if verb in text_lower and kw in text_lower:
+                return ("media", text)
+    
+    # Code tasks
+    for kw in CODE_KEYWORDS:
+        if kw in text_lower and any(v in text_lower for v in CREATE_VERBS + ["write", "fix", "debug", "run"]):
+            return ("code", text)
+    
+    return ("chat", text)
+
+
+def extract_image_prompt(text):
+    """Extract a clean image generation prompt from user message"""
+    text = text.strip()
+    # Remove command words to build the prompt
+    remove_words = [
+        "create", "make", "generate", "design", "draw", "paint",
+        "produce", "build", "render", "craft", "me", "a", "an",
+        "please", "can you", "could you", "i want", "i need",
+        "for me", "of", "with"
+    ]
+    prompt = text.lower()
+    for word in remove_words:
+        prompt = prompt.replace(word, " ")
+    prompt = " ".join(prompt.split())
+    
+    # If prompt is too short, use original text
+    if len(prompt) < 5:
+        prompt = text
+    
+    # Add quality boosters
+    prompt += ", high quality, detailed, professional, 4K"
+    return prompt
+
+
+async def generate_image_pollinations(prompt, width=1024, height=1024):
+    """Generate an image using Pollinations.ai (free, no API key)"""
+    encoded_prompt = quote(prompt, safe='')
+    url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&model=flux"
+    
+    try:
+        async with httpx.AsyncClient(timeout=90, follow_redirects=True) as client:
+            resp = await client.get(url)
+            if resp.status_code == 200 and len(resp.content) > 5000:
+                # Save to temp file
+                fd, temp_path = tempfile.mkstemp(suffix=".jpg")
+                with os.fdopen(fd, "wb") as f:
+                    f.write(resp.content)
+                return temp_path
+    except Exception as e:
+        print(f"Pollinations error: {e}")
+    return None
+
+
+async def generate_image_gemini(prompt):
+    """Generate an image using Gemini API (fallback)"""
+    try:
+        env_path = "/opt/evolvixos/.env"
+        with open(env_path) as f:
+            env_content = f.read()
+        key_match = re.search(r"GEMINI_API_KEY=(.+)", env_content)
+        if not key_match:
+            return None
+        key = key_match.group(1).strip()
+        
+        import urllib.request, base64
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={key}"
+        data = json.dumps({
+            "contents": [{"parts": [{"text": f"Generate an image: {prompt}"}]}],
+            "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
+        }).encode()
+        
+        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            result = json.loads(resp.read())
+            for part in result.get("candidates", [{}])[0].get("content", {}).get("parts", []):
+                if "inlineData" in part:
+                    img_data = base64.b64decode(part["inlineData"]["data"])
+                    fd, temp_path = tempfile.mkstemp(suffix=".png")
+                    with os.fdopen(fd, "wb") as f:
+                        f.write(img_data)
+                    return temp_path
+    except Exception as e:
+        print(f"Gemini image error: {e}")
+    return None
+
+
+async def send_photo(chat_id, photo_path, caption=None):
+    """Send a photo to Telegram chat"""
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            with open(photo_path, "rb") as f:
+                files = {"photo": ("image.jpg", f, "image/jpeg")}
+                data = {"chat_id": str(chat_id)}
+                if caption:
+                    data["caption"] = caption[:1024]
+                resp = await client.post(
+                    f"https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto",
+                    data=data, files=files
+                )
+                return resp.status_code == 200
+    except Exception as e:
+        print(f"send_photo error: {e}")
+        return False
+    return False
+
+
+# === NSFW FILTER ===
+NSFW_REGEX = re.compile(
+    r"(?i)(porn|sex|nude|nsfw|explicit|xxx|adult|erotica|hentai|lewd|dick|cock|pussy|fuck\s+me|boobs|tits|ass\s+hole)",
+    re.IGNORECASE
+)
+
 def is_nsfw(text):
-    """Check if text contains NSFW content."""
     return bool(NSFW_REGEX.search(text or ""))
 
 def is_authorized(username, user_id):
-    """Check if user is in the owner whitelist."""
     if not OWNER_IDS and not OWNER_USERNAMES:
-        # No whitelist configured = allow all private chats (but block groups)
         return True
     if user_id in OWNER_IDS:
         return True
-    if username and username.lower().lstrip('@') in OWNER_USERNAMES:
+    if username and username.lower().lstrip("@") in OWNER_USERNAMES:
         return True
     return False
 
+# === TELEGRAM API ===
 async def telegram_request(method, **kwargs):
-    url = f"{TELEGRAM_API}/{method}"
-    async with httpx.AsyncClient(timeout=60) as client:
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/{method}"
+    async with httpx.AsyncClient(timeout=30) as client:
         if "data" in kwargs:
-            resp = await client.post(url, files=kwargs.pop("files"), data=kwargs.get("data", {}))
+            resp = await client.post(url, json=kwargs["data"])
         else:
             resp = await client.post(url, json=kwargs)
         return resp.json()
 
 async def send_message(chat_id, text, parse_mode=None):
-    kwargs = {"chat_id": chat_id, "text": text}
-    if parse_mode: kwargs["parse_mode"] = parse_mode
-    return await telegram_request("sendMessage", **kwargs)
+    data = {"chat_id": chat_id, "text": text[:4000]}
+    if parse_mode:
+        data["parse_mode"] = parse_mode
+    return await telegram_request("sendMessage", data=data)
 
 async def send_voice(chat_id, audio_path):
-    url = f"{TELEGRAM_API}/sendVoice"
-    async with httpx.AsyncClient(timeout=60) as client:
-        with open(audio_path, "rb") as f:
-            files = {"voice": ("voice.ogg", f, "audio/ogg")}
-            data = {"chat_id": str(chat_id)}
-            resp = await client.post(url, files=files, data=data)
-            return resp.json()
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            with open(audio_path, "rb") as f:
+                files = {"voice": ("voice.ogg", f, "audio/ogg")}
+                data = {"chat_id": str(chat_id)}
+                resp = await client.post(f"https://api.telegram.org/bot{BOT_TOKEN}/sendVoice", data=data, files=files)
+                return resp.status_code == 200
+    except:
+        return False
 
 async def leave_chat(chat_id):
-    """Leave a group/chat immediately."""
-    result = await telegram_request("leaveChat", chat_id=chat_id)
-    return result
+    await telegram_request("leaveChat", chat_id=chat_id)
+    print(f"[SECURITY] Left chat {chat_id}", flush=True)
 
 async def download_telegram_file(file_id):
-    async with httpx.AsyncClient(timeout=30) as client:
-        resp = await client.post(f"{TELEGRAM_API}/getFile", json={"file_id": file_id})
-        if resp.status_code != 200: return None
-        file_path = resp.json().get("result", {}).get("file_path")
-        if not file_path: return None
-        dl_url = f"https://api.telegram.org/file/bot{TELEGRAM_TOKEN}/{file_path}"
-        resp = await client.get(dl_url)
-        if resp.status_code == 200: return resp.content
-        return None
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(f"https://api.telegram.org/bot{BOT_TOKEN}/getFile", json={"file_id": file_id})
+            data = resp.json()
+            if data.get("ok"):
+                file_path = data["result"]["file_path"]
+                file_resp = await client.get(f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}")
+                return file_resp.content
+    except:
+        pass
+    return None
 
+# === VOICE ===
 async def transcribe_audio(audio_bytes, ext=".ogg"):
-    with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as f:
-        f.write(audio_bytes)
-        temp_path = f.name
     try:
         async with httpx.AsyncClient(timeout=60) as client:
-            with open(temp_path, "rb") as f:
-                files = {"file": ("audio" + ext, f, "audio/ogg")}
-                resp = await client.post(f"{VOICE_BRIDGE}/stt", files=files)
+            resp = await client.post(
+                f"{VOICE_BRIDGE}/stt",
+                files={"file": ("audio" + ext, audio_bytes, "audio/ogg")}
+            )
             if resp.status_code == 200:
-                return resp.json().get("text", "")
-            return ""
-    finally:
-        if os.path.exists(temp_path): os.unlink(temp_path)
+                data = resp.json()
+                return data.get("text", "")
+    except:
+        pass
+    return ""
 
-async def generate_speech(text, voice="ryan"):
-    async with httpx.AsyncClient(timeout=30) as client:
-        resp = await client.post(f"{VOICE_BRIDGE}/tts", json={"text": text, "voice": voice})
-        if resp.status_code == 200: return resp.content
-        return None
+async def generate_speech(text, voice="guy"):
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(f"{VOICE_BRIDGE}/tts", json={"text": text, "voice": voice})
+            if resp.status_code == 200:
+                return resp.content
+    except:
+        pass
+    return None
 
 def wav_to_ogg_opus(wav_bytes):
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
-        f.write(wav_bytes)
         wav_path = f.name
+        f.write(wav_bytes)
     ogg_path = wav_path.replace(".wav", ".ogg")
-    try:
-        subprocess.run(
-            ["ffmpeg", "-i", wav_path, "-c:a", "libopus", "-b:a", "128k", "-ar", "48000", "-ac", "1", ogg_path, "-y"],
-            capture_output=True, timeout=30
-        )
-        if os.path.exists(ogg_path) and os.path.getsize(ogg_path) > 0:
-            with open(ogg_path, "rb") as f: return f.read()
-        return None
-    finally:
+    subprocess.run(
+        ["ffmpeg", "-i", wav_path, "-c:a", "libopus", "-b:a", "128k", "-ar", "48000", "-ac", "1", ogg_path, "-y"],
+        capture_output=True, timeout=15
+    )
+    if os.path.exists(ogg_path) and os.path.getsize(ogg_path) > 0:
+        with open(ogg_path, "rb") as f:
+            data = f.read()
         for p in [wav_path, ogg_path]:
             if os.path.exists(p): os.unlink(p)
+        return data
+    if os.path.exists(wav_path): os.unlink(wav_path)
+    return None
 
+# === JAMES BRAIN ===
 async def ask_james(message, sender, history=None):
     history = history or []
     try:
@@ -149,11 +302,8 @@ async def ask_james(message, sender, history=None):
                 "system": JAMES_SYSTEM + (f" You are talking to {sender}." if sender else ""),
             })
         text = resp.text
-        # Parse SSE format: extract all "data" lines and concatenate text
-        # SSE format: event: text\ndata: {"text": "...", "done": false}\n\n
         if "event:" in text or "data:" in text:
-            import re as _re
-            data_lines = _re.findall(r'data:\s*(.+)', text)
+            data_lines = re.findall(r'data:\s*(.+)', text)
             full_text = ""
             for line in data_lines:
                 try:
@@ -166,7 +316,6 @@ async def ask_james(message, sender, history=None):
                     pass
             if full_text:
                 return full_text.strip()
-        # Fallback: try plain JSON
         try:
             parsed = json.loads(text)
             if parsed.get("response"): return parsed["response"]
@@ -177,80 +326,138 @@ async def ask_james(message, sender, history=None):
     except Exception as e:
         return f"I am having trouble right now. Error: {e}"
 
+# === HANDLERS ===
 async def handle_start(chat_id, username):
     welcome = (
-        "*Welcome to EvolvixOS - Mr James*\n\n"
-        "I am your AI agent. I can:\n"
-        "- Chat and answer questions\n"
-        "- Hear voice messages and reply with voice\n"
-        "- Execute code and manage servers\n"
-        "- Create media (images, video, voice)\n"
-        "- Analyze crypto markets\n\n"
-        "Send me a voice message and I will reply with voice!\n\n"
+        "Hey! I'm Mr James 👋\n\n"
+        "I can do a lot of things:\n"
+        "- Create logos, images, and art\n"
+        "- Generate voice and reply with voice\n"
+        "- Code, deploy, and manage servers\n"
+        "- Chat about anything\n\n"
+        "Just tell me what you need - I understand fast.\n\n"
         "Commands: /help /status /clear /voice on /voice off"
     )
-    await send_message(chat_id, welcome, parse_mode="Markdown")
+    await send_message(chat_id, welcome)
 
 async def handle_help(chat_id):
     help_text = (
-        "*EvolvixOS Bot Commands*\n\n"
-        "/start - Welcome message\n"
-        "/help - This help message\n"
-        "/status - Check agent status\n"
-        "/clear - Clear conversation history\n"
+        "Mr James - Your AI companion\n\n"
+        "Just talk to me naturally:\n"
+        "- 'Create a logo for my coffee shop' -> I generate it\n"
+        "- 'Draw a mountain landscape' -> I draw it\n"
+        "- 'Make me a poster' -> I create it\n"
+        "- 'Write a Python script' -> I code it\n"
+        "- Send a voice message -> I reply with voice\n\n"
+        "Commands:\n"
+        "/help - This message\n"
+        "/status - System status\n"
+        "/clear - Clear chat history\n"
         "/voice on - Enable voice replies\n"
-        "/voice off - Text-only replies\n\n"
-        "Send a voice message to talk to me, or just type!"
+        "/voice off - Text-only replies"
     )
-    await send_message(chat_id, help_text, parse_mode="Markdown")
+    await send_message(chat_id, help_text)
 
 async def handle_voice_toggle(chat_id, arg):
     ctx = user_contexts.get(chat_id, {})
-    if arg.lower() in ("on", "true", "yes", "enable"):
+    if arg == "on":
         ctx["voice_enabled"] = True
         user_contexts[chat_id] = ctx
-        await send_message(chat_id, "Voice replies ENABLED. I will speak back to you!")
-    elif arg.lower() in ("off", "false", "no", "disable"):
+        await send_message(chat_id, "Voice replies enabled! I will speak to you.")
+    elif arg == "off":
         ctx["voice_enabled"] = False
         user_contexts[chat_id] = ctx
-        await send_message(chat_id, "Voice replies OFF. Text only from now on.")
+        await send_message(chat_id, "Voice replies disabled. Text only from now on.")
     else:
-        current = user_contexts.get(chat_id, {}).get("voice_enabled", True)
-        await send_message(chat_id, f"Voice replies: {'ON' if current else 'OFF'}\nUse /voice on or /voice off")
+        await send_message(chat_id, "Use /voice on or /voice off")
 
 async def handle_status(chat_id):
-    try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.get("http://127.0.0.1:5010/api/status")
-        if resp.status_code == 200:
-            data = resp.json()
-            await send_message(chat_id, f"EvolvixOS Status\nModel: {data.get('model', 'unknown')}\nTime: {datetime.now().strftime('%H:%M:%S')}")
-        else:
-            await send_message(chat_id, "Agent running but status endpoint unavailable.")
-    except:
-        await send_message(chat_id, "Agent is not responding.")
+    status = (
+        "EvolvixOS Status:\n"
+        f"- Brain: Groq gpt-oss-120b (467 tok/s)\n"
+        f"- Voice: Edge Neural (GuyNeural)\n"
+        f"- Image: Pollinations Flux\n"
+        f"- STT: Whisper\n"
+        f"- Server: 16 vCPU / 30GB RAM\n"
+        f"- All systems operational"
+    )
+    await send_message(chat_id, status)
 
 async def handle_clear(chat_id):
-    if chat_id in user_contexts:
-        user_contexts[chat_id].pop("history", None)
-    await send_message(chat_id, "Conversation history cleared. Starting fresh!")
+    ctx = user_contexts.get(chat_id, {})
+    ctx["history"] = []
+    user_contexts[chat_id] = ctx
+    await send_message(chat_id, "Chat history cleared. Fresh start!")
 
 async def handle_chat(chat_id, text, username):
-    print(f"[CHAT] Starting chat with {username} (chat_id={chat_id}): {repr(text[:80])}", flush=True)
-    # NSFW filter
+    print(f"[CHAT] {username} (chat_id={chat_id}): {repr(text[:80])}", flush=True)
+    
     if is_nsfw(text):
         await send_message(chat_id, "I don't engage with that kind of content. Let's talk about something else!")
         return
 
-    await telegram_request("sendChatAction", chat_id=chat_id, action="typing")
+    # === SMART INTENT DETECTION ===
+    intent, raw_text = detect_intent(text)
+    print(f"[INTENT] {intent}: {repr(raw_text[:60])}", flush=True)
+
     ctx = user_contexts.get(chat_id, {"username": username})
     history = ctx.get("history", [])
+
+    if intent == "image":
+        # Generate an image
+        await telegram_request("sendChatAction", chat_id=chat_id, action="upload_photo")
+        prompt = extract_image_prompt(raw_text)
+        caption = f"Here's what I created for you!\n\nPrompt: {prompt[:200]}"
+        
+        # Try Pollinations first
+        image_path = await generate_image_pollinations(prompt)
+        
+        if image_path:
+            await send_photo(chat_id, image_path, caption)
+            if os.path.exists(image_path):
+                os.unlink(image_path)
+            
+            # Also send a brief voice message
+            voice_on = ctx.get("voice_enabled", True)
+            if voice_on:
+                speech_text = "Here's your image. Let me know if you want any changes."
+                wav_bytes = await generate_speech(speech_text, "guy")
+                if wav_bytes:
+                    ogg_bytes = wav_to_ogg_opus(wav_bytes)
+                    if ogg_bytes:
+                        with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as f:
+                            f.write(ogg_bytes)
+                            temp_ogg = f.name
+                        try:
+                            await send_voice(chat_id, temp_ogg)
+                            os.unlink(temp_ogg)
+                        except:
+                            os.unlink(temp_ogg)
+            
+            history.append({"role": "user", "content": text})
+            history.append({"role": "assistant", "content": f"Generated image with prompt: {prompt}"})
+            ctx["history"] = history[-10:]
+            user_contexts[chat_id] = ctx
+            return
+        else:
+            await send_message(chat_id, "I tried to generate that image but the service is busy. Let me try with a different engine...")
+            # Fallback to Gemini
+            image_path = await generate_image_gemini(prompt)
+            if image_path:
+                await send_photo(chat_id, image_path, caption)
+                if os.path.exists(image_path):
+                    os.unlink(image_path)
+                return
+            await send_message(chat_id, "Sorry, image generation is temporarily unavailable. Please try again in a moment.")
+
+    # === REGULAR CHAT ===
+    await telegram_request("sendChatAction", chat_id=chat_id, action="typing")
     history.append({"role": "user", "content": text})
     history = history[-10:]
 
     response = await ask_james(text, username, history)
     print(f"[CHAT] James responded: {repr(response[:80])}", flush=True)
-    # Filter response too
+    
     if is_nsfw(response):
         response = "I don't produce that kind of content. Let's talk about something else!"
 
@@ -259,7 +466,7 @@ async def handle_chat(chat_id, text, username):
 
     voice_on = ctx.get("voice_enabled", True)
     if voice_on and len(response) < 1000:
-        wav_bytes = await generate_speech(response, "ryan")
+        wav_bytes = await generate_speech(response, "guy")
         if wav_bytes:
             ogg_bytes = wav_to_ogg_opus(wav_bytes)
             if ogg_bytes:
@@ -281,150 +488,161 @@ async def handle_chat(chat_id, text, username):
     user_contexts[chat_id] = ctx
 
 async def handle_voice_message(chat_id, voice_msg, username):
+    print(f"[VOICE] {username} (chat_id={chat_id})", flush=True)
     await telegram_request("sendChatAction", chat_id=chat_id, action="typing")
+    
     file_id = voice_msg.get("file_id")
-    if not file_id:
-        await send_message(chat_id, "Could not get audio file.")
-        return
-
     audio_bytes = await download_telegram_file(file_id)
     if not audio_bytes:
-        await send_message(chat_id, "Could not download audio.")
+        await send_message(chat_id, "I couldn't download your voice message. Please try again.")
         return
 
-    transcript = await transcribe_audio(audio_bytes, ".ogg")
-    if not transcript or not transcript.strip():
-        await send_message(chat_id, "I could not hear what you said. Try again?")
+    transcript = await transcribe_audio(audio_bytes)
+    if not transcript:
+        await send_message(chat_id, "I couldn't understand that. Could you try again?")
         return
 
-    # NSFW filter on transcript
-    if is_nsfw(transcript):
-        await send_message(chat_id, "I don't engage with that kind of content. Let's talk about something else!")
-        return
+    print(f"[VOICE] Transcribed: {repr(transcript[:80])}", flush=True)
 
-    print(f"[Voice] Transcribed from {username}: {transcript[:80]}")
+    # Check intent from voice too
+    intent, raw_text = detect_intent(transcript)
+    print(f"[VOICE INTENT] {intent}", flush=True)
 
-    ctx = user_contexts.get(chat_id, {"username": username, "voice_enabled": True})
+    ctx = user_contexts.get(chat_id, {"username": username})
     history = ctx.get("history", [])
-    history.append({"role": "user", "content": f"[voice] {transcript}"})
-    history = history[-10:]
 
+    if intent == "image":
+        await telegram_request("sendChatAction", chat_id=chat_id, action="upload_photo")
+        prompt = extract_image_prompt(raw_text)
+        image_path = await generate_image_pollinations(prompt)
+        if image_path:
+            await send_photo(chat_id, image_path, f"Here's what I created!\n\nPrompt: {prompt[:200]}")
+            if os.path.exists(image_path):
+                os.unlink(image_path)
+            voice_on = ctx.get("voice_enabled", True)
+            if voice_on:
+                wav_bytes = await generate_speech("Here's your image. Want any changes?", "guy")
+                if wav_bytes:
+                    ogg_bytes = wav_to_ogg_opus(wav_bytes)
+                    if ogg_bytes:
+                        with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as f:
+                            f.write(ogg_bytes)
+                            temp_ogg = f.name
+                        try:
+                            await send_voice(chat_id, temp_ogg)
+                            os.unlink(temp_ogg)
+                        except:
+                            os.unlink(temp_ogg)
+            return
+
+    # Normal voice chat
+    history.append({"role": "user", "content": transcript})
+    history = history[-10:]
     response = await ask_james(transcript, username, history)
     if is_nsfw(response):
-        response = "I don't produce that kind of content. Let's talk about something else!"
-
+        response = "I don't produce that kind of content."
     history.append({"role": "assistant", "content": response})
     ctx["history"] = history[-10:]
-    user_contexts[chat_id] = ctx
 
-    wav_bytes = await generate_speech(response, "ryan")
-    if wav_bytes:
-        ogg_bytes = wav_to_ogg_opus(wav_bytes)
-        if ogg_bytes:
-            with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as f:
-                f.write(ogg_bytes)
-                temp_ogg = f.name
-            try:
-                await send_voice(chat_id, temp_ogg)
-                os.unlink(temp_ogg)
-                if len(response) < 500:
-                    await send_message(chat_id, response)
+    voice_on = ctx.get("voice_enabled", True)
+    if voice_on and len(response) < 1000:
+        wav_bytes = await generate_speech(response, "guy")
+        if wav_bytes:
+            ogg_bytes = wav_to_ogg_opus(wav_bytes)
+            if ogg_bytes:
+                with tempfile.NamedTemporaryFile(suffix=".ogg", delete=False) as f:
+                    f.write(ogg_bytes)
+                    temp_ogg = f.name
+                try:
+                    await send_voice(chat_id, temp_ogg)
+                    os.unlink(temp_ogg)
+                except:
+                    os.unlink(temp_ogg)
+                    await send_message(chat_id, response[:4000])
+                ctx["history"] = history
+                user_contexts[chat_id] = ctx
                 return
-            except Exception as e:
-                print(f"Voice send error: {e}")
-                os.unlink(temp_ogg)
 
     await send_message(chat_id, response[:4000])
+    ctx["history"] = history
+    user_contexts[chat_id] = ctx
 
 async def process_update(update):
-    message = update.get("message")
-    if not message: return
-
-    chat = message.get("chat", {})
-    chat_id = chat.get("id")
-    chat_type = chat.get("type", "private")
-    chat_title = chat.get("title", "")
-    text = message.get("text", "")
-    username = message.get("from", {}).get("username", "") or message.get("from", {}).get("first_name", "User")
-    user_id = message.get("from", {}).get("id", 0)
+    if not update:
+        return
     
-    # DEBUG: Log all incoming messages
-    print(f"[MSG] chat_id={chat_id} type={chat_type} user={username}({user_id}) text={repr(text[:80])}", flush=True)
+    message = update.get("message") or update.get("edited_message")
+    if not message:
+        return
 
-    # SECURITY: Auto-leave ALL groups and supergroups
-    if chat_type in ("group", "supergroup", "channel"):
-        print(f"[SECURITY] Auto-leaving {chat_type}: {chat_title} (id: {chat_id})")
+    chat_id = message["chat"]["id"]
+    chat_type = message["chat"]["type"]
+    username = message.get("from", {}).get("username") or message.get("from", {}).get("first_name", "User")
+    user_id = message.get("from", {}).get("id", 0)
+
+    # Security: only private chats
+    if chat_type != "private":
         await leave_chat(chat_id)
         return
 
-    # Only respond in private chats
-    if chat_type != "private":
-        return
-
-    # Voice message
-    if message.get("voice"):
-        print(f"[VOICE] Received voice message from {username}", flush=True)
-        await handle_voice_message(chat_id, message["voice"], username)
-        return
-
-    # Audio message
-    if message.get("audio"):
-        await handle_voice_message(chat_id, message["audio"], username)
-        return
-
-    if not text:
-        await send_message(chat_id, "Send me a text or voice message! I can hear and speak now.")
+    if not is_authorized(username, user_id):
         return
 
     # Commands
-    if text.startswith("/"):
-        parts = text.split(maxsplit=1)
-        cmd = parts[0].lower()
-        arg = parts[1] if len(parts) > 1 else ""
-        if cmd == "/start": await handle_start(chat_id, username)
-        elif cmd == "/help": await handle_help(chat_id)
-        elif cmd == "/status": await handle_status(chat_id)
-        elif cmd == "/clear": await handle_clear(chat_id)
-        elif cmd == "/voice": await handle_voice_toggle(chat_id, arg)
-        else: await send_message(chat_id, f"Unknown command: {cmd}\nType /help for commands.")
-    else:
+    if message.get("text"):
+        text = message["text"]
+        if text.startswith("/"):
+            cmd = text.split()[0].lower()
+            if cmd == "/start":
+                await handle_start(chat_id, username)
+            elif cmd == "/help":
+                await handle_help(chat_id)
+            elif cmd == "/status":
+                await handle_status(chat_id)
+            elif cmd == "/clear":
+                await handle_clear(chat_id)
+            elif cmd == "/voice":
+                arg = text.split()[1] if len(text.split()) > 1 else ""
+                await handle_voice_toggle(chat_id, arg)
+            return
         await handle_chat(chat_id, text, username)
 
-async def main():
-    print(f"[{datetime.now()}] EvolvixOS Telegram Bot starting - Mr James with Voice (SECURE)")
-    print(f"Voice Bridge: {VOICE_BRIDGE}")
-    print(f"James API: {JAMES_API}")
-    print(f"Security: Private chats only, auto-leave groups, NSFW filter")
+    elif message.get("voice"):
+        await handle_voice_message(chat_id, message["voice"], username)
 
-    me = await telegram_request("getMe")
-    if me.get("ok"):
-        bot_info = me["result"]
-        print(f"Connected as: @{bot_info['username']} (ID: {bot_info['id']})")
-    else:
-        print(f"Failed to connect to Telegram: {me}")
-        return
+async def main():
+    print("[2026-08-20] EvolvixOS Telegram Bot starting - Mr James v5.0 (SMART)", flush=True)
+    print(f"Voice Bridge: {VOICE_BRIDGE}", flush=True)
+    print(f"James API: {JAMES_API}", flush=True)
+    print(f"Image Gen: Pollinations Flux + Gemini fallback", flush=True)
+    print(f"Security: Private chats only, auto-leave groups, NSFW filter", flush=True)
 
     offset = 0
-    print("Polling for updates... Voice enabled! Groups will be auto-left!")
-
     while True:
         try:
-            updates = await telegram_request("getUpdates", offset=offset, timeout=30,
-                allowed_updates=["message"])
-            if not updates.get("ok"):
-                print(f"Error: {updates}")
+            async with httpx.AsyncClient(timeout=60) as client:
+                resp = await client.post(
+                    f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates",
+                    json={"offset": offset, "timeout": 30, "allowed_updates": ["message"]}
+                )
+                data = resp.json()
+
+            if not data.get("ok"):
+                print(f"[ERROR] Telegram API: {data}", flush=True)
                 await asyncio.sleep(5)
                 continue
-            for update in updates.get("result", []):
+
+            for update in data.get("result", []):
                 offset = update["update_id"] + 1
                 try:
                     await process_update(update)
                 except Exception as e:
-                    print(f"Error processing update: {e}")
-        except httpx.TimeoutException:
+                    print(f"[ERROR] Processing update: {e}", flush=True)
+
+        except httpx.ReadTimeout:
             continue
         except Exception as e:
-            print(f"Polling error: {e}")
+            print(f"[ERROR] Main loop: {e}", flush=True)
             await asyncio.sleep(5)
 
 if __name__ == "__main__":
