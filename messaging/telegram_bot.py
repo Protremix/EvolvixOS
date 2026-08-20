@@ -11,6 +11,9 @@ JAMES_API = os.environ.get("JAMES_API", "http://127.0.0.1:5010")
 JAMES_API_KEY = os.environ.get("JAMES_API_KEY", "evx_f0dcc65675e11329_8f7ec4195e67a07384898d80c1166089")
 VOICE_BRIDGE = os.environ.get("VOICE_BRIDGE", "http://127.0.0.1:8095")
 GROQ_KEY = os.environ.get("GROQ_API_KEY", "")
+
+sys.path.insert(0, "/opt/evolvixos")
+from logo_engine import create_professional_logo as _create_professional_logo
 OWNER_IDS = set()
 OWNER_USERNAMES = set()
 
@@ -106,6 +109,42 @@ def looks_like_refinement(text):
     return any(h in t for h in REFINEMENT_HINTS)
 
 
+def is_logo_request(text):
+    t = text.lower()
+    return "logo" in t or "wordmark" in t or "brand mark" in t
+
+
+def extract_brand_name(conversation_context):
+    """Pull a likely brand/company name out of the accumulated conversation, via simple heuristics"""
+    combined = " ".join(conversation_context)
+    # Look for capitalized word(s) right after common trigger phrases
+    m = re.search(r'(?:call(?:ed)?\s+it|named?|for)\s+([A-Z][A-Za-z0-9]+(?:\s+[A-Z][A-Za-z0-9]+)?)', combined)
+    if m:
+        return m.group(1).strip()
+    # Fallback: any standalone capitalized word that isn't a common English word
+    words = re.findall(r'\b[A-Z][a-zA-Z]{2,}\b', combined)
+    stop = {"Create", "Make", "Design", "Draw", "Logo", "Modern", "Digital", "Blockchain", "Yes", "Green", "Blue"}
+    candidates = [w for w in words if w not in stop]
+    if candidates:
+        return candidates[-1]
+    return "Brand"
+
+
+async def generate_professional_logo(conversation_context):
+    """Use the icon+typography pipeline for actual logo requests"""
+    combined_desc = " ".join(conversation_context)
+    brand_name = extract_brand_name(conversation_context)
+    tagline = ""
+    m = re.search(r'tagline[:\s]+["\']?([^"\'\n]{3,60})', combined_desc, re.IGNORECASE)
+    if m:
+        tagline = m.group(1).strip()
+    logo_img, icon_prompt = await _create_professional_logo(brand_name, combined_desc, tagline)
+    fd, temp_path = tempfile.mkstemp(suffix=".png")
+    os.close(fd)
+    logo_img.save(temp_path)
+    return temp_path, brand_name
+
+
 async def enhance_image_prompt(user_request, conversation_context=None):
     """Use Groq to turn a request (plus any accumulated context) into a specific, creative image prompt"""
     context_note = ""
@@ -135,7 +174,7 @@ async def enhance_image_prompt(user_request, conversation_context=None):
                         {"role": "user", "content": f"Design request: {user_request}{context_note}"}
                     ],
                     "temperature": 0.9,
-                    "max_tokens": 300
+                    "max_tokens": 700
                 }
             )
             data = resp.json()
@@ -457,9 +496,23 @@ async def handle_chat(chat_id, text, username):
         ctx["in_image_mode"] = True
         user_contexts[chat_id] = ctx
 
-        # Generate a high-quality image immediately - no clarifying questions
         await telegram_request("sendChatAction", chat_id=chat_id, action="typing")
-        
+
+        is_logo = any(is_logo_request(t) for t in image_context)
+
+        if is_logo:
+            # Use the icon+typography pipeline - real fonts, no garbled AI text
+            try:
+                await telegram_request("sendChatAction", chat_id=chat_id, action="upload_photo")
+                image_path, brand_name = await generate_professional_logo(image_context)
+                caption = f"Here's your {brand_name} logo!\n\nWant changes? Just tell me what to adjust (colors, name, style)."
+                await send_photo(chat_id, image_path, caption)
+                if os.path.exists(image_path):
+                    os.unlink(image_path)
+                return
+            except Exception as e:
+                print(f"[LOGO] pipeline failed, falling back: {e}", flush=True)
+
         # Step 1: Enhance prompt with Groq AI, using full accumulated context
         prompt = await enhance_image_prompt(raw_text, conversation_context=image_context)
         print(f"[IMAGE] Enhanced prompt: {repr(prompt[:100])}", flush=True)
