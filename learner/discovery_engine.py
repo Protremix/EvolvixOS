@@ -226,7 +226,7 @@ def sync_openclaw_repo():
                       "Follow Me on Facebook"]
 
     ROW_PATTERN = re_mod.compile(
-        r'\\|\\s*\\[([^\\]]+)\\]\\(([^)]+)\\)\\s*\\|\\s*([^|]+)\\s*\\|'
+        r'\|\s*\[([^\]]+)\]\(([^)]+)\)\s*\|\s*([^|]+)\s*\|'
     )
 
     try:

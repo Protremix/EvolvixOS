@@ -152,118 +152,6 @@
           "word_count": 832,
           "read_time": 4,
           "url": "/api/learn/module-05-prompt-engineering"
-        },
-        {
-          "filename": "supplement-challenge-solutions.md",
-          "title": "Practice Solutions and Hints",
-          "module_num": 0,
-          "phase": "Phase 1: Foundations",
-          "is_supplement": true,
-          "summary": "These are reference approaches, not scripts to follow blindly. Try each exercise first, compare your result, and adapt the solution to your project's stack and requirements.",
-          "goals": [],
-          "sections": [
-            "Module 2: Strong first project",
-            "Module 3: Plan then build",
-            "Module 4: Focused refinement",
-            "Module 5: Repair a vague prompt",
-            "Module 6: Secure data model",
-            "Module 8: Release decision",
-            "Module 9: Invitation workflow",
-            "Module 10: Root-cause debugging",
-            "Module 11: Staged migration",
-            "Module 12: Performance review",
-            "Module 13: Reliable API action",
-            "Module 14: Git sync workflow",
-            "Module 15: External deployment",
-            "How to evaluate your work"
-          ],
-          "word_count": 1465,
-          "read_time": 7,
-          "url": "/api/learn/supplement-challenge-solutions"
-        },
-        {
-          "filename": "supplement-pricing-and-plans.md",
-          "title": "Pricing, Credits, and Plans",
-          "module_num": 0,
-          "phase": "Phase 1: Foundations",
-          "is_supplement": true,
-          "summary": "Verified against Lovable's official pricing documentation on July 18, 2026. Pricing, grants, and feature limits can change. Use the [live plan documentation](https://docs.lovable.dev/introduction/subs",
-          "goals": [],
-          "sections": [
-            "Current plan overview",
-            "One credit balance",
-            "Included usage-specific grants",
-            "Build costs",
-            "General credits and rollover",
-            "Selected plan differences",
-            "Managing usage",
-            "Cost-control habits",
-            "Official references"
-          ],
-          "word_count": 967,
-          "read_time": 4,
-          "url": "/api/learn/supplement-pricing-and-plans"
-        },
-        {
-          "filename": "supplement-quick-reference.md",
-          "title": "Lovable Quick Reference",
-          "module_num": 0,
-          "phase": "Phase 1: Foundations",
-          "is_supplement": true,
-          "summary": "Current as of July 18, 2026.",
-          "goals": [],
-          "sections": [
-            "Mode chooser",
-            "Best prompt structure",
-            "First-project prompt",
-            "Plan before a risky change",
-            "Build safely",
-            "Debugging prompt",
-            "Verification prompts",
-            "Preview toolbar",
-            "Knowledge and references",
-            "Lovable Cloud checklist",
-            "Integration chooser",
-            "Pre-publish checklist",
-            "Current navigation",
-            "Official references"
-          ],
-          "word_count": 841,
-          "read_time": 4,
-          "url": "/api/learn/supplement-quick-reference"
-        },
-        {
-          "filename": "supplement-troubleshooting.md",
-          "title": "Troubleshooting Lovable Projects",
-          "module_num": 0,
-          "phase": "Phase 1: Foundations",
-          "is_supplement": true,
-          "summary": "Use this guide to move from symptom to evidence. Menu names and plan availability are current as of July 18, 2026.",
-          "goals": [],
-          "sections": [
-            "First response to any issue",
-            "\"Lovable built the wrong thing\"",
-            "\"I cannot find Chat, Agent, Visual Edits, or Code Mode\"",
-            "\"My live site does not show the latest changes\"",
-            "\"The app works in preview but not production\"",
-            "\"A direct link returns 404\"",
-            "\"Authentication works for one user but not another\"",
-            "\"Data is missing or access is denied\"",
-            "\"Data is visible to the wrong user\"",
-            "\"An API key is visible\"",
-            "\"The API or connector fails\"",
-            "\"Payments work in preview but not live\"",
-            "\"Cloud cannot be moved to another region\"",
-            "\"Browser testing cannot complete the flow\"",
-            "\"The project is slow\"",
-            "\"Credits disappear faster than expected\"",
-            "\"GitHub changes are not appearing\"",
-            "Escalation package",
-            "Official references"
-          ],
-          "word_count": 1242,
-          "read_time": 6,
-          "url": "/api/learn/supplement-troubleshooting"
         }
       ]
     },
@@ -688,5 +576,5 @@
       "url": "/api/learn/supplement-troubleshooting"
     }
   ],
-  "last_updated": "2026-08-18T12:48:36.072501+00:00"
+  "last_updated": "2026-08-21T19:24:27.535334+00:00"
 }

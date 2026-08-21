@@ -59,4 +59,4 @@ uploads/
 # Conversations (user data)
 conversations/
 node_modules/
-*.key
+models/registry.db

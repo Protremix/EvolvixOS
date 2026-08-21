@@ -51,6 +51,7 @@ IDENTITY_DIR = "/opt/evolvixos/identity"
 MEMORY_DIR = "/opt/evolvixos/memory"
 CONVERSATION_DIR = "/opt/evolvixos/conversations"
 SKILLS_DIR = "/opt/evolvixos/skills"
+REGISTRY_DB = "/opt/evolvixos/models/registry.db"
 from tim_integration import TIMIntegration
 from mbti_profiles import _PROFILES as MBTI_PROFILES
 from tencentcloud_manager import TencentCloudManager
@@ -426,7 +427,7 @@ def is_simple_chat(prompt):
         r'^(how\s+are\s+you|how\s+are\s+things|what\s+up|wassup)\s*[!?]*$',
         r'^(thank|thanks|thx|ty)\s*',
         r'^(bye|goodbye|see\s+you|cya)\s*[!.?]*$',
-        r'^.{0,20}$',  # Very short messages = probably casual
+        r'^.{0,10}$',  # Very short messages (<=10 chars) = probably casual
     ]
     for pattern in simple_patterns:
         if re.match(pattern, prompt_lower):
@@ -2598,6 +2599,21 @@ class ModelAPI(BaseHTTPRequestHandler):
             self._add_security_headers()
             self.end_headers()
             self.wfile.write(data)
+        elif self.path == "/api/v1/skills/stats":
+            try:
+                conn = sqlite3.connect(REGISTRY_DB)
+                c = conn.cursor()
+                c.execute("SELECT COUNT(*) FROM model_registry")
+                total = c.fetchone()[0]
+                c.execute("SELECT category, COUNT(*) FROM model_registry GROUP BY category")
+                by_cat = {row[0]: row[1] for row in c.fetchall()}
+                c.execute("SELECT COUNT(*) FROM model_registry WHERE status='discovered'")
+                new_count = c.fetchone()[0]
+                conn.close()
+                self.respond(200, {"total": total, "new": new_count, "by_category": by_cat})
+            except Exception as e:
+                self.respond(200, {"total": 0, "error": str(e)})
+
         else:
             self.respond(404, {"error": "Not found"})
 
@@ -2715,6 +2731,39 @@ class ModelAPI(BaseHTTPRequestHandler):
                 self.respond(200, {"status": "uploaded", "filename": filename, "size": len(data)})
             except Exception as e:
                 self.respond(400, {"error": f"Invalid base64: {str(e)}"})
+        elif self.path == "/api/v1/skills/import":
+            skills = body.get("skills", [])
+            if not skills:
+                self.respond(400, {"error": "skills array required"})
+                return
+            added, updated, skipped = 0, 0, 0
+            try:
+                conn = sqlite3.connect(REGISTRY_DB)
+                c = conn.cursor()
+                c.execute("CREATE TABLE IF NOT EXISTS model_registry (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, category TEXT, description TEXT, source TEXT, engine TEXT DEFAULT 'github-discovered', status TEXT DEFAULT 'discovered', stars INTEGER DEFAULT 0, language TEXT, topics TEXT, url TEXT, quality_score REAL DEFAULT 0, created_date TEXT)")
+                for skill in skills:
+                    name = skill.get("name", "")
+                    category = skill.get("category", "unknown")
+                    desc = skill.get("description", "")
+                    url = skill.get("source_url", "")
+                    stars = skill.get("stars", 0)
+                    lang = skill.get("language", "unknown")
+                    topics = skill.get("tags", "")
+                    quality = skill.get("quality_score", 0)
+                    c.execute("SELECT id FROM model_registry WHERE name=? AND category=?", (name, category))
+                    if c.fetchone():
+                        c.execute("UPDATE model_registry SET description=?, stars=?, language=?, topics=?, quality_score=?, status='updated' WHERE name=? AND category=?", (desc, stars, lang, topics, quality, name, category))
+                        updated += 1
+                    else:
+                        c.execute("INSERT INTO model_registry (name, category, description, source, engine, status, stars, language, topics, url, quality_score, created_date) VALUES (?, ?, ?, 'github-discovery', 'github-discovered', 'discovered', ?, ?, ?, ?, ?, ?)", (name, category, desc, stars, lang, topics, url, quality, datetime.now().isoformat()))
+                        added += 1
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                self.respond(500, {"error": str(e)})
+                return
+            self.respond(200, {"added": added, "updated": updated, "skipped": skipped, "total": len(skills)})
+
         else:
             self.respond(404, {"error": "Not found"})
 

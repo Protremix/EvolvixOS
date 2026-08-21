@@ -1,10 +1,9 @@
 {
   "title": "Free AI Tools",
-  "subtitle": "Curated list of free and low-cost AI tools, LLM APIs, IDEs, agents, and infrastructure for building real AI apps",
+  "subtitle": "Curated list of free and low-cost AI tools for building real AI apps",
   "source": "https://github.com/ShaikhWarsi/free-ai-tools",
-  "total_tools": 85,
+  "total_tools": 84,
   "total_categories": 16,
-  "total_stacks": 8,
   "categories": [
     {
       "id": "llm-api",
@@ -12,9 +11,7 @@
       "slug": "llm-api-providers",
       "description": "Free and low-cost API providers for GPT, Claude, Gemini, and open-source models",
       "icon": "Zap",
-      "color": "#3B82F6",
-      "featured": true,
-      "toolCount": 10
+      "color": "#3B82F6"
     },
     {
       "id": "ide",
@@ -22,9 +19,7 @@
       "slug": "ai-ides",
       "description": "Full-featured development environments with built-in AI coding assistance",
       "icon": "Code2",
-      "color": "#8B5CF6",
-      "featured": true,
-      "toolCount": 7
+      "color": "#8B5CF6"
     },
     {
       "id": "cli",
@@ -32,9 +27,7 @@
       "slug": "cli-tools",
       "description": "Command-line tools for AI-assisted coding in your terminal",
       "icon": "Terminal",
-      "color": "#10B981",
-      "featured": true,
-      "toolCount": 15
+      "color": "#10B981"
     },
     {
       "id": "local-model",
@@ -42,9 +35,7 @@
       "slug": "local-models",
       "description": "Run open-weight frontier models locally for unlimited offline coding",
       "icon": "Cpu",
-      "color": "#F59E0B",
-      "featured": true,
-      "toolCount": 6
+      "color": "#F59E0B"
     },
     {
       "id": "rag",
@@ -52,9 +43,7 @@
       "slug": "rag-tools",
       "description": "Retrieval-Augmented Generation tools for document Q&A systems",
       "icon": "Search",
-      "color": "#F43F5E",
-      "featured": true,
-      "toolCount": 7
+      "color": "#F43F5E"
     },
     {
       "id": "agent",
@@ -62,9 +51,7 @@
       "slug": "agent-frameworks",
       "description": "Frameworks for building autonomous AI agents and workflows",
       "icon": "Bot",
-      "color": "#6366F1",
-      "featured": true,
-      "toolCount": 5
+      "color": "#6366F1"
     },
     {
       "id": "speech",
@@ -72,9 +59,7 @@
       "slug": "speech-apis",
       "description": "Speech-to-text and text-to-speech models and APIs",
       "icon": "Mic",
-      "color": "#06B6D4",
-      "featured": false,
-      "toolCount": 4
+      "color": "#06B6D4"
     },
     {
       "id": "image",
@@ -82,9 +67,7 @@
       "slug": "image-models",
       "description": "Image generation models and APIs including FLUX, DALL-E, Stable Diffusion",
       "icon": "Image",
-      "color": "#EC4899",
-      "featured": false,
-      "toolCount": 6
+      "color": "#EC4899"
     },
     {
       "id": "video",
@@ -92,9 +75,7 @@
       "slug": "video-apis",
       "description": "Text-to-video and image-to-video generation APIs",
       "icon": "Video",
-      "color": "#8B5CF6",
-      "featured": false,
-      "toolCount": 4
+      "color": "#8B5CF6"
     },
     {
       "id": "vector-db",
@@ -102,9 +83,7 @@
       "slug": "vector-databases",
       "description": "Production-ready vector storage for embeddings and semantic search",
       "icon": "Database",
-      "color": "#14B8A6",
-      "featured": true,
-      "toolCount": 3
+      "color": "#14B8A6"
     },
     {
       "id": "hosting",
@@ -112,9 +91,7 @@
       "slug": "hosting-gpu",
       "description": "Serverless GPU providers and model hosting platforms",
       "icon": "Server",
-      "color": "#F97316",
-      "featured": false,
-      "toolCount": 3
+      "color": "#F97316"
     },
     {
       "id": "evaluation",
@@ -122,9 +99,7 @@
       "slug": "evaluation-tools",
       "description": "Tools for benchmarking and evaluating AI models and applications",
       "icon": "BarChart3",
-      "color": "#64748B",
-      "featured": false,
-      "toolCount": 3
+      "color": "#64748B"
     },
     {
       "id": "embedding",
@@ -132,9 +107,7 @@
       "slug": "embedding-apis",
       "description": "Text embedding APIs essential for RAG and semantic search",
       "icon": "Layers",
-      "color": "#10B981",
-      "featured": false,
-      "toolCount": 3
+      "color": "#10B981"
     },
     {
       "id": "automation",
@@ -142,9 +115,7 @@
       "slug": "automation",
       "description": "No-code and low-code platforms for building AI workflows",
       "icon": "Workflow",
-      "color": "#0EA5E9",
-      "featured": false,
-      "toolCount": 0
+      "color": "#0EA5E9"
     },
     {
       "id": "browser",
@@ -152,9 +123,7 @@
       "slug": "browser-automation",
       "description": "Tools for AI agents to control browsers and web scraping",
       "icon": "Globe",
-      "color": "#D946EF",
-      "featured": false,
-      "toolCount": 3
+      "color": "#D946EF"
     },
     {
       "id": "chat-platform",
@@ -162,9 +131,7 @@
       "slug": "chat-platforms",
       "description": "General-purpose chat interfaces with free tiers",
       "icon": "MessageSquare",
-      "color": "#84CC16",
-      "featured": false,
-      "toolCount": 5
+      "color": "#84CC16"
     }
   ],
   "tools": [
@@ -176,7 +143,6 @@
       "description": "Frontman is an open-source visual AI agent for editing running web apps from the browser. It supports Next.js, Astro, and Vite apps, works with Anthropic, OpenAI, OpenRouter, and compatible providers, runs in local development, and produces normal source-code diffs. Best for visual UI changes on existing applications.",
       "website": "https://frontman.sh",
       "github": "https://github.com/frontman-ai/frontman",
-      "docs": "",
       "models": [
         "Anthropic",
         "OpenAI",
@@ -211,25 +177,14 @@
         "Best for UI changes",
         "Self-hosted setup"
       ],
-      "useCases": [
-        "Visual UI changes",
-        "Frontend development",
-        "Rapid prototyping",
-        "Design iterations"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "Bring your own API keys",
-        "paidTier": "Self-hosted, free",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "openrouter",
@@ -239,7 +194,6 @@
       "description": "OpenRouter provides access to 29 free models including Llama 3.3 70B, Qwen3.6-Plus, Nemotron 3 Super, MiniMax M2.5, and Devstral 2. Routes requests to various providers with a single API.",
       "website": "https://openrouter.ai",
       "github": "",
-      "docs": "",
       "models": [
         "Llama 3.3 70B",
         "Qwen3.6-Plus",
@@ -269,28 +223,14 @@
         "Free tier limits shared across models",
         "Rate limits can be restrictive"
       ],
-      "useCases": [
-        "Multi-model applications",
-        "Cost optimization",
-        "Fallback strategies"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "20 RPM, 50 requests/day (1,000/day with $10+ credits)",
-        "paidTier": "$10+ for increased limits",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerDay": 50,
-        "rateLimitPerMinute": 20
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "groq",
@@ -300,7 +240,6 @@
       "description": "Groq provides the fastest inference for LLMs with speeds up to 2,000 tokens/sec. Offers generous free tiers for multiple models with excellent rate limits.",
       "website": "https://console.groq.com",
       "github": "",
-      "docs": "",
       "models": [
         "Llama 3.1 8B",
         "Llama 3.3 70B",
@@ -332,29 +271,14 @@
         "Limited to specific models",
         "No GPT/Claude access"
       ],
-      "useCases": [
-        "Real-time chat",
-        "Trading bots",
-        "Live coding assistants",
-        "Voice applications"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "1,000-14,400 requests/day depending on model",
-        "paidTier": "Pay-per-use beyond free tier",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerDay": 14400,
-        "rateLimitPerMinute": 30
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "google-ai-studio",
@@ -364,7 +288,6 @@
       "description": "Google AI Studio provides free access to Gemini models including Gemini 3 Flash and 3.1 Pro. Simple web-based interface and API access. Note: Gemini 3.1 Pro may be paid-only for some tiers.",
       "website": "https://aistudio.google.com",
       "github": "",
-      "docs": "",
       "models": [
         "Gemini 3.1 Pro",
         "Gemini 3 Flash",
@@ -394,27 +317,14 @@
         "3.1 Pro may be paid-only",
         "Rate limits vary by model"
       ],
-      "useCases": [
-        "Multimodal apps",
-        "Long document analysis",
-        "Research assistants"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "250 RPD (Tier 1) for most, 1,500 RPD for Gemini 3 Flash",
-        "paidTier": "Tier 2 requires $250 spend + 30 days",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerDay": 1500
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "nvidia-nim",
@@ -424,7 +334,6 @@
       "description": "NVIDIA NIM provides hosted inference for 46+ models including Llama 3.3, Llama 4 Scout, Mistral Large, and Qwen3 235B. Phone verification required. Models tend to be context window limited.",
       "website": "https://build.nvidia.com",
       "github": "",
-      "docs": "",
       "models": [
         "Llama 3.3 70B",
         "Llama 4 Scout",
@@ -452,26 +361,14 @@
         "Phone verification required",
         "Context window limitations"
       ],
-      "useCases": [
-        "Enterprise apps",
-        "GPU-accelerated inference"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "1K credits signup, up to 5K total, 40 RPM (phone verify required)",
-        "paidTier": "Pay-per-use beyond credits",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "rateLimitPerMinute": 40
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "cerebras",
@@ -481,7 +378,6 @@
       "description": "Cerebras offers ultra-fast inference on specialized hardware with 1.5M tokens/day free tier. Excellent for high-throughput applications. Now features Qwen3.6-Plus-480B at 2,400 t/s.",
       "website": "https://cloud.cerebras.ai",
       "github": "",
-      "docs": "",
       "models": [
         "Qwen3.6-Plus-480B",
         "GPT-OSS 120B",
@@ -510,28 +406,14 @@
         "Limited model selection",
         "8K context window"
       ],
-      "useCases": [
-        "High-throughput apps",
-        "Batch processing",
-        "Real-time systems"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "1.5M tokens/day, 30 req/min, 8,192 context",
-        "paidTier": "Developer $10+, Enterprise custom",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerDay": 1500000,
-        "rateLimitPerMinute": 30
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "mistral-platform",
@@ -541,7 +423,6 @@
       "description": "Mistral's official platform with access to Mistral Large 3, Small 3.1, Codestral, and Pixtral. Free tier requires opting into data training and phone verification.",
       "website": "https://console.mistral.ai",
       "github": "",
-      "docs": "",
       "models": [
         "Mistral Large 3",
         "Mistral Small 3.1",
@@ -569,27 +450,14 @@
         "Requires data training opt-in",
         "Phone verification needed"
       ],
-      "useCases": [
-        "European compliance",
-        "Code generation",
-        "High-volume apps"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "1 req/s, 500K tokens/min, 1B tokens/month",
-        "paidTier": "Pay-per-use beyond limits",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerMonth": 1000000000
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "github-models",
@@ -599,7 +467,6 @@
       "description": "Access 30+ models including GPT-5.5, Claude, Llama, and Gemini through GitHub Models. Now requires Copilot subscription \u2014 no longer usable as standalone free API.",
       "website": "https://github.com/marketplace/models",
       "github": "",
-      "docs": "",
       "models": [
         "GPT-5.5-Instant",
         "Claude Sonnet 4.6",
@@ -628,27 +495,14 @@
         "No standalone free tier anymore",
         "Requires paid Copilot"
       ],
-      "useCases": [
-        "GitHub workflows",
-        "Multi-model testing",
-        "Prototyping"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "Copilot-required \u2014 not standalone free API",
-        "paidTier": "Copilot Pro $10/mo, Pro+ $39/mo, Max $100/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerMonth": 0
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "cloudflare-workers-ai",
@@ -658,7 +512,6 @@
       "description": "Run 47+ models on Cloudflare's global edge network. 10,000 neurons/day free allocation with generous rate limits.",
       "website": "https://developers.cloudflare.com/workers-ai",
       "github": "",
-      "docs": "",
       "models": [
         "Llama 3.3 70B",
         "Llama 4 Scout",
@@ -690,27 +543,14 @@
         "Neuron pricing can be confusing",
         "Limited context on some models"
       ],
-      "useCases": [
-        "Edge AI",
-        "Global applications",
-        "Low-latency inference"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "10,000 neurons/day",
-        "paidTier": "Pay-per-use beyond free allocation",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerDay": 10000
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "ofoxai",
@@ -720,7 +560,6 @@
       "description": "Unified API gateway for 100+ LLMs. OpenAI and Anthropic SDK-compatible. China-friendly with Hong Kong direct access (100-300ms latency). No monthly fees, pay per token.",
       "website": "https://ofox.ai",
       "github": "",
-      "docs": "",
       "models": [
         "GLM-4.7-Flash"
       ],
@@ -746,27 +585,14 @@
         "Only 1 free model",
         "Limited documentation"
       ],
-      "useCases": [
-        "Multi-provider routing",
-        "China-region apps",
-        "Cost optimization"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "GLM-4.7-Flash free (200K context, 128K output, $0/M tokens)",
-        "paidTier": "Pay per token for premium models",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "rateLimitPerMinute": 60
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "opencode-zen",
@@ -776,7 +602,6 @@
       "description": "AI gateway with curated free models via OpenCode Zen. Includes Big Pickle Stealth (72% SWE-bench), MiniMax M2.5 Free (80.2% SWE-bench), MiMo V2 Pro/Omni/Flash Free, and more.",
       "website": "https://opencode.ai/docs/zen/",
       "github": "",
-      "docs": "",
       "models": [
         "Big Pickle Stealth",
         "MiniMax M2.5 Free",
@@ -807,24 +632,14 @@
         "Limited model selection",
         "Data may be used for improvement"
       ],
-      "useCases": [
-        "AI agents",
-        "Coding assistants",
-        "Privacy-focused apps"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "free",
         "freeTier": "Zen Free tier with 8 exclusive models",
-        "paidTier": "Go subscription $10/mo for premium models",
-        "creditCardRequired": false
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "cursor",
@@ -834,7 +649,6 @@
       "description": "The leading AI-native IDE with autonomous coding capabilities. Features Agent mode, tab predictions, and multi-file editing. Credit-based billing since Jun 2025.",
       "website": "https://cursor.com",
       "github": "",
-      "docs": "",
       "models": [
         "GPT-5.5-Instant",
         "Cursor Small",
@@ -863,27 +677,14 @@
         "Limited free tier",
         "Premium models require paid plans"
       ],
-      "useCases": [
-        "Full-stack development",
-        "Code refactoring",
-        "Autonomous coding"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "freemium",
         "freeTier": "Limited Agent requests + limited Tab completions/mo + 1-week Pro trial",
-        "paidTier": "Pro $20/mo ($16/mo annual), Pro+ $60/mo ($48/mo annual), Ultra $200/mo ($160/mo annual)",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerMonth": 0
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "trae",
@@ -893,7 +694,6 @@
       "description": "ByteDance's AI IDE with competitive pricing. 5-tier token system (effective Feb 24, 2026). Offers DeepSeek V4, GPT-5.5-Instant, Gemini 2.5 Pro.",
       "website": "https://trae.ai",
       "github": "",
-      "docs": "",
       "models": [
         "DeepSeek V4",
         "GPT-5.5-Instant",
@@ -920,27 +720,14 @@
         "Claude models removed",
         "Usage-based beyond tier"
       ],
-      "useCases": [
-        "Budget-conscious devs",
-        "Alternative to Cursor",
-        "DeepSeek users"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "freemium",
         "freeTier": "Limited usage, 5,000 auto-completions/month, Standard queue",
-        "paidTier": "Lite $3/mo, Pro $10/mo, Pro+ $30/mo, Ultra $100/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "credits": "5,000 auto-completions/month (free)"
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "windsurf",
@@ -950,7 +737,6 @@
       "description": "Formerly Codeium. Multi-provider IDE with access to OpenAI, Anthropic, Google, and xAI models. Quota-based pricing since Mar 19, 2026.",
       "website": "https://windsurf.com",
       "github": "",
-      "docs": "",
       "models": [
         "Claude Fable 5",
         "GPT-5.5 Thinking",
@@ -979,26 +765,14 @@
         "Limited free tier",
         "Daily/weekly caps"
       ],
-      "useCases": [
-        "Multi-model workflows",
-        "Cascade agent users"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "freemium",
         "freeTier": "Light daily/weekly quota, unlimited Tab completions, 1 app deploy/day",
-        "paidTier": "Pro $20/mo, Max $200/mo, Teams $40/user/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "credits": "7-27 Premium Plus msgs/day (Pro)"
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "qoder",
@@ -1008,7 +782,6 @@
       "description": "Alibaba's AI IDE featuring Qwen3.6-Plus (71.2% SWE) and GPT-5.5-Instant. Unlimited completions in free tier with limited chat/agent. 50% launch promo ended Apr 30, 2026.",
       "website": "https://qoder.com",
       "github": "",
-      "docs": "",
       "models": [
         "Qwen3.6-Plus",
         "Qwen-Coder-Qoder",
@@ -1035,24 +808,14 @@
         "Limited chat in free tier",
         "Promo ended Apr 30"
       ],
-      "useCases": [
-        "Qwen model users",
-        "Budget-conscious",
-        "Chinese developers"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "freemium",
         "freeTier": "Unlimited completions + limited chat/agent + 2-week Pro trial",
-        "paidTier": "Pro $20/mo, Pro+ $60/mo, Ultra $200/mo",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "void-ide",
@@ -1062,7 +825,6 @@
       "description": "New 2026 category - Agent-first IDE with specialized agents for frontend, backend, and testing.",
       "website": "https://voideditor.com",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "ide",
@@ -1085,23 +847,14 @@
         "Early stage",
         "Limited documentation"
       ],
-      "useCases": [
-        "Full-stack development",
-        "Team workflows"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "freemium",
         "freeTier": "Preview tier with high usage limits",
-        "paidTier": "Pricing TBD",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "roocode",
@@ -1111,7 +864,6 @@
       "description": "Open-source AI coding assistant for VS Code. Bring your own API keys for unlimited usage. Formerly Roo Cline.",
       "website": "https://roocode.com",
       "github": "https://github.com/RooCodeInc/Roo-Code",
-      "docs": "",
       "models": [],
       "tags": [
         "ide",
@@ -1135,24 +887,14 @@
         "Requires API keys",
         "More setup needed"
       ],
-      "useCases": [
-        "Privacy-conscious devs",
-        "Cost control",
-        "Custom workflows"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Unlimited with your own API keys",
-        "paidTier": "Pay only for API usage",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "codeium",
@@ -1162,7 +904,6 @@
       "description": "Free AI coding assistant with unlimited completions and chat. Pro tier unlocks pro-grade models.",
       "website": "https://codeium.com",
       "github": "",
-      "docs": "",
       "models": [
         "Llama 3.1 70B (base)",
         "Claude 3.5 Sonnet (Pro)",
@@ -1188,24 +929,14 @@
         "Pro-grade models require Pro",
         "Base model only in free"
       ],
-      "useCases": [
-        "Students",
-        "Budget-conscious",
-        "Multiple IDE users"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "freemium",
         "freeTier": "Unlimited completions, AI chat, commands",
-        "paidTier": "Pro $10/mo for advanced models",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "qwen-code",
@@ -1215,7 +946,6 @@
       "description": "Command-line AI workflow tool from Alibaba. Adapted from Gemini CLI with Qwen OAuth authentication.",
       "website": "https://github.com/QwenLM/qwen-code",
       "github": "https://github.com/QwenLM/qwen-code",
-      "docs": "",
       "models": [
         "Qwen3.6-Plus",
         "Qwen3-Coder-480B"
@@ -1238,28 +968,14 @@
       "cons": [
         "No free tier with Alibaba's models anymore"
       ],
-      "useCases": [
-        "CLI coding",
-        "Qwen users",
-        "Terminal workflows"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "open-source",
         "freeTier": "Only with self-hosted models or free endpoints. Alibaba discontinued their free tier on April 15th, 2026",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerDay": 2000,
-        "rateLimitPerMinute": 60
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "gemini-cli",
@@ -1269,7 +985,6 @@
       "description": "Official Google CLI for Gemini models. v0.37.1 (April 2026). Gemini 3.1 Pro is paid-only; 3 Flash is the free tier. Features MCP server support and Google Search grounding.",
       "website": "https://github.com/google-gemini/gemini-cli",
       "github": "https://github.com/google-gemini/gemini-cli",
-      "docs": "",
       "models": [
         "Gemini 3 Flash",
         "Gemini 2.5 Pro"
@@ -1296,27 +1011,14 @@
         "Gemini 3.1 Pro is paid-only",
         "Google ecosystem"
       ],
-      "useCases": [
-        "Google ecosystem",
-        "Research",
-        "Web-connected coding"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "free",
         "freeTier": "1,500 req/day (Gemini 3 Flash), 100 req/day (Gemini 2.5 Pro)",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerDay": 1500
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "rovo-cli",
@@ -1326,7 +1028,6 @@
       "description": "Atlassian's CLI with Claude Sonnet 4.6 and GPT-5.5-Instant. Jira/Confluence integration and MCP support.",
       "website": "https://www.atlassian.com/rovo",
       "github": "",
-      "docs": "",
       "models": [
         "Claude Sonnet 4.6",
         "GPT-5.5-Instant",
@@ -1353,27 +1054,14 @@
         "Beta status",
         "Requires Atlassian account"
       ],
-      "useCases": [
-        "Atlassian users",
-        "Task automation",
-        "Enterprise workflows"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "5M tokens/day (beta)",
-        "paidTier": "Pro $19.99/mo for 100 tasks/day, Ultra for 300 tasks/day",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerDay": 5000000
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "warp",
@@ -1383,7 +1071,6 @@
       "description": "Modern Rust-based terminal with AI features. GPT-5.5-Instant, Claude Sonnet 4.6, and Gemini models built-in.",
       "website": "https://warp.dev",
       "github": "",
-      "docs": "",
       "models": [
         "GPT-5.5-Instant",
         "Claude Sonnet 4.6",
@@ -1411,27 +1098,14 @@
         "Credit-based limits",
         "Not a full IDE"
       ],
-      "useCases": [
-        "Terminal workflows",
-        "DevOps",
-        "Command-line coding"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "freemium",
         "freeTier": "150 AI credits/month (first 2 months), then 75 credits/month",
-        "paidTier": "Build $20/mo (1,500 credits)",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "credits": "75-150 AI credits/month"
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "github-copilot-cli",
@@ -1441,7 +1115,6 @@
       "description": "GitHub Copilot's command-line interface. Major switch to usage-based billing (GitHub AI Credits) effective Jun 1, 2026. Agent mode with autonomous multi-step coding. Free for students/teachers.",
       "website": "https://github.com/features/copilot",
       "github": "",
-      "docs": "",
       "models": [
         "GPT-5.5-Instant",
         "Claude Sonnet 4.6",
@@ -1471,27 +1144,14 @@
         "Usage-based billing since Jun 1",
         "Premium models need paid tiers"
       ],
-      "useCases": [
-        "GitHub users",
-        "Students",
-        "CI/CD workflows"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "50 agent/chat + 2,000 completions/month",
-        "paidTier": "Pro $10/mo ($15 AI Credits), Pro+ $39/mo ($70 AI Credits), Max $100/mo ($200 AI Credits)",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerMonth": 2050
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "jules",
@@ -1501,7 +1161,6 @@
       "description": "Google's task-oriented AI coding agent. Completes specific development tasks autonomously.",
       "website": "https://jules.google",
       "github": "",
-      "docs": "",
       "models": [
         "Gemini 2.5 Pro"
       ],
@@ -1525,27 +1184,14 @@
         "Task-based not chat",
         "Requires Gmail"
       ],
-      "useCases": [
-        "Specific tasks",
-        "Automation",
-        "Gemini users"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "15 tasks/day, 3 concurrent",
-        "paidTier": "Pro $19.99/mo (100 tasks/day, 15 concurrent)",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerDay": 15
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "claude-code",
@@ -1555,7 +1201,6 @@
       "description": "Official Anthropic CLI for Claude. Features Sonnet 4.6, Opus 4.8, and Haiku 4.5. Extended thinking modes (think, megathink, ultrathink) for complex reasoning.",
       "website": "https://www.anthropic.com/claude-code",
       "github": "",
-      "docs": "",
       "models": [
         "Claude Sonnet 4.6",
         "Claude Opus 4.8",
@@ -1582,24 +1227,14 @@
         "Limited free tier",
         "Weekly limits"
       ],
-      "useCases": [
-        "Complex reasoning",
-        "Anthropic ecosystem",
-        "Research"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "Limited free usage with Sonnet 4.6",
-        "paidTier": "Pro $20/mo, Max 5x $100/mo (~225 msgs/5h), Max 20x $200/mo (~900 msgs/5h)",
-        "creditCardRequired": false
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "aws-kiro",
@@ -1609,7 +1244,6 @@
       "description": "AWS's spec-driven agentic IDE and CLI \u2014 official replacement for Amazon Q Developer (EOL Apr 30, 2027). Features Claude Fable 5, Opus 4.8, Sonnet 4.6, Haiku 4.5 via AWS Bedrock. Spec-driven development with requirements.md \u2192 design.md \u2192 tasks.md workflow.",
       "website": "https://kiro.dev",
       "github": "",
-      "docs": "",
       "models": [
         "Claude Fable 5",
         "Claude Opus 4.8",
@@ -1640,27 +1274,14 @@
         "AWS ecosystem lock-in",
         "Q Developer EOL transition"
       ],
-      "useCases": [
-        "AWS development",
-        "Spec-first coding",
-        "Infrastructure as code"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "50 credits/month + 500 welcome bonus (14-day)",
-        "paidTier": "Pro $20/mo (1,000 credits), Pro+ $40/mo (2,000 credits), Power $200/mo (10,000 credits)",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "credits": "50 credits/month (free)"
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "xiaomi-mimo",
@@ -1670,7 +1291,6 @@
       "description": "Xiaomi's subscription plan for AI coding scenarios \u2014 bundled access to MiMo flagship models. Compatible with OpenCode, Claude Code, and other mainstream toolchains. API pricing permanently reduced 99% on May 26, 2026.",
       "website": "https://platform.xiaomimimo.com",
       "github": "",
-      "docs": "",
       "models": [
         "MiMo-V2.5-Pro",
         "MiMo-V2.5",
@@ -1699,27 +1319,14 @@
         "Chinese ecosystem",
         "Credit-based system"
       ],
-      "useCases": [
-        "Budget coding",
-        "Chinese developers",
-        "High-volume API usage"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "Free API credits available",
-        "paidTier": "Lite $6/mo, Standard $16/mo, Pro $50/mo, Max $100/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "credits": "60M-82B credits/month depending on tier"
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "openai-codex-cli",
@@ -1729,7 +1336,6 @@
       "description": "OpenAI's official CLI for GPT-5.5. Features session compaction for multi-million token deep sessions. Free with ChatGPT Plus ($20/mo) or Pro ($200/mo).",
       "website": "https://github.com/openai/codex",
       "github": "https://github.com/openai/codex",
-      "docs": "",
       "models": [
         "GPT-5.5",
         "GPT-5.5 Pro (Pro tier)"
@@ -1755,24 +1361,14 @@
         "Requires ChatGPT subscription",
         "Limited free tier"
       ],
-      "useCases": [
-        "OpenAI ecosystem",
-        "Research",
-        "Deep reasoning tasks"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "Free with ChatGPT Plus ($20/mo): 30-150 msgs/5h",
-        "paidTier": "ChatGPT Pro $200/mo with GPT-5.5 Pro: 300-1,500 msgs/5h",
-        "creditCardRequired": false
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "opencode",
@@ -1782,7 +1378,6 @@
       "description": "Open-source AI coding agent in Go. 167k+ GitHub stars, 850+ contributors, 6.5M monthly users. Apache 2.0 licensed. Five agent modes (Build, Plan, Debug, Review, Docs). LSP-driven self-correction. Multi-agent support up to 10 parallel agents.",
       "website": "https://opencode.ai",
       "github": "https://github.com/anomalyco/opencode",
-      "docs": "",
       "models": [
         "GLM-5.1",
         "Kimi K2.5",
@@ -1818,24 +1413,14 @@
         "Go-based may be unfamiliar",
         "Premium models need Go sub"
       ],
-      "useCases": [
-        "Privacy-conscious",
-        "Multi-model users",
-        "Go developers"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Zen Free tier with 8 exclusive models + BYOK (75+ providers)",
-        "paidTier": "Go $10/mo ($5 first month) \u2014 curated open-weight model bundle",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "forgecode",
@@ -1845,7 +1430,6 @@
       "description": "AI-enabled pair programmer in Rust. Apache 2.0 licensed with semantic codebase search. 300+ models via OpenRouter.",
       "website": "https://forgecode.dev",
       "github": "https://github.com/antinomyhq/forgecode",
-      "docs": "",
       "models": [
         "300+ via OpenRouter"
       ],
@@ -1870,27 +1454,14 @@
         "Lower free limits",
         "Rust required"
       ],
-      "useCases": [
-        "Rust users",
-        "Semantic search fans",
-        "Open source preference"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "10K tokens/day via OpenRouter",
-        "paidTier": "BYOK or OpenRouter paid tiers",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerDay": 10000
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "goose",
@@ -1900,7 +1471,6 @@
       "description": "Open-source extensible AI agent from Block, now under AAIF/Linux Foundation. Desktop, CLI, and API.",
       "website": "https://block.github.io/goose/",
       "github": "https://github.com/block/goose",
-      "docs": "",
       "models": [],
       "tags": [
         "cli",
@@ -1925,24 +1495,14 @@
         "Requires setup",
         "BYOK only"
       ],
-      "useCases": [
-        "Enterprise",
-        "Extensible workflows",
-        "Linux Foundation ecosystem"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Unlimited with BYOK",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "ohmypi",
@@ -1952,7 +1512,6 @@
       "description": "Bring-your-own-keys CLI coding tool. Unlimited usage with your own API keys. Flexible provider support.",
       "website": "https://ohmypi.com",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "cli",
@@ -1974,24 +1533,14 @@
         "Requires API keys",
         "Setup needed"
       ],
-      "useCases": [
-        "Privacy-conscious",
-        "Cost control",
-        "Custom workflows"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Unlimited with BYOK",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "aider",
@@ -2001,7 +1550,6 @@
       "description": "Free command-line assistant with built-in Git integration. Multi-file editing with repository context.",
       "website": "https://aider.chat",
       "github": "https://github.com/paul-gauthier/aider",
-      "docs": "",
       "models": [],
       "tags": [
         "cli",
@@ -2025,24 +1573,14 @@
         "BYOK required",
         "Terminal only"
       ],
-      "useCases": [
-        "Git-centric workflows",
-        "Multi-file changes",
-        "Voice coding"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Free, BYOK",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "ollama",
@@ -2052,7 +1590,6 @@
       "description": "The easiest way to run LLMs locally. One-command installation for Llama, Qwen, Mistral, and more.",
       "website": "https://ollama.com",
       "github": "https://github.com/ollama/ollama",
-      "docs": "",
       "models": [
         "Llama 3.3",
         "Qwen 3.6",
@@ -2084,25 +1621,14 @@
         "Setup complexity",
         "Slower than APIs"
       ],
-      "useCases": [
-        "Privacy-focused",
-        "Offline work",
-        "Cost control",
-        "Experimentation"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "100% free, unlimited local usage",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "qwen3-plus-local",
@@ -2112,7 +1638,6 @@
       "description": "Alibaba's flagship coding model. Strong performance on coding benchmarks, available via Ollama.",
       "website": "https://qwenlm.github.io",
       "github": "",
-      "docs": "",
       "models": [
         "Qwen3.6-Plus-480B"
       ],
@@ -2138,24 +1663,14 @@
         "Requires ~150GB VRAM",
         "Very large model"
       ],
-      "useCases": [
-        "Local coding",
-        "Privacy",
-        "Qwen ecosystem"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "Free, runs locally",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "llama-3-3",
@@ -2165,7 +1680,6 @@
       "description": "Meta's Llama 3.3 70B - one of the best open-source models for general tasks and coding.",
       "website": "https://llama.meta.com",
       "github": "",
-      "docs": "",
       "models": [
         "Llama 3.3 70B",
         "Llama 4 Scout",
@@ -2192,24 +1706,14 @@
         "Llama license requirements",
         "Large VRAM needs"
       ],
-      "useCases": [
-        "General purpose",
-        "Production apps",
-        "Community support"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "Free, open weights",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "deepseek-coder-v4",
@@ -2219,7 +1723,6 @@
       "description": "DeepSeek's coding-optimized model with excellent performance. Smaller lite version for easier local deployment.",
       "website": "https://deepseek.ai",
       "github": "",
-      "docs": "",
       "models": [
         "DeepSeek Coder V4",
         "DeepSeek Coder V4 Lite"
@@ -2244,24 +1747,14 @@
         "DeepSeek license restrictions",
         "Setup required"
       ],
-      "useCases": [
-        "Budget coding",
-        "API fallback",
-        "Local development"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "Free, runs locally",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "gemma-4",
@@ -2271,7 +1764,6 @@
       "description": "Google's latest open-source model family. Fully Apache 2.0 licensed for unrestricted use.",
       "website": "https://ai.google.dev/gemma",
       "github": "",
-      "docs": "",
       "models": [
         "Gemma 4 2B",
         "Gemma 4 4B",
@@ -2301,24 +1793,14 @@
         "Newer model",
         "Check Ollama availability"
       ],
-      "useCases": [
-        "Mobile apps",
-        "Apache 2.0 requirement",
-        "Google ecosystem"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "Free, Apache 2.0",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "lm-studio",
@@ -2328,7 +1810,6 @@
       "description": "Desktop application for running open-source LLMs locally with a user-friendly interface. Download and run models with a few clicks, no terminal required.",
       "website": "https://lmstudio.ai/",
       "github": "",
-      "docs": "",
       "models": [
         "Llama 3.3 70B",
         "Qwen3.6",
@@ -2361,26 +1842,14 @@
         "Not open source",
         "Requires GPU/RAM"
       ],
-      "useCases": [
-        "Beginners",
-        "No terminal users",
-        "Desktop development",
-        "Privacy-focused",
-        "Local experimentation"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "free",
         "freeTier": "100% free, unlimited local usage",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "llamaindex",
@@ -2390,7 +1859,6 @@
       "description": "Leading framework for building production RAG systems. Document chunking, embeddings, and retrieval.",
       "website": "https://llamaindex.ai",
       "github": "https://github.com/run-llama/llama_index",
-      "docs": "",
       "models": [],
       "tags": [
         "rag",
@@ -2414,24 +1882,14 @@
         "Learning curve",
         "Python focused"
       ],
-      "useCases": [
-        "Document Q&A",
-        "Knowledge bases",
-        "ExamAi-style apps"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "100% open source",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "langchain",
@@ -2441,7 +1899,6 @@
       "description": "Comprehensive framework for building LLM applications. Chains, agents, and RAG capabilities.",
       "website": "https://langchain.com",
       "github": "https://github.com/langchain-ai/langchain",
-      "docs": "",
       "models": [],
       "tags": [
         "rag",
@@ -2467,24 +1924,14 @@
         "Rapid changes",
         "Can be heavy"
       ],
-      "useCases": [
-        "Complex workflows",
-        "Multi-step agents",
-        "Production apps"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Open source framework",
-        "paidTier": "LangSmith for monitoring",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "chromadb",
@@ -2494,7 +1941,6 @@
       "description": "Simple, Python-native vector database. Perfect for prototyping and small applications.",
       "website": "https://chromadb.dev",
       "github": "https://github.com/chroma-core/chroma",
-      "docs": "",
       "models": [],
       "tags": [
         "rag",
@@ -2518,24 +1964,14 @@
         "Python only",
         "Less scalable than alternatives"
       ],
-      "useCases": [
-        "Prototyping",
-        "Small apps",
-        "Python projects"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Free, unlimited local",
-        "paidTier": "Chroma Cloud for hosted",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "qdrant",
@@ -2545,7 +1981,6 @@
       "description": "Rust-based vector database with high performance. Available as local, cloud, or self-hosted.",
       "website": "https://qdrant.tech",
       "github": "https://github.com/qdrant/qdrant",
-      "docs": "",
       "models": [],
       "tags": [
         "rag",
@@ -2569,27 +2004,14 @@
         "More complex than Chroma",
         "Rust ecosystem"
       ],
-      "useCases": [
-        "Production RAG",
-        "High-scale apps",
-        "Performance-critical"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Free self-hosted, 1GB cloud",
-        "paidTier": "Cloud from $25/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerDay": 1000000000
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "weaviate",
@@ -2599,7 +2021,6 @@
       "description": "Scalable vector search engine with hybrid search capabilities. Cloud and self-hosted options.",
       "website": "https://weaviate.io",
       "github": "https://github.com/weaviate/weaviate",
-      "docs": "",
       "models": [],
       "tags": [
         "rag",
@@ -2623,27 +2044,14 @@
         "GraphQL learning curve",
         "Complex for simple use cases"
       ],
-      "useCases": [
-        "Hybrid search",
-        "Enterprise RAG",
-        "Knowledge graphs"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "5M vectors cloud, unlimited self-hosted",
-        "paidTier": "Cloud from $25/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerMonth": 5000000
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "ragas",
@@ -2653,7 +2061,6 @@
       "description": "Framework for evaluating RAG pipeline performance. Metrics for retrieval and generation quality.",
       "website": "https://ragas.io",
       "github": "https://github.com/explodinggradients/ragas",
-      "docs": "",
       "models": [],
       "tags": [
         "rag",
@@ -2675,24 +2082,14 @@
         "Requires setup",
         "Needs test data"
       ],
-      "useCases": [
-        "RAG evaluation",
-        "Quality testing",
-        "CI/CD"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "Open source",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "n8n",
@@ -2702,7 +2099,6 @@
       "description": "Self-hostable workflow automation with AI integration. 3,000+ app integrations.",
       "website": "https://n8n.io",
       "github": "https://github.com/n8n-io/n8n",
-      "docs": "",
       "models": [],
       "tags": [
         "agent",
@@ -2726,24 +2122,14 @@
         "Self-hosting complexity",
         "Learning curve"
       ],
-      "useCases": [
-        "Workflow automation",
-        "Self-hosted RAG",
-        "Enterprise"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Unlimited self-hosted",
-        "paidTier": "Cloud from $20/mo",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "gumloop",
@@ -2753,7 +2139,6 @@
       "description": "Natural-language builder for AI agents. 'Gummie' troubleshooting agent included.",
       "website": "https://gumloop.com",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "agent",
@@ -2775,27 +2160,14 @@
         "Less flexible than code",
         "Credit limits"
       ],
-      "useCases": [
-        "Non-technical users",
-        "Rapid prototyping",
-        "Simple agents"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "2,000 credits/month",
-        "paidTier": "Paid tiers available",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "credits": "2,000 credits/month"
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "langgraph",
@@ -2805,7 +2177,6 @@
       "description": "LangChain's framework for building stateful, multi-actor applications with LLMs.",
       "website": "https://langchain-ai.github.io/langgraph/",
       "github": "https://github.com/langchain-ai/langgraph",
-      "docs": "",
       "models": [],
       "tags": [
         "agent",
@@ -2828,24 +2199,14 @@
         "Learning curve",
         "Overkill for simple use cases"
       ],
-      "useCases": [
-        "Complex agents",
-        "Multi-step workflows",
-        "Conversational AI"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Open source",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "autogen",
@@ -2855,7 +2216,6 @@
       "description": "Microsoft's framework for building multi-agent conversational systems. Agents can converse and collaborate.",
       "website": "https://microsoft.github.io/autogen/",
       "github": "https://github.com/microsoft/autogen",
-      "docs": "",
       "models": [],
       "tags": [
         "agent",
@@ -2878,24 +2238,14 @@
         "Complex setup",
         "Microsoft ecosystem"
       ],
-      "useCases": [
-        "Multi-agent systems",
-        "Team simulations",
-        "Complex workflows"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Open source",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "crewai",
@@ -2905,7 +2255,6 @@
       "description": "Framework for orchestrating role-playing autonomous AI agents. Agents work together as a crew.",
       "website": "https://crewai.com",
       "github": "https://github.com/joaomdmoura/crewai",
-      "docs": "",
       "models": [],
       "tags": [
         "agent",
@@ -2928,24 +2277,14 @@
         "Python only",
         "Rapidly evolving"
       ],
-      "useCases": [
-        "Content teams",
-        "Research crews",
-        "Role-based workflows"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Open source",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "pinecone",
@@ -2955,7 +2294,6 @@
       "description": "Fully managed vector database. No ops required with excellent performance and scale.",
       "website": "https://pinecone.io",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "vector-db",
@@ -2980,27 +2318,14 @@
         "Not open source",
         "Vendor lock-in"
       ],
-      "useCases": [
-        "Production RAG",
-        "Enterprise",
-        "No-ops preference"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "2GB (1 pod)",
-        "paidTier": "From $70/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerDay": 2000000000
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "supabase-vector",
@@ -3010,7 +2335,6 @@
       "description": "Postgres with pgvector extension. Full-stack friendly with generous free tier.",
       "website": "https://supabase.com",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "vector-db",
@@ -3034,27 +2358,14 @@
         "Not pure vector DB",
         "Shared resources in free"
       ],
-      "useCases": [
-        "Full-stack apps",
-        "Postgres users",
-        "MVP to production"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "500MB",
-        "paidTier": "$25/mo starter",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerDay": 500000000
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "lancedb",
@@ -3064,7 +2375,6 @@
       "description": "Serverless vector database optimized for multimodal data. Embeddings and vectors with no server needed.",
       "website": "https://lancedb.com",
       "github": "https://github.com/lancedb/lancedb",
-      "docs": "",
       "models": [],
       "tags": [
         "vector-db",
@@ -3088,24 +2398,14 @@
         "Newer database",
         "Smaller community"
       ],
-      "useCases": [
-        "Multimodal RAG",
-        "Serverless apps",
-        "Edge deployment"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Free local, generous cloud beta",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "whisper-groq",
@@ -3115,7 +2415,6 @@
       "description": "OpenAI's Whisper running on Groq's fast infrastructure. Excellent for transcription.",
       "website": "https://console.groq.com",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "speech",
@@ -3138,27 +2437,14 @@
         "Groq limits",
         "API only"
       ],
-      "useCases": [
-        "Transcription",
-        "Live captions",
-        "Voice apps"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "2,000 req/day, 7,200 audio-sec/min",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerDay": 2000
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "whisper-local",
@@ -3168,7 +2454,6 @@
       "description": "OpenAI's Whisper running locally via Ollama. Unlimited offline transcription.",
       "website": "https://github.com/openai/whisper",
       "github": "https://github.com/openai/whisper",
-      "docs": "",
       "models": [],
       "tags": [
         "speech",
@@ -3193,24 +2478,14 @@
         "Setup needed",
         "Slower than API"
       ],
-      "useCases": [
-        "Privacy-focused",
-        "Offline work",
-        "Sensitive data"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "Unlimited offline",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "elevenlabs",
@@ -3220,7 +2495,6 @@
       "description": "Premium text-to-speech with voice cloning. Most realistic AI voices available.",
       "website": "https://elevenlabs.io",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "speech",
@@ -3245,27 +2519,14 @@
         "Paid for quality",
         "API only"
       ],
-      "useCases": [
-        "Voice apps",
-        "Audiobooks",
-        "Content creation"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "10K chars/month",
-        "paidTier": "From $5/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerMonth": 10000
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "piper",
@@ -3275,7 +2536,6 @@
       "description": "Fast, local text-to-speech. High-quality offline voice generation.",
       "website": "https://github.com/rhasspy/piper",
       "github": "https://github.com/rhasspy/piper",
-      "docs": "",
       "models": [],
       "tags": [
         "speech",
@@ -3300,24 +2560,14 @@
         "Voice quality varies",
         "Fewer voices"
       ],
-      "useCases": [
-        "Privacy-focused",
-        "Offline apps",
-        "Embedded systems"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "Unlimited offline",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "flux",
@@ -3327,7 +2577,6 @@
       "description": "Black Forest Labs' open-source image generation model. Excellent quality, commercially usable.",
       "website": "https://blackforestlabs.ai",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "image",
@@ -3351,24 +2600,14 @@
         "Hardware requirements",
         "Setup complexity"
       ],
-      "useCases": [
-        "Image generation",
-        "Creative apps",
-        "Commercial use"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Free via local or Replicate",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "dalle-4",
@@ -3378,7 +2617,6 @@
       "description": "OpenAI's state-of-the-art image generation via ChatGPT Plus or API.",
       "website": "https://openai.com/dall-e-4",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "image",
@@ -3402,24 +2640,14 @@
         "API costs",
         "Rate limits"
       ],
-      "useCases": [
-        "High-quality images",
-        "ChatGPT users",
-        "Content creation"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "paid",
         "freeTier": "Limited in ChatGPT Free",
-        "paidTier": "ChatGPT Plus $20/mo",
-        "creditCardRequired": true
-      },
-      "deployment": "api"
+        "creditCardRequired": false
+      }
     },
     {
       "id": "ideogram",
@@ -3429,7 +2657,6 @@
       "description": "Image generation with best-in-class text rendering. Free tier available.",
       "website": "https://ideogram.ai",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "image",
@@ -3453,28 +2680,14 @@
         "Daily limits",
         "Not open source"
       ],
-      "useCases": [
-        "Logos",
-        "Graphics with text",
-        "Social media",
-        "Presentations"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "20 prompts/day",
-        "paidTier": "Plus $8/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerDay": 20
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "leonardo",
@@ -3484,7 +2697,6 @@
       "description": "Image generation platform with generous free tier. Commercial use allowed.",
       "website": "https://leonardo.ai",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "image",
@@ -3508,27 +2720,14 @@
         "Token system",
         "Not open source"
       ],
-      "useCases": [
-        "Game assets",
-        "Commercial projects",
-        "Concept art"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "150 tokens/day (~70 images)",
-        "paidTier": "From $12/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerDay": 150
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "diffusionbee",
@@ -3538,7 +2737,6 @@
       "description": "Desktop app for local Stable Diffusion image generation. No API keys required, runs entirely on your computer with a simple, intuitive interface.",
       "website": "https://diffusionbee.com/",
       "github": "https://github.com/divamgupta/diffusionbee-stable-diffusion-ui",
-      "docs": "",
       "models": [],
       "tags": [
         "image",
@@ -3567,26 +2765,14 @@
         "Requires GPU",
         "MacOS support only"
       ],
-      "useCases": [
-        "Local image generation",
-        "Privacy-focused",
-        "No API costs",
-        "Beginners",
-        "Offline work"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "100% free, unlimited local usage",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "comfyui",
@@ -3596,7 +2782,6 @@
       "description": "Powerful and modular diffusion model GUI, api and backend with a graph/nodes interface. Open-source and highly customizable for advanced users, artists, and production workflows.",
       "website": "https://www.comfy.org/",
       "github": "https://github.com/Comfy-Org/ComfyUI",
-      "docs": "",
       "models": [],
       "tags": [
         "image",
@@ -3627,26 +2812,14 @@
         "Requires GPU",
         "Technical knowledge needed"
       ],
-      "useCases": [
-        "Advanced image generation",
-        "Custom workflows",
-        "Batch processing",
-        "Production pipelines",
-        "AI artists"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "100% free, unlimited local usage",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "sora",
@@ -3656,7 +2829,6 @@
       "description": "OpenAI's text-to-video model. High-quality generation up to 120 seconds.",
       "website": "https://openai.com/sora",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "video",
@@ -3680,24 +2852,14 @@
         "Plus subscription required",
         "Rate limits"
       ],
-      "useCases": [
-        "High-quality video",
-        "Content creation",
-        "ChatGPT users"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "paid",
         "freeTier": "Limited in ChatGPT Plus",
-        "paidTier": "ChatGPT Plus $20/mo",
-        "creditCardRequired": true
-      },
-      "deployment": "api"
+        "creditCardRequired": false
+      }
     },
     {
       "id": "veo-3",
@@ -3707,7 +2869,6 @@
       "description": "Google's video generation model. 1080p, 60-second clips with realistic motion.",
       "website": "https://deepmind.google/technologies/veo",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "video",
@@ -3731,24 +2892,14 @@
         "Limited availability",
         "Google ecosystem"
       ],
-      "useCases": [
-        "Cinematic video",
-        "Google ecosystem",
-        "Realistic motion"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "Limited preview access",
-        "paidTier": "Google AI Pro/Ultra",
-        "creditCardRequired": false
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "runway",
@@ -3758,7 +2909,6 @@
       "description": "Creative filmmaking video generation. Industry standard for AI video.",
       "website": "https://runwayml.com",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "video",
@@ -3783,27 +2933,14 @@
         "Expensive",
         "Short duration"
       ],
-      "useCases": [
-        "Creative video",
-        "Filmmaking",
-        "Music videos"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "3 free credits",
-        "paidTier": "From $15/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "credits": "3 free credits"
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "luma-dream-machine",
@@ -3813,7 +2950,6 @@
       "description": "Fast, realistic video generation with generous free tier.",
       "website": "https://lumalabs.ai",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "video",
@@ -3837,27 +2973,14 @@
         "5 second limit",
         "Not open source"
       ],
-      "useCases": [
-        "Quick video",
-        "Prototyping",
-        "Social media"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "30 generations/month",
-        "paidTier": "From $10/mo",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerMonth": 30
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "modal",
@@ -3867,7 +2990,6 @@
       "description": "Serverless GPU platform for running AI models. Python-native with excellent developer experience.",
       "website": "https://modal.com",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "hosting",
@@ -3892,24 +3014,14 @@
         "Can be expensive",
         "Vendor lock-in"
       ],
-      "useCases": [
-        "Python inference",
-        "Batch jobs",
-        "Model serving"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "$5-30/month in credits",
-        "paidTier": "Pay per compute",
-        "creditCardRequired": false
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "replicate",
@@ -3919,7 +3031,6 @@
       "description": "Run open-source models in the cloud. Simple API for thousands of models.",
       "website": "https://replicate.com",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "hosting",
@@ -3944,27 +3055,14 @@
         "Not for training",
         "Per-prediction pricing"
       ],
-      "useCases": [
-        "Quick deployment",
-        "Prototyping",
-        "Image/video models"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "6 req/min (no payment), up to 3K RPM with payment",
-        "paidTier": "Pay per prediction",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "rateLimitPerMinute": 6
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "runpod",
@@ -3974,7 +3072,6 @@
       "description": "Cloud GPU rental for training and inference. Spot and on-demand instances.",
       "website": "https://runpod.io",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "hosting",
@@ -3999,24 +3096,14 @@
         "Credit card required",
         "Spot interruptions"
       ],
-      "useCases": [
-        "Training",
-        "Fine-tuning",
-        "Heavy inference"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "paid",
         "freeTier": "None",
-        "paidTier": "$0.20-0.50/hr spot, higher on-demand",
-        "creditCardRequired": true
-      },
-      "deployment": "api"
+        "creditCardRequired": false
+      }
     },
     {
       "id": "langsmith",
@@ -4026,7 +3113,6 @@
       "description": "LangChain's platform for tracing, evaluating, and monitoring LLM applications.",
       "website": "https://smith.langchain.com",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "evaluation",
@@ -4049,27 +3135,14 @@
         "LangChain focused",
         "Paid adds up"
       ],
-      "useCases": [
-        "Production monitoring",
-        "Debugging",
-        "Evaluation"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "5K traces/month",
-        "paidTier": "Pro $0.05/trace",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerMonth": 5000
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "promptfoo",
@@ -4079,7 +3152,6 @@
       "description": "Test and evaluate prompts with automated red-teaming. Open-source and self-hosted.",
       "website": "https://promptfoo.dev",
       "github": "https://github.com/promptfoo/promptfoo",
-      "docs": "",
       "models": [],
       "tags": [
         "evaluation",
@@ -4103,24 +3175,14 @@
         "Self-hosted",
         "Learning curve"
       ],
-      "useCases": [
-        "Prompt engineering",
-        "Safety testing",
-        "CI/CD"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "100% open source",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "deepeval",
@@ -4130,7 +3192,6 @@
       "description": "Unit testing framework for LLMs. Python-based with comprehensive metrics.",
       "website": "https://deepeval.com",
       "github": "https://github.com/confident-ai/deepeval",
-      "docs": "",
       "models": [],
       "tags": [
         "evaluation",
@@ -4154,24 +3215,14 @@
         "Python only",
         "Learning curve"
       ],
-      "useCases": [
-        "LLM testing",
-        "Quality assurance",
-        "CI/CD"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "Open source",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "jina-embeddings",
@@ -4181,7 +3232,6 @@
       "description": "High-quality multilingual embeddings. 1M tokens/day free tier.",
       "website": "https://jina.ai",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "embedding",
@@ -4205,27 +3255,14 @@
         "API only",
         "Not open source"
       ],
-      "useCases": [
-        "RAG",
-        "Multilingual apps",
-        "Semantic search"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "1M tokens/day",
-        "paidTier": "Pay per use",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerDay": 1000000
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "openai-embeddings",
@@ -4235,7 +3272,6 @@
       "description": "OpenAI's text-embedding-3-small with generous free tier.",
       "website": "https://platform.openai.com",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "embedding",
@@ -4259,27 +3295,14 @@
         "API only",
         "Not open source"
       ],
-      "useCases": [
-        "RAG",
-        "Reliable embeddings",
-        "Production apps"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "200K tokens/day",
-        "paidTier": "Pay per use",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "tokensPerDay": 200000
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "bge-embeddings",
@@ -4289,7 +3312,6 @@
       "description": "BAAI's embedding models. Best retrieval accuracy, can be self-hosted.",
       "website": "https://github.com/FlagOpen/FlagEmbedding",
       "github": "https://github.com/FlagOpen/FlagEmbedding",
-      "docs": "",
       "models": [],
       "tags": [
         "embedding",
@@ -4313,24 +3335,14 @@
         "Self-hosting needed",
         "Setup complexity"
       ],
-      "useCases": [
-        "High-accuracy RAG",
-        "Self-hosted",
-        "Chinese content"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Free, self-host or HF",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "chatgpt",
@@ -4340,7 +3352,6 @@
       "description": "OpenAI's chat interface. Free tier includes GPT-5.5 Instant with DALL-E 4 and Sora 3 access.",
       "website": "https://chatgpt.com",
       "github": "",
-      "docs": "",
       "models": [
         "GPT-5.5 Instant",
         "GPT-5.5 Pro (paid)"
@@ -4367,27 +3378,14 @@
         "Restrictive free limits",
         "Plus for best access"
       ],
-      "useCases": [
-        "General chat",
-        "Content creation",
-        "Research"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "GPT-5.5 Instant (~20 msgs/5hr), DALL-E 4",
-        "paidTier": "Plus $20/mo for more GPT-5.5 access",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerHour": 7
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "gemini-chat",
@@ -4397,7 +3395,6 @@
       "description": "Google's chat interface with 2M token context, Deep Research feature, and Gemini 3.1 Flash free model.",
       "website": "https://gemini.google.com",
       "github": "",
-      "docs": "",
       "models": [
         "Gemini 3.1 Flash",
         "Gemini 3.1 Pro (paid)"
@@ -4424,27 +3421,14 @@
         "Research quota limits",
         "Google data practices"
       ],
-      "useCases": [
-        "Research",
-        "Long documents",
-        "Google users"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "Gemini 3.1 Flash, 20 Deep Research/month",
-        "paidTier": "Pro $20/mo for more features",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerMonth": 20
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "claude-chat",
@@ -4454,7 +3438,6 @@
       "description": "Anthropic's chat interface. Strong reasoning capabilities with Claude Sonnet 4.6 and Haiku 4.5 free tier.",
       "website": "https://claude.ai",
       "github": "",
-      "docs": "",
       "models": [
         "Claude Sonnet 4.6",
         "Claude Haiku 4.5",
@@ -4482,28 +3465,14 @@
         "Low free limits",
         "Opus requires Pro"
       ],
-      "useCases": [
-        "Analysis",
-        "Reasoning",
-        "Writing",
-        "Coding help"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "Claude Sonnet 4.6 / Haiku 4.5 (~30 msgs/5h)",
-        "paidTier": "Pro $20/mo for Opus 4.8 and Fable 5",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerHour": 6
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "grok-chat",
@@ -4513,7 +3482,6 @@
       "description": "xAI's chat interface featuring Grok 4.2, Aurora 2 image generation, and voice mode.",
       "website": "https://grok.com",
       "github": "",
-      "docs": "",
       "models": [
         "Grok 4.2",
         "Aurora 2"
@@ -4540,27 +3508,14 @@
         "Low free limits",
         "xAI ecosystem"
       ],
-      "useCases": [
-        "Real-time Q&A",
-        "General chat",
-        "Image generation"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "Grok 4.2, Aurora 2 images, voice (15 msgs/12hr)",
-        "paidTier": "Premium tiers for more access",
-        "creditCardRequired": false
-      },
-      "limits": {
-        "requestsPerHour": 1.25
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "mistral-chat",
@@ -4570,7 +3525,6 @@
       "description": "Mistral's chat interface with Mistral Medium 3 model. Structured output capabilities.",
       "website": "https://chat.mistral.ai",
       "github": "",
-      "docs": "",
       "models": [
         "Mistral Medium 3"
       ],
@@ -4594,24 +3548,14 @@
         "Fewer integrations than competitors",
         "Limited free features"
       ],
-      "useCases": [
-        "Structured output tasks",
-        "European compliance",
-        "General chat"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "Mistral Medium 3, structured output",
-        "paidTier": "Pro tiers for premium models",
-        "creditCardRequired": false
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "stagehand",
@@ -4621,7 +3565,6 @@
       "description": "Next-gen Playwright with natural language commands for AI agents.",
       "website": "https://stagehand.dev",
       "github": "https://github.com/browserbase/stagehand",
-      "docs": "",
       "models": [],
       "tags": [
         "browser",
@@ -4645,24 +3588,14 @@
         "Newer tool",
         "Learning curve"
       ],
-      "useCases": [
-        "AI agents",
-        "Browser automation",
-        "Testing"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "hybrid",
       "pricing": {
         "type": "open-source",
         "freeTier": "Open source",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "hybrid"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "browserbase",
@@ -4672,7 +3605,6 @@
       "description": "Managed browser infrastructure for AI agents. Session recording and scaling.",
       "website": "https://browserbase.com",
       "github": "",
-      "docs": "",
       "models": [],
       "tags": [
         "browser",
@@ -4696,24 +3628,14 @@
         "Paid service",
         "Vendor lock-in"
       ],
-      "useCases": [
-        "AI agents",
-        "Web scraping",
-        "Automation at scale"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": false,
       "featured": false,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "api",
       "pricing": {
         "type": "freemium",
         "freeTier": "$5 free tier",
-        "paidTier": "Pay per use",
-        "creditCardRequired": false
-      },
-      "deployment": "api"
+        "creditCardRequired": true
+      }
     },
     {
       "id": "playwright",
@@ -4723,7 +3645,6 @@
       "description": "Reliable, fast browser automation from Microsoft. Industry standard.",
       "website": "https://playwright.dev",
       "github": "https://github.com/microsoft/playwright",
-      "docs": "",
       "models": [],
       "tags": [
         "browser",
@@ -4748,508 +3669,15 @@
         "Not AI-native",
         "Requires learning"
       ],
-      "useCases": [
-        "Testing",
-        "Automation",
-        "Scraping",
-        "E2E"
-      ],
-      "strengths": [],
-      "limitations": [],
       "openSource": true,
       "featured": true,
-      "verified": null,
-      "addedDate": "",
+      "deployment": "local",
       "pricing": {
         "type": "open-source",
         "freeTier": "100% free",
-        "paidTier": "",
-        "creditCardRequired": false
-      },
-      "deployment": "local"
-    },
-    {
-      "id": "free-image-gen-api",
-      "name": "Free Image Gen API",
-      "category": "image",
-      "shortDescription": "Deploy your own free AI image generation API - 100,000 calls/day using Cloudflare Workers AI",
-      "description": "A deployable Cloudflare Worker that provides free AI image generation using Stable Diffusion XL. Generates images from text prompts with API key authentication. Supports multiple models including SDXL, SDXL Lightning, DreamShaper, and more. 100,000 free API calls per day on Cloudflare's free tier.",
-      "website": "https://github.com/saurav-z/free-image-generation-api",
-      "github": "https://github.com/saurav-z/free-image-generation-api",
-      "pricing": {
-        "type": "free",
-        "freeTier": "100,000 API calls per day (Cloudflare Workers AI free tier)",
-        "paidTier": "Pay-per-use beyond free tier",
-        "creditCardRequired": false
-      },
-      "models": [
-        "@cf/stabilityai/stable-diffusion-xl-base-1.0",
-        "@cf/bytedance/stable-diffusion-xl-lightning",
-        "@cf/lykon/dreamshaper-8-lcm",
-        "@cf/blackforestlabs/ux-1-schnell",
-        "@cf/runwayml/stable-diffusion-v1-5-img2img",
-        "@cf/runwayml/stable-diffusion-v1-5-inpainting"
-      ],
-      "tags": [
-        "api",
-        "image-generation",
-        "cloudflare",
-        "stable-diffusion",
-        "free-tier",
-        "deployable",
-        "serverless"
-      ],
-      "deployment": "api",
-      "openSource": true,
-      "features": [
-        "100,000 free API calls/day",
-        "Stable Diffusion XL model",
-        "API key authentication",
-        "Multiple model options",
-        "One-file deployment (worker.js)",
-        "Returns JPEG image directly",
-        "Text-to-image generation"
-      ],
-      "pros": [
-        "Generous free tier (100K/day)",
-        "No credit card required",
-        "Multiple SD models available",
-        "Simple single-file deployment",
-        "Open source MIT license"
-      ],
-      "cons": [
-        "Requires Cloudflare account setup",
-        "Limited to Cloudflare's available models",
-        "Need to deploy your own Worker"
-      ],
-      "useCases": [
-        "Image generation APIs",
-        "Content creation pipelines",
-        "Prototype AI image features",
-        "Batch image generation"
-      ],
-      "featured": true,
-      "verified": true,
-      "addedDate": "2026-08-18"
+        "creditCardRequired": true
+      }
     }
   ],
-  "stacks": [
-    {
-      "id": "fully-free",
-      "name": "Zero-Cost Dev Stack",
-      "description": "Complete AI-powered development without spending a dime. All tools have generous free tiers, no credit card required.",
-      "useCase": "Students, hobbyists, bootstrapped founders, and anyone avoiding subscriptions",
-      "cost": "$0/month",
-      "tags": [
-        "free",
-        "no-credit-card",
-        "beginner-friendly",
-        "unlimited-local"
-      ],
-      "featured": true,
-      "layers": [
-        {
-          "name": "IDE",
-          "tool": "Cursor Hobby / Qoder",
-          "toolId": "cursor",
-          "reason": "Limited completions + GPT-5.5-Instant chat, no credit card"
-        },
-        {
-          "name": "API",
-          "tool": "OpenRouter + Groq",
-          "toolId": "openrouter",
-          "reason": "50 req/day OpenRouter + 14.4K req/day Groq combo"
-        },
-        {
-          "name": "CLI",
-          "tool": "Gemini CLI / OpenCode Zen",
-          "toolId": "gemini-cli",
-          "reason": "1,500 req/day Gemini 3 Flash or OpenCode Zen free models"
-        },
-        {
-          "name": "Local Models",
-          "tool": "Ollama + Qwen3.6-Plus",
-          "toolId": "ollama",
-          "reason": "Unlimited offline coding with top open models"
-        },
-        {
-          "name": "Embeddings",
-          "tool": "Jina AI",
-          "toolId": "jina-embeddings",
-          "reason": "1M tokens/day free for RAG and semantic search"
-        },
-        {
-          "name": "Vector DB",
-          "tool": "ChromaDB / LanceDB",
-          "toolId": "chromadb",
-          "reason": "Free, open-source, runs locally"
-        }
-      ]
-    },
-    {
-      "id": "fastest",
-      "name": "Speed Demon Stack",
-      "description": "Blazing fast inference for real-time applications. Sub-100ms responses at every layer.",
-      "useCase": "Live coding assistants, chatbots, real-time analysis, trading bots",
-      "cost": "$0-20/month",
-      "tags": [
-        "fast",
-        "low-latency",
-        "real-time",
-        "production"
-      ],
-      "featured": true,
-      "layers": [
-        {
-          "name": "Inference",
-          "tool": "Groq / Cerebras",
-          "toolId": "groq",
-          "reason": "2,000 tokens/sec (Cerebras), 50ms latency"
-        },
-        {
-          "name": "Coding",
-          "tool": "Qwen3.6-Plus via Groq",
-          "toolId": "groq",
-          "reason": "1,000 req/day at 71.2% SWE-bench"
-        },
-        {
-          "name": "Agent",
-          "tool": "OpenCode Zen",
-          "toolId": "opencode",
-          "reason": "Big Pickle (72.0%), MiniMax M2.5 (80.2%)"
-        },
-        {
-          "name": "Caching",
-          "tool": "DeepSeek V4",
-          "toolId": "deepseek-coder-v4",
-          "reason": "90% cache discount on repeated prompts"
-        },
-        {
-          "name": "Edge Deploy",
-          "tool": "Cloudflare Workers AI",
-          "toolId": "cloudflare-workers-ai",
-          "reason": "Run models at the edge, 10K neurons/day free"
-        }
-      ]
-    },
-    {
-      "id": "cheapest-pro",
-      "name": "Pro on a Budget",
-      "description": "Professional-grade AI tools for under $10/month. Smart provider mixing for maximum value.",
-      "useCase": "Freelancers, indie developers, small teams wanting quality without $200/mo bills",
-      "cost": "~$10/month",
-      "tags": [
-        "cheap",
-        "pro-grade",
-        "budget-friendly",
-        "value"
-      ],
-      "featured": true,
-      "layers": [
-        {
-          "name": "IDE",
-          "tool": "Trae Pro",
-          "toolId": "trae",
-          "reason": "$10/mo for $20 basic usage + bonus + SOLO mode"
-        },
-        {
-          "name": "CLI",
-          "tool": "OpenCode Go / MiMo Lite",
-          "toolId": "opencode",
-          "reason": "Go $10/mo or Xiaomi MiMo Lite $6/mo (~120 tasks)"
-        },
-        {
-          "name": "API",
-          "tool": "OpenRouter",
-          "toolId": "openrouter",
-          "reason": "$10 credits last months with smart model routing"
-        },
-        {
-          "name": "CLI",
-          "tool": "Gemini CLI",
-          "toolId": "gemini-cli",
-          "reason": "v0.37.1 with Gemini 3 Flash, 1,500 req/day free"
-        },
-        {
-          "name": "Fallback",
-          "tool": "Ollama",
-          "toolId": "ollama",
-          "reason": "Free local models for when API quotas run out"
-        }
-      ]
-    },
-    {
-      "id": "local-privacy",
-      "name": "Privacy-First Stack",
-      "description": "100% offline AI development. No data ever leaves your machine - perfect for sensitive code and IP protection.",
-      "useCase": "Enterprise codebases, healthcare apps, legal tech, finance, proprietary software",
-      "cost": "$0/month (hardware only)",
-      "tags": [
-        "privacy",
-        "offline",
-        "secure",
-        "enterprise-ready",
-        "hipaa-friendly"
-      ],
-      "featured": true,
-      "layers": [
-        {
-          "name": "Models",
-          "tool": "Ollama + Llama 3.3 / Qwen3-Coder",
-          "toolId": "ollama",
-          "reason": "Run Llama 3.3, Qwen3-Coder locally - zero data transmission"
-        },
-        {
-          "name": "IDE",
-          "tool": "Continue.dev + VS Code",
-          "toolId": "continue",
-          "reason": "BYO local models, no cloud required"
-        },
-        {
-          "name": "CLI",
-          "tool": "Aider + local Ollama",
-          "toolId": "aider",
-          "reason": "Git-integrated, works with local models"
-        },
-        {
-          "name": "Chat UI",
-          "tool": "Open WebUI",
-          "toolId": "open-webui",
-          "reason": "Self-hosted ChatGPT alternative, runs entirely local"
-        },
-        {
-          "name": "Vector DB",
-          "tool": "ChromaDB / LanceDB",
-          "toolId": "chromadb",
-          "reason": "Local embeddings storage, no cloud dependency"
-        },
-        {
-          "name": "Speech",
-          "tool": "Whisper (local)",
-          "toolId": "whisper-local",
-          "reason": "Local transcription, no API calls, completely offline"
-        }
-      ]
-    },
-    {
-      "id": "agentic",
-      "name": "Autonomous Agent Stack",
-      "description": "Build self-running AI workflows that handle complex tasks end-to-end with memory and tool use.",
-      "useCase": "Automated code review, documentation updates, testing pipelines, research agents",
-      "cost": "$0-30/month",
-      "tags": [
-        "agents",
-        "automation",
-        "workflows",
-        "self-hosted"
-      ],
-      "featured": true,
-      "layers": [
-        {
-          "name": "Orchestration",
-          "tool": "n8n / Gumloop",
-          "toolId": "n8n",
-          "reason": "Visual workflow builder, self-host for free"
-        },
-        {
-          "name": "Reasoning",
-          "tool": "DeepSeek R1 / DeepSeek V4",
-          "toolId": "deepseek-coder-v4",
-          "reason": "Complex decision making, cheap API"
-        },
-        {
-          "name": "Execution",
-          "tool": "Qwen3.6-Plus",
-          "toolId": "qwen-code",
-          "reason": "Strong coding model at 71.2% SWE-bench"
-        },
-        {
-          "name": "Memory",
-          "tool": "ChromaDB / Supabase Vector",
-          "toolId": "chromadb",
-          "reason": "Long-term agent memory and context storage"
-        },
-        {
-          "name": "Embeddings",
-          "tool": "Jina AI",
-          "toolId": "jina-embeddings",
-          "reason": "1M tokens/day free, powers semantic memory"
-        },
-        {
-          "name": "Monitoring",
-          "tool": "LangSmith",
-          "toolId": "langsmith",
-          "reason": "Trace agent steps and evaluate quality"
-        }
-      ]
-    },
-    {
-      "id": "rag",
-      "name": "Knowledge Base Stack",
-      "description": "Production-ready document Q&A system. Upload documents, ask questions, get cited answers.",
-      "useCase": "Internal wikis, legal document analysis, customer support, research assistants, exam prep",
-      "cost": "$0-50/month",
-      "tags": [
-        "rag",
-        "documents",
-        "knowledge-base",
-        "qa",
-        "production"
-      ],
-      "featured": true,
-      "layers": [
-        {
-          "name": "Framework",
-          "tool": "LlamaIndex / LangChain",
-          "toolId": "llamaindex",
-          "reason": "RAG orchestration, ingestion to query end-to-end"
-        },
-        {
-          "name": "Vector DB",
-          "tool": "ChromaDB / Weaviate / Supabase",
-          "toolId": "chromadb",
-          "reason": "Document storage and retrieval"
-        },
-        {
-          "name": "Embeddings",
-          "tool": "E5-Mistral-7B (best accuracy)",
-          "toolId": "bge-embeddings",
-          "reason": "Best open-source embeddings for retrieval accuracy"
-        },
-        {
-          "name": "LLM",
-          "tool": "Claude Sonnet 4.6 (79.3% SWE)",
-          "toolId": "claude-code",
-          "reason": "Excellent at following instructions and citing sources"
-        },
-        {
-          "name": "UI",
-          "tool": "Open WebUI",
-          "toolId": "open-webui",
-          "reason": "Chat interface with document upload, RAG-ready out of the box"
-        },
-        {
-          "name": "Eval",
-          "tool": "RAGAS",
-          "toolId": "ragas",
-          "reason": "Measure RAG pipeline performance"
-        }
-      ]
-    },
-    {
-      "id": "startup-mvp",
-      "name": "Startup MVP Stack",
-      "description": "Ship fast with AI-assisted full-stack development. From idea to deployed product in days.",
-      "useCase": "Startup founders, indie hackers, rapid prototyping, weekend projects",
-      "cost": "$20-50/month",
-      "tags": [
-        "startup",
-        "mvp",
-        "full-stack",
-        "ship-fast"
-      ],
-      "featured": false,
-      "layers": [
-        {
-          "name": "Full-Stack",
-          "tool": "v0.dev",
-          "toolId": "v0",
-          "reason": "Generate React components from prompts, free tier available"
-        },
-        {
-          "name": "Backend",
-          "tool": "Supabase",
-          "toolId": "supabase",
-          "reason": "Database, auth, storage - free tier generous for MVPs"
-        },
-        {
-          "name": "IDE",
-          "tool": "Cursor",
-          "toolId": "cursor",
-          "reason": "Best-in-class AI coding, Hobby free tier, then $20/mo Pro"
-        },
-        {
-          "name": "Design",
-          "tool": "Figma AI",
-          "toolId": "figma-ai",
-          "reason": "UI mockups and wireframes with AI assistance"
-        },
-        {
-          "name": "Copy",
-          "tool": "Claude",
-          "toolId": "claude-chat",
-          "reason": "Marketing copy, emails, documentation"
-        },
-        {
-          "name": "Deploy",
-          "tool": "Vercel",
-          "toolId": "vercel",
-          "reason": "Deploy in seconds, free tier for static sites"
-        }
-      ]
-    },
-    {
-      "id": "documentation",
-      "name": "Docs & Content Stack",
-      "description": "AI-powered technical writing and documentation workflow. Never write docs from scratch again.",
-      "useCase": "Developer advocates, tech writers, open source maintainers, product teams",
-      "cost": "$0-20/month",
-      "tags": [
-        "documentation",
-        "technical-writing",
-        "dx"
-      ],
-      "featured": false,
-      "layers": [
-        {
-          "name": "Generation",
-          "tool": "Mintlify Writer",
-          "toolId": "mintlify",
-          "reason": "AI writes docs from your code automatically"
-        },
-        {
-          "name": "Editing",
-          "tool": "Grammarly",
-          "toolId": "grammarly",
-          "reason": "Polish and grammar check for technical writing"
-        },
-        {
-          "name": "Examples",
-          "tool": "Claude",
-          "toolId": "claude-chat",
-          "reason": "Generate code examples and tutorials"
-        },
-        {
-          "name": "Diagrams",
-          "tool": "Mermaid",
-          "toolId": "mermaid",
-          "reason": "Text-to-diagrams for architecture docs"
-        },
-        {
-          "name": "Hosting",
-          "tool": "Mintlify",
-          "toolId": "mintlify",
-          "reason": "Beautiful docs sites with AI search, free for open source"
-        }
-      ]
-    }
-  ],
-  "last_updated": "2026-08-18T13:06:43.923610+00:00",
-  "category_counts": {
-    "ide": 8,
-    "llm-api": 10,
-    "cli": 15,
-    "local-model": 6,
-    "rag": 6,
-    "agent": 5,
-    "vector-db": 3,
-    "speech": 4,
-    "image": 7,
-    "video": 4,
-    "hosting": 3,
-    "evaluation": 3,
-    "embedding": 3,
-    "chat-platform": 5,
-    "browser": 3
-  }
+  "last_updated": "2026-08-21T19:24:27.543022+00:00"
 }

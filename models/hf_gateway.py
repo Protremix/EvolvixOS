@@ -159,7 +159,7 @@ class HFGatewayHandler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     # FIX: Use port 20129 to match Nginx config, and ThreadingHTTPServer
     port = int(os.environ.get("HF_GATEWAY_PORT", "20129"))
-    server = ThreadingHTTPServer(("0.0.0.0", port), HFGatewayHandler)
+    server = ThreadingHTTPServer(("127.0.0.1", port), HFGatewayHandler)
     print(f"🤗 HuggingFace Gateway v8.1 running on port {port} (threaded)")
     print(f"   Models: {', '.join(HF_MODELS.keys())}")
     server.serve_forever()

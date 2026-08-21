@@ -186,7 +186,7 @@ class AuthHandler(BaseHTTPRequestHandler):
 
     def _read_body(self):
         length = int(self.headers.get("Content-Length", 0))
-        if length > 1_000_000:  # 1MB max
+        if length > 1048576:  # 1MB max
             return {}
         if length:
             return json.loads(self.rfile.read(length))
@@ -486,5 +486,5 @@ init_api_keys_table()
 if __name__ == "__main__":
     port = 5022
     print(f"EvolvixOS Auth API v8.1 starting on port {port}")
-    server = ThreadingHTTPServer(("0.0.0.0", port), AuthHandler)
+    server = ThreadingHTTPServer(("127.0.0.1", port), AuthHandler)
     server.serve_forever()
