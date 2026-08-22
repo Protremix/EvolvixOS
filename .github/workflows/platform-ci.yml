@@ -26,7 +26,7 @@ jobs:
       - name: Run tests
         run: |
           find . -name "test_*.py" -o -name "*_test.py" | head -20
-          python -m pytest tests/ -v --tb=short 2>/dev/null || echo "No test directory found"
+          python -m pytest tests/ -v --tb=short --maxfail=0
 
   docker-build:
     name: Docker Build Check
