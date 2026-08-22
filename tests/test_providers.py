@@ -1,6 +1,13 @@
 """Model Provider Tests"""
-import sys, os, pytest
+import sys, os, urllib.request, pytest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+def server_available(url, timeout=2):
+    try:
+        urllib.request.urlopen(url, timeout=timeout)
+        return True
+    except Exception:
+        return False
 
 try:
     if os.path.exists("/opt/evolvixos/.env"):
@@ -12,11 +19,13 @@ try:
                 if k not in os.environ: os.environ[k] = v
     from v10.providers.ollama import OllamaProvider
     from v10.providers.groq import GroqProvider
+    HAS_OLLAMA = server_available("http://127.0.0.1:11434/api/tags")
     HAS_PROVIDERS = True
-except (ImportError, ConnectionError, Exception):
+except Exception:
     HAS_PROVIDERS = False
+    HAS_OLLAMA = False
 
-pytestmark = pytest.mark.skipif(not HAS_PROVIDERS, reason="Providers or server not available")
+pytestmark = pytest.mark.skipif(not (HAS_PROVIDERS and HAS_OLLAMA), reason="Providers or Ollama server not available")
 
 
 class TestOllamaProvider:

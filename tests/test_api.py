@@ -86,6 +86,6 @@ class TestMonitoring:
     def test_prometheus_running(self):
         import subprocess
         result = subprocess.run(["docker", "ps", "--format", "{{.Names}}"], capture_output=True, text=True)
-        if result.returncode != 0:
-            pytest.skip("docker not available")
+        if result.returncode != 0 or not result.stdout.strip():
+            pytest.skip("docker not available or no containers running")
         assert "evolvixos-prometheus" in result.stdout

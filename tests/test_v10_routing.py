@@ -1,8 +1,15 @@
 """V10 Model Routing Tests"""
-import sys, os, pytest
+import sys, os, json, urllib.request, pytest
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Skip entire module if v10 or Ollama not available
+def server_available(url, timeout=2):
+    try:
+        urllib.request.urlopen(url, timeout=timeout)
+        return True
+    except Exception:
+        return False
+
+# Skip entire module if v10 modules or Ollama server not available
 try:
     if os.path.exists("/opt/evolvixos/.env"):
         for line in open("/opt/evolvixos/.env"):
@@ -15,11 +22,14 @@ try:
     from v10.providers.base import LLMRegistry, PrivacyMode
     from v10.providers.ollama import OllamaProvider
     from v10.providers.groq import GroqProvider
+    # Also verify Ollama server is reachable
+    HAS_OLLAMA = server_available("http://127.0.0.1:11434/api/tags")
     HAS_V10 = True
-except (ImportError, ConnectionError, Exception):
+except Exception:
     HAS_V10 = False
+    HAS_OLLAMA = False
 
-pytestmark = pytest.mark.skipif(not HAS_V10, reason="V10 modules or server not available")
+pytestmark = pytest.mark.skipif(not (HAS_V10 and HAS_OLLAMA), reason="V10 modules or Ollama server not available")
 
 
 @pytest.fixture
