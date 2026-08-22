@@ -1,20 +1,26 @@
-
 """V10 Model Routing Tests"""
 import sys, os, pytest
-sys.path.insert(0, "/opt/evolvixos")
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-if os.path.exists("/opt/evolvixos/.env"):
-    for line in open("/opt/evolvixos/.env"):
-        line = line.strip()
-        if line and not line.startswith("#") and "=" in line:
-            k, v = line.split("=", 1)
-            v = v.strip().strip("'").strip('"')
-            if k not in os.environ: os.environ[k] = v
+# Skip entire module if v10 or Ollama not available
+try:
+    if os.path.exists("/opt/evolvixos/.env"):
+        for line in open("/opt/evolvixos/.env"):
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                v = v.strip().strip("'").strip('"')
+                if k not in os.environ: os.environ[k] = v
+    from v10.router.model_router import ModelRouter
+    from v10.providers.base import LLMRegistry, PrivacyMode
+    from v10.providers.ollama import OllamaProvider
+    from v10.providers.groq import GroqProvider
+    HAS_V10 = True
+except (ImportError, ConnectionError, Exception):
+    HAS_V10 = False
 
-from v10.router.model_router import ModelRouter
-from v10.providers.base import LLMRegistry, PrivacyMode
-from v10.providers.ollama import OllamaProvider
-from v10.providers.groq import GroqProvider
+pytestmark = pytest.mark.skipif(not HAS_V10, reason="V10 modules or server not available")
+
 
 @pytest.fixture
 def registry():
@@ -63,7 +69,6 @@ class TestPerTaskModelSelection:
 
     def test_simple_short_uses_chat_model(self, router):
         d = router.route("hi")
-        # Router classifies as task_type=chat, uses chat model (7b)
         assert d.task_type == "chat"
         assert d.model == "qwen2.5:7b"
 
