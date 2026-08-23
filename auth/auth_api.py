@@ -577,9 +577,9 @@ class AuthHandler(BaseHTTPRequestHandler):
                     "api-key": BREVO_API_KEY
                 })
                 urllib.request.urlopen(req, timeout=15)
-                logger.info(f"Password reset OTP sent to {email}")
+                print(f"Password reset OTP sent to {email}")
             except Exception as e:
-                logger.error(f"Failed to send reset email: {e}")
+                print(f"Failed to send reset email: {e}")
             
             self._send_json(200, {"ok": True, "message": "If the email exists, a reset code has been sent."})
             return
