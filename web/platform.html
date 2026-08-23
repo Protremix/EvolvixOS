@@ -439,9 +439,26 @@ select option { background: #0a0a0f; }
               <div class="flex-1">
                 <div class="text-xs text-gray-500 mb-1">Model:</div>
                 <select id="agent-model" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm">
-                  <option value="auto">🤖 Automatic</option>
+                  <option value="auto" selected>🤖 Automatic</option>
                   <option value="openai/gpt-oss-20b">⚡ GPT-OSS 20B</option>
+                  <option value="openai/gpt-oss-120b">🧠 GPT-OSS 120B</option>
+                  <option value="z-ai/glm-4.7-flash">⚡ GLM 4.7 Flash</option>
                   <option value="z-ai/glm-5">🔮 GLM 5</option>
+                  <option value="z-ai/glm-5.2">💎 GLM 5.2</option>
+                  <option value="z-ai/glm-5.2:free">🆓 GLM 5.2 (Free)</option>
+                  <option value="google/gemma-4-31b-it:free">🆓 Gemma 4 31B</option>
+                  <option value="nvidia/nemotron-3-ultra-550b-a55b:free">🆓 Nemotron Ultra</option>
+                  <option value="nvidia/nemotron-3-super-120b-a12b:free">🆓 Nemotron Super</option>
+                  <option value="cohere/north-mini-code:free">🆓 Cohere North Code</option>
+                  <option value="deepseek/deepseek-v4-flash">⚡ DeepSeek V4 Flash</option>
+                  <option value="inclusionai/ling-2.6-flash">⚡ Ling 2.6 Flash</option>
+                  <option value="mistralai/mistral-nemo">⚡ Mistral Nemo</option>
+                  <option value="ibm-granite/granite-4.0-h-micro">⚡ Granite 4.0</option>
+                  <option value="google/gemini-3.1-pro-preview">🌟 Gemini 3.1 Pro</option>
+                  <option value="anthropic/claude-sonnet-5">🎭 Claude Sonnet 5</option>
+                  <option value="moonshot/kimi-k2.5">🌙 Kimi K2.5</option>
+                  <option value="amazon/nova-pro-v1">📦 Amazon Nova Pro</option>
+                  <option value="mistralai/mistral-large-2512">🦊 Mistral Large</option>
                   <option value="qwen2.5:14b">💻 Qwen 14B (Local)</option>
                   <option value="qwen2.5:7b">💻 Qwen 7B (Local)</option>
                 </select>
@@ -450,6 +467,25 @@ select option { background: #0a0a0f; }
                 <div class="text-xs text-gray-500 mb-1">Temperature:</div>
                 <input id="agent-temp" type="number" min="0" max="1" step="0.1" value="0.7"
                   class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm">
+              </div>
+            </div>
+            <div class="flex gap-2 mb-3">
+              <div class="flex-1">
+                <div class="text-xs text-gray-500 mb-1">Max tokens:</div>
+                <input id="agent-max-tokens" type="number" min="256" max="32768" step="256" value="4096"
+                  class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm">
+              </div>
+              <div class="flex-1">
+                <div class="text-xs text-gray-500 mb-1">Top-p:</div>
+                <input id="agent-top-p" type="number" min="0" max="1" step="0.05" value="0.9"
+                  class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm">
+              </div>
+              <div class="flex-1 flex flex-col">
+                <div class="text-xs text-gray-500 mb-1">Memory:</div>
+                <select id="agent-memory-enabled" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm">
+                  <option value="true" selected>Enabled</option>
+                  <option value="false">Disabled</option>
+                </select>
               </div>
             </div>
             <div class="text-xs text-gray-500 mb-1">Tools (comma-separated):</div>
@@ -1125,10 +1161,13 @@ async function createAgent() {
   const system_prompt = document.getElementById('agent-prompt').value;
   const model = document.getElementById('agent-model').value;
   const temperature = parseFloat(document.getElementById('agent-temp').value) || 0.7;
+  const max_tokens = parseInt(document.getElementById('agent-max-tokens')?.value) || 4096;
+  const top_p = parseFloat(document.getElementById('agent-top-p')?.value) || 0.9;
+  const memory_enabled = document.getElementById('agent-memory-enabled')?.value !== 'false';
   const tools = document.getElementById('agent-tools').value.split(',').map(t => t.trim()).filter(Boolean);
   if (!name || !system_prompt) return toast('Enter name and prompt', 'error');
   try {
-    await api('/agents', 'POST', {name, system_prompt, model, temperature, tools});
+    await api('/agents', 'POST', {name, system_prompt, model, temperature, tools, max_tokens, top_p, memory_enabled});
     closeAgentModal();
     loadAgents();
     toast(`Agent '${name}' created`, 'success');
@@ -1151,7 +1190,9 @@ async function openAgentChat(name) {
   document.getElementById('agent-chat-active').classList.remove('hidden');
   document.getElementById('agent-chat-title').textContent = name;
   document.getElementById('agent-chat-avatar').textContent = name.charAt(0).toUpperCase();
-  document.getElementById('agent-chat-model').textContent = currentAgentData?.model || 'auto';
+  const _tools = currentAgentData?.tools?.length || 0;
+  const _mem = currentAgentData?.memory?.length || 0;
+  document.getElementById('agent-chat-model').textContent = (currentAgentData?.model || 'auto') + ' - ' + _tools + ' tools - ' + _mem + ' mem';
   document.getElementById('agent-chat-messages').innerHTML = '';
   
   // Load past conversation history for this agent
