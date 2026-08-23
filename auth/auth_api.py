@@ -116,21 +116,29 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def send_email_otp(to_email, otp_code, display_name=""):
-    """Send OTP verification code via email using IONOS SMTP relay."""
+    """Send OTP verification code via Brevo API (HTTPS — no port 25 needed)."""
     import os
+    import urllib.request
 
-    SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.ionos.es")
-    SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
-    SMTP_USER = os.environ.get("SMTP_USER", "info@protremix.com")
-    SMTP_PASS = os.environ.get("SMTP_PASS", "")
+    BREVO_API_KEY = os.environ.get("BREVO_API_KEY", os.environ.get("BRAVO_API_KEY", ""))
+    BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
+    SENDER_EMAIL = os.environ.get("SMTP_USER", "noreply@evolvixos.com")
+    SENDER_NAME = "EvolvixOS"
 
-    try:
-        msg = MIMEMultipart("alternative")
-        msg["From"] = f"EvolvixOS <{SMTP_USER}>"
-        msg["To"] = to_email
-        msg["Subject"] = f"Your EvolvixOS Verification Code: {otp_code}"
+    html = f"""<html><body style="font-family:Inter,Arial,sans-serif;background:#0a0a0f;color:#fff;padding:40px;margin:0;">
+<div style="max-width:480px;margin:0 auto;background:#111113;border:1px solid #1f1f23;border-radius:16px;padding:40px;">
+<h1 style="color:#fff;font-size:24px;margin:0 0 8px;">EvolvixOS</h1>
+<p style="color:#888;font-size:14px;margin:0 0 24px;">AI Engineering Platform</p>
+<p style="color:#ccc;font-size:16px;">Hello {display_name or 'there'},</p>
+<p style="color:#ccc;font-size:16px;">Your verification code is:</p>
+<div style="background:#0a0a0b;border:1px solid #333;border-radius:12px;padding:20px;text-align:center;margin:20px 0;">
+<span style="font-size:32px;font-weight:700;color:#2dd4bf;letter-spacing:8px;">{otp_code}</span>
+</div>
+<p style="color:#888;font-size:13px;">This code expires in 10 minutes. If you didn\'t create an account, ignore this email.</p>
+<p style="color:#555;font-size:12px;margin-top:32px;">— EvolvixOS Team</p>
+</div></body></html>"""
 
-        text = f"""EvolvixOS Email Verification
+    text = f"""EvolvixOS Email Verification
 
 Hello {display_name or 'there'}!
 
@@ -140,39 +148,43 @@ This code expires in 10 minutes.
 
 — EvolvixOS Team"""
 
-        html = f"""<html><body style="font-family:Inter,sans-serif;background:#0a0a0f;color:#fff;padding:40px;">
-<div style="max-width:480px;margin:0 auto;background:#111113;border:1px solid #1f1f23;border-radius:16px;padding:40px;">
-<h1 style="color:#fff;font-size:24px;margin:0 0 8px;">EvolvixOS</h1>
-<p style="color:#888;font-size:14px;margin:0 0 24px;">AI Engineering Platform</p>
-<p style="color:#ccc;font-size:16px;">Hello {display_name or 'there'},</p>
-<p style="color:#ccc;font-size:16px;">Your verification code is:</p>
-<div style="background:#0a0a0b;border:1px solid #333;border-radius:12px;padding:20px;text-align:center;margin:20px 0;">
-<span style="font-size:32px;font-weight:700;color:#2dd4bf;letter-spacing:8px;">{otp_code}</span>
-</div>
-<p style="color:#888;font-size:13px;">This code expires in 10 minutes. If you didn't create an account, ignore this email.</p>
-<p style="color:#555;font-size:12px;margin-top:32px;">— EvolvixOS Team</p>
-</div></body></html>"""
+    payload = json.dumps({
+        "sender": {"email": SENDER_EMAIL, "name": SENDER_NAME},
+        "to": [{"email": to_email}],
+        "subject": f"Your EvolvixOS Verification Code: {otp_code}",
+        "htmlContent": html,
+        "textContent": text
+    }).encode()
 
-        msg.attach(MIMEText(text, "plain"))
-        msg.attach(MIMEText(html, "html"))
-
-        # Try direct SMTP relay (port 587) first
-        if SMTP_PASS:
-            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as server:
-                server.starttls()
-                server.login(SMTP_USER, SMTP_PASS)
-                server.sendmail(SMTP_USER, to_email, msg.as_string())
-            print(f"Email OTP sent to {to_email} via {SMTP_HOST}")
+    try:
+        req = urllib.request.Request(BREVO_API_URL, data=payload, headers={
+            "Content-Type": "application/json",
+            "api-key": BREVO_API_KEY
+        })
+        resp = urllib.request.urlopen(req, timeout=15)
+        if resp.status in (200, 201):
+            print(f"Email OTP sent to {to_email} via Brevo API")
             return True
         else:
-            # Fallback: try local postfix
+            print(f"Brevo API returned {resp.status}")
+            return False
+    except Exception as e:
+        print(f"Email OTP send error (Brevo API): {e}")
+        # Fallback to local postfix
+        try:
+            msg = MIMEMultipart("alternative")
+            msg["From"] = f"EvolvixOS <noreply@evolvixos.com>"
+            msg["To"] = to_email
+            msg["Subject"] = f"Your EvolvixOS Verification Code: {otp_code}"
+            msg.attach(MIMEText(text, "plain"))
+            msg.attach(MIMEText(html, "html"))
             with smtplib.SMTP("127.0.0.1", 25, timeout=10) as server:
                 server.sendmail("noreply@evolvixos.com", to_email, msg.as_string())
-            print(f"Email OTP sent to {to_email} via local postfix")
+            print(f"Email OTP sent to {to_email} via local postfix (fallback)")
             return True
-    except Exception as e:
-        print(f"Email OTP send error: {e}")
-        return False
+        except Exception as e2:
+            print(f"Fallback also failed: {e2}")
+            return False
 
 
 def send_telegram_otp(chat_id, otp_code, display_name=""):
