@@ -1301,8 +1301,24 @@ document.querySelectorAll('.nav-item').forEach(item => {
 // ─── API helpers ───
 async function api(path, method='GET', body=null) {
   const opts = {method, headers: {'Content-Type': 'application/json'}};
+  // Inject auth token from localStorage
+  try {
+    const raw = localStorage.getItem('evolvixos_user');
+    if (raw) {
+      const user = JSON.parse(raw);
+      if (user && user.token) {
+        opts.headers['Authorization'] = 'Bearer ' + user.token;
+      }
+    }
+  } catch(e) {}
   if (body) opts.body = JSON.stringify(body);
   const res = await fetch(API + path, opts);
+  if (res.status === 401) {
+    // Token expired — redirect to login
+    localStorage.removeItem('evolvixos_user');
+    window.location.href = '/login';
+    return {};
+  }
   return res.json();
 }
 
@@ -1755,7 +1771,12 @@ async function uploadFile(event) {
   const formData = new FormData();
   formData.append('file', file);
   try {
-    const res = await fetch(API + '/storage/upload', {method: 'POST', body: formData});
+    const uploadOpts = {method: 'POST', body: formData};
+    try {
+      const raw = localStorage.getItem('evolvixos_user');
+      if (raw) { const u = JSON.parse(raw); if (u && u.token) uploadOpts.headers = {'Authorization': 'Bearer ' + u.token}; }
+    } catch(e) {}
+    const res = await fetch(API + '/storage/upload', uploadOpts);
     const data = await res.json();
     document.getElementById('upload-result').innerHTML = `<div class="text-sm text-green-400 mt-4">✓ Uploaded: <a href="${data.url}" target="_blank" class="text-purple-400 hover:underline">${data.url || 'file'}</a></div>`;
     toast('File uploaded', 'success');
