@@ -20,41 +20,87 @@ html, body { -webkit-tap-highlight-color: transparent; overscroll-behavior: none
 body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6}
 .mono{font-family:'JetBrains Mono',monospace}
 
+/* ─── Scroll Progress Bar ─── */
+.scroll-progress{position:fixed;top:0;left:0;height:3px;width:0%;z-index:200;background:linear-gradient(90deg,var(--purple),var(--pink),var(--cyan));transition:width .1s;box-shadow:0 0 10px rgba(168,85,247,.5)}
+
+/* ─── Animated Background Orbs ─── */
+.orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.25;pointer-events:none;z-index:0;animation:float 20s ease-in-out infinite}
+.orb-1{width:500px;height:500px;background:var(--purple);top:-100px;left:-100px;animation-delay:0s}
+.orb-2{width:400px;height:400px;background:var(--pink);top:40%;right:-100px;animation-delay:-5s}
+.orb-3{width:350px;height:350px;background:var(--cyan);bottom:-100px;left:30%;animation-delay:-10s}
+@keyframes float{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-50px) scale(1.1)}66%{transform:translate(-20px,30px) scale(.95)}}
+
 /* ─── Nav ─── */
-nav{position:fixed;top:0;width:100%;z-index:100;backdrop-filter:blur(12px);background:rgba(10,10,15,0.8);border-bottom:1px solid var(--border);transition:padding .3s}
-nav .inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:16px 24px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.5px}
-.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--purple),var(--pink));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff}
+nav{position:fixed;top:0;width:100%;z-index:100;backdrop-filter:blur(12px);background:rgba(10,10,15,.8);border-bottom:1px solid var(--border);transition:padding .3s,background .3s}
+nav.scrolled{background:rgba(10,10,15,.95);box-shadow:0 4px 30px rgba(0,0,0,.3)}
+nav .inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:16px 24px;transition:padding .3s}
+nav.scrolled .inner{padding:10px 24px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.5px;transition:transform .2s}
+.logo:hover{transform:scale(1.03)}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--purple),var(--pink));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;box-shadow:0 0 20px rgba(168,85,247,.3);animation:logoGlow 3s ease-in-out infinite}
+@keyframes logoGlow{0%,100%{box-shadow:0 0 20px rgba(168,85,247,.3)}50%{box-shadow:0 0 30px rgba(217,70,239,.5)}}
 .nav-links{display:flex;gap:28px;align-items:center}
-.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
-.nav-links a:hover{color:var(--text)}
-.btn-launch{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff !important;padding:8px 20px;border-radius:8px;font-weight:600 !important;font-size:14px;transition:transform .2s,box-shadow .2s}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s;position:relative}
+.nav-links a:not(.btn-launch)::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--pink));transition:width .3s}
+.nav-links a:not(.btn-launch):hover{color:var(--text)}
+.nav-links a:not(.btn-launch):hover::after{width:100%}
+.btn-launch{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff !important;padding:8px 20px;border-radius:8px;font-weight:600 !important;font-size:14px;transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.btn-launch::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);transition:left .5s}
 .btn-launch:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(168,85,247,.4)}
+.btn-launch:hover::before{left:100%}
 
 /* ─── Hero ─── */
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;text-align:center;padding:80px 24px 60px}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;text-align:center;padding:80px 24px 60px;z-index:1}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(168,85,247,.15),transparent);pointer-events:none}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:6px 16px;font-size:13px;color:var(--muted);margin-bottom:24px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:6px 16px;font-size:13px;color:var(--muted);margin-bottom:24px;animation:fadeInDown .8s ease}
 .hero-badge .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.hero h1{font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-2px;line-height:1.1;margin-bottom:20px}
-.hero h1 .grad{background:linear-gradient(135deg,var(--purple),var(--pink),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:clamp(16px,2vw,20px);color:var(--muted);max-width:600px;margin:0 auto 36px}
-.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.btn-primary{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;padding:14px 32px;border-radius:10px;font-weight:700;font-size:16px;text-decoration:none;transition:transform .2s,box-shadow .3s;display:inline-flex;align-items:center;gap:8px}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+.hero h1{font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-2px;line-height:1.1;margin-bottom:20px;animation:fadeInUp .8s ease .15s both}
+.hero h1 .grad{background:linear-gradient(135deg,var(--purple),var(--pink),var(--cyan),var(--purple));background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradientShift 4s ease infinite}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.hero .typewriter{border-right:3px solid var(--purple);animation:blink .8s step-end infinite;padding-right:4px}
+@keyframes blink{50%{border-color:transparent}}
+.hero p{font-size:clamp(16px,2vw,20px);color:var(--muted);max-width:600px;margin:0 auto 36px;animation:fadeInUp .8s ease .3s both}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeInUp .8s ease .45s both}
+.btn-primary{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;padding:14px 32px;border-radius:10px;font-weight:700;font-size:16px;text-decoration:none;transition:transform .2s,box-shadow .3s;display:inline-flex;align-items:center;gap:8px;position:relative;overflow:hidden}
+.btn-primary::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transition:left .6s}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(168,85,247,.35)}
-.btn-secondary{background:var(--card);border:1px solid var(--border);color:var(--text);padding:14px 32px;border-radius:10px;font-weight:600;font-size:16px;text-decoration:none;transition:border-color .2s;display:inline-flex;align-items:center;gap:8px}
-.btn-secondary:hover{border-color:var(--purple)}
+.btn-primary:hover::before{left:100%}
+.btn-secondary{background:var(--card);border:1px solid var(--border);color:var(--text);padding:14px 32px;border-radius:10px;font-weight:600;font-size:16px;text-decoration:none;transition:all .3s;display:inline-flex;align-items:center;gap:8px}
+.btn-secondary:hover{border-color:var(--purple);box-shadow:0 0 20px rgba(168,85,247,.15);transform:translateY(-1px)}
 
-/* ─── Brains ─── */
-.section{max-width:1200px;margin:0 auto;padding:80px 24px}
+/* ─── Stats ─── */
+.stats-row{display:flex;justify-content:center;gap:48px;flex-wrap:wrap;margin:40px 0 0;animation:fadeInUp .8s ease .6s both}
+.stat{text-align:center}
+.stat .num{font-size:36px;font-weight:800;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat .label{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* ─── Scroll Reveal ─── */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-stagger > *{opacity:0;transform:translateY(20px);transition:opacity .5s ease,transform .5s ease}
+.reveal-stagger.visible > *{opacity:1;transform:translateY(0)}
+.reveal-stagger.visible > *:nth-child(1){transition-delay:0s}
+.reveal-stagger.visible > *:nth-child(2){transition-delay:.08s}
+.reveal-stagger.visible > *:nth-child(3){transition-delay:.16s}
+.reveal-stagger.visible > *:nth-child(4){transition-delay:.24s}
+.reveal-stagger.visible > *:nth-child(5){transition-delay:.32s}
+.reveal-stagger.visible > *:nth-child(6){transition-delay:.4s}
+
+/* ─── Sections ─── */
+.section{max-width:1200px;margin:0 auto;padding:80px 24px;position:relative;z-index:1}
 .section-title{text-align:center;margin-bottom:50px}
 .section-title h2{font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-1px;margin-bottom:12px}
 .section-title p{color:var(--muted);font-size:17px}
+
+/* ─── Brains ─── */
 .brains-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
-.brain-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;transition:transform .3s,border-color .3s}
-.brain-card:hover{transform:translateY(-4px);border-color:var(--purple)}
-.brain-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;font-weight:700}
+.brain-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;transition:transform .4s cubic-bezier(.34,1.56,.64,1),border-color .3s,box-shadow .3s;position:relative;overflow:hidden}
+.brain-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--purple),transparent);opacity:0;transition:opacity .3s}
+.brain-card:hover{transform:translateY(-8px);border-color:var(--purple);box-shadow:0 12px 40px rgba(168,85,247,.15)}
+.brain-card:hover::before{opacity:1}
+.brain-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;font-weight:700;transition:transform .3s}
+.brain-card:hover .brain-icon{transform:scale(1.15) rotate(-5deg)}
 .brain-card h3{font-size:15px;font-weight:700;margin-bottom:4px}
 .brain-card .model{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:8px}
 .brain-card .desc{font-size:13px;color:var(--dim);line-height:1.5}
@@ -62,33 +108,42 @@ nav .inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justif
 
 /* ─── Features ─── */
 .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
-.feature-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;transition:border-color .3s}
-.feature-card:hover{border-color:var(--pink)}
-.feature-icon{font-size:28px;margin-bottom:16px}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;transition:transform .4s cubic-bezier(.34,1.56,.64,1),border-color .3s,box-shadow .3s;position:relative;overflow:hidden}
+.feature-card::after{content:'';position:absolute;bottom:0;left:0;width:100%;height:0;background:linear-gradient(transparent,rgba(168,85,247,.05));transition:height .4s;pointer-events:none}
+.feature-card:hover{transform:translateY(-6px);border-color:var(--pink);box-shadow:0 10px 40px rgba(217,70,239,.1)}
+.feature-card:hover::after{height:100%}
+.feature-icon{font-size:28px;margin-bottom:16px;display:inline-block;transition:transform .3s}
+.feature-card:hover .feature-icon{transform:scale(1.2)}
 .feature-card h3{font-size:18px;font-weight:700;margin-bottom:8px}
 .feature-card p{color:var(--muted);font-size:14px;line-height:1.6}
 
 /* ─── Code Block ─── */
-.code-block{background:#0d0d12;border:1px solid var(--border);border-radius:14px;overflow:hidden;max-width:700px;margin:0 auto}
+.code-block{background:#0d0d12;border:1px solid var(--border);border-radius:14px;overflow:hidden;max-width:700px;margin:0 auto;transition:border-color .3s,box-shadow .3s}
+.code-block:hover{border-color:var(--purple);box-shadow:0 0 30px rgba(168,85,247,.1)}
 .code-header{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
-.code-dot{width:12px;height:12px;border-radius:50%}
+.code-dot{width:12px;height:12px;border-radius:50%;transition:transform .2s}
+.code-dot:hover{transform:scale(1.2)}
 .code-dot.r{background:#ff5f57}.code-dot.y{background:#febc2e}.code-dot.g{background:#28c840}
 .code-title{font-size:13px;color:var(--muted);margin-left:8px;font-family:'JetBrains Mono',monospace}
 .code-body{padding:20px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;overflow-x:auto;text-align:left}
 .code-body .k{color:var(--purple)}.code-body .s{color:var(--cyan)}.code-body .c{color:var(--dim)}.code-body .n{color:var(--pink)}
 
-/* ─── Stats ─── */
-.stats-row{display:flex;justify-content:center;gap:48px;flex-wrap:wrap;margin:40px 0}
-.stat{text-align:center}
-.stat .num{font-size:36px;font-weight:800;background:linear-gradient(135deg,var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.stat .label{font-size:13px;color:var(--muted);margin-top:4px}
+/* ─── CTA ─── */
+.cta-section{text-align:center;padding:40px 24px;position:relative;z-index:1}
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;height:200px;background:radial-gradient(ellipse,rgba(168,85,247,.1),transparent);pointer-events:none;animation:ctaPulse 4s ease-in-out infinite}
+@keyframes ctaPulse{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.2)}}
 
 /* ─── Footer ─── */
-footer{border-top:1px solid var(--border);padding:40px 24px;text-align:center}
+footer{border-top:1px solid var(--border);padding:40px 24px;text-align:center;position:relative;z-index:1}
 footer p{color:var(--dim);font-size:13px}
-footer a{color:var(--muted);text-decoration:none}
+footer a{color:var(--muted);text-decoration:none;transition:color .2s}
 footer a:hover{color:var(--text)}
 
+/* ─── Animations ─── */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── Mobile ─── */
 @media(max-width:768px){
   .nav-links a:not(.btn-launch){display:none}
   .brains-grid{grid-template-columns:1fr 1fr}
@@ -100,6 +155,7 @@ footer a:hover{color:var(--text)}
   .code-body{font-size:12px;padding:14px}
   .features-grid{grid-template-columns:1fr}
   footer{padding:32px 16px}
+  .orb{filter:blur(60px);opacity:.15}
 }
 @media(max-width:480px){
   .brains-grid{grid-template-columns:1fr}
@@ -121,12 +177,26 @@ footer a:hover{color:var(--text)}
   .nav-links a:last-child{border-bottom:none}
   .nav-links .btn-launch{margin:8px 0 4px;text-align:center}
 }
+
+/* ─── Reduce motion ─── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  .orb{display:none}
+}
 </style>
 </head>
 <body>
 
+<!-- Scroll Progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Animated Background Orbs -->
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
 <!-- Nav -->
-<nav>
+<nav id="nav">
   <div class="inner">
     <a href="/" class="logo"><span class="logo-icon">E</span> EvolvixOS</a>
     <div class="nav-links" id="nav-links">
@@ -141,37 +211,33 @@ footer a:hover{color:var(--text)}
     </div>
   </div>
 </nav>
-<script>
-function toggleNav(){var n=document.getElementById('nav-links');n.classList.toggle('open')}
-function closeNav(){var n=document.getElementById('nav-links');n.classList.remove('open')}
-</script>
 
 <!-- Hero -->
 <section class="hero">
   <div>
-    <div class="hero-badge"><span class="dot"></span> 5 AI brains online · Platform API live</div>
-    <h1>Engineer at the<br><span class="grad">speed of thought</span></h1>
+    <div class="hero-badge"><span class="dot"></span> <span id="hero-badge-text">5 AI brains online</span> · Platform API live</div>
+    <h1>Engineer at the<br><span class="grad" id="hero-grad">speed of thought</span></h1>
     <p>An open-source AI engineering platform that orchestrates multiple LLMs, entity-based data, backend functions, and workflows — all buildable through natural language.</p>
     <div class="hero-cta">
       <a href="/platform/" class="btn-primary">Launch Platform →</a>
       <a href="#brains" class="btn-secondary">Explore AI Brains</a>
     </div>
-    <div class="stats-row">
-      <div class="stat"><div class="num">5</div><div class="label">AI Brains</div></div>
-      <div class="stat"><div class="num">8+</div><div class="label">Entities Built</div></div>
-      <div class="stat"><div class="num">44+</div><div class="label">Tools</div></div>
-      <div class="stat"><div class="num">100%</div><div class="label">Open Source</div></div>
+    <div class="stats-row" id="stats-row">
+      <div class="stat"><div class="num" data-target="5" data-suffix="">0</div><div class="label">AI Brains</div></div>
+      <div class="stat"><div class="num" data-target="8" data-suffix="+">0</div><div class="label">Entities Built</div></div>
+      <div class="stat"><div class="num" data-target="44" data-suffix="+">0</div><div class="label">Tools</div></div>
+      <div class="stat"><div class="num" data-target="100" data-suffix="%">0</div><div class="label">Open Source</div></div>
     </div>
   </div>
 </section>
 
 <!-- AI Brains -->
 <section class="section" id="brains">
-  <div class="section-title">
+  <div class="section-title reveal">
     <h2>5 AI Brains, One Platform</h2>
     <p>Intelligent routing selects the best model for each task — automatically</p>
   </div>
-  <div class="brains-grid">
+  <div class="brains-grid reveal-stagger">
     <div class="brain-card">
       <div class="brain-icon" style="background:rgba(34,211,238,.15);color:#22d3ee">⚡</div>
       <h3>Groq</h3>
@@ -212,11 +278,11 @@ function closeNav(){var n=document.getElementById('nav-links');n.classList.remov
 
 <!-- Features -->
 <section class="section" id="features" style="padding-top:0">
-  <div class="section-title">
+  <div class="section-title reveal">
     <h2>Everything You Need to Build</h2>
     <p>From entity to production — all through natural language</p>
   </div>
-  <div class="features-grid">
+  <div class="features-grid reveal-stagger">
     <div class="feature-card">
       <div class="feature-icon">🗃️</div>
       <h3>Entity System</h3>
@@ -252,11 +318,11 @@ function closeNav(){var n=document.getElementById('nav-links');n.classList.remov
 
 <!-- Code Example -->
 <section class="section" id="code" style="padding-top:0">
-  <div class="section-title">
+  <div class="section-title reveal">
     <h2>Build With Natural Language</h2>
     <p>Or use the REST API directly</p>
   </div>
-  <div class="code-block">
+  <div class="code-block reveal">
     <div class="code-header">
       <div class="code-dot r"></div><div class="code-dot y"></div><div class="code-dot g"></div>
       <span class="code-title">evolvixos — create entity</span>
@@ -283,10 +349,11 @@ function closeNav(){var n=document.getElementById('nav-links');n.classList.remov
 </section>
 
 <!-- CTA -->
-<section class="section" style="text-align:center;padding-top:40px">
-  <h2 style="font-size:clamp(24px,4vw,36px);font-weight:700;margin-bottom:16px">Ready to build?</h2>
-  <p style="color:var(--muted);margin-bottom:32px;font-size:17px">Launch the platform and start creating with natural language.</p>
-  <a href="/platform/" class="btn-primary" style="font-size:18px;padding:16px 40px">Launch Platform →</a>
+<section class="section cta-section">
+  <div class="cta-glow"></div>
+  <h2 class="reveal" style="font-size:clamp(24px,4vw,36px);font-weight:700;margin-bottom:16px;position:relative">Ready to build?</h2>
+  <p class="reveal" style="color:var(--muted);margin-bottom:32px;font-size:17px;position:relative">Launch the platform and start creating with natural language.</p>
+  <a href="/platform/" class="btn-primary reveal" style="font-size:18px;padding:16px 40px;position:relative">Launch Platform →</a>
 </section>
 
 <!-- Footer -->
@@ -296,12 +363,79 @@ function closeNav(){var n=document.getElementById('nav-links');n.classList.remov
 </footer>
 
 <script>
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(a=>{
-  a.addEventListener('click',e=>{e.preventDefault();document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'})})
-})
-// Nav shrink on scroll
-window.addEventListener('scroll',()=>{const n=document.querySelector('nav .inner');n.style.padding=window.scrollY>20?'10px 24px':'16px 24px'})
+function toggleNav(){var n=document.getElementById('nav-links');n.classList.toggle('open')}
+function closeNav(){var n=document.getElementById('nav-links');n.classList.remove('open')}
+
+// ─── Scroll progress bar ───
+var progressBar = document.getElementById('scrollProgress');
+var nav = document.getElementById('nav');
+window.addEventListener('scroll', function() {
+  var scrollH = document.documentElement.scrollHeight - window.innerHeight;
+  var pct = (window.scrollY / scrollH) * 100;
+  progressBar.style.width = pct + '%';
+  if (window.scrollY > 20) nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
+});
+
+// ─── Scroll reveal animations ───
+var revealObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Trigger count-up for stats
+      if (entry.target.id === 'stats-row' || entry.target.closest('#stats-row')) {
+        animateCounters();
+      }
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.reveal, .reveal-stagger').forEach(function(el) { revealObserver.observe(el); });
+
+// ─── Count-up animation ───
+var countersDone = false;
+function animateCounters() {
+  if (countersDone) return;
+  countersDone = true;
+  document.querySelectorAll('.stat .num').forEach(function(el) {
+    var target = parseInt(el.dataset.target);
+    var suffix = el.dataset.suffix || '';
+    var duration = 1200;
+    var start = performance.now();
+    function update(now) {
+      var progress = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+      el.textContent = Math.round(target * eased) + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  });
+}
+
+// ─── Trigger stats count-up on load (hero is visible immediately) ───
+setTimeout(animateCounters, 600);
+
+// ─── Typewriter effect for hero badge ───
+var badgeText = '5 AI brains online';
+var badgeEl = document.getElementById('hero-badge-text');
+badgeEl.textContent = '';
+var charIdx = 0;
+function typeBadge() {
+  if (charIdx < badgeText.length) {
+    badgeEl.textContent += badgeText[charIdx];
+    charIdx++;
+    setTimeout(typeBadge, 60);
+  }
+}
+setTimeout(typeBadge, 400);
+
+// ─── Smooth scroll ───
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    e.preventDefault();
+    var target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
 </script>
 </body>
 </html>
