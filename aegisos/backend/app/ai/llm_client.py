@@ -85,13 +85,13 @@ class LLMClient:
                 try:
                     start = time.time()
                     response = self._openai_client.post(self._base_url, headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}, json=payload)
-                        response.raise_for_status()
-                        data = response.json()
-                        latency_ms = (time.time() - start) * 1000
-                        content = data["choices"][0]["message"]["content"]
-                        tokens = data.get("usage", {}).get("total_tokens", 0)
-                        logger.info("llm_call_success", model=self.model, tokens=tokens, latency_ms=round(latency_ms, 2), attempt=attempt + 1)
-                        return LLMResponse(content=content, model=self.model, tokens_used=tokens, latency_ms=latency_ms)
+                    response.raise_for_status()
+                    data = response.json()
+                    latency_ms = (time.time() - start) * 1000
+                    content = data["choices"][0]["message"]["content"]
+                    tokens = data.get("usage", {}).get("total_tokens", 0)
+                    logger.info("llm_call_success", model=self.model, tokens=tokens, latency_ms=round(latency_ms, 2), attempt=attempt + 1)
+                    return LLMResponse(content=content, model=self.model, tokens_used=tokens, latency_ms=latency_ms)
                 except httpx.HTTPStatusError as e:
                     last_error = e
                     logger.error("llm_call_http_error", status_code=e.response.status_code, attempt=attempt + 1)
