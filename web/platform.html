@@ -693,9 +693,100 @@ select option { background: #0a0a0f; }
 .toggle-checkbox:checked { background: #7c3aed; }
 .toggle-checkbox::before { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: #6b7280; border-radius: 50%; transition: all 0.2s; }
 .toggle-checkbox:checked::before { left: 20px; background: white; }
+
+/* ═══════ PREMIUM ANIMATIONS v2 ═══════ */
+
+/* Scroll progress bar */
+.scroll-progress-platform{position:fixed;top:0;left:0;height:2px;width:0%;z-index:200;background:linear-gradient(90deg,#8b5cf6,#d946ef,#22d3ee);transition:width .1s;box-shadow:0 0 8px rgba(139,92,246,.4)}
+
+/* Animated gradient text */
+.gradient-text{background:linear-gradient(135deg,#8b5cf6,#d946ef,#ec4899,#8b5cf6);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradientShift 5s ease infinite}
+@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* Page transition — scale + fade */
+.page{display:none;animation:pageIn .4s cubic-bezier(.4,0,.2,1)}
+.page.active{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Card stagger reveal */
+.stagger-in{opacity:0;transform:translateY(20px);animation:staggerIn .5s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes staggerIn{to{opacity:1;transform:translateY(0)}}
+
+/* Modal scale-up */
+.modal-content{animation:modalIn .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(.92) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-overlay{backdrop-filter:blur(8px);animation:overlayIn .2s ease}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+
+/* Toast slide-in */
+.toast{animation:toastIn .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-20px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Button ripple */
+.ripple{position:relative;overflow:hidden}
+.ripple-effect{position:absolute;border-radius:50%;background:rgba(255,255,255,.3);transform:scale(0);animation:rippleAnim .6s ease-out;pointer-events:none}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0}}
+
+/* Neon card hover */
+.entity-card{transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.entity-card:hover{transform:translateY(-4px);border-color:rgba(139,92,246,.5);box-shadow:0 8px 30px rgba(139,92,246,.15),0 0 20px rgba(139,92,246,.08)}
+.agent-list-item{transition:all .25s cubic-bezier(.4,0,.2,1)}
+.agent-list-item:hover{background:rgba(139,92,246,.06);transform:translateX(2px)}
+
+/* Nav item active bar */
+.nav-item{transition:all .25s cubic-bezier(.4,0,.2,1);position:relative}
+.nav-item:hover{background:rgba(139,92,246,.06);transform:translateX(2px)}
+.nav-item.active{background:linear-gradient(90deg,rgba(139,92,246,.15),transparent)}
+.nav-item.active::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#8b5cf6,#d946ef);border-radius:0 2px 2px 0;animation:navBarIn .3s ease}
+@keyframes navBarIn{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+
+/* Logo pulsing glow */
+.logo-glow{animation:logoGlow 3s ease-in-out infinite}
+@keyframes logoGlow{0%,100%{box-shadow:0 0 20px rgba(139,92,246,.2)}50%{box-shadow:0 0 30px rgba(217,70,239,.4)}}
+
+/* Suggestion card — spring hover */
+.suggestion-card{transition:all .3s cubic-bezier(.34,1.56,.64,1);cursor:pointer}
+.suggestion-card:hover{transform:translateY(-4px) scale(1.02);border-color:rgba(139,92,246,.4);box-shadow:0 12px 40px rgba(139,92,246,.12)}
+
+/* Prompt box glow */
+.prompt-box{transition:all .3s ease}
+.prompt-box:focus-within{border-color:rgba(139,92,246,.5);box-shadow:0 0 0 4px rgba(139,92,246,.08),0 8px 30px rgba(139,92,246,.12),0 0 20px rgba(139,92,246,.05)}
+
+/* Chat message slide-in */
+.chat-msg{animation:msgIn .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes msgIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Typing dots — bounce */
+.typing-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#8b5cf6;margin:0 2px;animation:typingBounce 1.4s infinite}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+
+/* Floating background orbs */
+.plat-orb{position:fixed;border-radius:50%;filter:blur(100px);opacity:.08;pointer-events:none;z-index:0;animation:orbFloat 25s ease-in-out infinite}
+.plat-orb-1{width:400px;height:400px;background:#8b5cf6;top:-100px;right:-100px;animation-delay:0s}
+.plat-orb-2{width:300px;height:300px;background:#d946ef;bottom:-50px;left:200px;animation-delay:-8s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-60px) scale(1.1)}66%{transform:translate(-30px,40px) scale(.9)}}
+
+/* Tool chip pop */
+.tool-chip{animation:chipPop .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes chipPop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+
+/* Toggle switch */
+.toggle-checkbox{transition:background .3s}
+.toggle-checkbox::before{transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+
+/* Skeleton shimmer */
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.02) 25%,rgba(139,92,246,.06) 50%,rgba(255,255,255,.02) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+
+/* Reduced motion */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}.plat-orb{display:none}}
+
 </style>
 </head>
 <body class="bg-[#0a0a0f] text-gray-100 h-screen overflow-hidden">
+<!-- Scroll Progress --><div class="scroll-progress-platform" id="scrollProgressPlat"></div>
+<!-- Background Orbs --><div class="plat-orb plat-orb-1"></div><div class="plat-orb plat-orb-2"></div>
 
 <!-- Layout: Sidebar + Main -->
 <div class="flex h-screen">
@@ -709,7 +800,7 @@ select option { background: #0a0a0f; }
     <div class="p-4 border-b border-gray-800/60">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 flex items-center justify-center font-bold text-sm shadow-lg shadow-purple-500/20" style="animation: float 3s ease-in-out infinite;">E</div>
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 flex items-center justify-center font-bold text-sm logo-glow">E</div>
         <div>
           <span class="font-semibold text-sm">EvolvixOS</span>
           <p class="text-[10px] text-gray-500 -mt-0.5">Platform Builder</p>
@@ -2372,5 +2463,77 @@ setInterval(checkHealth, 30000);
   </div>
 </div>
 
+<script>
+// ═══ Premium Animation JS ═══
+(function(){
+  // Scroll progress bar
+  var sp = document.getElementById('scrollProgressPlat');
+  var scrollContainer = document.querySelector('.flex-1.overflow-y-auto');
+  if (scrollContainer) {
+    scrollContainer.addEventListener('scroll', function() {
+      var sh = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+      if (sh > 0) sp.style.width = (scrollContainer.scrollTop / sh * 100) + '%';
+    });
+  }
+  
+  // Button ripple effect
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('button');
+    if (!btn || btn.disabled) return;
+    var rect = btn.getBoundingClientRect();
+    var ripple = document.createElement('span');
+    ripple.className = 'ripple-effect';
+    var size = Math.max(rect.width, rect.height);
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+    btn.appendChild(ripple);
+    setTimeout(function() { ripple.remove(); }, 600);
+  });
+  
+  // Stagger reveal — observe cards when they appear
+  function addStagger(selector, delayBase) {
+    document.querySelectorAll(selector).forEach(function(el, i) {
+      if (el.classList.contains('stagger-in')) return;
+      el.classList.add('stagger-in');
+      el.style.animationDelay = (i * delayBase) + 's';
+    });
+  }
+  
+  // Hook into existing render functions to add stagger
+  var origRenderEntities = window.renderEntities;
+  if (origRenderEntities) {
+    window.renderEntities = function() {
+      origRenderEntities.apply(this, arguments);
+      setTimeout(function() { addStagger('#entities-grid > div', 0.06); }, 10);
+    };
+  }
+  var origRenderAgents = window.renderAgentsList;
+  if (origRenderAgents) {
+    window.renderAgentsList = function() {
+      origRenderAgents.apply(this, arguments);
+      setTimeout(function() { addStagger('#agents-list > div', 0.05); }, 10);
+    };
+  }
+  var origRenderFuncs = window.renderFunctions;
+  if (origRenderFuncs) {
+    window.renderFunctions = function() {
+      origRenderFuncs.apply(this, arguments);
+      setTimeout(function() { addStagger('#functions-list > div', 0.06); }, 10);
+    };
+  }
+  
+  // Add ripple class to all buttons
+  document.querySelectorAll('button').forEach(function(b) { b.classList.add('ripple'); });
+})();
+
+// Apply gradient-text to page headings
+document.querySelectorAll('.page h2').forEach(function(h) {
+  if (!h.classList.contains('gradient-text') && !h.closest('.modal-content')) {
+    h.classList.add('gradient-text');
+  }
+});
+
+</script>
 </body>
 </html>
