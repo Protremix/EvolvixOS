@@ -10,6 +10,30 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 
+
+// Theme Toggle
+function toggleTheme() {
+  var body = document.body;
+  body.classList.toggle('light-mode');
+  var isLight = body.classList.contains('light-mode');
+  localStorage.setItem('evolvixos_theme', isLight ? 'light' : 'dark');
+  var sun = document.querySelector('.sun-icon');
+  var moon = document.querySelector('.moon-icon');
+  if (sun && moon) { sun.style.display = isLight ? 'block' : 'none'; moon.style.display = isLight ? 'none' : 'block'; }
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', isLight ? '#f5f5f9' : '#0a0a0f');
+}
+(function() {
+  var saved = localStorage.getItem('evolvixos_theme');
+  if (saved === 'light') {
+    document.body.classList.add('light-mode');
+    setTimeout(function() {
+      var sun = document.querySelector('.sun-icon'); var moon = document.querySelector('.moon-icon');
+      if (sun && moon) { sun.style.display = 'block'; moon.style.display = 'none'; }
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f5f5f9');
+    }, 100);
+  }
+})();
+
 // User Settings
 async function openUserSettings() {
   try {
@@ -801,6 +825,76 @@ select option { background: #0a0a0f; }
 .cmd-footer{padding:8px 16px;border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;font-size:11px;color:#475569}
 .cmd-footer kbd{background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px}
 
+
+/* Theme Toggle */
+.theme-toggle{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);cursor:pointer;transition:all .2s;color:#64748b}
+.theme-toggle:hover{border-color:rgba(139,92,246,.3);color:#a78bfa}
+.theme-toggle svg{width:14px;height:14px}
+
+/* Light mode overrides */
+body.light-mode{background:#f5f5f9 !important;color:#1e1e2e}
+body.light-mode .bg-\[\#0a0a0f\]{background:#f5f5f9 !important}
+body.light-mode .bg-\[\#0c0c12\]{background:#fff !important}
+body.light-mode .bg-\[\#0f0f12\]{background:#fff !important}
+body.light-mode .bg-\[\#12121a\]{background:#f1f1f6 !important}
+body.light-mode .bg-\[\#1a1a2e\]{background:#e8e8f0 !important}
+body.light-mode .text-gray-100{color:#1e1e2e !important}
+body.light-mode .text-gray-300{color:#475569 !important}
+body.light-mode .text-gray-400{color:#64748b !important}
+body.light-mode .text-gray-500{color:#94a3b8 !important}
+body.light-mode .text-gray-600{color:#cbd5e1 !important}
+body.light-mode .text-gray-700{color:#e2e8f0 !important}
+body.light-mode .text-white{color:#1e1e2e !important}
+body.light-mode .border-gray-800{border-color:#e2e8f0 !important}
+body.light-mode .border-gray-800\/60{border-color:#e2e8f0 !important}
+body.light-mode .border-gray-700{border-color:#cbd5e1 !important}
+body.light-mode .bg-white\/5{background:rgba(0,0,0,.04) !important}
+body.light-mode .bg-white\/10{background:rgba(0,0,0,.06) !important}
+body.light-mode .bg-white\/\[0\.02\]{background:rgba(0,0,0,.02) !important}
+body.light-mode .bg-white\/\[0\.04\]{background:rgba(0,0,0,.03) !important}
+body.light-mode .bg-purple-500\/10{background:rgba(139,92,246,.08) !important}
+body.light-mode .hover\:bg-purple-500\/10:hover{background:rgba(139,92,246,.08) !important}
+body.light-mode .hover\:bg-white\/5:hover{background:rgba(0,0,0,.04) !important}
+body.light-mode .hover\:text-white:hover{color:#1e1e2e !important}
+body.light-mode .hover\:text-purple-400:hover{color:#7c3aed !important}
+body.light-mode .border-white\/10{border-color:rgba(0,0,0,.08) !important}
+body.light-mode .border-white\/5{border-color:rgba(0,0,0,.05) !important}
+body.light-mode .border-white\/\[0\.06\]{border-color:rgba(0,0,0,.05) !important}
+body.light-mode .divide-gray-800>*{border-color:#e2e8f0 !important}
+body.light-mode .bg-gray-800{background:#e2e8f0 !important}
+body.light-mode .bg-gray-900{background:#f1f1f6 !important}
+body.light-mode select option{background:#fff !important;color:#1e1e2e}
+body.light-mode input{background:#fff !important;color:#1e1e2e}
+body.light-mode input::placeholder{color:#94a3b8}
+body.light-mode textarea{background:#fff !important;color:#1e1e2e}
+body.light-mode select{background:#fff !important;color:#1e1e2e}
+body.light-mode .agent-msg-content pre{background:#f1f1f6 !important;border:1px solid #e2e8f0 !important;color:#1e1e2e}
+body.light-mode .cmd-palette{background:#fff !important;border:1px solid #e2e8f0 !important;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+body.light-mode .cmd-input{color:#1e1e2e !important}
+body.light-mode .cmd-input::placeholder{color:#94a3b8}
+body.light-mode .cmd-item-label{color:#1e1e2e !important}
+body.light-mode .cmd-footer{border-top:1px solid #e2e8f0 !important;color:#94a3b8}
+body.light-mode .cmd-item-icon{background:rgba(139,92,246,.08)}
+body.light-mode .plat-orb{opacity:.04 !important}
+body.light-mode .scroll-progress-platform{background:#7c3aed !important}
+body.light-mode .toast{background:#fff !important;color:#1e1e2e;border:1px solid #e2e8f0}
+body.light-mode .modal-overlay{background:rgba(0,0,0,.3) !important}
+body.light-mode .modal{background:#fff !important;color:#1e1e2e;border:1px solid #e2e8f0}
+body.light-mode .bottom-nav{background:#fff !important;border-top:1px solid #e2e8f0 !important}
+body.light-mode .nav-item.active{background:linear-gradient(90deg,rgba(139,92,246,.08),transparent) !important}
+body.light-mode .nav-item.active::before{background:linear-gradient(180deg,#7c3aed,#c026d3) !important}
+body.light-mode .gradient-text{background:linear-gradient(135deg,#7c3aed,#c026d3);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+body.light-mode .header-links a{color:#64748b !important}
+body.light-mode .header-links a:hover{color:#7c3aed !important}
+body.light-mode .logo-glow{box-shadow:0 0 15px rgba(139,92,246,.2)}
+body.light-mode h1,body.light-mode h2,body.light-mode h3{color:#1e1e2e}
+body.light-mode .chat-bubble-ai{background:#f1f1f6 !important;color:#1e1e2e}
+body.light-mode .typing-dot{background:#7c3aed !important}
+body.light-mode .ripple{background:rgba(139,92,246,.3)}
+body.light-mode .bg-black\/40{background:rgba(0,0,0,.2) !important}
+body.light-mode .bg-black\/50{background:rgba(0,0,0,.2) !important}
+body.light-mode .bg-black\/60{background:rgba(0,0,0,.3) !important}
+
 </style>
 </head>
 <body class="bg-[#0a0a0f] text-gray-100 h-screen overflow-hidden">
@@ -858,6 +952,10 @@ select option { background: #0a0a0f; }
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg>
         Agents
       </a>
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="analytics">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 12l4-4 4 4 5-5"/></svg>
+        Analytics
+      </a>
       <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="memory">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg>
         Memory
@@ -896,7 +994,11 @@ select option { background: #0a0a0f; }
         <h1 id="page-title" class="text-sm font-medium text-gray-300">AI Builder</h1>
       </div>
       <div class="header-links flex items-center gap-3 text-xs text-gray-500">
-        <a href="/platform/api/docs" target="_blank" class="hover:text-purple-400 transition-colors">API Docs</a>
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">
+        <svg class="sun-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="moon-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      </button>
+      <a href="/platform/api/docs" target="_blank" class="hover:text-purple-400 transition-colors">API Docs</a>
         <span class="text-gray-700">·</span>
         <a href="/" class="hover:text-purple-400 transition-colors">Home</a>
       </div>
@@ -1272,7 +1374,106 @@ select option { background: #0a0a0f; }
       </div>
 
       <!-- Memory Page -->
-      <div id="page-memory" class="page p-6 max-w-3xl mx-auto">
+      <div id="page-analytics" class="page p-6 max-w-5xl mx-auto">
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold gradient-text mb-1">Analytics Dashboard</h2>
+    <p class="text-sm text-gray-500">Platform overview and usage metrics</p>
+  </div>
+
+  <!-- Stat Cards -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="analytics-stats">
+    <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-5 hover:border-purple-500/30 transition-all">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[11px] text-gray-500 uppercase tracking-wider font-medium">Entities</span>
+        <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+          <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+      </div>
+      <p class="text-2xl font-bold" id="stat-entities">-</p>
+      <p class="text-[11px] text-gray-600 mt-1">data models</p>
+    </div>
+    <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-5 hover:border-purple-500/30 transition-all">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[11px] text-gray-500 uppercase tracking-wider font-medium">Functions</span>
+        <div class="w-8 h-8 rounded-lg bg-fuchsia-500/10 flex items-center justify-center">
+          <svg class="w-4 h-4 text-fuchsia-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+        </div>
+      </div>
+      <p class="text-2xl font-bold" id="stat-functions">-</p>
+      <p class="text-[11px] text-gray-600 mt-1">deployed endpoints</p>
+    </div>
+    <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-5 hover:border-purple-500/30 transition-all">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[11px] text-gray-500 uppercase tracking-wider font-medium">Agents</span>
+        <div class="w-8 h-8 rounded-lg bg-pink-500/10 flex items-center justify-center">
+          <svg class="w-4 h-4 text-pink-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg>
+        </div>
+      </div>
+      <p class="text-2xl font-bold" id="stat-agents">-</p>
+      <p class="text-[11px] text-gray-600 mt-1">AI agents</p>
+    </div>
+    <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-5 hover:border-purple-500/30 transition-all">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[11px] text-gray-500 uppercase tracking-wider font-medium">Workflows</span>
+        <div class="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6m11-11h-6M7 12H1"/></svg>
+        </div>
+      </div>
+      <p class="text-2xl font-bold" id="stat-workflows">-</p>
+      <p class="text-[11px] text-gray-600 mt-1">automations</p>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-5">
+      <h3 class="text-sm font-semibold text-gray-300 mb-4">Records per Entity</h3>
+      <div id="records-chart" style="min-height:200px">
+        <div class="flex items-center justify-center h-32 text-gray-600 text-xs">Loading...</div>
+      </div>
+    </div>
+    <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-5">
+      <h3 class="text-sm font-semibold text-gray-300 mb-4">AI Model Usage</h3>
+      <div id="model-usage" class="space-y-3">
+        <div class="flex items-center justify-center h-32 text-gray-600 text-xs">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Timeline -->
+  <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-5 mb-6">
+    <h3 class="text-sm font-semibold text-gray-300 mb-4">Recent Activity</h3>
+    <div id="activity-feed" class="space-y-1">
+      <div class="flex items-center justify-center py-8 text-gray-600 text-xs">Loading activity...</div>
+    </div>
+  </div>
+
+  <!-- System Health -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-gray-500">API Status</span>
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-green-500" style="animation: pulse 2s infinite"></span>
+          <span class="text-xs text-green-400 font-medium">Online</span>
+        </span>
+      </div>
+    </div>
+    <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-gray-500">Response Time</span>
+        <span class="text-xs font-mono text-purple-400" id="health-latency">- ms</span>
+      </div>
+    </div>
+    <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-4">
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-gray-500">Active Models</span>
+        <span class="text-xs font-medium text-fuchsia-400" id="health-models">-</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="page-memory" class="page p-6 max-w-3xl mx-auto">
         <div class="flex items-center justify-between mb-8">
           <div>
             <h2 class="text-2xl font-bold">Memory</h2>
@@ -1447,13 +1648,14 @@ function navigateTo(page) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
   if (navItem) navItem.classList.add('active');
-  const titles = {chat: 'AI Builder', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', agents: 'Agents', memory: 'Memory', records: 'Records'};
+  const titles = {chat: 'AI Builder', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', agents: 'Agents', memory: 'Memory', records: 'Records', analytics: 'Analytics'};
   document.getElementById('page-title').textContent = titles[page] || page;
   if (page === 'entities') loadEntities();
   if (page === 'functions') loadFunctions();
   if (page === 'workflows') loadWorkflows();
   if (page === 'agents') loadAgents();
   if (page === 'memory') loadMemory();
+  if (page === 'analytics') loadAnalytics();
 }
 
 document.querySelectorAll('.nav-item').forEach(item => {
@@ -2569,6 +2771,108 @@ document.querySelectorAll('.page h2').forEach(function(h) {
 
 <script>
 
+
+// Analytics Dashboard
+async function loadAnalytics() {
+  try {
+    var entities = [];
+    try { var r1 = await api('/api/entities'); entities = await r1.json(); if (!Array.isArray(entities)) entities = entities.entities || entities.data || []; } catch(e) {}
+
+    var functions = [];
+    try { var r2 = await api('/api/functions'); functions = await r2.json(); if (!Array.isArray(functions)) functions = functions.functions || functions.data || []; } catch(e) {}
+
+    var agents = [];
+    try { var r3 = await api('/api/agents'); agents = await r3.json(); if (!Array.isArray(agents)) agents = agents.agents || agents.data || []; } catch(e) {}
+
+    var workflows = [];
+    try { var r4 = await api('/api/workflows'); workflows = await r4.json(); if (!Array.isArray(workflows)) workflows = workflows.workflows || workflows.data || []; } catch(e) {}
+
+    document.getElementById('stat-entities').textContent = entities.length;
+    document.getElementById('stat-functions').textContent = functions.length;
+    document.getElementById('stat-agents').textContent = agents.length;
+    document.getElementById('stat-workflows').textContent = workflows.length;
+
+    // Records bar chart
+    var rc = document.getElementById('records-chart');
+    if (entities.length > 0) {
+      var counts = [];
+      for (var i = 0; i < Math.min(entities.length, 8); i++) {
+        var nm = entities[i].name || entities[i].entity_name || 'Entity';
+        var ct = entities[i].record_count || entities[i].count || 0;
+        counts.push({name: nm, count: ct});
+      }
+      var mx = Math.max.apply(null, counts.map(function(r){return r.count;})) || 1;
+      rc.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px">' + counts.map(function(r) {
+        var pct = (r.count / mx) * 100;
+        if (pct === 0) pct = 2;
+        return '<div style="display:flex;align-items:center;gap:10px">' +
+          '<span style="font-size:11px;color:#94a3b8;width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0">' + r.name + '</span>' +
+          '<div style="flex:1;height:22px;background:rgba(255,255,255,.03);border-radius:6px;overflow:hidden">' +
+            '<div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#8b5cf6,#d946ef);border-radius:6px;transition:width .8s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;justify-content:flex-end;padding-right:6px">' +
+              '<span style="font-size:10px;color:#fff;font-weight:600">' + r.count + '</span>' +
+            '</div>' +
+          '</div></div>';
+      }).join('') + '</div>';
+    } else {
+      rc.innerHTML = '<div class="flex items-center justify-center h-32 text-gray-600 text-xs">No entities yet</div>';
+    }
+
+    // Model usage
+    var mu = document.getElementById('model-usage');
+    var mc = {};
+    agents.forEach(function(a) { var m = a.model || a.llm_model || 'default'; mc[m] = (mc[m]||0)+1; });
+    if (Object.keys(mc).length === 0) mc = {'Automatic':0,'GLM-5':0,'GPT-OSS':0,'qwen2.5:7b':0};
+    var total = agents.length || 1;
+    var colors = ['#8b5cf6','#d946ef','#ec4899','#f59e0b','#10b981','#3b82f6'];
+    var ci = 0;
+    mu.innerHTML = Object.entries(mc).map(function(e) {
+      var pct = total > 0 ? (e[1]/total)*100 : 0;
+      var c = colors[ci++ % colors.length];
+      return '<div><div style="display:flex;justify-content:space-between;margin-bottom:4px">' +
+        '<span style="font-size:12px;color:#cbd5e1;font-weight:500">' + e[0] + '</span>' +
+        '<span style="font-size:11px;color:#64748b">' + e[1] + '</span></div>' +
+        '<div style="height:8px;background:rgba(255,255,255,.03);border-radius:4px;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;background:' + c + ';border-radius:4px;transition:width .8s ease"></div></div></div>';
+    }).join('');
+
+    // Activity feed
+    var af = document.getElementById('activity-feed');
+    var acts = [];
+    entities.slice(0,3).forEach(function(e) { acts.push({icon:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',text:'Entity "'+(e.name||'?')+'" created',time:e.created_date||'',color:'#a78bfa'}); });
+    functions.slice(0,3).forEach(function(f) { acts.push({icon:'M16 18l6-6-6-6M8 6l-6 6 6 6',text:'Function "'+(f.name||'?')+'" deployed',time:f.created_date||'',color:'#e879f9'}); });
+    agents.slice(0,3).forEach(function(a) { acts.push({icon:'M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0',text:'Agent "'+(a.name||'?')+'" created',time:a.created_date||'',color:'#f472b6'}); });
+    acts.sort(function(a,b){return (b.time||'').localeCompare(a.time||'');});
+    acts = acts.slice(0,8);
+    if (acts.length > 0) {
+      af.innerHTML = acts.map(function(a) {
+        var ts = '';
+        if (a.time) { var d = new Date(a.time); if (!isNaN(d)) { var diff = Date.now()-d.getTime(); if (diff<60000) ts='just now'; else if (diff<3600000) ts=Math.floor(diff/60000)+'m ago'; else if (diff<86400000) ts=Math.floor(diff/3600000)+'h ago'; else ts=Math.floor(diff/86400000)+'d ago'; } }
+        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03)">' +
+          '<div style="width:28px;height:28px;border-radius:8px;background:'+a.color+'15;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<svg width="14" height="14" fill="none" stroke="'+a.color+'" stroke-width="2" viewBox="0 0 24 24"><path d="'+a.icon+'"/></svg></div>' +
+          '<span style="font-size:13px;color:#cbd5b4;flex:1">'+a.text+'</span>' +
+          '<span style="font-size:11px;color:#475569">'+ts+'</span></div>';
+      }).join('');
+    } else {
+      af.innerHTML = '<div class="flex items-center justify-center py-8 text-gray-600 text-xs">No recent activity</div>';
+    }
+
+    // System health
+    try {
+      var start = Date.now();
+      var hr = await fetch(API + '/health');
+      var hd = await hr.json();
+      document.getElementById('health-latency').textContent = (Date.now()-start) + ' ms';
+      document.getElementById('health-models').textContent = (hd.models||hd.providers||5) + ' active';
+    } catch(e) {
+      document.getElementById('health-latency').textContent = '- ms';
+      document.getElementById('health-models').textContent = '-';
+    }
+  } catch(e) {
+    console.error('Analytics error:', e);
+  }
+}
+
 // ═══ Command Palette ═══
 var cmdItems = [
   {label:'AI Builder',desc:'Open the AI chat builder',page:'chat',icon:'M12 2L2 7l10 5 10-5-10-5z'},
@@ -2578,6 +2882,7 @@ var cmdItems = [
   {label:'Storage',desc:'Upload and manage files',page:'storage',icon:'M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z'},
   {label:'Agents',desc:'Chat with AI agents',page:'agents',icon:'M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0'},
   {label:'Memory',desc:'Platform memory and preferences',page:'memory',icon:'M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0'},
+  {label:'Analytics',desc:'Usage metrics and activity',page:'analytics',icon:'M3 3v18h18M7 12l4-4 4 4 5-5'},
   {label:'Billing',desc:'Plans, credits, and billing',page:'billing',icon:'M3 10h18M3 10l2-6h14l2 6M3 10v10h18V10'},
   {label:'New Entity',desc:'Create a new data model',action:'newEntity',icon:'M12 5v14M5 12h14'},
   {label:'New Function',desc:'Deploy a new backend function',action:'newFunction',icon:'M12 5v14M5 12h14'},
@@ -2654,11 +2959,11 @@ function executeCmd(index) {
   if (item.page) {
     navigateTo(item.page);
   } else if (item.action === 'newEntity') {
-    showPage('entities'); setTimeout(function(){ if(typeof showCreateEntity==="function") showCreateEntity(); }, 200, 200);
+    navigateTo('entities');
   } else if (item.action === 'newFunction') {
-    showPage('functions'); setTimeout(function(){ if(typeof showCreateFunction==="function") showCreateFunction(); }, 200, 200);
+    navigateTo('functions');
   } else if (item.action === 'newAgent') {
-    showPage('agents'); setTimeout(function(){ if(typeof showCreateAgent==="function") showCreateAgent(); }, 200, 200);
+    navigateTo('agents');
   } else if (item.action === 'newChat') {
     startNewChat();
   }
