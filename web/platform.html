@@ -4,7 +4,151 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EvolvixOS Platform — Build Apps with AI</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com">
+// User Settings
+async function openUserSettings() {
+  try {
+    var raw = localStorage.getItem('evolvixos_user');
+    if (!raw) { toast('Please login first', 'error'); return; }
+    var user = JSON.parse(raw);
+    var token = user.token || '';
+    // Load profile
+    var resp = await fetch('https://evolvixos.com/auth/me', { headers: { 'Authorization': 'Bearer ' + token } });
+    var data = await resp.json();
+    var u = data.user || data;
+    document.getElementById('user-email').value = u.email || '';
+    document.getElementById('user-display-name').value = u.display_name || '';
+    document.getElementById('user-telegram').value = u.telegram_username || '';
+    document.getElementById('user-settings-title').textContent = (u.display_name || u.email || 'Account') + ' Settings';
+    var av = (u.display_name || u.email || 'U').charAt(0).toUpperCase();
+    document.getElementById('user-avatar-display').textContent = av;
+    // Load usage
+    loadUsage(token);
+    // Load API keys
+    loadApiKeys(token);
+    // Load sessions
+    loadSessions(token);
+    switchUserTab('profile');
+    document.getElementById('user-settings-modal').classList.remove('hidden');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+function closeUserSettings() { document.getElementById('user-settings-modal').classList.add('hidden'); }
+function switchUserTab(tab) {
+  document.querySelectorAll('.user-tab-content').forEach(function(el) { el.classList.add('hidden'); });
+  document.querySelectorAll('.user-tab-btn').forEach(function(el) { el.classList.remove('active'); });
+  var t = document.getElementById('utab-' + tab); if (t) t.classList.remove('hidden');
+  var b = document.getElementById('utab-btn-' + tab); if (b) b.classList.add('active');
+}
+async function saveUserProfile() {
+  var raw = localStorage.getItem('evolvixos_user');
+  var user = JSON.parse(raw);
+  var resp = await fetch('https://evolvixos.com/auth/update-profile', {
+    method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ display_name: document.getElementById('user-display-name').value, telegram_username: document.getElementById('user-telegram').value })
+  });
+  var data = await resp.json();
+  if (data.message) { toast('Profile saved', 'success'); openUserSettings(); }
+  else { toast('Error: ' + (data.error || 'Unknown'), 'error'); }
+}
+async function changePassword() {
+  var newPass = document.getElementById('user-new-pass').value;
+  var confirmPass = document.getElementById('user-confirm-pass').value;
+  if (newPass !== confirmPass) { toast('Passwords do not match', 'error'); return; }
+  if (newPass.length < 6) { toast('Password must be 6+ characters', 'error'); return; }
+  var raw = localStorage.getItem('evolvixos_user');
+  var user = JSON.parse(raw);
+  var resp = await fetch('https://evolvixos.com/auth/change-password', {
+    method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ current_password: document.getElementById('user-current-pass').value, new_password: newPass })
+  });
+  var data = await resp.json();
+  if (data.message) { toast('Password changed', 'success'); document.getElementById('user-current-pass').value = ''; document.getElementById('user-new-pass').value = ''; document.getElementById('user-confirm-pass').value = ''; }
+  else { toast('Error: ' + (data.error || 'Unknown'), 'error'); }
+}
+async function loadUsage(token) {
+  try {
+    var resp = await fetch('https://evolvixos.com/auth/usage', { headers: { 'Authorization': 'Bearer ' + token } });
+    var data = await resp.json();
+    var stats = [
+      { label: 'API Calls', value: data.api_calls, icon: 'calls' },
+      { label: 'Entities', value: data.entities, icon: 'ent' },
+      { label: 'Agents', value: data.agents, icon: 'agt' },
+      { label: 'API Keys', value: data.api_keys, icon: 'key' },
+      { label: 'Sessions', value: data.active_sessions, icon: 'ses' },
+      { label: 'Member Since', value: data.member_since ? data.member_since.split(' ')[0] : '', icon: 'cal' }
+    ];
+    document.getElementById('usage-stats').innerHTML = stats.map(function(s) {
+      return '<div class="bg-[#0a0a0f] rounded-lg border border-gray-800 p-4"><div class="text-xs text-gray-500">' + s.label + '</div><div class="text-2xl font-bold mt-1">' + s.value + '</div></div>';
+    }).join('');
+    document.getElementById('user-plan-display').textContent = data.plan + ' Plan';
+  } catch(e) { console.error(e); }
+}
+async function loadApiKeys(token) {
+  try {
+    var resp = await fetch('https://evolvixos.com/auth/api-keys', { headers: { 'Authorization': 'Bearer ' + token } });
+    var data = await resp.json();
+    var keys = data.keys || [];
+    var list = document.getElementById('api-keys-list');
+    if (!keys.length) { list.innerHTML = '<div class="text-xs text-gray-600 py-4">No API keys yet</div>'; return; }
+    list.innerHTML = keys.map(function(k) {
+      return '<div class="flex items-center justify-between bg-[#0a0a0f] rounded-lg border border-gray-800 p-3"><div><div class="text-sm font-mono">' + k.key_id + '</div><div class="text-xs text-gray-500">Name: ' + (k.name||'Default') + ' | Requests: ' + (k.requests||0) + ' | ' + (k.active ? 'Active' : 'Revoked') + '</div></div><button onclick="revokeApiKey(\'' + k.key_id + '\')" class="text-red-400 text-xs hover:text-red-300">Revoke</button></div>';
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+async function createApiKey() {
+  var name = prompt('API key name:', 'My Key');
+  if (!name) return;
+  var raw = localStorage.getItem('evolvixos_user');
+  var user = JSON.parse(raw);
+  var resp = await fetch('https://evolvixos.com/auth/api-keys/generate', {
+    method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: name })
+  });
+  var data = await resp.json();
+  if (data.api_key || data.key) {
+    document.getElementById('new-api-key-display').classList.remove('hidden');
+    document.getElementById('new-key-value').value = data.api_key || data.key;
+    loadApiKeys(user.token);
+    toast('API key created', 'success');
+  } else { toast('Error: ' + (data.error || 'Unknown'), 'error'); }
+}
+async function revokeApiKey(keyId) {
+  if (!confirm('Revoke this API key? It will stop working immediately.')) return;
+  var raw = localStorage.getItem('evolvixos_user');
+  var user = JSON.parse(raw);
+  var resp = await fetch('https://evolvixos.com/auth/api-keys/revoke', {
+    method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ key_id: keyId })
+  });
+  var data = await resp.json();
+  if (data.ok || data.message) { toast('Key revoked', 'success'); loadApiKeys(user.token); }
+  else { toast('Error: ' + (data.error || 'Unknown'), 'error'); }
+}
+function copyNewKey() { var i = document.getElementById('new-key-value'); i.select(); document.execCommand('copy'); toast('Key copied', 'success'); }
+async function loadSessions(token) {
+  try {
+    var resp = await fetch('https://evolvixos.com/auth/sessions', { headers: { 'Authorization': 'Bearer ' + token } });
+    var data = await resp.json();
+    var sessions = data.sessions || [];
+    var list = document.getElementById('sessions-list');
+    if (!sessions.length) { list.innerHTML = '<div class="text-xs text-gray-600 py-4">No active sessions</div>'; return; }
+    list.innerHTML = sessions.slice(0, 10).map(function(s) {
+      return '<div class="flex items-center justify-between bg-[#0a0a0f] rounded-lg border border-gray-800 p-3"><div><div class="text-sm">IP: ' + s.ip + '</div><div class="text-xs text-gray-500">Created: ' + (s.created||'') + '</div></div><button onclick="revokeSession(' + s.id + ')" class="text-red-400 text-xs hover:text-red-300">Revoke</button></div>';
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+async function revokeSession(id) {
+  var raw = localStorage.getItem('evolvixos_user');
+  var user = JSON.parse(raw);
+  var resp = await fetch('https://evolvixos.com/auth/revoke-session', {
+    method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: id })
+  });
+  var data = await resp.json();
+  if (data.message) { toast('Session revoked', 'success'); loadSessions(user.token); }
+}
+
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 * { font-family: 'Inter', sans-serif; }
@@ -1577,6 +1721,73 @@ setInterval(checkHealth, 30000);
       </div>
     </div>
     <div class="flex gap-2 justify-end p-5 border-t border-gray-800"><button onclick="closeAgentSettings()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button><button onclick="saveAgentSettings()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Save Settings</button></div>
+  </div>
+</div>
+
+
+<!-- User Settings Modal -->
+<div id="user-settings-modal" class="fixed inset-0 bg-black/60 modal-overlay flex items-center justify-center z-50 hidden">
+  <div class="modal-content bg-[#0c0c12] border border-gray-800 rounded-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+    <div class="flex items-center justify-between p-5 border-b border-gray-800">
+      <div class="flex items-center gap-3">
+        <div id="user-avatar-display" class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-lg font-bold text-purple-400">U</div>
+        <div>
+          <h3 class="text-lg font-semibold" id="user-settings-title">Account Settings</h3>
+          <p class="text-xs text-gray-500" id="user-plan-display">Community Plan</p>
+        </div>
+      </div>
+      <button onclick="closeUserSettings()" class="text-gray-500 hover:text-white transition-colors text-xl">&times;</button>
+    </div>
+    <div class="flex gap-1 px-5 py-2 border-b border-gray-800/50 overflow-x-auto">
+      <button onclick="switchUserTab('profile')" id="utab-btn-profile" class="user-tab-btn active px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">Profile</button>
+      <button onclick="switchUserTab('security')" id="utab-btn-security" class="user-tab-btn px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">Security</button>
+      <button onclick="switchUserTab('usage')" id="utab-btn-usage" class="user-tab-btn px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">Usage</button>
+      <button onclick="switchUserTab('apikeys')" id="utab-btn-apikeys" class="user-tab-btn px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">API Keys</button>
+      <button onclick="switchUserTab('sessions')" id="utab-btn-sessions" class="user-tab-btn px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">Sessions</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-5">
+      <!-- PROFILE -->
+      <div id="utab-profile" class="user-tab-content space-y-4">
+        <div><div class="text-xs text-gray-500 mb-1">Email</div><input id="user-email" type="text" disabled class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm opacity-60"></div>
+        <div><div class="text-xs text-gray-500 mb-1">Display Name</div><input id="user-display-name" type="text" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"></div>
+        <div><div class="text-xs text-gray-500 mb-1">Telegram Username (for OTP)</div><input id="user-telegram" type="text" placeholder="@username" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"></div>
+        <div id="user-member-since" class="text-xs text-gray-600 bg-[#0a0a0f] rounded-lg p-3 border border-gray-800/40"></div>
+        <button onclick="saveUserProfile()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Save Profile</button>
+      </div>
+      <!-- SECURITY -->
+      <div id="utab-security" class="user-tab-content hidden space-y-4">
+        <div class="text-sm font-medium mb-2">Change Password</div>
+        <div><div class="text-xs text-gray-500 mb-1">Current Password</div><input id="user-current-pass" type="password" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"></div>
+        <div><div class="text-xs text-gray-500 mb-1">New Password</div><input id="user-new-pass" type="password" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"></div>
+        <div><div class="text-xs text-gray-500 mb-1">Confirm New Password</div><input id="user-confirm-pass" type="password" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"></div>
+        <button onclick="changePassword()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Change Password</button>
+      </div>
+      <!-- USAGE -->
+      <div id="utab-usage" class="user-tab-content hidden space-y-4">
+        <div id="usage-stats" class="grid grid-cols-2 gap-3"></div>
+        <div class="pt-4 border-t border-gray-800/50">
+          <div class="text-sm font-medium mb-2">Plan</div>
+          <div class="bg-[#0a0a0f] rounded-lg p-3 border border-gray-800">
+            <div class="flex items-center justify-between"><span class="text-sm">Community Plan</span><span class="text-xs text-green-400">Active</span></div>
+            <div class="text-xs text-gray-500 mt-1">Unlimited entities, agents, functions, workflows</div>
+          </div>
+        </div>
+      </div>
+      <!-- API KEYS -->
+      <div id="utab-apikeys" class="user-tab-content hidden space-y-4">
+        <div class="flex items-center justify-between"><div class="text-sm font-medium">API Keys</div><button onclick="createApiKey()" class="px-3 py-1.5 bg-purple-600 rounded-lg text-sm hover:bg-purple-500">+ Generate New</button></div>
+        <div id="api-keys-list" class="space-y-2"></div>
+        <div id="new-api-key-display" class="hidden bg-green-900/20 border border-green-800 rounded-lg p-3"><div class="text-xs text-green-400 mb-1">New key created! Copy it now — it won't be shown again:</div><div class="flex gap-2"><input id="new-key-value" type="text" readonly class="flex-1 bg-[#0a0a0f] rounded-lg px-3 py-2 text-sm font-mono text-green-400"><button onclick="copyNewKey()" class="px-3 py-2 bg-gray-800 rounded-lg text-sm">Copy</button></div></div>
+      </div>
+      <!-- SESSIONS -->
+      <div id="utab-sessions" class="user-tab-content hidden space-y-4">
+        <div class="text-sm font-medium">Active Sessions</div>
+        <div id="sessions-list" class="space-y-2"></div>
+      </div>
+    </div>
+    <div class="flex gap-2 justify-end p-5 border-t border-gray-800">
+      <button onclick="closeUserSettings()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Close</button>
+    </div>
   </div>
 </div>
 

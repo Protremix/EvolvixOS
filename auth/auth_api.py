@@ -303,6 +303,51 @@ class AuthHandler(BaseHTTPRequestHandler):
             stats = get_usage_stats(user_id)
             self._send_json(200, {"usage": stats})
             return
+        if self.path == "/auth/usage":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute("SELECT count(*) FROM api_usage_log WHERE key_id IN (SELECT key_id FROM api_keys WHERE user_id = ?)", (user_id,))
+                api_calls = c.fetchone()[0]
+                c.execute("SELECT count(*) FROM api_keys WHERE user_id = ? AND is_active = 1", (user_id,))
+                api_keys_count = c.fetchone()[0]
+                c.execute("SELECT count(*) FROM user_sessions WHERE user_id = ?", (user_id,))
+                sessions_count = c.fetchone()[0]
+                c.execute("SELECT created_date FROM users WHERE id = ?", (user_id,))
+                row = c.fetchone()
+                created_date = row[0] if row else ""
+            import urllib.request
+            entity_count = 0
+            agent_count = 0
+            try:
+                resp = urllib.request.urlopen("http://127.0.0.1:8080/api/entities")
+                entity_count = len(json.loads(resp.read()).get("entities", []))
+            except: pass
+            try:
+                resp = urllib.request.urlopen("http://127.0.0.1:8080/api/agents")
+                agent_count = len(json.loads(resp.read()).get("agents", []))
+            except: pass
+            self._send_json(200, {
+                "api_calls": api_calls, "api_keys": api_keys_count,
+                "active_sessions": sessions_count, "entities": entity_count,
+                "agents": agent_count, "member_since": created_date,
+                "plan": "Community", "plan_limits": {"entities": "Unlimited", "agents": "Unlimited", "api_calls": "Unlimited"}
+            })
+            return
+        if self.path == "/auth/sessions":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute("SELECT id, token, created_date, expires, ip_address FROM user_sessions WHERE user_id = ? ORDER BY created_date DESC", (user_id,))
+                sessions = [{"id": r[0], "created": r[2], "expires": r[3], "ip": r[4] or "unknown"} for r in c.fetchall()]
+            self._send_json(200, {"sessions": sessions})
+            return
         self._send_json(404, {"error": "Not found"})
 
     def do_POST(self):
@@ -660,6 +705,51 @@ class AuthHandler(BaseHTTPRequestHandler):
                 self._send_json(200, {"ok": True, "message": "Key revoked"})
             else:
                 self._send_json(404, {"error": "Key not found"})
+            return
+        if path == "/auth/update-profile":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                if "display_name" in body:
+                    c.execute("UPDATE users SET display_name = ? WHERE id = ?", (body["display_name"], user_id))
+                if "telegram_username" in body:
+                    c.execute("UPDATE users SET telegram_username = ? WHERE id = ?", (body["telegram_username"].lstrip("@"), user_id))
+                conn.commit()
+            self._send_json(200, {"message": "Profile updated"})
+            return
+        if path == "/auth/change-password":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            if not body.get("current_password") or not body.get("new_password"):
+                self._send_json(400, {"error": "Missing passwords"})
+                return
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute("SELECT password_hash FROM users WHERE id = ?", (user_id,))
+                row = c.fetchone()
+                if not row or not verify_password(body["current_password"], row[0]):
+                    self._send_json(400, {"error": "Current password incorrect"})
+                    return
+                new_hash = hash_password(body["new_password"])
+                c.execute("UPDATE users SET password_hash = ? WHERE id = ?", (new_hash, user_id))
+                conn.commit()
+            self._send_json(200, {"message": "Password changed"})
+            return
+        if path == "/auth/revoke-session":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute("DELETE FROM user_sessions WHERE id = ? AND user_id = ?", (body.get("session_id"), user_id))
+                conn.commit()
+            self._send_json(200, {"message": "Session revoked"})
             return
         self._send_json(404, {"error": "Endpoint not found"})
 
