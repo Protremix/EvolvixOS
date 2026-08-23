@@ -517,26 +517,30 @@ Proactive defaults (always use action "create_entity"):
 
 Always respond with a JSON action object. If the user just wants to chat, respond with {{"action": "chat", "message": "your response"}}."""
 
-    # Call Ollama
-    ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
-    payload = json.dumps({
-        "model": "qwen2.5:7b",
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": msg.message}
-        ],
-        "stream": False,
-        "options": {"temperature": 0.3}
-    }).encode()
+    # Call Ollama (only as last resort if OpenRouter and GLM both failed)
+    if ai_response is None:
+      ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
+      payload = json.dumps({
+          "model": "qwen2.5:7b",
+          "messages": [
+              {"role": "system", "content": system_prompt},
+              {"role": "user", "content": msg.message}
+          ],
+          "stream": False,
+          "options": {"temperature": 0.3}
+      }).encode()
 
-    try:
-        req = urllib.request.Request(f"{ollama_url}/api/chat", data=payload, headers={"Content-Type": "application/json"})
-        resp = urllib.request.urlopen(req, timeout=30)
-        ollama_data = json.loads(resp.read())
-        ai_response = ollama_data.get("message", {}).get("content", "")
-        resp.close()
-    except Exception as e:
-        return {"error": f"LLM error: {str(e)}", "message": "Sorry, I couldn't process that."}
+      try:
+          req = urllib.request.Request(f"{ollama_url}/api/chat", data=payload, headers={"Content-Type": "application/json"})
+          resp = urllib.request.urlopen(req, timeout=30)
+          ollama_data = json.loads(resp.read())
+          ai_response = ollama_data.get("message", {}).get("content", "")
+          resp.close()
+      except Exception as e:
+          return {"error": f"LLM error: {str(e)}", "message": "Sorry, I couldn't process that."}
+
+    if ai_response is None:
+        return {"error": "All LLM providers failed", "message": "Sorry, I couldn\'t process that."}
 
     # Try to parse AI response as JSON action
     try:
