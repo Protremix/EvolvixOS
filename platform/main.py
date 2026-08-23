@@ -397,7 +397,8 @@ async def create_agent(agent: AgentCreate, db=Depends(get_db)):
     """Create a new AI agent with custom system prompt."""
     try:
         return await AgentManager.create_agent(db, agent.name, agent.system_prompt,
-            agent.model, agent.temperature, agent.tools)
+            agent.model, agent.temperature, agent.tools, "platform",
+            agent.max_tokens, agent.top_p, agent.memory_enabled, agent.stream)
     except ValueError as e:
         raise HTTPException(400, str(e))
 

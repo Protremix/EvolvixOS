@@ -11,8 +11,10 @@ class AgentManager:
 
     @staticmethod
     async def create_agent(db: AsyncSession, name: str, system_prompt: str,
-                          model: str = "qwen2.5:7b", temperature: float = 0.7,
-                          tools: list = None, created_by: str = None):
+                          model: str = "auto", temperature: float = 0.7,
+                          tools: list = None, created_by: str = None,
+                          max_tokens: int = 4096, top_p: float = 0.9,
+                          memory_enabled: bool = True, stream: bool = False):
         if not name or not system_prompt:
             raise ValueError("Name and system_prompt are required")
         result = await db.execute(
@@ -21,12 +23,13 @@ class AgentManager:
         if result.fetchone():
             raise ValueError(f"Agent '{name}' already exists")
         await db.execute(text("""
-            INSERT INTO platform_agents (name, system_prompt, model, temperature, tools, created_by)
-            VALUES (:name, :prompt, :model, :temp, :tools, :created_by)
+            INSERT INTO platform_agents (name, system_prompt, model, temperature, tools, created_by, max_tokens, top_p, memory_enabled, stream)
+            VALUES (:name, :prompt, :model, :temp, :tools, :created_by, :max_tokens, :top_p, :memory_enabled, :stream)
         """), {
             "name": name, "prompt": system_prompt, "model": model,
             "temp": temperature, "tools": json.dumps(tools or []),
-            "created_by": created_by
+            "created_by": created_by, "max_tokens": max_tokens,
+            "top_p": top_p, "memory_enabled": memory_enabled, "stream": stream
         })
         await db.commit()
         return {"name": name, "model": model, "tools": tools or [], "message": f"Agent '{name}' created"}
@@ -34,19 +37,23 @@ class AgentManager:
     @staticmethod
     async def list_agents(db: AsyncSession):
         result = await db.execute(text(
-            "SELECT name, model, temperature, tools, status, created_date FROM platform_agents ORDER BY created_date DESC"
+            "SELECT name, model, temperature, tools, status, created_date, max_tokens, top_p, memory_enabled, stream FROM platform_agents ORDER BY created_date DESC"
         ))
         rows = result.fetchall()
         return [{
             "name": r[0], "model": r[1], "temperature": r[2],
             "tools": r[3] if isinstance(r[3], list) else json.loads(r[3] or "[]"),
-            "status": r[4], "created_date": r[5].isoformat() if r[5] else None
+            "status": r[4], "created_date": r[5].isoformat() if r[5] else None,
+            "max_tokens": r[6] if r[6] else 4096,
+            "top_p": r[7] if r[7] else 0.9,
+            "memory_enabled": r[8] if r[8] is not None else True,
+            "stream": r[9] if r[9] is not None else False
         } for r in rows]
 
     @staticmethod
     async def get_agent(db: AsyncSession, name: str):
         result = await db.execute(text(
-            "SELECT name, system_prompt, model, temperature, tools, memory, status FROM platform_agents WHERE name = :name"
+            "SELECT name, system_prompt, model, temperature, tools, memory, status, max_tokens, top_p, memory_enabled, stream FROM platform_agents WHERE name = :name"
         ), {"name": name})
         row = result.fetchone()
         if not row:
@@ -56,7 +63,11 @@ class AgentManager:
             "temperature": row[3],
             "tools": row[4] if isinstance(row[4], list) else json.loads(row[4] or "[]"),
             "memory": row[5] if isinstance(row[5], list) else json.loads(row[5] or "[]"),
-            "status": row[6]
+            "status": row[6],
+            "max_tokens": row[7] if row[7] else 4096,
+            "top_p": row[8] if row[8] else 0.9,
+            "memory_enabled": row[9] if row[9] is not None else True,
+            "stream": row[10] if row[10] is not None else False
         }
 
     @staticmethod
@@ -78,6 +89,18 @@ class AgentManager:
         if "status" in updates:
             set_clauses.append("status = :status")
             params["status"] = updates["status"]
+        if "max_tokens" in updates:
+            set_clauses.append("max_tokens = :max_tokens")
+            params["max_tokens"] = updates["max_tokens"]
+        if "top_p" in updates:
+            set_clauses.append("top_p = :top_p")
+            params["top_p"] = updates["top_p"]
+        if "memory_enabled" in updates:
+            set_clauses.append("memory_enabled = :memory_enabled")
+            params["memory_enabled"] = updates["memory_enabled"]
+        if "stream" in updates:
+            set_clauses.append("stream = :stream")
+            params["stream"] = updates["stream"]
         if not set_clauses:
             raise ValueError("No fields to update")
         set_clauses.append("updated_date = NOW()")

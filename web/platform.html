@@ -417,7 +417,10 @@ select option { background: #0a0a0f; }
           <div class="modal-content bg-[#0c0c12] border border-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col shadow-2xl">
             <div class="flex items-center justify-between mb-4">
               <h3 id="agent-chat-title" class="text-lg font-semibold">Chat with Agent</h3>
-              <button onclick="closeAgentChat()" class="text-gray-500 hover:text-white transition-colors text-xl">×</button>
+              <button onclick="openAgentSettings()" class="text-gray-500 hover:text-purple-400 transition-colors" title="Agent Settings">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </button>
+                <button onclick="closeAgentChat()" class="text-gray-500 hover:text-white transition-colors text-xl">×</button>
             </div>
             <div id="agent-chat-messages" class="flex-1 overflow-y-auto space-y-3 mb-4 max-h-96"></div>
             <div class="flex gap-2">
@@ -1274,6 +1277,56 @@ async function sendAgentMessage() {
     document.getElementById('agent-typing')?.remove();
     addAgentChatBubble('system', `Error: ${e.message}`);
   }
+}
+
+// Agent Settings
+async function openAgentSettings() {
+  if (!currentAgent) return;
+  try {
+    const data = await api('/agents/' + currentAgent);
+    document.getElementById('settings-agent-name').value = data.name;
+    document.getElementById('settings-system-prompt').value = data.system_prompt || '';
+    document.getElementById('settings-model').value = data.model || 'auto';
+    document.getElementById('settings-temperature').value = data.temperature != null ? data.temperature : 0.7;
+    document.getElementById('settings-max-tokens').value = data.max_tokens != null ? data.max_tokens : 4096;
+    document.getElementById('settings-top-p').value = data.top_p != null ? data.top_p : 0.9;
+    document.getElementById('settings-memory-enabled').value = String(data.memory_enabled != null ? data.memory_enabled : true);
+    document.getElementById('settings-stream').value = String(data.stream != null ? data.stream : false);
+    document.getElementById('settings-tools').value = (data.tools || []).join(', ');
+    document.getElementById('settings-status').value = data.status || 'active';
+    const memCount = (data.memory || []).length;
+    document.getElementById('settings-memory-info').textContent = 'Conversation memory: ' + memCount + ' messages stored (last 20 used in context)';
+    document.getElementById('agent-settings-modal').classList.remove('hidden');
+  } catch(e) { toast('Error loading settings: ' + e.message, 'error'); }
+}
+
+function closeAgentSettings() {
+  document.getElementById('agent-settings-modal').classList.add('hidden');
+}
+
+async function saveAgentSettings() {
+  if (!currentAgent) return;
+  const updates = {
+    system_prompt: document.getElementById('settings-system-prompt').value,
+    model: document.getElementById('settings-model').value,
+    temperature: parseFloat(document.getElementById('settings-temperature').value) || 0.7,
+    max_tokens: parseInt(document.getElementById('settings-max-tokens').value) || 4096,
+    top_p: parseFloat(document.getElementById('settings-top-p').value) || 0.9,
+    memory_enabled: document.getElementById('settings-memory-enabled').value === 'true',
+    stream: document.getElementById('settings-stream').value === 'true',
+    tools: document.getElementById('settings-tools').value.split(',').map(function(t) { return t.trim(); }).filter(Boolean),
+    status: document.getElementById('settings-status').value,
+  };
+  try {
+    await api('/agents/' + currentAgent, 'PUT', updates);
+    closeAgentSettings();
+    toast('Settings saved', 'success');
+    loadAgents();
+    var _tools = (updates.tools || []).length;
+    var _mem = (currentAgentData && currentAgentData.memory) ? currentAgentData.memory.length : 0;
+    var hdr = document.getElementById('agent-chat-model');
+    if (hdr) hdr.textContent = updates.model + ' - ' + _tools + ' tools - ' + _mem + ' mem';
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 async function clearAgentMemory() {
