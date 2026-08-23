@@ -491,18 +491,11 @@ async def chat_build(msg: ChatMessage, db=Depends(get_db)):
     memory_text = ""
     try:
         mem_result = await db.execute(text(
-            "SELECT data FROM entity_platformmemory "
-            "ORDER BY created_date DESC LIMIT 20"
+            "SELECT content FROM entity_platformmemory ORDER BY created_date DESC LIMIT 20"
         ))
         mem_rows = mem_result.fetchall()
         if mem_rows:
-            memory_items = []
-            for r in mem_rows:
-                try:
-                    d = json.loads(r[0]) if isinstance(r[0], str) else r[0]
-                    if isinstance(d, dict) and d.get("content"):
-                        memory_items.append(d["content"])
-                except: pass
+            memory_items = [r[0] for r in mem_rows if r[0]]
             if memory_items:
                 memory_text = "\n\nUSER MEMORY — Things to remember about this user and project:\n" + "\n".join(f"- {m}" for m in memory_items)
     except Exception:
@@ -670,8 +663,8 @@ Always respond with a JSON action object. If the user just wants to chat, respon
                     database="evolvixos", user="evolvixos", password="evolvixos"
                 )
                 await conn.execute(
-                    "INSERT INTO entity_platformmemory (data, created_date, updated_date) VALUES ($1, NOW(), NOW())",
-                    mem_data
+                    "INSERT INTO entity_platformmemory (content, category, scope, confidence, source, timestamp, created_date, updated_date) VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())",
+                    msg.message[:200], "preference", "builder", "inferred", "chat", datetime.now().isoformat()
                 )
                 await conn.close()
                 print(f"Memory saved: {msg.message[:40]}")
