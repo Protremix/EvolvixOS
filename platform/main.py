@@ -38,6 +38,65 @@ from database import get_db, init_db, async_session
 from entities.manager import EntityManager
 from entities.crud import EntityCRUD as EnhancedCRUD
 from auth.middleware import optional_auth, require_auth, require_admin, get_user_from_token
+import sqlite3 as sqlite3_billing
+
+AUTH_DB_PATH = "/opt/evolvixos/auth/users.db"
+
+def deduct_user_credits(user_id, model_id, tokens_in=0, tokens_out=0):
+    """Deduct credits from user subscription based on model tier."""
+    if not user_id:
+        return {"ok": True, "cost": 0}  # No user = free (internal calls)
+    # Model tier costs
+    model_lower = (model_id or "").lower()
+    if ":free" in model_lower:
+        cost = 1
+    elif any(m in model_lower for m in ["gpt-oss-20b", "gpt-oss-120b", "deepseek-v4-flash", "nemotron-3-super"]):
+        cost = 2
+    elif any(m in model_lower for m in ["gemini-3.1-pro-preview", "claude-opus"]):
+        cost = 20
+    elif any(m in model_lower for m in ["glm-5.2", "glm-5.3", "claude-sonnet-5", "gemini-3.1-pro", "kimi-k2.7", "nemotron-3-ultra"]):
+        cost = 10
+    elif any(m in model_lower for m in ["glm-5", "kimi-k2", "qwen2.5"]):
+        cost = 5
+    else:
+        cost = 5
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute("SELECT id, credits_remaining FROM subscriptions WHERE user_id = ? AND status = ?", (int(user_id), "active"))
+        row = c.fetchone()
+        if not row:
+            conn.close()
+            return {"ok": True, "cost": 0}  # No subscription = free for now
+        sub_id, remaining = row
+        if remaining < cost:
+            conn.close()
+            return {"ok": False, "error": "Insufficient credits. Upgrade your plan or buy more credits.", "remaining": remaining, "cost": cost}
+        new_balance = remaining - cost
+        c.execute("UPDATE subscriptions SET credits_remaining = ?, credits_used = credits_used + ? WHERE id = ?", (new_balance, cost, sub_id))
+        c.execute("INSERT INTO credit_transactions (user_id, amount, type, description, model_used, tokens_in, tokens_out, balance_after, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (int(user_id), cost, "debit", "API call: " + (model_id or "auto"), model_id or "auto", tokens_in, tokens_out, new_balance, time.strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+        conn.close()
+        return {"ok": True, "cost": cost, "remaining": new_balance}
+    except Exception as e:
+        return {"ok": True, "cost": 0}  # Don't block API on billing errors
+
+def get_user_plan_limits(user_id):
+    """Get user plan limits for resource gating."""
+    if not user_id:
+        return None
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute("SELECT s.credits_remaining, p.name, p.max_agents, p.max_entities, p.max_functions, p.max_workflows FROM subscriptions s JOIN plans p ON s.plan_id = p.id WHERE s.user_id = ? AND s.status = ?", (int(user_id), "active"))
+        row = c.fetchone()
+        conn.close()
+        if not row:
+            return None
+        return {"credits": row[0], "plan": row[1], "max_agents": row[2], "max_entities": row[3], "max_functions": row[4], "max_workflows": row[5]}
+    except:
+        return None
 from workflows.engine import WorkflowEngine
 from agents.manager import AgentManager
 from plugins.registry import PluginRegistry
@@ -274,6 +333,13 @@ async def run_function_post(name: str, request: Request, db=Depends(get_db)):
     return await _execute_function(name, request, db, method="POST")
 
 async def _execute_function(name: str, request: Request, db, method: str):
+    # ─── Credit deduction for function calls ───
+    user = get_user_from_token(request)
+    user_id = user.get("user_id") if user else None
+    if user_id:
+        credit_check = deduct_user_credits(user_id, "function-call", 0, 0)
+        if not credit_check.get("ok"):
+            raise HTTPException(402, credit_check.get("error", "Insufficient credits"))
     """Execute a backend function by name."""
     result = await db.execute(text("SELECT code, env_vars FROM platform_functions WHERE name = :name"), {"name": name})
     row = result.fetchone()
@@ -441,10 +507,21 @@ async def delete_agent(name: str, db=Depends(get_db)):
         raise HTTPException(404, str(e))
 
 @app.post("/api/agents/{name}/invoke")
-async def invoke_agent(name: str, msg: AgentInvoke, db=Depends(get_db)):
+async def invoke_agent(name: str, msg: AgentInvoke, request: Request, db=Depends(get_db)):
     """Invoke an agent — send a message and get a response."""
+    # ─── Credit deduction ───
+    user = get_user_from_token(request)
+    user_id = user.get("user_id") if user else None
+    if user_id:
+        # Get agent model for credit cost
+        agent = await AgentManager.get_agent(db, name)
+        agent_model = agent.get("model", "auto") if agent else "auto"
+        credit_check = deduct_user_credits(user_id, agent_model)
+        if not credit_check.get("ok"):
+            raise HTTPException(402, credit_check.get("error", "Insufficient credits"))
     try:
-        return await AgentManager.invoke_agent(db, name, msg.message, msg.context)
+        result = await AgentManager.invoke_agent(db, name, msg.message, msg.context)
+        return result
     except ValueError as e:
         raise HTTPException(400, str(e))
 
@@ -519,12 +596,32 @@ async def exec_plugin(plugin_id: str, params: dict = Body(...), db=Depends(get_d
 
 # ─── Chat / AI Builder ───
 @app.post("/api/chat")
-async def chat_build(msg: ChatMessage, db=Depends(get_db)):
+async def chat_build(msg: ChatMessage, request: Request, db=Depends(get_db)):
     """
     AI chat builder — talk to the platform to create entities, functions, workflows.
     Uses the local Ollama LLM to interpret intent and execute actions.
     """
     import urllib.request
+
+    # ─── Credit deduction ───
+    user = get_user_from_token(request)
+    user_id = user.get("user_id") if user else None
+    if user_id:
+        # Determine model that will be used for credit cost
+        pre_model = msg.model or "auto"
+        if pre_model == "auto":
+            msg_lower = msg.message.lower()
+            if any(w in msg_lower for w in ["analyze", "reason", "think", "complex", "architect"]):
+                pre_model = "z-ai/glm-5.2"
+            elif any(w in msg_lower for w in ["build", "create", "make", "entity", "app"]):
+                pre_model = "z-ai/glm-5"
+            elif any(w in msg_lower for w in ["code", "function", "api", "deploy"]):
+                pre_model = "openai/gpt-oss-120b"
+            else:
+                pre_model = "openai/gpt-oss-20b"
+        credit_check = deduct_user_credits(user_id, pre_model)
+        if not credit_check.get("ok"):
+            raise HTTPException(402, credit_check.get("error", "Insufficient credits"))
 
     # Get existing entities so the LLM knows what's already built
     existing_entities = await EntityManager.list_entities(db)
