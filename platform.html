@@ -7,168 +7,618 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-body { font-family: 'Inter', sans-serif; }
+* { font-family: 'Inter', sans-serif; }
 .mono { font-family: 'JetBrains Mono', monospace; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+.page { display: none; }
+.page.active { display: block; }
+.nav-item.active { background: rgba(139,92,246,0.15); color: #a78bfa; }
+.field-type { cursor: pointer; transition: all 0.15s; }
+.field-type:hover { border-color: #8b5cf6; }
 </style>
 </head>
-<body class="bg-[#0a0a0f] text-gray-100 min-h-screen">
+<body class="bg-[#0a0a0f] text-gray-100 h-screen overflow-hidden">
 
-<!-- Header -->
-<header class="border-b border-gray-800 bg-[#0f0f15] sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center font-bold text-sm">E</div>
-      <h1 class="text-lg font-semibold">EvolvixOS Platform</h1>
-      <span class="text-xs text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded">v1.0</span>
-    </div>
-    <div class="flex items-center gap-4 text-sm text-gray-400">
-      <a href="/platform/" class="hover:text-white">Entities</a>
-      <a href="/platform/functions" class="hover:text-white">Functions</a>
-      <a href="/platform/workflows" class="hover:text-white">Workflows</a>
-      <a href="/platform/chat" class="text-purple-400 hover:text-purple-300">AI Builder</a>
-    </div>
-  </div>
-</header>
+<!-- Layout: Sidebar + Main -->
+<div class="flex h-screen">
 
-<!-- Main content -->
-<div class="max-w-7xl mx-auto px-4 py-8">
-
-  <!-- AI Chat Builder -->
-  <section id="chat-section" class="mb-8">
-    <h2 class="text-2xl font-bold mb-2">Build with AI</h2>
-    <p class="text-gray-400 mb-4">Describe what you want to build — AI creates entities, functions, and workflows automatically.</p>
-    <div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4">
-      <div class="flex gap-2">
-        <input id="chat-input" type="text" placeholder="e.g. Create a Task entity with title, status, and priority" 
-          class="flex-1 bg-[#0a0a0f] border border-gray-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-purple-500">
-        <button onclick="sendChat()" class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 rounded-lg font-medium text-sm hover:opacity-90">Build</button>
+  <!-- Sidebar -->
+  <aside class="w-60 bg-[#0f0f15] border-r border-gray-800 flex flex-col">
+    <!-- Logo -->
+    <div class="p-4 border-b border-gray-800">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center font-bold text-sm">E</div>
+        <span class="font-semibold">EvolvixOS</span>
       </div>
-      <div id="chat-response" class="mt-4 text-sm"></div>
     </div>
-  </section>
 
-  <!-- Entities grid -->
-  <section>
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-2xl font-bold">Entities</h2>
-      <button onclick="loadEntities()" class="text-sm text-purple-400 hover:text-purple-300">↻ Refresh</button>
-    </div>
-    <div id="entities-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-  </section>
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto py-2">
+      <div class="px-3 py-1 text-xs text-gray-500 uppercase tracking-wider">Build</div>
+      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="chat">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h8M8 8h8M8 16h5"/></svg>
+        AI Builder
+      </a>
+      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="entities">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+        Entities
+      </a>
+      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="functions">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+        Functions
+      </a>
+      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="workflows">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Workflows
+      </a>
+      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="storage">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7v10c0 2 4 3 8 3s8-1 8-3V7M4 7c0 2 4 3 8 3s8-1 8-3M4 7c0-2 4-3 8-3s8 1 8 3"/></svg>
+        Storage
+      </a>
 
-  <!-- Records -->
-  <section id="records-section" class="mt-8 hidden">
-    <div class="flex items-center justify-between mb-4">
-      <h2 id="records-title" class="text-2xl font-bold"></h2>
-      <button id="back-btn" onclick="showEntities()" class="text-sm text-gray-400 hover:text-white">← Back</button>
+      <div class="px-3 py-1 mt-4 text-xs text-gray-500 uppercase tracking-wider">Data</div>
+      <div id="entity-nav-items"></div>
+    </nav>
+
+    <!-- Bottom -->
+    <div class="p-3 border-t border-gray-800">
+      <div class="flex items-center gap-2 text-xs text-gray-500">
+        <div class="w-2 h-2 rounded-full bg-green-500"></div>
+        <span>Platform API: <span id="api-status">checking...</span></span>
+      </div>
     </div>
-    <div id="records-table" class="bg-[#0f0f15] border border-gray-800 rounded-xl overflow-hidden"></div>
-  </section>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- Top Bar -->
+    <header class="h-12 border-b border-gray-800 bg-[#0f0f15] flex items-center justify-between px-4">
+      <div class="flex items-center gap-3">
+        <h1 id="page-title" class="text-sm font-medium text-gray-300">AI Builder</h1>
+      </div>
+      <div class="flex items-center gap-2 text-xs text-gray-500">
+        <a href="/platform/api/docs" target="_blank" class="hover:text-white">API Docs</a>
+        <span>·</span>
+        <a href="/" class="hover:text-white">Home</a>
+      </div>
+    </header>
+
+    <!-- Pages -->
+    <div class="flex-1 overflow-y-auto">
+
+      <!-- AI Builder Page -->
+      <div id="page-chat" class="page active p-6 max-w-4xl mx-auto">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold mb-1">Build with AI</h2>
+          <p class="text-gray-400 text-sm">Describe what you want to build. AI creates entities, functions, and workflows automatically.</p>
+        </div>
+        <div class="space-y-3 mb-4" id="chat-messages">
+          <div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4 text-sm text-gray-400">
+            <p class="text-purple-400 font-medium mb-1">EvolvixOS Builder</p>
+            <p>Hi! I can create entities, deploy functions, and set up workflows. Try:</p>
+            <ul class="mt-2 space-y-1 text-gray-500">
+              <li>· "Create a Task entity with title, status, and priority"</li>
+              <li>· "Create a function that returns a random quote"</li>
+              <li>· "Create a daily report workflow"</li>
+            </ul>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <input id="chat-input" type="text" placeholder="Describe what you want to build..."
+            class="flex-1 bg-[#0f0f15] border border-gray-700 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-purple-500">
+          <button onclick="sendChat()" class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-3 rounded-lg font-medium text-sm hover:opacity-90">Send</button>
+        </div>
+      </div>
+
+      <!-- Entities Page -->
+      <div id="page-entities" class="page p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-bold">Entities</h2>
+            <p class="text-gray-400 text-sm mt-1">Define your data models. Each entity becomes a CRUD API automatically.</p>
+          </div>
+          <button onclick="showCreateEntity()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium">+ New Entity</button>
+        </div>
+        <div id="entities-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+        <!-- Create Entity Modal -->
+        <div id="entity-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-lg mx-4">
+            <h3 class="text-lg font-semibold mb-4">New Entity</h3>
+            <input id="entity-name" type="text" placeholder="Entity name (PascalCase, e.g. Task, Product, User)"
+              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-purple-500">
+            <div class="text-xs text-gray-500 mb-2">Fields:</div>
+            <div id="entity-fields" class="space-y-2 mb-3"></div>
+            <button onclick="addFieldRow()" class="text-xs text-purple-400 hover:text-purple-300 mb-4">+ Add field</button>
+            <div class="flex gap-2 justify-end">
+              <button onclick="closeEntityModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
+              <button onclick="createEntity()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Create</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Records Page -->
+      <div id="page-records" class="page p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <button onclick="navigateTo('entities')" class="text-gray-400 hover:text-white text-sm">← Entities</button>
+            <h2 id="records-title" class="text-2xl font-bold"></h2>
+          </div>
+          <button onclick="showCreateRecord()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium">+ New Record</button>
+        </div>
+        <div id="records-table" class="bg-[#0f0f15] border border-gray-800 rounded-xl overflow-hidden"></div>
+
+        <!-- Create Record Modal -->
+        <div id="record-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-lg mx-4">
+            <h3 class="text-lg font-semibold mb-4">New Record</h3>
+            <div id="record-fields" class="space-y-3 mb-4"></div>
+            <div class="flex gap-2 justify-end">
+              <button onclick="closeRecordModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
+              <button onclick="createRecord()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Create</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Functions Page -->
+      <div id="page-functions" class="page p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-bold">Backend Functions</h2>
+            <p class="text-gray-400 text-sm mt-1">Deploy Python functions as HTTP endpoints.</p>
+          </div>
+          <button onclick="showCreateFunction()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium">+ New Function</button>
+        </div>
+        <div id="functions-list" class="space-y-3"></div>
+
+        <!-- Create Function Modal -->
+        <div id="function-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4">
+            <h3 class="text-lg font-semibold mb-4">New Function</h3>
+            <input id="function-name" type="text" placeholder="Function name (camelCase, e.g. getJoke)"
+              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-purple-500">
+            <div class="text-xs text-gray-500 mb-2">Code (define a handler function):</div>
+            <textarea id="function-code" rows="12"
+              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mono focus:outline-none focus:border-purple-500"
+              placeholder="def handler(input):&#10;    return {'message': 'Hello!'}"></textarea>
+            <div class="flex gap-2 justify-end mt-4">
+              <button onclick="closeFunctionModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
+              <button onclick="createFunction()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Deploy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Workflows Page -->
+      <div id="page-workflows" class="page p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-bold">Workflows</h2>
+            <p class="text-gray-400 text-sm mt-1">Automations triggered on schedule or entity events.</p>
+          </div>
+          <button onclick="showCreateWorkflow()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium">+ New Workflow</button>
+        </div>
+        <div id="workflows-list" class="space-y-3"></div>
+
+        <!-- Create Workflow Modal -->
+        <div id="workflow-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4">
+            <h3 class="text-lg font-semibold mb-4">New Workflow</h3>
+            <input id="workflow-name" type="text" placeholder="Workflow name (e.g. Daily Report)"
+              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-purple-500">
+            <div class="text-xs text-gray-500 mb-2">Trigger type:</div>
+            <select id="workflow-trigger" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3">
+              <option value="scheduled">Scheduled (cron)</option>
+              <option value="entity">Entity Event</option>
+              <option value="connector">Connector Event</option>
+            </select>
+            <div class="text-xs text-gray-500 mb-2">Steps (JSON):</div>
+            <textarea id="workflow-steps" rows="8"
+              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mono focus:outline-none focus:border-purple-500"
+              placeholder='{"steps": [{"type": "ai", "name": "greet", "prompt": "Say hello"}]}'></textarea>
+            <div class="flex gap-2 justify-end mt-4">
+              <button onclick="closeWorkflowModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
+              <button onclick="createWorkflow()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Create</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Storage Page -->
+      <div id="page-storage" class="page p-6">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold mb-1">File Storage</h2>
+          <p class="text-gray-400 text-sm">Upload and manage files.</p>
+        </div>
+        <div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-8 text-center">
+          <input type="file" id="file-upload" class="hidden" onchange="uploadFile(event)">
+          <div class="drag-zone border-2 border-dashed border-gray-700 rounded-xl p-12 cursor-pointer hover:border-purple-500" onclick="document.getElementById('file-upload').click()">
+            <p class="text-gray-400">Click to upload a file</p>
+            <p class="text-xs text-gray-600 mt-2">Any file type supported</p>
+          </div>
+          <div id="upload-result" class="mt-4"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
 </div>
 
 <script>
 const API = '/platform/api';
+let currentEntity = null;
+let entitySchemas = {};
 
+// ─── Navigation ───
+function navigateTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if (navItem) navItem.classList.add('active');
+  const titles = {chat: 'AI Builder', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', records: 'Records'};
+  document.getElementById('page-title').textContent = titles[page] || page;
+  if (page === 'entities') loadEntities();
+  if (page === 'functions') loadFunctions();
+  if (page === 'workflows') loadWorkflows();
+}
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => navigateTo(item.dataset.page));
+});
+
+// ─── API helpers ───
+async function api(path, method='GET', body=null) {
+  const opts = {method, headers: {'Content-Type': 'application/json'}};
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  return res.json();
+}
+
+// ─── Health check ───
+async function checkHealth() {
+  try {
+    const data = await api('/entities');
+    document.getElementById('api-status').textContent = 'online';
+    document.getElementById('api-status').className = 'text-green-400';
+    entitySchemas = {};
+    (data.entities || []).forEach(e => entitySchemas[e.name] = e.schema);
+    updateEntityNav(data.entities || []);
+  } catch(e) {
+    document.getElementById('api-status').textContent = 'offline';
+    document.getElementById('api-status').className = 'text-red-400';
+  }
+}
+
+function updateEntityNav(entities) {
+  const nav = document.getElementById('entity-nav-items');
+  nav.innerHTML = entities.map(e => `
+    <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" onclick="viewRecords('${e.name}')" data-entity="${e.name}">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+      ${e.name}
+    </a>
+  `).join('');
+}
+
+// ─── AI Chat Builder ───
 async function sendChat() {
   const input = document.getElementById('chat-input');
-  const response = document.getElementById('chat-response');
   const msg = input.value.trim();
   if (!msg) return;
-  
-  response.innerHTML = '<p class="text-gray-500">Thinking...</p>';
   input.value = '';
   
-  try {
-    const res = await fetch(API + '/chat', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({message: msg})
-    });
-    const data = await res.json();
-    
-    let html = '<div class="bg-[#0a0a0f] border border-gray-800 rounded-lg p-3">';
-    if (data.message) html += '<p class="text-green-400 mb-2">' + data.message + '</p>';
-    if (data.action) html += '<p class="text-xs text-gray-500 mono">Action: ' + data.action + '</p>';
-    if (data.result) html += '<pre class="text-xs text-gray-400 mt-2 mono">' + JSON.stringify(data.result, null, 2) + '</pre>';
-    html += '</div>';
-    response.innerHTML = html;
-    
-    loadEntities();
-  } catch(e) {
-    response.innerHTML = '<p class="text-red-400">Error: ' + e.message + '</p>';
-  }
-}
-
-async function loadEntities() {
-  try {
-    const res = await fetch(API + '/entities');
-    const data = await res.json();
-    const grid = document.getElementById('entities-grid');
-    
-    if (!data.entities || data.entities.length === 0) {
-      grid.innerHTML = '<p class="text-gray-500 col-span-full text-center py-8">No entities yet. Use AI Builder above to create one.</p>';
-      return;
-    }
-    
-    grid.innerHTML = data.entities.map(e => {
-      const fields = Object.keys(e.schema?.properties || {});
-      return `
-        <div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-purple-500 transition-colors" onclick="viewRecords('${e.name}')">
-          <h3 class="font-semibold text-lg mb-2">${e.name}</h3>
-          <div class="flex flex-wrap gap-1 mb-3">
-            ${fields.map(f => '<span class="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded">' + f + '</span>').join('')}
-          </div>
-          <p class="text-xs text-gray-500">' + fields.length + ' fields</p>
-        </div>
-      `;
-    }).join('');
-  } catch(e) {
-    document.getElementById('entities-grid').innerHTML = '<p class="text-red-400">Error loading entities: ' + e.message + '</p>';
-  }
-}
-
-async function viewRecords(name) {
-  document.getElementById('entities-grid').parentElement.classList.add('hidden');
-  document.getElementById('records-section').classList.remove('hidden');
-  document.getElementById('records-title').textContent = name + ' Records';
+  addChatMessage('user', msg);
+  addChatMessage('system', '<span class="text-gray-500">Thinking...</span>');
   
   try {
-    const res = await fetch(API + '/entities/' + name + '/records');
-    const data = await res.json();
-    const table = document.getElementById('records-table');
+    const data = await api('/chat', 'POST', {message: msg});
+    const sysMsg = document.querySelector('#chat-messages > div:last-child');
     
-    if (!data.records || data.records.length === 0) {
-      table.innerHTML = '<p class="text-gray-500 text-center py-8">No records yet.</p>';
+    let html = '';
+    if (data.message) html += `<p>${data.message}</p>`;
+    if (data.action && data.action !== 'chat') html += `<p class="text-xs text-purple-400 mt-2 mono">Action: ${data.action}</p>`;
+    if (data.result) html += `<pre class="text-xs text-gray-500 mt-2 mono bg-[#0a0a0f] p-2 rounded overflow-x-auto">${JSON.stringify(data.result, null, 2)}</pre>`;
+    if (data.entities) html += `<pre class="text-xs text-gray-500 mt-2 mono bg-[#0a0a0f] p-2 rounded overflow-x-auto">${JSON.stringify(data.entities, null, 2)}</pre>`;
+    if (data.error) html += `<p class="text-red-400 mt-2">${data.error}</p>`;
+    sysMsg.innerHTML = `<p class="text-purple-400 font-medium mb-1">EvolvixOS Builder</p>${html}`;
+    
+    checkHealth();
+  } catch(e) {
+    sysMsg.innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`;
+  }
+}
+
+function addChatMessage(role, content) {
+  const div = document.createElement('div');
+  div.className = role === 'user' 
+    ? 'bg-purple-600/10 border border-purple-800/30 rounded-xl p-4 text-sm ml-12'
+    : 'bg-[#0f0f15] border border-gray-800 rounded-xl p-4 text-sm';
+  div.innerHTML = role === 'user' 
+    ? `<p class="text-gray-300">${content}</p>`
+    : `<p class="text-purple-400 font-medium mb-1">EvolvixOS Builder</p>${content}`;
+  document.getElementById('chat-messages').appendChild(div);
+  div.scrollIntoView({behavior: 'smooth'});
+}
+
+// ─── Entities ───
+async function loadEntities() {
+  try {
+    const data = await api('/entities');
+    entitySchemas = {};
+    (data.entities || []).forEach(e => entitySchemas[e.name] = e.schema);
+    const grid = document.getElementById('entities-grid');
+    if (!data.entities || data.entities.length === 0) {
+      grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500"><p>No entities yet. Use AI Builder to create one.</p></div>';
       return;
     }
-    
+    grid.innerHTML = data.entities.map(e => {
+      const fields = Object.keys(e.schema?.properties || {});
+      return `<div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-purple-500 transition-colors" onclick="viewRecords('${e.name}')">
+        <h3 class="font-semibold text-lg mb-2">${e.name}</h3>
+        <div class="flex flex-wrap gap-1 mb-3">${fields.map(f => `<span class="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded">${f}</span>`).join('')}</div>
+        <p class="text-xs text-gray-500">${fields.length} fields · <span class="text-purple-400">View records →</span></p>
+      </div>`;
+    }).join('');
+    updateEntityNav(data.entities);
+  } catch(e) {
+    document.getElementById('entities-grid').innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`;
+  }
+}
+
+function showCreateEntity() { document.getElementById('entity-modal').classList.remove('hidden'); addFieldRow(); }
+function closeEntityModal() { document.getElementById('entity-modal').classList.add('hidden'); document.getElementById('entity-name').value = ''; document.getElementById('entity-fields').innerHTML = ''; }
+
+function addFieldRow() {
+  const div = document.createElement('div');
+  div.className = 'flex gap-2';
+  div.innerHTML = `
+    <input type="text" placeholder="field name" class="flex-1 bg-[#0a0a0f] border border-gray-700 rounded px-2 py-1.5 text-xs field-name">
+    <select class="bg-[#0a0a0f] border border-gray-700 rounded px-2 py-1.5 text-xs field-type">
+      <option value="string">string</option><option value="integer">integer</option><option value="number">number</option><option value="boolean">boolean</option><option value="array">array</option><option value="object">object</option>
+    </select>
+    <label class="flex items-center gap-1 text-xs text-gray-400"><input type="checkbox" class="field-required"> req</label>
+    <button onclick="this.parentElement.remove()" class="text-red-400 text-xs px-1">×</button>
+  `;
+  document.getElementById('entity-fields').appendChild(div);
+}
+
+async function createEntity() {
+  const name = document.getElementById('entity-name').value.trim();
+  if (!name) return alert('Enter entity name');
+  const props = {}, required = [];
+  document.querySelectorAll('#entity-fields > div').forEach(row => {
+    const fieldName = row.querySelector('.field-name').value.trim();
+    const fieldType = row.querySelector('.field-type').value;
+    const isReq = row.querySelector('.field-required').checked;
+    if (fieldName) {
+      props[fieldName] = {type: fieldType};
+      if (isReq) required.push(fieldName);
+    }
+  });
+  const schema = {type: 'object', properties: props};
+  if (required.length) schema.required = required;
+  try {
+    await api('/entities', 'POST', {name, schema});
+    closeEntityModal();
+    loadEntities();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ─── Records ───
+async function viewRecords(name) {
+  currentEntity = name;
+  navigateTo('records');
+  document.getElementById('records-title').textContent = name + ' Records';
+  document.getElementById('page-title').textContent = name;
+  try {
+    const data = await api(`/entities/${name}/records`);
+    const table = document.getElementById('records-table');
+    if (!data.records || data.records.length === 0) {
+      table.innerHTML = '<p class="text-gray-500 text-center py-8">No records yet. Click "+ New Record" to create one.</p>';
+      return;
+    }
     const cols = Object.keys(data.records[0]);
     let html = '<table class="w-full text-sm"><thead><tr class="border-b border-gray-800">';
-    cols.forEach(c => html += '<th class="text-left px-4 py-3 text-gray-400 font-medium">' + c + '</th>');
-    html += '</tr></thead><tbody>';
-    data.records.forEach(r => {
+    cols.forEach(c => html += `<th class="text-left px-4 py-3 text-gray-400 font-medium">${c}</th>`);
+    html += '<th class="px-4 py-3"></th></tr></thead><tbody>';
+    data.records.forEach((r, idx) => {
       html += '<tr class="border-b border-gray-800/50 hover:bg-gray-900/30">';
       cols.forEach(c => {
         let val = r[c];
-        if (typeof val === 'object') val = JSON.stringify(val);
         if (val === null) val = '<span class="text-gray-600">null</span>';
-        html += '<td class="px-4 py-3">' + val + '</td>';
+        else if (typeof val === 'object') val = JSON.stringify(val);
+        html += `<td class="px-4 py-3 text-xs">${val}</td>`;
       });
+      html += `<td class="px-4 py-3"><button onclick="deleteRecord(${r.id})" class="text-red-400 text-xs hover:text-red-300">Delete</button></td>`;
       html += '</tr>';
     });
     html += '</tbody></table>';
     table.innerHTML = html;
-  } catch(e) {
-    document.getElementById('records-table').innerHTML = '<p class="text-red-400 p-4">Error: ' + e.message + '</p>';
-  }
+  } catch(e) { document.getElementById('records-table').innerHTML = `<p class="text-red-400 p-4">Error: ${e.message}</p>`; }
 }
 
-function showEntities() {
-  document.getElementById('records-section').classList.add('hidden');
-  document.getElementById('entities-grid').parentElement.classList.remove('hidden');
+function showCreateRecord() {
+  if (!currentEntity) return;
+  const schema = entitySchemas[currentEntity];
+  if (!schema) return;
+  const props = schema.properties || {};
+  const div = document.getElementById('record-fields');
+  div.innerHTML = Object.entries(props).map(([name, def]) => {
+    const req = (schema.required || []).includes(name) ? '<span class="text-red-400">*</span>' : '';
+    if (def.type === 'boolean') {
+      return `<div><label class="text-xs text-gray-400">${name} ${req}</label><select class="w-full bg-[#0a0a0f] border border-gray-700 rounded px-3 py-2 text-sm mt-1" data-field="${name}"><option value="true">true</option><option value="false">false</option></select></div>`;
+    }
+    return `<div><label class="text-xs text-gray-400">${name} ${req}</label><input type="text" data-field="${name}" data-type="${def.type}" class="w-full bg-[#0a0a0f] border border-gray-700 rounded px-3 py-2 text-sm mt-1 focus:outline-none focus:border-purple-500"></div>`;
+  }).join('');
+  document.getElementById('record-modal').classList.remove('hidden');
 }
 
-// Load on start
+function closeRecordModal() { document.getElementById('record-modal').classList.add('hidden'); }
+
+async function createRecord() {
+  const data = {};
+  document.querySelectorAll('#record-fields [data-field]').forEach(el => {
+    const field = el.dataset.field;
+    const type = el.dataset.type;
+    let val = el.value;
+    if (type === 'integer') val = parseInt(val) || 0;
+    else if (type === 'number') val = parseFloat(val) || 0;
+    else if (type === 'boolean') val = val === 'true';
+    if (val !== '' && val !== undefined) data[field] = val;
+  });
+  try {
+    await api(`/entities/${currentEntity}/records`, 'POST', {data});
+    closeRecordModal();
+    viewRecords(currentEntity);
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteRecord(id) {
+  if (!confirm('Delete this record?')) return;
+  try {
+    await api(`/entities/${currentEntity}/records/${id}`, 'DELETE');
+    viewRecords(currentEntity);
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ─── Functions ───
+async function loadFunctions() {
+  try {
+    const data = await api('/functions');
+    const list = document.getElementById('functions-list');
+    if (!data.functions || data.functions.length === 0) {
+      list.innerHTML = '<div class="text-center py-12 text-gray-500"><p>No functions deployed yet.</p></div>';
+      return;
+    }
+    list.innerHTML = data.functions.map(f => `
+      <div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold text-purple-400 mono">${f.name}</h3>
+            <p class="text-xs text-gray-500 mt-1">${f.language} · ${f.created_date?.split('T')[0] || ''}</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="testFunction('${f.name}')" class="text-xs bg-gray-800 px-3 py-1.5 rounded hover:bg-gray-700">Test</button>
+            <button onclick="deleteFunction('${f.name}')" class="text-xs text-red-400 hover:text-red-300">Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { document.getElementById('functions-list').innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`; }
+}
+
+function showCreateFunction() { document.getElementById('function-modal').classList.remove('hidden'); }
+function closeFunctionModal() { document.getElementById('function-modal').classList.add('hidden'); }
+
+async function createFunction() {
+  const name = document.getElementById('function-name').value.trim();
+  const code = document.getElementById('function-code').value;
+  if (!name || !code) return alert('Enter name and code');
+  try {
+    await api('/functions', 'POST', {name, code});
+    closeFunctionModal();
+    document.getElementById('function-name').value = '';
+    document.getElementById('function-code').value = '';
+    loadFunctions();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function testFunction(name) {
+  try {
+    const result = await api(`/fn/${name}`, 'POST', {});
+    alert(JSON.stringify(result, null, 2));
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteFunction(name) {
+  if (!confirm('Delete this function?')) return;
+  // Note: delete endpoint not yet implemented — for now just show message
+  alert('Function deletion coming soon');
+}
+
+// ─── Workflows ───
+async function loadWorkflows() {
+  try {
+    const data = await api('/workflows');
+    const list = document.getElementById('workflows-list');
+    if (!data.workflows || data.workflows.length === 0) {
+      list.innerHTML = '<div class="text-center py-12 text-gray-500"><p>No workflows yet.</p></div>';
+      return;
+    }
+    list.innerHTML = data.workflows.map(w => `
+      <div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold">${w.name}</h3>
+            <p class="text-xs text-gray-500 mt-1">Trigger: ${w.trigger_type} · Status: <span class="${w.status === 'active' ? 'text-green-400' : 'text-yellow-400'}">${w.status}</span></p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="executeWorkflow('${w.name}')" class="text-xs bg-gray-800 px-3 py-1.5 rounded hover:bg-gray-700">Execute</button>
+            <button onclick="toggleWorkflow('${w.name}', '${w.status}')" class="text-xs ${w.status === 'active' ? 'text-yellow-400' : 'text-green-400'}">${w.status === 'active' ? 'Pause' : 'Activate'}</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { document.getElementById('workflows-list').innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`; }
+}
+
+function showCreateWorkflow() { document.getElementById('workflow-modal').classList.remove('hidden'); }
+function closeWorkflowModal() { document.getElementById('workflow-modal').classList.add('hidden'); }
+
+async function createWorkflow() {
+  const name = document.getElementById('workflow-name').value.trim();
+  const triggerType = document.getElementById('workflow-trigger').value;
+  const stepsStr = document.getElementById('workflow-steps').value;
+  if (!name) return alert('Enter workflow name');
+  let definition = {};
+  try { definition = JSON.parse(stepsStr); } catch(e) { return alert('Invalid JSON for steps'); }
+  try {
+    await api('/workflows', 'POST', {name, definition, trigger_type: triggerType});
+    closeWorkflowModal();
+    loadWorkflows();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function executeWorkflow(name) {
+  try {
+    const result = await api(`/workflows/${name}/execute`, 'POST');
+    alert(JSON.stringify(result, null, 2));
+    loadWorkflows();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function toggleWorkflow(name, status) {
+  const action = status === 'active' ? 'deactivate' : 'activate';
+  try {
+    await api(`/workflows/${name}/${action}`, 'PUT');
+    loadWorkflows();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+// ─── File Upload ───
+async function uploadFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('file', file);
+  try {
+    const res = await fetch(API + '/files/upload', {method: 'POST', body: formData});
+    const data = await res.json();
+    document.getElementById('upload-result').innerHTML = `
+      <div class="bg-green-500/10 border border-green-800/30 rounded-lg p-3 text-sm">
+        <p class="text-green-400">✓ Uploaded: ${data.filename}</p>
+        <p class="text-xs text-gray-500 mt-1">URL: ${data.url} · Size: ${data.size} bytes</p>
+      </div>`;
+  } catch(e) { document.getElementById('upload-result').innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`; }
+}
+
+// ─── Init ───
+checkHealth();
 loadEntities();
 </script>
 </body>
