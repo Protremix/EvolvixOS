@@ -124,6 +124,7 @@ class LLMRegistry:
         """Auto-register all available providers."""
         for mod_name, cls_name in [
             ("v10.providers.ollama", "OllamaProvider"),
+            ("v10.providers.openrouter", "OpenRouterProvider"),
             ("v10.providers.groq", "GroqProvider"),
             ("v10.providers.gemini", "GeminiProvider"),
             ("v10.providers.kimi", "KimiProvider"),
