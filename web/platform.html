@@ -224,28 +224,80 @@ async function loadBilling() {
 
 async function subscribe(planName) {
   var cycle = confirm('Monthly billing? Click OK for monthly, Cancel for yearly (20% off)') ? 'monthly' : 'yearly';
+  var priceMap = { 'Free': 0, 'Starter': 900, 'Pro': 2900, 'Team': 9900 };
+  var yearMap = { 'Starter': 8600, 'Pro': 27800, 'Team': 95000 };
+  var priceCents = cycle === 'yearly' ? (yearMap[planName] || 0) : (priceMap[planName] || 0);
+  if (planName === 'Free' || priceCents === 0) {
+    // Free plan — no checkout needed
+    var raw = localStorage.getItem('evolvixos_user');
+    var user = JSON.parse(raw);
+    var resp = await fetch('https://evolvixos.com/auth/subscribe', {
+      method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: planName, cycle: cycle })
+    });
+    var data = await resp.json();
+    if (data.message) { toast('Switched to ' + planName, 'success'); loadBilling(); }
+    else { toast('Error: ' + (data.error || 'Unknown'), 'error'); }
+    return;
+  }
+  // Stripe Checkout
   var raw = localStorage.getItem('evolvixos_user');
   var user = JSON.parse(raw);
-  var resp = await fetch('https://evolvixos.com/auth/subscribe', {
+  var resp = await fetch('https://evolvixos.com/auth/stripe-checkout', {
     method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plan: planName, cycle: cycle })
+    body: JSON.stringify({ type: 'subscription', plan: planName, cycle: cycle, price_cents: priceCents })
   });
   var data = await resp.json();
-  if (data.message) { toast('Subscribed to ' + planName + '!', 'success'); loadBilling(); }
-  else { toast('Error: ' + (data.error || 'Unknown'), 'error'); }
+  if (data.checkout_url) {
+    window.location.href = data.checkout_url;
+  } else {
+    toast('Error: ' + (data.error || 'Payment setup failed'), 'error');
+  }
 }
 
 async function buyCredits(credits, price) {
   var raw = localStorage.getItem('evolvixos_user');
   var user = JSON.parse(raw);
-  var resp = await fetch('https://evolvixos.com/auth/buy-credits', {
+  var resp = await fetch('https://evolvixos.com/auth/stripe-checkout', {
     method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ credits: credits, price: price })
+    body: JSON.stringify({ type: 'credits', credits: credits, price_cents: price * 100 })
   });
   var data = await resp.json();
-  if (data.message) { toast(data.message, 'success'); loadBilling(); }
-  else { toast('Error: ' + (data.error || 'Unknown'), 'error'); }
+  if (data.checkout_url) {
+    window.location.href = data.checkout_url;
+  } else {
+    toast('Error: ' + (data.error || 'Payment setup failed'), 'error');
+  }
 }
+
+
+async function openStripePortal() {
+  var raw = localStorage.getItem('evolvixos_user');
+  if (!raw) return;
+  var user = JSON.parse(raw);
+  try {
+    var resp = await fetch('https://evolvixos.com/auth/stripe-portal', {
+      method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    var data = await resp.json();
+    if (data.portal_url) window.location.href = data.portal_url;
+    else toast('No billing portal available. Subscribe first.', 'info');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// Handle payment redirect
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('payment') === 'success') {
+    toast('Payment successful! Your plan is now active.', 'success');
+    history.replaceState(null, '', window.location.pathname);
+    setTimeout(function() { switchView('billing'); }, 500);
+  } else if (params.get('payment') === 'cancelled') {
+    toast('Payment cancelled.', 'info');
+    history.replaceState(null, '', window.location.pathname);
+  }
+})();
 
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">

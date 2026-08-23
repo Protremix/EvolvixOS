@@ -103,6 +103,25 @@ def check_resource_limit(user_id, resource_type):
     return {"ok": True, "current": count, "limit": limit}
 
 
+import stripe
+
+stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "sk_test_placeholder")
+STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "whsec_placeholder")
+
+# Stripe product/price IDs (created via Stripe dashboard or API)
+STRIPE_PRICES = {
+    "Starter_monthly": None,  # price_xxx — set after creating in Stripe
+    "Starter_yearly": None,
+    "Pro_monthly": None,
+    "Pro_yearly": None,
+    "Team_monthly": None,
+    "Team_yearly": None,
+    "credits_1000": None,
+    "credits_5000": None,
+    "credits_15000": None,
+    "credits_50000": None,
+}
+
 RATE_LIMIT = defaultdict(list)  # ip -> [timestamps]
 MAX_REQUESTS = 10  # per 60 seconds per IP
 OTP_MAX_ATTEMPTS = 5  # max OTP attempts before lockout
@@ -471,6 +490,73 @@ class AuthHandler(BaseHTTPRequestHandler):
         self._send_json(404, {"error": "Not found"})
 
     def do_POST(self):
+        # Stripe webhook — needs raw body for signature verification
+        if self.path == "/auth/stripe-webhook":
+            content_length = int(self.headers.get("Content-Length", 0))
+            raw_body = self.rfile.read(content_length)
+            sig = self.headers.get("Stripe-Signature", "")
+            try:
+                event = stripe.Webhook.construct_event(raw_body, sig, STRIPE_WEBHOOK_SECRET)
+            except ValueError:
+                self._send_json(400, {"error": "Invalid payload"})
+                return
+            except stripe.error.SignatureVerificationError:
+                self._send_json(400, {"error": "Invalid signature"})
+                return
+
+            event_type = event["type"]
+            data = event["data"]["object"]
+            metadata = data.get("metadata", {})
+            user_id = int(metadata.get("user_id", 0)) if metadata.get("user_id") else int(data.get("client_reference_id", 0))
+
+            if event_type == "checkout.session.completed":
+                with sqlite3.connect(DB_PATH) as conn:
+                    c = conn.cursor()
+                    # Mark payment as paid
+                    c.execute("UPDATE payments SET status = 'paid' WHERE provider_charge_id = ?", (data.get("id"),))
+                    # If subscription, activate plan
+                    if metadata.get("type") == "subscription":
+                        plan_name = metadata.get("plan", "Free")
+                        cycle = metadata.get("cycle", "monthly")
+                        c.execute("SELECT id, credits_monthly FROM plans WHERE name = ?", (plan_name,))
+                        plan = c.fetchone()
+                        if plan and user_id:
+                            plan_id, credits = plan
+                            now = time.strftime("%Y-%m-%d %H:%M:%S")
+                            days = 365 if cycle == "yearly" else 30
+                            period_end = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time() + days * 86400))
+                            c.execute("SELECT id FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
+                            existing = c.fetchone()
+                            if existing:
+                                c.execute("UPDATE subscriptions SET plan_id = ?, billing_cycle = ?, credits_remaining = ?, current_period_start = ?, current_period_end = ?, updated_date = ? WHERE id = ?",
+                                    (plan_id, cycle, credits, now, period_end, now, existing[0]))
+                            else:
+                                c.execute("INSERT INTO subscriptions (user_id, plan_id, status, billing_cycle, credits_remaining, credits_used, current_period_start, current_period_end, created_date, updated_date) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?)",
+                                    (user_id, plan_id, "active", cycle, credits, now, period_end, now, now))
+                    # If credit purchase, add credits
+                    elif metadata.get("type") == "credits":
+                        credits_amount = int(metadata.get("credits", 0))
+                        if credits_amount and user_id:
+                            c.execute("SELECT id, credits_remaining FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
+                            row = c.fetchone()
+                            if row:
+                                c.execute("UPDATE subscriptions SET credits_remaining = ? WHERE id = ?", (row[1] + credits_amount, row[0]))
+                                c.execute("INSERT INTO credit_transactions (user_id, amount, type, description, timestamp) VALUES (?, ?, ?, ?, ?)",
+                                    (user_id, credits_amount, "credit", "Purchased " + str(credits_amount) + " credits via Stripe", time.strftime("%Y-%m-%d %H:%M:%S")))
+                    conn.commit()
+            elif event_type == "customer.subscription.deleted":
+                # Downgrade to Free
+                if user_id:
+                    with sqlite3.connect(DB_PATH) as conn:
+                        c = conn.cursor()
+                        free_id = c.execute("SELECT id FROM plans WHERE name = 'Free'").fetchone()[0]
+                        c.execute("UPDATE subscriptions SET plan_id = ?, credits_remaining = 100, updated_date = ? WHERE user_id = ? AND status = ?",
+                            (free_id, time.strftime("%Y-%m-%d %H:%M:%S"), user_id, "active"))
+                        conn.commit()
+
+            self._send_json(200, {"received": True})
+            return
+
         ip = self._get_ip()
         if not check_rate_limit(ip):
             self._send_json(429, {"error": "Too many requests. Please wait a minute."})
@@ -923,6 +1009,143 @@ class AuthHandler(BaseHTTPRequestHandler):
                 conn.commit()
             self._send_json(200, {"message": "Added " + str(amount) + " credits", "new_balance": new_balance})
             return
+        if path == "/auth/stripe-checkout":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            item_type = body.get("type", "subscription")
+            plan_name = body.get("plan", "")
+            cycle = body.get("cycle", "monthly")
+            credits_amount = body.get("credits", 0)
+            price_cents = body.get("price_cents", 0)
+            try:
+                # Get user email for Stripe customer
+                with sqlite3.connect(DB_PATH) as conn:
+                    c = conn.cursor()
+                    c.execute("SELECT email, display_name FROM users WHERE id = ?", (user_id,))
+                    row = c.fetchone()
+                    if not row:
+                        self._send_json(400, {"error": "User not found"})
+                        return
+                    user_email, display_name = row
+
+                if item_type == "subscription":
+                    # Create Stripe Checkout Session for subscription
+                    product_name = plan_name + " Plan - " + cycle.capitalize()
+                    description = "EvolvixOS " + plan_name + " plan (" + cycle + ")"
+                    session = stripe.checkout.Session.create(
+                        payment_method_types=["card"],
+                        customer_email=user_email,
+                        line_items=[{
+                            "price_data": {
+                                "currency": "usd",
+                                "product_data": {"name": product_name, "description": description},
+                                "unit_amount": price_cents,
+                                "recurring": {"interval": "year" if cycle == "yearly" else "month"}
+                            },
+                            "quantity": 1
+                        }],
+                        mode="subscription",
+                        success_url="https://evolvixos.com/platform/?payment=success&plan=" + plan_name,
+                        cancel_url="https://evolvixos.com/platform/?payment=cancelled",
+                        metadata={"user_id": str(user_id), "plan": plan_name, "cycle": cycle, "type": "subscription"},
+                        client_reference_id=str(user_id)
+                    )
+                else:
+                    # One-time credit purchase
+                    session = stripe.checkout.Session.create(
+                        payment_method_types=["card"],
+                        customer_email=user_email,
+                        line_items=[{
+                            "price_data": {
+                                "currency": "usd",
+                                "product_data": {"name": str(credits_amount) + " Credits", "description": "EvolvixOS Credit Pack"},
+                                "unit_amount": price_cents
+                            },
+                            "quantity": 1
+                        }],
+                        mode="payment",
+                        success_url="https://evolvixos.com/platform/?payment=success&credits=" + str(credits_amount),
+                        cancel_url="https://evolvixos.com/platform/?payment=cancelled",
+                        metadata={"user_id": str(user_id), "credits": str(credits_amount), "type": "credits"},
+                        client_reference_id=str(user_id)
+                    )
+                # Record pending payment
+                with sqlite3.connect(DB_PATH) as conn:
+                    c = conn.cursor()
+                    c.execute("INSERT INTO payments (user_id, amount, currency, plan_name, billing_cycle, status, provider, provider_charge_id, created_date) VALUES (?, ?, 'USD', ?, ?, 'pending', 'stripe', ?, ?)",
+                        (user_id, price_cents / 100, plan_name or "Credit Pack", cycle if item_type == "subscription" else "one-time", session.id, time.strftime("%Y-%m-%d %H:%M:%S")))
+                    conn.commit()
+                self._send_json(200, {"checkout_url": session.url, "session_id": session.id})
+            except stripe.error.StripeError as e:
+                self._send_json(400, {"error": str(e)})
+                return
+            except Exception as e:
+                self._send_json(500, {"error": "Payment setup failed: " + str(e)})
+                return
+        if path == "/auth/stripe-portal":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            try:
+                with sqlite3.connect(DB_PATH) as conn:
+                    c = conn.cursor()
+                    c.execute("SELECT email FROM users WHERE id = ?", (user_id,))
+                    row = c.fetchone()
+                    if not row:
+                        self._send_json(400, {"error": "User not found"})
+                        return
+                    user_email = row[0]
+                # Find or create customer
+                customers = stripe.Customer.list(email=user_email, limit=1)
+                if customers.data:
+                    customer_id = customers.data[0].id
+                    session = stripe.billing_portal.Session.create(
+                        customer=customer_id,
+                        return_url="https://evolvixos.com/platform/?view=billing"
+                    )
+                    self._send_json(200, {"portal_url": session.url})
+                else:
+                    self._send_json(404, {"error": "No Stripe customer found. Subscribe first."})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
+                return
+        if path == "/auth/stripe-create-products":
+            # One-time setup: create Stripe products and prices
+            admin_id = is_authorized(self)
+            if not admin_id:
+                self._send_json(401, {"error": "Admin only"})
+                return
+            created = {}
+            products = {
+                "Starter": {"monthly": 900, "yearly": 8600},
+                "Pro": {"monthly": 2900, "yearly": 27800},
+                "Team": {"monthly": 9900, "yearly": 95000}
+            }
+            credit_packs = {
+                "credits_1000": {"name": "1,000 Credits", "price": 500},
+                "credits_5000": {"name": "5,000 Credits", "price": 2000},
+                "credits_15000": {"name": "15,000 Credits", "price": 5000},
+                "credits_50000": {"name": "50,000 Credits", "price": 15000}
+            }
+            try:
+                for plan, cycles in products.items():
+                    p = stripe.Product.create(name="EvolvixOS " + plan + " Plan", description="EvolvixOS " + plan + " subscription")
+                    for cycle, cents in cycles.items():
+                        interval = "year" if cycle == "yearly" else "month"
+                        price = stripe.Price.create(product=p.id, unit_amount=cents, currency="usd", recurring={"interval": interval})
+                        key = plan + "_" + cycle
+                        created[key] = price.id
+                for key, info in credit_packs.items():
+                    p = stripe.Product.create(name=info["name"], description="EvolvixOS Credit Pack")
+                    price = stripe.Price.create(product=p.id, unit_amount=info["price"], currency="usd")
+                    created[key] = price.id
+                self._send_json(200, {"created": created, "message": "Products created. Save these price IDs to STRIPE_PRICES in auth_api.py"})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
+                return
         self._send_json(404, {"error": "Endpoint not found"})
 
     def log_message(self, format, *args):
