@@ -105,7 +105,46 @@ class AgentManager:
         if agent["status"] != "active":
             raise ValueError(f"Agent '{name}' is not active")
 
-        messages = [{"role": "system", "content": agent["system_prompt"]}]
+        model = agent["model"]
+        temperature = agent.get("temperature", 0.7)
+
+        # Build messages with system prompt + memory + context
+        # Build system prompt with plugin awareness
+        plugin_info = """\n\nAVAILABLE PLUGINS — You can suggest using these tools:
+- web_search: Search the internet
+- web_fetch: Fetch content from any URL
+- email_send: Send emails
+- http_request: Call external APIs
+- database_query: Query your entities
+- code_exec: Run Python code
+- file_ops: Read/write server files
+- github: GitHub repo operations
+- image_gen: Generate images
+- crypto: Get crypto prices
+- weather: Get weather info
+- time_tools: Get current time/date
+- translate: Translate text
+- summarize: Summarize text
+- sentiment: Analyze sentiment
+
+When a user asks something that needs a plugin, mention it in your response. Example: "I can search the web for that — use the web_search plugin." """
+        
+        messages = [{"role": "system", "content": agent["system_prompt"] + plugin_info}]
+
+        # Load persistent memory (PlatformMemory) into system context
+        try:
+            mem_result = await db.execute(text(
+                "SELECT content FROM entity_platformmemory ORDER BY created_date DESC LIMIT 20"
+            ))
+            mem_rows = mem_result.fetchall()
+            if mem_rows:
+                memory_items = [r[0] for r in mem_rows if r[0]]
+                if memory_items:
+                    messages[0]["content"] += "\n\nUSER MEMORY — Things to remember:\n" + "\n".join(f"- {m}" for m in memory_items)
+        except Exception:
+            pass
+
+        # Load conversation memory
         memory = agent.get("memory", [])
         for mem in memory[-10:]:
             if isinstance(mem, dict) and mem.get("role") and mem.get("content"):
@@ -114,26 +153,77 @@ class AgentManager:
             messages.append({"role": "system", "content": f"Context: {context['system_context']}"})
         messages.append({"role": "user", "content": message})
 
-        ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
-        payload = json.dumps({
-            "model": agent["model"],
-            "messages": messages,
-            "stream": False,
-            "options": {"temperature": agent["temperature"]}
-        }).encode()
+        # Route to OpenRouter or Ollama based on model name
+        is_local = ":" in model and "/" not in model  # e.g. "qwen2.5:7b"
+        
+        if is_local:
+            # Ollama for local models
+            ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
+            payload = json.dumps({
+                "model": model,
+                "messages": messages,
+                "stream": False,
+                "options": {"temperature": temperature, "top_p": agent.get("top_p", 0.9)}
+            }).encode()
+            try:
+                req = urllib.request.Request(
+                    f"{ollama_url}/api/chat", data=payload,
+                    headers={"Content-Type": "application/json"}
+                )
+                resp = urllib.request.urlopen(req, timeout=60)
+                data = json.loads(resp.read())
+                response_text = data.get("message", {}).get("content", "")
+                eval_count = data.get("eval_count", 0)
+            except Exception as e:
+                raise ValueError(f"Ollama error: {str(e)}")
+        else:
+            # OpenRouter for cloud models
+            openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
+            if not openrouter_key:
+                # Fallback to Ollama
+                ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
+                payload = json.dumps({
+                    "model": "qwen2.5:7b",
+                    "messages": messages,
+                    "stream": False,
+                    "options": {"temperature": temperature}
+                }).encode()
+                req = urllib.request.Request(
+                    f"{ollama_url}/api/chat", data=payload,
+                    headers={"Content-Type": "application/json"}
+                )
+                resp = urllib.request.urlopen(req, timeout=60)
+                data = json.loads(resp.read())
+                response_text = data.get("message", {}).get("content", "")
+                eval_count = data.get("eval_count", 0)
+            else:
+                model_name = model if model != "auto" else "z-ai/glm-4.7-flash"
+                payload = json.dumps({
+                    "model": model_name,
+                    "messages": messages,
+                    "max_tokens": agent.get("max_tokens", 4096),
+                    "temperature": temperature,
+                    "top_p": agent.get("top_p", 0.9)
+                }).encode()
+                try:
+                    req = urllib.request.Request(
+                        "https://openrouter.ai/api/v1/chat/completions",
+                        data=payload,
+                        headers={
+                            "Content-Type": "application/json",
+                            "Authorization": f"Bearer {openrouter_key}",
+                            "HTTP-Referer": "https://evolvixos.com",
+                            "X-Title": "EvolvixOS Platform"
+                        }
+                    )
+                    resp = urllib.request.urlopen(req, timeout=60)
+                    data = json.loads(resp.read())
+                    response_text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                    eval_count = data.get("usage", {}).get("total_tokens", 0)
+                except Exception as e:
+                    raise ValueError(f"OpenRouter error: {str(e)}")
 
-        try:
-            req = urllib.request.Request(
-                f"{ollama_url}/api/chat", data=payload,
-                headers={"Content-Type": "application/json"}
-            )
-            resp = urllib.request.urlopen(req, timeout=60)
-            data = json.loads(resp.read())
-            response_text = data.get("message", {}).get("content", "")
-            eval_count = data.get("eval_count", 0)
-        except Exception as e:
-            raise ValueError(f"LLM error: {str(e)}")
-
+        # Save conversation memory
         memory.append({"role": "user", "content": message})
         memory.append({"role": "assistant", "content": response_text})
         memory = memory[-20:]
@@ -143,9 +233,29 @@ class AgentManager:
         ), {"memory": json.dumps(memory), "name": name})
         await db.commit()
 
+        # Auto-extract preferences from user message
+        try:
+            user_lower = message.lower()
+            triggers = ["prefer", "always", "never", "use ", "don't", "remember", "should", "want", "need", "like"]
+            is_question = "?" in message or message.strip().startswith(("what", "how", "why", "where", "when", "who", "can you", "do you"))
+            should_save = any(t in user_lower for t in triggers) and len(message) > 10 and not is_question
+            if should_save:
+                import asyncpg
+                conn = await asyncpg.connect(
+                    host="127.0.0.1", port=5432,
+                    database="evolvixos", user="evolvixos", password="evolvixos"
+                )
+                await conn.execute(
+                    "INSERT INTO entity_platformmemory (content, category, scope, confidence, source, timestamp, created_date, updated_date) VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())",
+                    message[:200], "preference", name, "inferred", f"agent:{name}", datetime.now().isoformat()
+                )
+                await conn.close()
+        except Exception:
+            pass
+
         return {
             "agent": name, "response": response_text,
-            "model": agent["model"], "tokens": eval_count,
+            "model": model, "tokens": eval_count,
             "memory_size": len(memory)
         }
 

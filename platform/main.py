@@ -26,7 +26,7 @@ import traceback
 from datetime import datetime, timezone
 from typing import Any, Optional
 
-from fastapi import FastAPI, HTTPException, Depends, Request, UploadFile, File, Query
+from fastapi import FastAPI, HTTPException, Depends, Request, UploadFile, File, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
@@ -40,6 +40,7 @@ from entities.crud import EntityCRUD as EnhancedCRUD
 from auth.middleware import optional_auth, require_auth, require_admin, get_user_from_token
 from workflows.engine import WorkflowEngine
 from agents.manager import AgentManager
+from plugins.registry import PluginRegistry
 
 # ─── App ───
 app = FastAPI(
@@ -85,16 +86,23 @@ class WorkflowCreate(BaseModel):
 
 class AgentCreate(BaseModel):
     name: str = Field(..., description="Agent name")
-    system_prompt: str = Field(..., description="System prompt for the agent")
-    model: str = Field("qwen2.5:7b", description="Ollama model")
-    temperature: float = Field(0.7, description="Temperature 0-1")
+    system_prompt: str = Field(..., description="System prompt — defines agent personality and behavior")
+    model: str = Field("auto", description="AI model (auto, openai/gpt-oss-120b, z-ai/glm-5, qwen2.5:7b, etc.)")
+    temperature: float = Field(0.7, description="Temperature 0-1 (lower=precise, higher=creative)")
     tools: list = Field(default_factory=list, description="Available tools")
+    max_tokens: int = Field(4096, description="Max response tokens")
+    top_p: float = Field(0.9, description="Top-p nucleus sampling")
+    memory_enabled: bool = Field(True, description="Whether agent persists memory across sessions")
+    stream: bool = Field(False, description="Stream responses")
 
 class AgentUpdate(BaseModel):
     system_prompt: Optional[str] = None
     model: Optional[str] = None
     temperature: Optional[float] = None
     tools: Optional[list] = None
+    max_tokens: Optional[int] = None
+    top_p: Optional[float] = None
+    memory_enabled: Optional[bool] = None
     status: Optional[str] = None
 
 class AgentInvoke(BaseModel):
@@ -474,6 +482,28 @@ async def get_file(file_id: str):
 
 
 # ─── AI Chat Builder ───
+# ─── Plugins ───
+@app.get("/api/plugins")
+async def list_plugins():
+    """List all available plugins."""
+    return {"plugins": PluginRegistry.list_plugins()}
+
+@app.get("/api/plugins/{plugin_id}")
+async def get_plugin_info(plugin_id: str):
+    """Get details of a specific plugin."""
+    plugin = PluginRegistry.get_plugin(plugin_id)
+    if not plugin:
+        raise HTTPException(404, f"Plugin {plugin_id} not found")
+    return {"id": plugin_id, "name": plugin["name"], "description": plugin["description"],
+            "category": plugin["category"], "icon": plugin["icon"], "params": plugin["params"]}
+
+@app.post("/api/plugins/{plugin_id}/execute")
+async def exec_plugin(plugin_id: str, params: dict = Body(...), db=Depends(get_db)):
+    """Execute a plugin with parameters."""
+    result = await PluginRegistry.execute_plugin(plugin_id, params, db)
+    return result
+
+# ─── Chat / AI Builder ───
 @app.post("/api/chat")
 async def chat_build(msg: ChatMessage, db=Depends(get_db)):
     """
@@ -528,6 +558,19 @@ Proactive defaults (always use action "create_entity"):
 - "booking" or "reservations" -> "Booking": {{name, email, date, time, status}}
 - "fitness" or "workout tracker" -> "Workout": {{title, date, duration, calories_burned, type, notes}}
 - "task manager" or "todo" -> "Task": {{title, status, priority, due_date}}
+
+You also have access to PLUGINS for external operations:
+- web_search: Search the internet for current info
+- web_fetch: Fetch and parse any URL
+- email_send: Send emails via Brevo
+- http_request: Call external APIs
+- code_exec: Run Python code
+- github: GitHub repo operations
+- crypto: Get crypto prices
+- weather: Get weather
+- image_gen: Generate images
+- translate: Translate text
+When a user asks for something requiring external data, respond with: {{"action": "plugin", "plugin": "web_search", "params": {{"query": "search term"}}}}
 
 Always respond with a JSON action object. If the user just wants to chat, respond with {{"action": "chat", "message": "your response"}}."""
 
@@ -644,8 +687,9 @@ Always respond with a JSON action object. If the user just wants to chat, respon
     try:
         user_msg_lower = msg.message.lower()
         # Detect preferences, decisions, instructions
-        memory_triggers = ["prefer", "always", "never", "use", "don't", "remember", "should", "want", "need", "like", "default"]
-        should_save = any(t in user_msg_lower for t in memory_triggers) and len(msg.message) > 10
+        memory_triggers = ["prefer", "always", "never", "use ", "don't ", "remember", "should", "want", "need", "like", "default"]
+        is_question = "?" in msg.message or msg.message.strip().lower().startswith(("what", "how", "why", "where", "when", "who", "can you", "do you"))
+        should_save = any(t in user_msg_lower for t in memory_triggers) and len(msg.message) > 10 and not is_question
         if should_save:
             mem_data = json.dumps({
                 "content": msg.message[:200],
@@ -675,6 +719,31 @@ Always respond with a JSON action object. If the user just wants to chat, respon
 
     # Try to parse AI response as JSON action
     try:
+        # Handle plugin action
+        if '"action": "plugin"' in ai_response or '"action":"plugin"' in ai_response:
+            json_start = ai_response.find("{")
+            if json_start >= 0:
+                json_str = ai_response[json_start:]
+                brace_count = 0
+                end_idx = 0
+                for i, c in enumerate(json_str):
+                    if c == "{": brace_count += 1
+                    elif c == "}": brace_count -= 1
+                    if brace_count == 0:
+                        end_idx = i + 1
+                        break
+                plugin_action = json.loads(json_str[:end_idx])
+                if plugin_action.get("action") == "plugin":
+                    plugin_id = plugin_action.get("plugin", "")
+                    plugin_params = plugin_action.get("params", {})
+                    plugin_result = await PluginRegistry.execute_plugin(plugin_id, plugin_params, db)
+                    return {
+                        "message": f"Plugin '{plugin_id}' executed. Result: {json.dumps(plugin_result.get('result', plugin_result), indent=2)[:1000]}",
+                        "action": "plugin",
+                        "plugin": plugin_id,
+                        "result": plugin_result,
+                    }
+        
         # Find JSON in response
         json_start = ai_response.find("{")
         json_end = ai_response.rfind("}") + 1
