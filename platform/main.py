@@ -195,8 +195,11 @@ async def health():
 
 # ─── Entity Routes ───
 @app.get("/api/entities")
-async def list_entities(db=Depends(get_db)):
-    """List all entity schemas."""
+async def list_entities(db=Depends(get_db), request: Request = None):
+    """List all entity schemas — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
     try:
         entities = await EntityManager.list_entities(db)
         return {"entities": entities}
@@ -204,10 +207,13 @@ async def list_entities(db=Depends(get_db)):
         raise HTTPException(500, str(e))
 
 @app.post("/api/entities")
-async def create_entity(entity: EntityCreate, db=Depends(get_db)):
-    """Create a new entity with JSON schema → auto CRUD."""
+async def create_entity(entity: EntityCreate, db=Depends(get_db), request: Request = None):
+    """Create a new entity — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
     try:
-        result = await EntityManager.create_entity(db, entity.name, entity.schema)
+        result = await EntityManager.create_entity(db, entity.name, entity.schema, created_by=user.get("user_id") if user else None)
         return result
     except ValueError as e:
         raise HTTPException(400, str(e))
@@ -215,24 +221,33 @@ async def create_entity(entity: EntityCreate, db=Depends(get_db)):
         raise HTTPException(500, str(e))
 
 @app.get("/api/entities/{name}")
-async def get_entity(name: str, db=Depends(get_db)):
-    """Get entity schema."""
+async def get_entity(name: str, db=Depends(get_db), request: Request = None):
+    """Get entity schema — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
     entity = await EntityManager.get_entity(db, name)
     if not entity:
         raise HTTPException(404, f"Entity '{name}' not found")
     return entity
 
 @app.put("/api/entities/{name}")
-async def update_entity(name: str, entity: EntityUpdate, db=Depends(get_db)):
-    """Update entity schema (adds new columns)."""
+async def update_entity(name: str, entity: EntityUpdate, db=Depends(get_db), request: Request = None):
+    """Update entity schema — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
     try:
         return await EntityManager.update_entity(db, name, entity.schema)
     except ValueError as e:
         raise HTTPException(400, str(e))
 
 @app.delete("/api/entities/{name}")
-async def delete_entity(name: str, db=Depends(get_db)):
-    """Delete entity (schema + table). Fails if records exist."""
+async def delete_entity(name: str, db=Depends(get_db), request: Request = None):
+    """Delete entity — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
     try:
         return await EntityManager.delete_entity(db, name)
     except ValueError as e:
@@ -293,8 +308,11 @@ async def delete_record(name: str, record_id: int, db=Depends(get_db)):
 
 # ─── Backend Functions ───
 @app.get("/api/functions")
-async def list_functions(db=Depends(get_db)):
-    """List all deployed backend functions."""
+async def list_functions(db=Depends(get_db), request: Request = None):
+    """List all deployed functions — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
     result = await db.execute(text("SELECT name, language, created_date FROM platform_functions ORDER BY created_date DESC"))
     rows = result.fetchall()
     return {"functions": [{"name": r[0], "language": r[1], "created_date": r[2].isoformat() if r[2] else None} for r in rows]}
@@ -379,8 +397,11 @@ async def _execute_function(name: str, request: Request, db, method: str):
 
 # ─── Workflows ───
 @app.get("/api/workflows")
-async def list_workflows(db=Depends(get_db)):
-    """List all workflows."""
+async def list_workflows(db=Depends(get_db), request: Request = None):
+    """List all workflows — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
     result = await db.execute(text("SELECT name, trigger_type, status, created_date FROM platform_workflows ORDER BY created_date DESC"))
     rows = result.fetchall()
     return {"workflows": [{"name": r[0], "trigger_type": r[1], "status": r[2], "created_date": r[3].isoformat() if r[3] else None} for r in rows]}
@@ -466,32 +487,55 @@ async def filter_records(name: str, filter_req: dict, db=Depends(get_db)):
 
 # ─── Agents ───
 @app.get("/api/agents")
-async def list_agents(db=Depends(get_db)):
-    """List all AI agents."""
+async def list_agents(db=Depends(get_db), request: Request = None):
+    """List all AI agents — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
     agents = await AgentManager.list_agents(db)
     return {"agents": agents}
 
 @app.post("/api/agents")
-async def create_agent(agent: AgentCreate, db=Depends(get_db)):
+async def create_agent(agent: AgentCreate, db=Depends(get_db), request: Request = None):
     """Create a new AI agent with custom system prompt."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    created_by = user.get("user_id", "platform")
     try:
         return await AgentManager.create_agent(db, agent.name, agent.system_prompt,
-            agent.model, agent.temperature, agent.tools, "platform",
+            agent.model, agent.temperature, agent.tools, created_by,
             agent.max_tokens, agent.top_p, agent.memory_enabled, agent.stream)
     except ValueError as e:
         raise HTTPException(400, str(e))
 
 @app.get("/api/agents/{name}")
-async def get_agent(name: str, db=Depends(get_db)):
-    """Get agent details including system prompt and memory."""
+async def get_agent(name: str, db=Depends(get_db), request: Request = None):
+    """Get agent details — requires auth, masks secrets."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
     agent = await AgentManager.get_agent(db, name)
     if not agent:
         raise HTTPException(404, f"Agent '{name}' not found")
+    # Mask api_key for everyone, secrets for non-owners
+    if agent.get("api_key"):
+        agent["api_key"] = agent["api_key"][:8] + "..."
+    if agent.get("created_by") != user.get("user_id") and user.get("role") != "admin":
+        agent["agent_secrets"] = {k: "***" for k in (agent.get("agent_secrets") or {})}
     return agent
 
 @app.put("/api/agents/{name}")
-async def update_agent(name: str, updates: AgentUpdate, db=Depends(get_db)):
-    """Update agent configuration."""
+async def update_agent(name: str, updates: AgentUpdate, db=Depends(get_db), request: Request = None):
+    """Update agent — requires auth + ownership."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    agent = await AgentManager.get_agent(db, name)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+    if agent.get("created_by") != user.get("user_id") and user.get("role") != "admin":
+        raise HTTPException(403, "You can only modify agents you own")
     try:
         update_data = {k: v for k, v in updates.dict().items() if v is not None}
         return await AgentManager.update_agent(db, name, update_data)
@@ -499,8 +543,16 @@ async def update_agent(name: str, updates: AgentUpdate, db=Depends(get_db)):
         raise HTTPException(400, str(e))
 
 @app.delete("/api/agents/{name}")
-async def delete_agent(name: str, db=Depends(get_db)):
-    """Delete an agent."""
+async def delete_agent(name: str, db=Depends(get_db), request: Request = None):
+    """Delete agent — requires auth + ownership."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    agent = await AgentManager.get_agent(db, name)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+    if agent.get("created_by") != user.get("user_id") and user.get("role") != "admin":
+        raise HTTPException(403, "You can only delete agents you own")
     try:
         return await AgentManager.delete_agent(db, name)
     except ValueError as e:
@@ -589,8 +641,11 @@ async def get_plugin_info(plugin_id: str):
             "category": plugin["category"], "icon": plugin["icon"], "params": plugin["params"]}
 
 @app.post("/api/plugins/{plugin_id}/execute")
-async def exec_plugin(plugin_id: str, params: dict = Body(...), db=Depends(get_db)):
-    """Execute a plugin with parameters."""
+async def exec_plugin(plugin_id: str, params: dict = Body(...), db=Depends(get_db), request: Request = None):
+    """Execute a plugin — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
     result = await PluginRegistry.execute_plugin(plugin_id, params, db)
     return result
 

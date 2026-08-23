@@ -50,12 +50,9 @@ def get_user_from_token(request: Request) -> dict | None:
                     if user_row:
                         return {"user_id": str(user_id), "email": user_row[0], "role": "user"}
             except:
-                # If we can't parse expiry, let it through
-                c.execute("SELECT email, display_name FROM users WHERE id = ?", (user_id,))
-                user_row = c.fetchone()
+                # If we can't parse expiry, deny — fail closed
                 conn.close()
-                if user_row:
-                    return {"user_id": str(user_id), "email": user_row[0], "role": "user"}
+                return None
         
         conn.close()
     except Exception:
