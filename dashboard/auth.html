@@ -343,7 +343,7 @@ document.getElementById('btn-login').addEventListener('click', async () => {
         if (data.ok) {
             localStorage.setItem('evolvix_token', data.token);
             localStorage.setItem('evolvix_user', JSON.stringify(data.user));
-            window.location.href = '/studio?v=9';
+            window.location.href = '/platform/';
         } else {
             showError(data.error || 'Login failed');
             btn.disabled = false;
@@ -409,7 +409,7 @@ document.getElementById('btn-verify').addEventListener('click', async () => {
             localStorage.setItem('evolvix_token', data.token);
             localStorage.setItem('evolvix_user', JSON.stringify(data.user));
             showSuccess('Verified! Redirecting...');
-            setTimeout(() => window.location.href = '/studio?v=9', 1000);
+            setTimeout(() => window.location.href = '/platform/', 1000);
         } else {
             showError(data.error || 'Verification failed');
             btn.disabled = false;
@@ -460,7 +460,7 @@ const existingToken = localStorage.getItem('evolvix_token');
 if (existingToken) {
     fetch(API + '/me', { headers: { 'Authorization': 'Bearer ' + existingToken } })
         .then(r => r.json())
-        .then(d => { if (d.user) window.location.href = '/studio?v=9'; })
+        .then(d => { if (d.user) window.location.href = '/platform/'; })
         .catch(() => {});
 }
 </script>
