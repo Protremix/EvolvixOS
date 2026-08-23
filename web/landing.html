@@ -202,6 +202,8 @@ footer a:hover{color:var(--text)}
     <div class="nav-links" id="nav-links">
       <a href="#brains" onclick="closeNav()">AI Brains</a>
       <a href="#features" onclick="closeNav()">Features</a>
+      <a href="#comparison" onclick="closeNav()">Compare</a>
+      <a href="#faq" onclick="closeNav()">FAQ</a>
       <a href="#code" onclick="closeNav()">API</a>
       <a href="https://github.com/Protremix/EvolvixOS" target="_blank" onclick="closeNav()">GitHub</a>
       <a href="/platform/" class="btn-launch">Launch Platform</a>
@@ -349,6 +351,152 @@ footer a:hover{color:var(--text)}
 </section>
 
 <!-- CTA -->
+
+<!-- Comparison Table -->
+<section class="section" id="comparison" style="padding-top:0">
+  <div class="section-title reveal">
+    <h2>Why EvolvixOS?</h2>
+    <p>Open-source, self-hosted, and built for engineers</p>
+  </div>
+  <div class="reveal" style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:600px">
+      <thead>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.1)">
+          <th style="text-align:left;padding:16px 12px;color:var(--muted);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:1px">Feature</th>
+          <th style="text-align:center;padding:16px 12px;color:#d946ef;font-weight:700">EvolvixOS</th>
+          <th style="text-align:center;padding:16px 12px;color:var(--muted);font-weight:500">Base44</th>
+          <th style="text-align:center;padding:16px 12px;color:var(--muted);font-weight:500">Raw LLM API</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:14px 12px">Open Source</td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span> Self-hosted</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">✗ SaaS only</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">N/A</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:14px 12px">Multi-LLM Routing</td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span> 5 brains</td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span> Cloud only</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">Manual</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:14px 12px">Local Model Support</td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span> Ollama built-in</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">✗</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">Manual</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:14px 12px">Entity CRUD API</td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span> Auto-generated</td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span></td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">Build yourself</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:14px 12px">Backend Functions</td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span> Python</td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span> TypeScript</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">Build yourself</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:14px 12px">Workflows & Automations</td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span></td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span></td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">✗</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:14px 12px">Privacy Mode</td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span> LOCAL/HYBRID/CLOUD</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">Cloud only</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">Manual</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.05);transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:14px 12px">Cost</td>
+          <td style="text-align:center;padding:14px 12px;color:#22c55e">Free / Self-hosted</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">Credits-based</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">Per-token</td>
+        </tr>
+        <tr style="transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+          <td style="padding:14px 12px">Self-Improving Agent</td>
+          <td style="text-align:center;padding:14px 12px"><span style="color:#22c55e">✓</span> GitHub Discovery</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">✗</td>
+          <td style="text-align:center;padding:14px 12px;color:var(--muted)">✗</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="section" id="faq" style="padding-top:0">
+  <div class="section-title reveal">
+    <h2>Frequently Asked Questions</h2>
+    <p>Everything you need to know</p>
+  </div>
+  <div style="max-width:680px;margin:0 auto" id="faq-container">
+    <div class="reveal" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:12px;overflow:hidden">
+      <button onclick="toggleFaq(this)" style="width:100%;text-align:left;padding:18px 20px;background:none;border:none;color:#f8fafc;font-size:15px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+        <span>What is EvolvixOS?</span>
+        <span class="faq-icon" style="transition:transform .3s;color:#d946ef;font-size:20px">+</span>
+      </button>
+      <div class="faq-answer" style="max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease">
+        <p style="padding:0 20px 18px;color:var(--muted);font-size:14px;line-height:1.6">EvolvixOS is an open-source AI engineering platform that lets you build apps, manage data, and deploy functions using natural language. It orchestrates multiple LLMs (Groq, Gemini, GLM, Kimi, Ollama) and provides entity-based CRUD, backend functions, workflows, and an AI chat builder — all self-hostable.</p>
+      </div>
+    </div>
+    <div class="reveal" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:12px;overflow:hidden">
+      <button onclick="toggleFaq(this)" style="width:100%;text-align:left;padding:18px 20px;background:none;border:none;color:#f8fafc;font-size:15px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+        <span>Can I run it locally?</span>
+        <span class="faq-icon" style="transition:transform .3s;color:#d946ef;font-size:20px">+</span>
+      </button>
+      <div class="faq-answer" style="max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease">
+        <p style="padding:0 20px 18px;color:var(--muted);font-size:14px;line-height:1.6">Yes. EvolvixOS supports three privacy modes: LOCAL (all inference via Ollama, zero external calls), HYBRID (local for simple tasks, cloud for complex), and CLOUD (use external APIs like Groq/Gemini). Set EVOLVIX_PRIVACY_MODE env var to control routing.</p>
+      </div>
+    </div>
+    <div class="reveal" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:12px;overflow:hidden">
+      <button onclick="toggleFaq(this)" style="width:100%;text-align:left;padding:18px 20px;background:none;border:none;color:#f8fafc;font-size:15px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+        <span>How does the AI Builder work?</span>
+        <span class="faq-icon" style="transition:transform .3s;color:#d946ef;font-size:20px">+</span>
+      </button>
+      <div class="faq-answer" style="max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease">
+        <p style="padding:0 20px 18px;color:var(--muted);font-size:14px;line-height:1.6">Type a description like "build me a CRM" and the AI Builder creates entities (Contact, Deal, Company) with appropriate fields, deploys backend functions, and generates a full CRUD API — all through natural language. It uses the best available model (Automatic routing) or your selected model.</p>
+      </div>
+    </div>
+    <div class="reveal" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:12px;overflow:hidden">
+      <button onclick="toggleFaq(this)" style="width:100%;text-align:left;padding:18px 20px;background:none;border:none;color:#f8fafc;font-size:15px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+        <span>What AI models are supported?</span>
+        <span class="faq-icon" style="transition:transform .3s;color:#d946ef;font-size:20px">+</span>
+      </button>
+      <div class="faq-answer" style="max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease">
+        <p style="padding:0 20px 18px;color:var(--muted);font-size:14px;line-height:1.6">Five AI brains: Groq (gpt-oss-120b, 467 tok/s), Google Gemini (3.6 Flash, 1M context, vision), GLM (Z.ai, GLM-5), Kimi (Moonshot, 32k context), and Ollama (local models like qwen2.5:7b/14b). The Automatic mode routes to the best model per task — simple chat goes to the fastest, code generation to the smartest.</p>
+      </div>
+    </div>
+    <div class="reveal" style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:12px;overflow:hidden">
+      <button onclick="toggleFaq(this)" style="width:100%;text-align:left;padding:18px 20px;background:none;border:none;color:#f8fafc;font-size:15px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s" onmouseover="this.style.background='rgba(139,92,246,.04)'" onmouseout="this.style.background='transparent'">
+        <span>Is it production-ready?</span>
+        <span class="faq-icon" style="transition:transform .3s;color:#d946ef;font-size:20px">+</span>
+      </button>
+      <div class="faq-answer" style="max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease">
+        <p style="padding:0 20px 18px;color:var(--muted);font-size:14px;line-height:1.6">EvolvixOS runs as a systemd service with PostgreSQL, Nginx reverse proxy, and 350+ passing tests. It includes OTP email authentication, credit-based billing with Stripe, row-level security, and 24 integrated tools. Currently deployed at evolvixos.com.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+function toggleFaq(btn) {
+  var answer = btn.nextElementSibling;
+  var icon = btn.querySelector('.faq-icon');
+  if (answer.style.maxHeight === '0px' || !answer.style.maxHeight) {
+    answer.style.maxHeight = '300px';
+    icon.style.transform = 'rotate(45deg)';
+  } else {
+    answer.style.maxHeight = '0px';
+    icon.style.transform = 'rotate(0deg)';
+  }
+}
+</script>
+
 <section class="section cta-section">
   <div class="cta-glow"></div>
   <h2 class="reveal" style="font-size:clamp(24px,4vw,36px);font-weight:700;margin-bottom:16px;position:relative">Ready to build?</h2>

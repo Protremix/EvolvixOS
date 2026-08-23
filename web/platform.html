@@ -782,6 +782,25 @@ select option { background: #0a0a0f; }
 /* Reduced motion */
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}.plat-orb{display:none}}
 
+
+/* ═══ Command Palette ═══ */
+.cmd-palette-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:300;display:none;align-items:flex-start;justify-content:center;padding-top:15vh}
+.cmd-palette-overlay.show{display:flex;animation:overlayIn .15s ease}
+.cmd-palette{width:90%;max-width:560px;background:#0c0c12;border:1px solid rgba(139,92,246,.3);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(139,92,246,.1);overflow:hidden;animation:cmdIn .2s cubic-bezier(.34,1.56,.64,1)}
+@keyframes cmdIn{from{opacity:0;transform:scale(.95) translateY(-10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.cmd-input{width:100%;background:transparent;border:none;outline:none;color:#f8fafc;font-size:16px;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.cmd-input::placeholder{color:#475569}
+.cmd-results{max-height:400px;overflow-y:auto;padding:8px}
+.cmd-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;cursor:pointer;transition:background .15s;color:#94a3b8;font-size:14px}
+.cmd-item:hover,.cmd-item.selected{background:rgba(139,92,246,.12);color:#c4b5fd}
+.cmd-item-icon{width:32px;height:32px;border-radius:8px;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cmd-item-icon svg{width:16px;height:16px;color:#a78bfa}
+.cmd-item-label{font-weight:500;color:#e2e8f0;font-size:14px}
+.cmd-item-desc{font-size:12px;color:#64748b;margin-top:1px}
+.cmd-shortcut{margin-left:auto;font-size:11px;color:#475569;font-family:'JetBrains Mono',monospace;background:rgba(255,255,255,.04);padding:2px 6px;border-radius:4px}
+.cmd-footer{padding:8px 16px;border-top:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;font-size:11px;color:#475569}
+.cmd-footer kbd{background:rgba(255,255,255,.06);padding:1px 5px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px}
+
 </style>
 </head>
 <body class="bg-[#0a0a0f] text-gray-100 h-screen overflow-hidden">
@@ -2531,6 +2550,139 @@ setInterval(checkHealth, 30000);
 document.querySelectorAll('.page h2').forEach(function(h) {
   if (!h.classList.contains('gradient-text') && !h.closest('.modal-content')) {
     h.classList.add('gradient-text');
+  }
+});
+
+</script>
+
+<!-- Command Palette -->
+<div class="cmd-palette-overlay" id="cmdPaletteOverlay" onclick="closeCmdPalette(event)">
+  <div class="cmd-palette" onclick="event.stopPropagation()">
+    <input type="text" class="cmd-input" id="cmdInput" placeholder="Type a command or search..." oninput="filterCmdPalette()" onkeydown="handleCmdKeydown(event)">
+    <div class="cmd-results" id="cmdResults"></div>
+    <div class="cmd-footer">
+      <span><kbd>↑↓</kbd> Navigate &nbsp; <kbd>Enter</kbd> Select &nbsp; <kbd>Esc</kbd> Close</span>
+      <span>EvolvixOS Command Palette</span>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ═══ Command Palette ═══
+var cmdItems = [
+  {label:'AI Builder',desc:'Open the AI chat builder',page:'chat',icon:'M12 2L2 7l10 5 10-5-10-5z'},
+  {label:'Entities',desc:'View and manage data models',page:'entities',icon:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'},
+  {label:'Functions',desc:'Deploy Python code as endpoints',page:'functions',icon:'M16 18l6-6-6-6M8 6l-6 6 6 6'},
+  {label:'Workflows',desc:'Automations and scheduled tasks',page:'workflows',icon:'M12 1v6m0 10v6m11-11h-6M7 12H1'},
+  {label:'Storage',desc:'Upload and manage files',page:'storage',icon:'M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z'},
+  {label:'Agents',desc:'Chat with AI agents',page:'agents',icon:'M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0'},
+  {label:'Memory',desc:'Platform memory and preferences',page:'memory',icon:'M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0'},
+  {label:'Billing',desc:'Plans, credits, and billing',page:'billing',icon:'M3 10h18M3 10l2-6h14l2 6M3 10v10h18V10'},
+  {label:'New Entity',desc:'Create a new data model',action:'newEntity',icon:'M12 5v14M5 12h14'},
+  {label:'New Function',desc:'Deploy a new backend function',action:'newFunction',icon:'M12 5v14M5 12h14'},
+  {label:'New Agent',desc:'Create a new AI agent',action:'newAgent',icon:'M12 5v14M5 12h14'},
+  {label:'New Chat',desc:'Start a new AI builder chat',action:'newChat',icon:'M12 5v14M5 12h14'},
+];
+
+var cmdSelectedIndex = 0;
+
+function openCmdPalette() {
+  var overlay = document.getElementById('cmdPaletteOverlay');
+  overlay.classList.add('show');
+  var input = document.getElementById('cmdInput');
+  input.value = '';
+  input.focus();
+  renderCmdItems(cmdItems);
+}
+
+function closeCmdPalette(e) {
+  if (e && e.target !== document.getElementById('cmdPaletteOverlay')) return;
+  document.getElementById('cmdPaletteOverlay').classList.remove('show');
+}
+
+function renderCmdItems(items) {
+  var results = document.getElementById('cmdResults');
+  cmdSelectedIndex = 0;
+  results.innerHTML = items.map(function(item, i) {
+    return '<div class="cmd-item' + (i === 0 ? ' selected' : '') + '" onclick="executeCmd(' + i + ')" onmouseenter="cmdSelectedIndex=' + i + ';updateCmdSelection()">' +
+      '<div class="cmd-item-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="' + item.icon + '"/></svg></div>' +
+      '<div><div class="cmd-item-label">' + item.label + '</div><div class="cmd-item-desc">' + item.desc + '</div></div>' +
+      '</div>';
+  }).join('');
+  // Store current filtered items for execution
+  window._cmdFiltered = items;
+}
+
+function filterCmdPalette() {
+  var q = document.getElementById('cmdInput').value.toLowerCase();
+  var filtered = cmdItems.filter(function(item) {
+    return item.label.toLowerCase().indexOf(q) !== -1 || item.desc.toLowerCase().indexOf(q) !== -1;
+  });
+  renderCmdItems(filtered);
+}
+
+function updateCmdSelection() {
+  document.querySelectorAll('.cmd-item').forEach(function(el, i) {
+    el.classList.toggle('selected', i === cmdSelectedIndex);
+  });
+}
+
+function handleCmdKeydown(e) {
+  var items = window._cmdFiltered || cmdItems;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    cmdSelectedIndex = Math.min(cmdSelectedIndex + 1, items.length - 1);
+    updateCmdSelection();
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    cmdSelectedIndex = Math.max(cmdSelectedIndex - 1, 0);
+    updateCmdSelection();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    executeCmd(cmdSelectedIndex);
+  } else if (e.key === 'Escape') {
+    closeCmdPalette({target: document.getElementById('cmdPaletteOverlay')});
+  }
+}
+
+function executeCmd(index) {
+  var items = window._cmdFiltered || cmdItems;
+  var item = items[index];
+  if (!item) return;
+  document.getElementById('cmdPaletteOverlay').classList.remove('show');
+  if (item.page) {
+    navigateTo(item.page);
+  } else if (item.action === 'newEntity') {
+    showPage('entities'); setTimeout(function(){ if(typeof showCreateEntity==="function") showCreateEntity(); }, 200, 200);
+  } else if (item.action === 'newFunction') {
+    showPage('functions'); setTimeout(function(){ if(typeof showCreateFunction==="function") showCreateFunction(); }, 200, 200);
+  } else if (item.action === 'newAgent') {
+    showPage('agents'); setTimeout(function(){ if(typeof showCreateAgent==="function") showCreateAgent(); }, 200, 200);
+  } else if (item.action === 'newChat') {
+    startNewChat();
+  }
+}
+
+// Keyboard shortcut: Ctrl+K / Cmd+K
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    openCmdPalette();
+  }
+});
+
+// Add Ctrl+K hint to header
+document.addEventListener('DOMContentLoaded', function() {
+  var header = document.querySelector('.top-bar');
+  if (header) {
+    var hint = document.createElement('button');
+    hint.onclick = openCmdPalette;
+    hint.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;font-size:11px;color:#64748b;cursor:pointer;transition:all .2s';
+    hint.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Search <kbd style="background:rgba(255,255,255,.06);padding:1px 4px;border-radius:3px;font-family:JetBrains Mono,monospace;font-size:9px">Ctrl K</kbd>';
+    hint.onmouseenter = function() { this.style.borderColor = 'rgba(139,92,246,.3)'; this.style.color = '#a78bfa'; };
+    hint.onmouseleave = function() { this.style.borderColor = 'rgba(255,255,255,.08)'; this.style.color = '#64748b'; };
+    header.appendChild(hint);
   }
 });
 
