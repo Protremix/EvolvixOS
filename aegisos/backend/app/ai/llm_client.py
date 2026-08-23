@@ -45,9 +45,12 @@ class LLMClient:
         elif not self._validate_api_key(self.api_key):
             logger.warning("OpenAI API key format appears invalid — expected sk-... prefix")
         self.model = model
-        self.max_retries = max_retries
+        self.max_retries = max_retries if (self.api_key and self._validate_api_key(self.api_key)) else 1
         self.timeout = timeout
         self._base_url = "https://api.openai.com/v1/chat/completions"
+        # Persistent clients — avoid connection setup overhead per call
+        self._ollama_client = httpx.Client(timeout=30)
+        self._openai_client = httpx.Client(timeout=timeout)
 
     @staticmethod
     def _validate_api_key(key: str) -> bool:
@@ -66,87 +69,56 @@ class LLMClient:
         temperature: float = 0.3,
         max_tokens: int = 4000,
     ) -> LLMResponse:
-        """
-        Make a chat completion call to GPT-4o.
-
-        Args:
-            system_prompt: System message defining agent behavior
-            user_prompt: User message with the task
-            temperature: 0.1 for security, 0.3 for analysis, 0.7 for creative
-            max_tokens: Maximum tokens in the response
-
-        Returns:
-            LLMResponse with content and metadata
-        """
-        if not self.api_key:
-            raise RuntimeError("No OpenAI API key configured")
-
-        payload = {
-            "model": self.model,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "temperature": temperature,
-            "max_tokens": max_tokens,
-        }
-
-        last_error = None
-        for attempt in range(self.max_retries):
-            try:
-                start = time.time()
-                with httpx.Client(timeout=self.timeout) as client:
-                    response = client.post(
-                        self._base_url,
-                        headers={
-                            "Content-Type": "application/json",
-                            "Authorization": f"Bearer {self.api_key}",
-                        },
-                        json=payload,
-                    )
-                    response.raise_for_status()
-
-                    data = response.json()
-                    latency_ms = (time.time() - start) * 1000
-
-                    content = data["choices"][0]["message"]["content"]
-                    tokens = data.get("usage", {}).get("total_tokens", 0)
-
-                    logger.info(
-                        "llm_call_success",
-                        model=self.model,
-                        tokens=tokens,
-                        latency_ms=round(latency_ms, 2),
-                        attempt=attempt + 1,
-                    )
-
-                    return LLMResponse(
-                        content=content,
-                        model=self.model,
-                        tokens_used=tokens,
-                        latency_ms=latency_ms,
-                    )
-
-            except httpx.HTTPStatusError as e:
-                last_error = e
-                logger.error(
-                    "llm_call_http_error",
-                    status_code=e.response.status_code,
-                    attempt=attempt + 1,
-                )
-                if e.response.status_code == 429:
+        """Make a chat completion call. Tries OpenAI first, falls back to local Ollama."""
+        if self.api_key and self.api_key != "placeholder" and self._validate_api_key(self.api_key):
+            payload = {
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            }
+            last_error = None
+            for attempt in range(self.max_retries):
+                try:
+                    start = time.time()
+                    response = self._openai_client.post(self._base_url, headers={"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}, json=payload)
+                        response.raise_for_status()
+                        data = response.json()
+                        latency_ms = (time.time() - start) * 1000
+                        content = data["choices"][0]["message"]["content"]
+                        tokens = data.get("usage", {}).get("total_tokens", 0)
+                        logger.info("llm_call_success", model=self.model, tokens=tokens, latency_ms=round(latency_ms, 2), attempt=attempt + 1)
+                        return LLMResponse(content=content, model=self.model, tokens_used=tokens, latency_ms=latency_ms)
+                except httpx.HTTPStatusError as e:
+                    last_error = e
+                    logger.error("llm_call_http_error", status_code=e.response.status_code, attempt=attempt + 1)
+                    if e.response.status_code == 429: time.sleep(2 ** attempt)
+                    elif e.response.status_code >= 500: time.sleep(2 ** attempt)
+                    else: break
+                except Exception as e:
+                    last_error = e
+                    logger.error("llm_call_error", error=str(e), attempt=attempt + 1)
                     time.sleep(2 ** attempt)
-                elif e.response.status_code >= 500:
-                    time.sleep(2 ** attempt)
-                else:
-                    break
+            logger.warning(f"OpenAI failed after retries, falling back to Ollama: {last_error}")
+        return self._chat_ollama(system_prompt, user_prompt, temperature, max_tokens)
 
-            except Exception as e:
-                last_error = e
-                logger.error("llm_call_error", error=str(e), attempt=attempt + 1)
-                time.sleep(2 ** attempt)
-
-        raise RuntimeError(f"LLM call failed after {self.max_retries} attempts: {last_error}")
+    def _chat_ollama(self, system_prompt: str, user_prompt: str, temperature: float = 0.3, max_tokens: int = 4000) -> LLMResponse:
+        """Fallback: Use local Ollama when cloud providers are unavailable."""
+        ollama_url = os.environ.get("OLLAMA_URL", "http://172.18.0.1:11434")
+        ollama_model = os.environ.get("FALLBACK_LLM_MODEL", "qwen2.5:7b")  # 7b is 3x faster than 14b
+        payload = {"model": ollama_model, "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}], "stream": False, "keep_alive": "30m", "options": {"temperature": temperature, "top_p": 0.9}}
+        start = time.time()
+        response = self._ollama_client.post(f"{ollama_url}/api/chat", headers={"Content-Type": "application/json"}, json=payload)
+            response.raise_for_status()
+            data = response.json()
+            latency_ms = (time.time() - start) * 1000
+            content = data.get("message", {}).get("content", "No response from model.")
+            tokens = data.get("eval_count", 0)
+            logger.info("llm_fallback_ollama_success", model=ollama_model, tokens=tokens, latency_ms=round(latency_ms, 2))
+            return LLMResponse(content=content, model=ollama_model, tokens_used=tokens, latency_ms=latency_ms)
 
     def chat_json(
         self,
