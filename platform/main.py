@@ -539,13 +539,22 @@ Always respond with a JSON action object. If the user just wants to chat or asks
     action_type = action.get("action")
     try:
         if action_type == "create_entity":
-            result = await EntityManager.create_entity(db, action["name"], action["schema"])
-            return {"action": "create_entity", "result": result, "message": f"Entity '{action['name']}' created!"}
+            entity_name = action["name"]
+            # Check existence first for a friendly response instead of raising
+            existing = await EntityManager.get_entity(db, entity_name)
+            if existing:
+                return {
+                    "action": "create_entity",
+                    "already_existed": True,
+                    "message": f"You already have a '{entity_name}' entity set up — no need to create it again. Want me to add fields to it, or build something else?"
+                }
+            result = await EntityManager.create_entity(db, entity_name, action["schema"])
+            fields = ", ".join(action["schema"].get("properties", {}).keys())
+            return {"action": "create_entity", "result": result, "message": f"Created the '{entity_name}' entity with fields: {fields}. You can start adding records to it now."}
         elif action_type == "list_entities":
             entities = await EntityManager.list_entities(db)
             return {"action": "list_entities", "entities": entities}
         elif action_type == "create_function":
-            # Store function
             await db.execute(text("""
                 INSERT INTO platform_functions (name, code, env_vars)
                 VALUES (:name, :code, '{}')
@@ -562,11 +571,14 @@ Always respond with a JSON action object. If the user just wants to chat or asks
             await db.commit()
             return {"action": "create_workflow", "name": action["name"], "message": f"Workflow '{action['name']}' created!"}
         elif action_type == "chat":
-            return {"action": "chat", "message": action.get("message", ai_response)}
+            return {"action": "chat", "message": action.get("message", "How can I help you build today?")}
         else:
-            return {"action": "unknown", "message": ai_response}
+            return {"action": "unknown", "message": "Got that — but I'm not sure what to build yet. Could you tell me a bit more?"}
+    except ValueError as e:
+        # Known/expected validation errors — show the message cleanly, never raw JSON
+        return {"action": action_type, "error": str(e), "message": str(e)}
     except Exception as e:
-        return {"action": action_type, "error": str(e), "message": ai_response}
+        return {"action": action_type, "error": str(e), "message": "Something went wrong on my end while doing that — mind trying again?"}
 
 
 # ─── Startup ───
