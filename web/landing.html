@@ -91,6 +91,33 @@ footer a:hover{color:var(--text)}
   .nav-links a:not(.btn-launch){display:none}
   .brains-grid{grid-template-columns:1fr 1fr}
   .stats-row{gap:24px}
+  .section{padding:48px 16px}
+  .hero{padding:80px 16px 40px}
+  .hero-cta{flex-direction:column;gap:12px}
+  .btn-primary,.btn-secondary{width:100%;justify-content:center}
+  .code-body{font-size:12px;padding:14px}
+  .features-grid{grid-template-columns:1fr}
+  footer{padding:32px 16px}
+}
+@media(max-width:480px){
+  .brains-grid{grid-template-columns:1fr}
+  .stat .num{font-size:28px}
+  .hero h1{font-size:32px}
+  nav .inner{padding:12px 16px}
+  .logo{font-size:16px}
+  .logo-icon{width:28px;height:28px;font-size:14px}
+  .btn-launch{padding:6px 14px;font-size:13px}
+}
+/* Mobile hamburger */
+.nav-mobile-btn{display:none;cursor:pointer;width:36px;height:36px;align-items:center;justify-content:center;border-radius:8px}
+.nav-mobile-btn:hover{background:rgba(255,255,255,.06)}
+@media(max-width:768px){
+  .nav-mobile-btn{display:flex}
+  .nav-links{position:fixed;top:56px;left:0;right:0;background:rgba(10,10,15,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);flex-direction:column;gap:0;padding:8px 16px;transform:translateY(-200%);opacity:0;pointer-events:none;transition:all .3s}
+  .nav-links.open{transform:translateY(0);opacity:1;pointer-events:auto}
+  .nav-links a{padding:12px 0;font-size:15px;border-bottom:1px solid rgba(255,255,255,.04)}
+  .nav-links a:last-child{border-bottom:none}
+  .nav-links .btn-launch{margin:8px 0 4px;text-align:center}
 }
 </style>
 </head>
@@ -100,15 +127,22 @@ footer a:hover{color:var(--text)}
 <nav>
   <div class="inner">
     <a href="/" class="logo"><span class="logo-icon">E</span> EvolvixOS</a>
-    <div class="nav-links">
-      <a href="#brains">AI Brains</a>
-      <a href="#features">Features</a>
-      <a href="#code">API</a>
-      <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
+    <div class="nav-links" id="nav-links">
+      <a href="#brains" onclick="closeNav()">AI Brains</a>
+      <a href="#features" onclick="closeNav()">Features</a>
+      <a href="#code" onclick="closeNav()">API</a>
+      <a href="https://github.com/Protremix/EvolvixOS" target="_blank" onclick="closeNav()">GitHub</a>
       <a href="/platform/" class="btn-launch">Launch Platform</a>
+    </div>
+    <div class="nav-mobile-btn" onclick="toggleNav()">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </div>
   </div>
 </nav>
+<script>
+function toggleNav(){var n=document.getElementById('nav-links');n.classList.toggle('open')}
+function closeNav(){var n=document.getElementById('nav-links');n.classList.remove('open')}
+</script>
 
 <!-- Hero -->
 <section class="hero">

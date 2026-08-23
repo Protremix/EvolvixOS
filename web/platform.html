@@ -299,6 +299,29 @@ async function openStripePortal() {
   }
 })();
 
+// ═══ Mobile sidebar toggle ═══
+function toggleSidebar() {
+  var sb = document.getElementById('mobile-sidebar');
+  var ov = document.getElementById('mobile-overlay');
+  if (sb.classList.contains('open')) {
+    sb.classList.remove('open');
+    ov.classList.remove('open');
+  } else {
+    sb.classList.add('open');
+    ov.classList.add('open');
+  }
+}
+// Close sidebar when navigating
+document.querySelectorAll('.nav-item').forEach(function(item) {
+  item.addEventListener('click', function() {
+    if (window.innerWidth < 768) {
+      var sb = document.getElementById('mobile-sidebar');
+      var ov = document.getElementById('mobile-overlay');
+      sb.classList.remove('open');
+      ov.classList.remove('open');
+    }
+  });
+});
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -346,6 +369,144 @@ async function openStripePortal() {
   #agents-layout:not(.chat-open) #agents-chat-panel { display: none; }
   #agent-chat-empty-state { display: none; }
 }
+
+/* ═══ MOBILE RESPONSIVE LAYOUT ═══ */
+@media (max-width: 767px) {
+  /* Sidebar becomes a slide-out drawer */
+  #mobile-sidebar {
+    position: fixed;
+    left: -280px;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    z-index: 100;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  }
+  #mobile-sidebar.open {
+    left: 0;
+  }
+  #mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  #mobile-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* Hamburger button */
+  #hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  #hamburger:hover { background: rgba(255,255,255,0.06); }
+  #hamburger svg { width: 20px; height: 20px; }
+
+  /* Header adjustments */
+  header.top-bar { padding-left: 12px; padding-right: 12px; }
+  
+  /* Pages: reduce padding */
+  .page { padding: 16px 14px !important; }
+  .page.max-w-3xl { max-width: 100% !important; }
+  .page.max-w-5xl { max-width: 100% !important; }
+  .page.max-w-4xl { max-width: 100% !important; }
+  
+  /* Hero section */
+  #builder-hero { padding-top: 24px !important; padding-bottom: 16px !important; }
+  #builder-hero h2 { font-size: 24px !important; }
+  #builder-hero p { font-size: 14px !important; }
+  #builder-hero .w-16 { width: 56px !important; height: 56px !important; }
+  #builder-hero svg { width: 28px !important; height: 28px !important; }
+  
+  /* Prompt box */
+  .prompt-box { padding: 12px !important; }
+  #chat-input { font-size: 16px !important; } /* prevents iOS zoom */
+  
+  /* Prompt controls row: wrap */
+  .prompt-controls { flex-wrap: wrap; gap: 8px; }
+  .prompt-controls select { font-size: 11px !important; }
+  
+  /* Suggestion cards: 1 column on small phones */
+  #builder-suggestions { grid-template-columns: 1fr !important; }
+  
+  /* Entity/function cards: 1 column */
+  .grid { grid-template-columns: 1fr !important; }
+  
+  /* Modals: full-screen on mobile */
+  .modal-content {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+  .modal-overlay {
+    padding: 0 !important;
+    align-items: stretch !important;
+  }
+  
+  /* Settings modal tabs: horizontal scroll */
+  .settings-tabs {
+    flex-direction: row !important;
+    overflow-x: auto;
+    flex-shrink: 0;
+  }
+  .settings-tab-btn { white-space: nowrap; }
+  
+  /* Chat messages: full width */
+  .chat-msg { max-width: 100% !important; }
+  
+  /* Agent chat: full width */
+  #agent-chat-input { font-size: 16px !important; } /* iOS zoom fix */
+  #agents-layout { flex-direction: column !important; }
+  #agents-sidebar-panel { width: 100% !important; max-height: 40vh; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  #agents-chat-panel { flex: 1; }
+  
+  /* Entity record table: horizontal scroll */
+  .records-table { overflow-x: auto; display: block; }
+  .records-table table { min-width: 500px; }
+  
+  /* Plans grid: stack */
+  #plans-grid { grid-template-columns: 1fr !important; }
+  
+  /* Hide API Docs / Home links on very small screens */
+  @media (max-width: 380px) {
+    .header-links { display: none !important; }
+  }
+}
+
+/* Desktop: hide hamburger and overlay */
+@media (min-width: 768px) {
+  #hamburger { display: none; }
+  #mobile-overlay { display: none; }
+}
+
+/* Touch-friendly: larger tap targets on mobile */
+@media (max-width: 767px) {
+  .nav-item { padding-top: 12px; padding-bottom: 12px; }
+  button[class*="w-8 h-8"], button[class*="w-9 h-9"] { width: 40px !important; height: 40px !important; }
+  select { min-height: 36px; }
+  .field-type { padding: 10px !important; }
+}
+
+/* Smooth scrolling on iOS */
+@supports (-webkit-overflow-scrolling: touch) {
+  .overflow-y-auto, .flex-1 { -webkit-overflow-scrolling: touch; }
+}
 .agent-list-item.active { background: rgba(139,92,246,0.12); }
 .tool-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 3px 9px; border-radius: 999px; background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.25); color: #c4b5fd; }
 .agent-msg-content code { background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
@@ -389,8 +550,11 @@ select option { background: #0a0a0f; }
 <!-- Layout: Sidebar + Main -->
 <div class="flex h-screen">
 
+  <!-- Mobile overlay -->
+  <div id="mobile-overlay" onclick="toggleSidebar()"></div>
+
   <!-- Sidebar -->
-  <aside class="w-60 bg-[#0c0c12] border-r border-gray-800/60 flex flex-col">
+  <aside id="mobile-sidebar" class="w-60 bg-[#0c0c12] border-r border-gray-800/60 flex flex-col">
     <!-- Logo -->
     <div class="p-4 border-b border-gray-800/60">
       <div class="flex items-center gap-2.5">
@@ -459,11 +623,14 @@ select option { background: #0a0a0f; }
   <main class="flex-1 flex flex-col overflow-hidden">
 
     <!-- Top Bar -->
-    <header class="h-12 border-b border-gray-800/60 bg-[#0c0c12] flex items-center justify-between px-5">
+    <header class="top-bar h-12 border-b border-gray-800/60 bg-[#0c0c12] flex items-center justify-between px-5">
       <div class="flex items-center gap-3">
+        <div id="hamburger" onclick="toggleSidebar()">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </div>
         <h1 id="page-title" class="text-sm font-medium text-gray-300">AI Builder</h1>
       </div>
-      <div class="flex items-center gap-3 text-xs text-gray-500">
+      <div class="header-links flex items-center gap-3 text-xs text-gray-500">
         <a href="/platform/api/docs" target="_blank" class="hover:text-purple-400 transition-colors">API Docs</a>
         <span class="text-gray-700">·</span>
         <a href="/" class="hover:text-purple-400 transition-colors">Home</a>
@@ -489,7 +656,7 @@ select option { background: #0a0a0f; }
         <div class="prompt-box bg-[#0c0c12] border border-gray-800 rounded-2xl p-4 mb-6">
           <textarea id="chat-input" rows="2" placeholder="Describe the app you want to create..."
             class="w-full bg-transparent resize-none text-sm px-1 py-1 focus:outline-none placeholder-gray-600"></textarea>
-          <div class="flex items-center justify-between px-1 pt-2">
+          <div class="prompt-controls flex items-center justify-between px-1 pt-2">
             <div class="flex items-center gap-2">
               <button title="Attach (coming soon)" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-800 hover:text-gray-300 transition-all">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
@@ -497,25 +664,19 @@ select option { background: #0a0a0f; }
               <div class="w-px h-4 bg-gray-800"></div>
               <select id="builder-model" class="bg-transparent text-xs text-gray-500 hover:text-gray-300 focus:outline-none cursor-pointer transition-colors">
                 <option value="auto" selected>🤖 Automatic</option>
-                <option value="openai/gpt-oss-20b">⚡ GPT-OSS 20B</option>
-                <option value="openai/gpt-oss-120b">🧠 GPT-OSS 120B</option>
-                <option value="z-ai/glm-4.7-flash">⚡ GLM 4.7 Flash</option>
+                <option value="qwen/qwen3.8-27b">🏆 Qwen3.8 27B</option>
+                <option value="google/gemini-3.7-flash">🌟 Gemini 3.7 Flash</option>
+                <option value="deepseek/deepseek-v4-flash">⚡ DeepSeek V4 Flash</option>
+                <option value="google/gemma-4-31b-it">💬 Gemma 4 31B</option>
+                <option value="stepfun/step-3.7-flash">⚡ Step 3.7 Flash</option>
+                <option value="nvidia/nemotron-3-ultra-550b-a55b">🟢 Nemotron Ultra</option>
                 <option value="z-ai/glm-5">🔮 GLM 5</option>
                 <option value="z-ai/glm-5.2">💎 GLM 5.2</option>
-                <option value="z-ai/glm-5.2:free">🆓 GLM 5.2</option>
-                <option value="google/gemma-4-31b-it:free">🆓 Gemma 4 31B</option>
-                <option value="nvidia/nemotron-3-ultra-550b-a55b:free">🆓 Nemotron Ultra</option>
-                <option value="nvidia/nemotron-3-super-120b-a12b:free">🆓 Nemotron Super</option>
-                <option value="cohere/north-mini-code:free">🆓 Cohere North Code</option>
-                <option value="deepseek/deepseek-v4-flash">⚡ DeepSeek V4 Flash</option>
-                <option value="inclusionai/ling-2.6-flash">⚡ Ling 2.6 Flash</option>
-                <option value="mistralai/mistral-nemo">⚡ Mistral Nemo</option>
-                <option value="ibm-granite/granite-4.0-h-micro">⚡ Granite 4.0</option>
                 <option value="google/gemini-3.1-pro-preview">🌟 Gemini 3.1 Pro</option>
                 <option value="anthropic/claude-sonnet-5">🎭 Claude Sonnet 5</option>
-                <option value="moonshot/kimi-k2.5">🌙 Kimi K2.5</option>
-                <option value="amazon/nova-pro-v1">📦 Amazon Nova Pro</option>
-                <option value="mistralai/mistral-large-2512">🦊 Mistral Large</option>
+                <option value="qwen/qwen3.8-27b:free">🆓 Qwen3.8 (Free)</option>
+                <option value="google/gemma-4-31b-it:free">🆓 Gemma 4 (Free)</option>
+                <option value="nvidia/nemotron-3-ultra-550b-a55b:free">🆓 Nemotron (Free)</option>
                 <option value="qwen2.5:14b">💻 Qwen 14B (Local)</option>
                 <option value="qwen2.5:7b">💻 Qwen 7B (Local)</option>
               </select>
@@ -621,7 +782,7 @@ select option { background: #0a0a0f; }
           </div>
           <button onclick="showCreateRecord()" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">+ New Record</button>
         </div>
-        <div id="records-table" class="bg-[#0c0c12] border border-gray-800/60 rounded-xl overflow-hidden"></div>
+        <div id="records-table" class="records-table bg-[#0c0c12] border border-gray-800/60 rounded-xl overflow-hidden"></div>
 
         <div id="record-modal" class="fixed inset-0 bg-black/60 modal-overlay flex items-center justify-center z-50 hidden">
           <div class="modal-content bg-[#0c0c12] border border-gray-800 rounded-2xl p-6 w-full max-w-lg mx-4 shadow-2xl">
@@ -1862,7 +2023,7 @@ setInterval(checkHealth, 30000);
       </div>
       <button onclick="closeAgentSettings()" class="text-gray-500 hover:text-white transition-colors text-xl">&times;</button>
     </div>
-    <div class="flex gap-1 px-5 py-2 border-b border-gray-800/50 overflow-x-auto">
+    <div class="settings-tabs flex gap-1 px-5 py-2 border-b border-gray-800/50 overflow-x-auto">
       <button onclick="switchSettingsTab('general')" id="tab-btn-general" class="settings-tab-btn active px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">General</button>
       <button onclick="switchSettingsTab('sharing')" id="tab-btn-sharing" class="settings-tab-btn px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">Sharing</button>
       <button onclick="switchSettingsTab('identity')" id="tab-btn-identity" class="settings-tab-btn px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">Personalization</button>
