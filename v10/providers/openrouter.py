@@ -66,13 +66,8 @@ class OpenRouterProvider(LLMProvider):
 
         _model = model or self.default_model
 
-        # Condense long system prompts
-        condensed = []
-        for msg in messages:
-            if msg.get("role") == "system" and len(msg.get("content", "")) > 500:
-                condensed.append({"role": "system", "content": SYSTEM_PROMPT})
-            else:
-                condensed.append(msg)
+        # Pass through system prompt as-is — caller controls the prompt
+        condensed = messages
 
         body_dict = {
             "model": _model,

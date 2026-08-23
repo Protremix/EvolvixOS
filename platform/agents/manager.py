@@ -241,75 +241,16 @@ RULES:
             messages.append({"role": "system", "content": f"Context: {context['system_context']}"})
         messages.append({"role": "user", "content": message})
 
-        # Route to OpenRouter or Ollama based on model name
-        is_local = ":" in model and "/" not in model  # e.g. "qwen2.5:7b"
-        
-        if is_local:
-            # Ollama for local models
-            ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
-            payload = json.dumps({
-                "model": model,
-                "messages": messages,
-                "stream": False,
-                "options": {"temperature": temperature, "top_p": agent.get("top_p", 0.9)}
-            }).encode()
-            try:
-                req = urllib.request.Request(
-                    f"{ollama_url}/api/chat", data=payload,
-                    headers={"Content-Type": "application/json"}
-                )
-                resp = urllib.request.urlopen(req, timeout=60)
-                data = json.loads(resp.read())
-                response_text = data.get("message", {}).get("content", "")
-                eval_count = data.get("eval_count", 0)
-            except Exception as e:
-                raise ValueError(f"Ollama error: {str(e)}")
-        else:
-            # OpenRouter for cloud models
-            openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
-            if not openrouter_key:
-                # Fallback to Ollama
-                ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
-                payload = json.dumps({
-                    "model": "qwen2.5:7b",
-                    "messages": messages,
-                    "stream": False,
-                    "options": {"temperature": temperature}
-                }).encode()
-                req = urllib.request.Request(
-                    f"{ollama_url}/api/chat", data=payload,
-                    headers={"Content-Type": "application/json"}
-                )
-                resp = urllib.request.urlopen(req, timeout=60)
-                data = json.loads(resp.read())
-                response_text = data.get("message", {}).get("content", "")
-                eval_count = data.get("eval_count", 0)
-            else:
-                model_name = model if model != "auto" else "z-ai/glm-4.7-flash"
-                payload = json.dumps({
-                    "model": model_name,
-                    "messages": messages,
-                    "max_tokens": agent.get("max_tokens", 4096),
-                    "temperature": temperature,
-                    "top_p": agent.get("top_p", 0.9)
-                }).encode()
-                try:
-                    req = urllib.request.Request(
-                        "https://openrouter.ai/api/v1/chat/completions",
-                        data=payload,
-                        headers={
-                            "Content-Type": "application/json",
-                            "Authorization": f"Bearer {openrouter_key}",
-                            "HTTP-Referer": "https://evolvixos.com",
-                            "X-Title": "EvolvixOS Platform"
-                        }
-                    )
-                    resp = urllib.request.urlopen(req, timeout=60)
-                    data = json.loads(resp.read())
-                    response_text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-                    eval_count = data.get("usage", {}).get("total_tokens", 0)
-                except Exception as e:
-                    raise ValueError(f"OpenRouter error: {str(e)}")
+        # ─── Unified routing via V10 ModelRouter (respects privacy mode) ───
+        from routing_bridge import unified_chat
+        llm_result = await unified_chat(
+            messages, model=model, temperature=temperature,
+            max_tokens=agent.get("max_tokens", 4096), prefer_cloud=True
+        )
+        response_text = llm_result.get("content", "")
+        eval_count = 0
+        used_model = llm_result.get("model", model)
+        used_provider = llm_result.get("provider", "auto")
 
         # Save conversation memory
         memory.append({"role": "user", "content": message})
