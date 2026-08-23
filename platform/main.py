@@ -662,24 +662,21 @@ Always respond with a JSON action object. If the user just wants to chat, respon
                 "source": "chat",
                 "timestamp": datetime.now().isoformat()
             })
-            # Use separate connection to avoid transaction issues
-            from sqlalchemy import create_engine
-            db_url = os.environ.get("DATABASE_URL", "postgresql+asyncpg://aegis:aegis@localhost:5432/evolvixos")
-            sync_url = db_url.replace("asyncpg", "psycopg2").replace("+psycopg2", "")
+            # Use asyncpg directly to avoid transaction issues
             try:
-                import psycopg2
-                conn = psycopg2.connect("dbname=evolvixos user=aegis password=aegis host=localhost")
-                cur = conn.cursor()
-                cur.execute(
-                    "INSERT INTO entity_platformmemory (data, created_date, updated_date) VALUES (%s, NOW(), NOW())",
-                    (mem_data,)
+                import asyncpg
+                conn = await asyncpg.connect(
+                    host="localhost", port=5432,
+                    database="evolvixos", user="aegis", password="aegis"
                 )
-                conn.commit()
-                cur.close()
-                conn.close()
+                await conn.execute(
+                    "INSERT INTO entity_platformmemory (data, created_date, updated_date) VALUES ($1, NOW(), NOW())",
+                    mem_data
+                )
+                await conn.close()
                 print(f"Memory saved: {msg.message[:40]}")
             except Exception as sync_err:
-                print(f"Sync memory save failed: {sync_err}")
+                print(f"Memory save failed: {sync_err}")
     except Exception as mem_err:
         print(f"Memory save failed: {mem_err}")
 
