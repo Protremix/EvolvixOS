@@ -112,13 +112,13 @@ class LLMClient:
         payload = {"model": ollama_model, "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}], "stream": False, "keep_alive": "30m", "options": {"temperature": temperature, "top_p": 0.9}}
         start = time.time()
         response = self._ollama_client.post(f"{ollama_url}/api/chat", headers={"Content-Type": "application/json"}, json=payload)
-            response.raise_for_status()
-            data = response.json()
-            latency_ms = (time.time() - start) * 1000
-            content = data.get("message", {}).get("content", "No response from model.")
-            tokens = data.get("eval_count", 0)
-            logger.info("llm_fallback_ollama_success", model=ollama_model, tokens=tokens, latency_ms=round(latency_ms, 2))
-            return LLMResponse(content=content, model=ollama_model, tokens_used=tokens, latency_ms=latency_ms)
+        response.raise_for_status()
+        data = response.json()
+        latency_ms = (time.time() - start) * 1000
+        content = data.get("message", {}).get("content", "No response from model.")
+        tokens = data.get("eval_count", 0)
+        logger.info("llm_fallback_ollama_success", model=ollama_model, tokens=tokens, latency_ms=round(latency_ms, 2))
+        return LLMResponse(content=content, model=ollama_model, tokens_used=tokens, latency_ms=latency_ms)
 
     def chat_json(
         self,
