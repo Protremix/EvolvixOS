@@ -5,6 +5,8 @@ import urllib.request
 from datetime import datetime
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+from entities.manager import EntityManager
+from plugins.registry import PluginRegistry
 
 class AgentManager:
     """Manages AI agents with custom prompts, models, and tools."""
@@ -192,28 +194,30 @@ class AgentManager:
         model = agent["model"]
         temperature = agent.get("temperature", 0.7)
 
-        # Build messages with system prompt + memory + context
-        # Build system prompt with plugin awareness
-        plugin_info = """\n\nAVAILABLE PLUGINS — You can suggest using these tools:
-- web_search: Search the internet
-- web_fetch: Fetch content from any URL
-- email_send: Send emails
-- http_request: Call external APIs
-- database_query: Query your entities
-- code_exec: Run Python code
-- file_ops: Read/write server files
-- github: GitHub repo operations
-- image_gen: Generate images
-- crypto: Get crypto prices
-- weather: Get weather info
-- time_tools: Get current time/date
-- translate: Translate text
-- summarize: Summarize text
-- sentiment: Analyze sentiment
+        # Build messages with system prompt + real builder tool schema
+        existing_entities = await EntityManager.list_entities(db)
+        existing_names = [e["name"] for e in existing_entities] if existing_entities else []
+        existing_summary = ", ".join(existing_names) if existing_names else "none yet"
 
-When a user asks something that needs a plugin, mention it in your response. Example: "I can search the web for that — use the web_search plugin." """
-        
-        messages = [{"role": "system", "content": agent["system_prompt"] + plugin_info}]
+        builder_tools = f"""\n\n─── PLATFORM TOOLS ───
+You are not just chatting — you can actually DO things on the EvolvixOS platform for the user. Entities that already exist: {existing_summary}.
+
+To take an action, respond with ONLY a JSON object (no other text):
+- Create entity: {{"action": "create_entity", "name": "Task", "schema": {{"type": "object", "properties": {{"title": {{"type": "string"}}, "done": {{"type": "boolean"}}}}, "required": ["title"]}}}}
+- List entities: {{"action": "list_entities"}}
+- Create backend function: {{"action": "create_function", "name": "getJoke", "code": "def handler(input):\n    return {{'joke': 'hello'}}"}}
+- Create workflow: {{"action": "create_workflow", "name": "Daily Report", "trigger_type": "scheduled", "definition": {{}}}}
+- Run a plugin/tool: {{"action": "plugin", "plugin": "web_search", "params": {{"query": "search term"}}}}
+  Available plugins: web_search, web_fetch, email_send, http_request, code_exec, github, crypto, weather, image_gen, translate
+- Just reply in chat: {{"action": "chat", "message": "your response"}}
+
+RULES:
+1. If the user asks you to build/create something, DO IT immediately with create_entity/create_function/create_workflow — don't just describe it.
+2. Check the existing entities list first — never create a duplicate; if one already fits, say so via {{"action": "chat", ...}}.
+3. If the user just wants to talk, or asks a question you can answer directly, use {{"action": "chat", "message": "..."}}.
+4. Always respond with EXACTLY ONE JSON object, nothing else — no markdown fences, no extra prose outside the JSON."""
+
+        messages = [{"role": "system", "content": agent["system_prompt"] + builder_tools}]
 
         # Load persistent memory (PlatformMemory) into system context
         try:
@@ -337,10 +341,94 @@ When a user asks something that needs a plugin, mention it in your response. Exa
         except Exception:
             pass
 
+        # ─── Parse and execute the tool action ───
+        tool_action = None
+        tool_result = None
+        final_message = response_text
+
+        try:
+            json_start = response_text.find("{")
+            json_end = response_text.rfind("}") + 1
+            if json_start >= 0 and json_end > json_start:
+                parsed = json.loads(response_text[json_start:json_end])
+                action_type = parsed.get("action")
+
+                if action_type == "create_entity":
+                    entity_name = parsed.get("name", "")
+                    existing = await EntityManager.get_entity(db, entity_name)
+                    if existing:
+                        final_message = f"You already have a '{entity_name}' entity — no need to create it again. Want me to add fields to it, or build something else?"
+                        tool_action = "create_entity"
+                        tool_result = {"already_existed": True, "name": entity_name}
+                    else:
+                        result = await EntityManager.create_entity(db, entity_name, parsed.get("schema", {}))
+                        fields = ", ".join(parsed.get("schema", {}).get("properties", {}).keys())
+                        final_message = f"Created the '{entity_name}' entity with fields: {fields}. You can start adding records to it now."
+                        tool_action = "create_entity"
+                        tool_result = {"name": entity_name, "fields": fields}
+
+                elif action_type == "list_entities":
+                    entities = await EntityManager.list_entities(db)
+                    names = ", ".join([e["name"] for e in entities]) if entities else "none yet"
+                    final_message = f"Current entities: {names}"
+                    tool_action = "list_entities"
+                    tool_result = {"entities": entities}
+
+                elif action_type == "create_function":
+                    fn_name = parsed.get("name", "")
+                    await db.execute(text("""
+                        INSERT INTO platform_functions (name, code, env_vars)
+                        VALUES (:name, :code, '{}')
+                        ON CONFLICT (name) DO UPDATE SET code = EXCLUDED.code
+                    """), {"name": fn_name, "code": parsed.get("code", "")})
+                    await db.commit()
+                    final_message = f"Function '{fn_name}' deployed! Callable at /api/fn/{fn_name}"
+                    tool_action = "create_function"
+                    tool_result = {"name": fn_name, "url": f"/api/fn/{fn_name}"}
+
+                elif action_type == "create_workflow":
+                    wf_name = parsed.get("name", "")
+                    await db.execute(text("""
+                        INSERT INTO platform_workflows (name, definition, trigger_type, trigger_config)
+                        VALUES (:name, :def, :type, '{}')
+                        ON CONFLICT (name) DO UPDATE SET definition = EXCLUDED.definition
+                    """), {"name": wf_name, "def": json.dumps(parsed.get("definition", {})), "type": parsed.get("trigger_type", "scheduled")})
+                    await db.commit()
+                    final_message = f"Workflow '{wf_name}' created!"
+                    tool_action = "create_workflow"
+                    tool_result = {"name": wf_name}
+
+                elif action_type == "plugin":
+                    plugin_id = parsed.get("plugin", "")
+                    plugin_params = parsed.get("params", {})
+                    plugin_res = await PluginRegistry.execute_plugin(plugin_id, plugin_params, db)
+                    final_message = f"Ran {plugin_id}. Result: " + json.dumps(plugin_res.get("result", plugin_res), default=str)[:800]
+                    tool_action = "plugin"
+                    tool_result = {"plugin": plugin_id, "result": plugin_res}
+
+                elif action_type == "chat":
+                    final_message = parsed.get("message", response_text)
+                    tool_action = "chat"
+        except (json.JSONDecodeError, KeyError, TypeError):
+            # Not a tool call — just plain chat text
+            final_message = response_text
+        except Exception as tool_err:
+            final_message = f"I tried to do that but hit an error: {str(tool_err)}"
+            tool_result = {"error": str(tool_err)}
+
+        # Overwrite the stored memory turn with the clean final message (not raw JSON)
+        if memory and memory[-1].get("role") == "assistant":
+            memory[-1]["content"] = final_message
+            await db.execute(text(
+                "UPDATE platform_agents SET memory = :memory WHERE name = :name"
+            ), {"memory": json.dumps(memory), "name": name})
+            await db.commit()
+
         return {
-            "agent": name, "response": response_text,
+            "agent": name, "response": final_message,
             "model": model, "tokens": eval_count,
-            "memory_size": len(memory)
+            "memory_size": len(memory),
+            "tool_action": tool_action, "tool_result": tool_result
         }
 
     @staticmethod

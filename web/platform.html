@@ -340,6 +340,17 @@ async function openStripePortal() {
 .field-type:hover { border-color: #8b5cf6; transform: translateY(-1px); }
 
 .modal-overlay { backdrop-filter: blur(8px); }
+/* Agent builder chat — mobile shows one pane at a time */
+@media (max-width: 767px) {
+  #agents-layout.chat-open #agents-sidebar-panel { display: none; }
+  #agents-layout:not(.chat-open) #agents-chat-panel { display: none; }
+  #agent-chat-empty-state { display: none; }
+}
+.agent-list-item.active { background: rgba(139,92,246,0.12); }
+.tool-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 3px 9px; border-radius: 999px; background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.25); color: #c4b5fd; }
+.agent-msg-content code { background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
+.agent-msg-content pre { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 12px; overflow-x: auto; margin: 6px 0; font-family: 'JetBrains Mono', monospace; font-size: 0.82em; }
+.agent-msg-content strong { color: #e5e7eb; font-weight: 600; }
 .modal-content { animation: fadeIn 0.2s ease; }
 
 .suggestion-card { transition: all 0.25s ease; }
@@ -705,30 +716,59 @@ select option { background: #0a0a0f; }
         </div>
       </div>
 
-      <!-- Agents Page -->
-      <div id="page-agents" class="page flex h-full" style="max-height: calc(100vh - 3rem);">
-        <div class="flex items-center justify-between mb-8">
-          <div>
-            <h2 class="text-2xl font-bold">AI Agents</h2>
-            <p class="text-gray-500 text-sm mt-1">Custom AI agents with system prompts and tools.</p>
-          </div>
-          <button onclick="showCreateAgent()" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">+ New Agent</button>
-        </div>
-        <div id="agents-list" class="space-y-3"></div>
+      <!-- Agents Page — full builder chat experience -->
+      <div id="page-agents" class="page h-full" style="max-height: calc(100vh - 3rem);">
+        <div id="agents-layout" class="flex h-full rounded-2xl border border-gray-800/60 overflow-hidden bg-[#0a0a0f]">
 
-        <div id="agent-chat-modal" class="fixed inset-0 bg-black/60 modal-overlay flex items-center justify-center z-50 hidden">
-          <div class="modal-content bg-[#0c0c12] border border-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col shadow-2xl">
-            <div class="flex items-center justify-between mb-4">
-              <h3 id="agent-chat-title" class="text-lg font-semibold">Chat with Agent</h3>
-              <button onclick="openAgentSettings()" class="text-gray-500 hover:text-purple-400 transition-colors" title="Agent Settings">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                </button>
-                <button onclick="closeAgentChat()" class="text-gray-500 hover:text-white transition-colors text-xl">×</button>
+          <!-- Left: agent roster -->
+          <div id="agents-sidebar-panel" class="w-full md:w-72 shrink-0 border-r border-gray-800/60 bg-[#0c0c12] flex flex-col">
+            <div class="p-4 border-b border-gray-800/60 flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-bold">Agents</h2>
+                <p class="text-gray-500 text-xs mt-0.5">Chat to build & manage anything.</p>
+              </div>
+              <button onclick="showCreateAgent()" class="btn-primary w-8 h-8 rounded-lg text-lg font-medium flex items-center justify-center shrink-0" title="New Agent">+</button>
             </div>
-            <div id="agent-chat-messages" class="flex-1 overflow-y-auto space-y-3 mb-4 max-h-96"></div>
-            <div class="flex gap-2">
-              <input id="agent-chat-input" type="text" placeholder="Message..." class="flex-1 bg-[#0a0a0f] border border-gray-800 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-purple-500 transition-colors">
-              <button onclick="sendAgentMessage()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Send</button>
+            <div id="agents-list" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
+          </div>
+
+          <!-- Right: active chat -->
+          <div id="agents-chat-panel" class="flex-1 flex flex-col min-w-0">
+            <!-- Empty state (desktop, nothing selected) -->
+            <div id="agent-chat-empty-state" class="flex-1 flex flex-col items-center justify-center text-center px-6">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mb-4">
+                <svg class="w-7 h-7 text-purple-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg>
+              </div>
+              <p class="text-gray-400 text-sm max-w-xs">Pick an agent on the left, or create a new one. They can chat, build entities, deploy functions, and run tools for you — for real.</p>
+            </div>
+
+            <!-- Active chat (hidden until an agent is selected) -->
+            <div id="agent-chat-active" class="flex-1 flex flex-col hidden min-h-0">
+              <div class="flex items-center gap-3 px-5 py-3.5 border-b border-gray-800/60 shrink-0">
+                <button onclick="closeAgentChat()" class="md:hidden text-gray-500 hover:text-white shrink-0" title="Back">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <div id="agent-chat-avatar" class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0 text-xs font-bold">A</div>
+                <div class="flex-1 min-w-0">
+                  <h3 id="agent-chat-title" class="text-sm font-semibold truncate">Agent</h3>
+                  <div id="agent-chat-model" class="text-[11px] text-gray-500 truncate">auto</div>
+                </div>
+                <button onclick="openAgentSettings()" class="text-gray-500 hover:text-purple-400 transition-colors shrink-0" title="Agent Settings">
+                  <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </button>
+              </div>
+              <div id="agent-chat-messages" class="flex-1 overflow-y-auto px-5 py-4 space-y-4 min-h-0"></div>
+              <div class="px-4 py-3 border-t border-gray-800/60 shrink-0">
+                <div class="flex gap-2 items-end">
+                  <textarea id="agent-chat-input" rows="1" placeholder="Ask your agent to build, fix, search, or just chat..."
+                    class="flex-1 resize-none bg-[#0f0f15] border border-gray-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-purple-500 transition-colors max-h-32"
+                    onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendAgentMessage();}"
+                    oninput="this.style.height='38px'; this.style.height=Math.min(this.scrollHeight,128)+'px';"></textarea>
+                  <button onclick="sendAgentMessage()" class="btn-primary w-9 h-9 rounded-xl flex items-center justify-center shrink-0" title="Send">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1491,9 +1531,15 @@ async function openAgentChat(name) {
     currentAgentData = data;
   } catch(e) { currentAgentData = {name}; }
 
-  // Show the chat modal
-  document.getElementById('agent-chat-modal').classList.remove('hidden');
+  // Switch panels: hide empty state, show active chat; on mobile, hide the roster
+  document.getElementById('agent-chat-empty-state').classList.add('hidden');
+  document.getElementById('agent-chat-active').classList.remove('hidden');
+  document.getElementById('agents-layout').classList.add('chat-open');
+
   document.getElementById('agent-chat-title').textContent = name;
+  document.getElementById('agent-chat-avatar').textContent = name.charAt(0).toUpperCase();
+  const _tools = currentAgentData?.tools?.length || 0;
+  document.getElementById('agent-chat-model').textContent = (currentAgentData?.model || 'auto') + (_tools ? ` · ${_tools} tools` : ' · builder tools active');
   document.getElementById('agent-chat-messages').innerHTML = '';
 
   // Load past conversation history for this agent
@@ -1505,9 +1551,8 @@ async function openAgentChat(name) {
         addAgentChatBubble(r.role, r.content);
       });
     } else {
-      // Show welcome message
-      const firstLine = currentAgentData?.system_prompt ? currentAgentData.system_prompt.split('\n')[0].slice(0, 100) : 'How can I help you today?';
-      addAgentChatBubble('system', `Hi! I'm **${name}**. ${firstLine}`);
+      const firstLine = currentAgentData?.system_prompt ? currentAgentData.system_prompt.split('\n')[0].slice(0, 120) : 'How can I help you today?';
+      addAgentChatBubble('system', `Hi! I'm **${name}**. ${firstLine}\n\nI can chat, but I can also actually build things — create entities, deploy functions, set up workflows, and run tools. Just ask.`);
     }
   } catch(e) {
     addAgentChatBubble('system', `Hi! I'm **${name}**. How can I help you?`);
@@ -1523,22 +1568,54 @@ async function openAgentChat(name) {
 }
 
 function closeAgentChat() {
-  document.getElementById('agent-chat-modal').classList.add('hidden');
-  currentAgent = null;
+  // On mobile this returns to the roster; on desktop the panes are always both visible
+  document.getElementById('agents-layout').classList.remove('chat-open');
   document.querySelectorAll('.agent-list-item').forEach(el => el.classList.remove('active'));
 }
 
-function addAgentChatBubble(role, content) {
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderAgentMarkdown(content) {
+  let s = escapeHtml(content);
+  // Code blocks ```...```
+  s = s.replace(/```([\s\S]*?)```/g, (m, code) => `<pre>${code.trim()}</pre>`);
+  // Inline code `...`
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // Bold **...**
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // Line breaks
+  s = s.replace(/\n/g, '<br>');
+  return s;
+}
+
+const TOOL_ICONS = {
+  create_entity: '🧩', list_entities: '📋', create_function: '⚡',
+  create_workflow: '🔁', plugin: '🔌', chat: ''
+};
+const TOOL_LABELS = {
+  create_entity: 'Created entity', list_entities: 'Listed entities', create_function: 'Deployed function',
+  create_workflow: 'Created workflow', plugin: 'Ran tool'
+};
+
+function addAgentChatBubble(role, content, toolAction, toolResult) {
   const msgs = document.getElementById('agent-chat-messages');
   if (!msgs) return;
   const div = document.createElement('div');
-  div.className = 'chat-msg ' + (role === 'user'
-    ? 'flex justify-end'
-    : '');
+  div.className = 'chat-msg ' + (role === 'user' ? 'flex justify-end' : '');
+  const renderedContent = renderAgentMarkdown(content);
+  let toolChip = '';
+  if (toolAction && toolAction !== 'chat' && TOOL_LABELS[toolAction]) {
+    let detail = '';
+    if (toolResult?.name) detail = ': ' + toolResult.name;
+    else if (toolResult?.plugin) detail = ': ' + toolResult.plugin;
+    toolChip = `<div class="mb-1.5"><span class="tool-chip">${TOOL_ICONS[toolAction] || '🔧'} ${TOOL_LABELS[toolAction]}${detail}</span></div>`;
+  }
   if (role === 'user') {
-    div.innerHTML = `<div class="bg-purple-600/15 border border-purple-800/20 rounded-2xl rounded-br-md px-4 py-3 text-sm max-w-md"><p class="text-gray-200">${content}</p></div>`;
+    div.innerHTML = `<div class="bg-purple-600/15 border border-purple-800/20 rounded-2xl rounded-br-md px-4 py-3 text-sm max-w-[85%] md:max-w-md"><p class="text-gray-200 agent-msg-content">${renderedContent}</p></div>`;
   } else {
-    div.innerHTML = `<div class="flex items-start gap-2.5"><div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0"><span class="text-[10px] font-bold text-white">${(currentAgent||'A').charAt(0)}</span></div><div class="bg-[#0c0c12] border border-gray-800/60 rounded-2xl rounded-bl-md px-4 py-3 text-sm max-w-md"><p class="text-gray-300">${content}</p></div></div>`;
+    div.innerHTML = `<div class="flex items-start gap-2.5"><div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0"><span class="text-[10px] font-bold text-white">${(currentAgent||'A').charAt(0)}</span></div><div class="bg-[#0c0c12] border border-gray-800/60 rounded-2xl rounded-bl-md px-4 py-3 text-sm max-w-[85%] md:max-w-md">${toolChip}<p class="text-gray-300 agent-msg-content">${renderedContent}</p></div></div>`;
   }
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
@@ -1567,9 +1644,8 @@ async function sendAgentMessage() {
     const data = await api(`/agents/${currentAgent}/invoke`, 'POST', {message: msg});
     document.getElementById('agent-typing')?.remove();
     const agentResponse = data.response || data.message || JSON.stringify(data);
-    addAgentChatBubble('system', agentResponse);
-    saveChatMessage('system', agentResponse, null, null, currentAgent);
-    // Update model display
+    addAgentChatBubble('system', agentResponse, data.tool_action, data.tool_result);
+    saveChatMessage('system', agentResponse, data.model, data.tool_action, currentAgent);
   } catch(e) {
     document.getElementById('agent-typing')?.remove();
     addAgentChatBubble('system', `Error: ${e.message}`);
