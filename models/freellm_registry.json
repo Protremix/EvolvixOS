@@ -4,11 +4,11 @@
   "source": "https://github.com/open-free-llm-api/awesome-freellm-apis",
   "website": "https://freellm.net",
   "total_providers": 31,
-  "total_free_models": 444,
+  "total_free_models": 450,
   "providers": [
     {
       "name": "NVIDIA NIM",
-      "free_models": 125,
+      "free_models": 126,
       "credit_card": "Phone verification",
       "max_context": "1M",
       "modalities": [
@@ -28,7 +28,7 @@
     },
     {
       "name": "ModelScope",
-      "free_models": 56,
+      "free_models": 58,
       "credit_card": "Registration",
       "max_context": "1M",
       "modalities": [
@@ -216,7 +216,7 @@
     },
     {
       "name": "OpenCode Zen",
-      "free_models": 11,
+      "free_models": 12,
       "credit_card": "Registration",
       "max_context": "1M",
       "modalities": [
@@ -360,6 +360,19 @@
       "models": []
     },
     {
+      "name": "Cline",
+      "free_models": 3,
+      "credit_card": "Registration",
+      "max_context": "0",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "",
+      "tier": "permanent_free",
+      "base_url": "",
+      "models": []
+    },
+    {
       "name": "Chutes.ai",
       "free_models": 2,
       "credit_card": "Registration",
@@ -439,19 +452,6 @@
       "models": []
     },
     {
-      "name": "Cline",
-      "free_models": 2,
-      "credit_card": "Registration",
-      "max_context": "0",
-      "modalities": [
-        "text"
-      ],
-      "key_url": "",
-      "tier": "permanent_free",
-      "base_url": "",
-      "models": []
-    },
-    {
       "name": "Nebius",
       "free_models": 1,
       "credit_card": "Registration",
@@ -466,7 +466,7 @@
     },
     {
       "name": "OpenRouter",
-      "free_models": 27,
+      "free_models": 28,
       "credit_model": "Free tier + $10 topup \u2192 1K RPD",
       "max_context": "1M",
       "modalities": [
@@ -486,5 +486,5 @@
       "models": []
     }
   ],
-  "last_updated": "2026-08-21T19:24:27.536199+00:00"
+  "last_updated": "2026-08-23T11:53:23.793218+00:00"
 }

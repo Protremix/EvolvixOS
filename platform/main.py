@@ -262,6 +262,7 @@ async def list_records(
     limit: int = Query(50, ge=1, le=500),
     skip: int = Query(0, ge=0),
     sort: Optional[str] = None,
+    request: Request = None,
     db=Depends(get_db)
 ):
     """List entity records with pagination and sorting."""
@@ -269,16 +270,20 @@ async def list_records(
         # Extract filters from query params
         filters = {}
         # Note: In a real implementation, we'd extract non-standard query params
-        result = await EnhancedCRUD.list_records(db, name, limit=limit, skip=skip, filters=filters, sort=sort)
+        user = get_user_from_token(request) if request else None
+        user_id = user.get("user_id") if user else None
+        result = await EnhancedCRUD.list_records(db, name, limit=limit, skip=skip, filters=filters, sort=sort, user_id=user_id)
         return result
     except Exception as e:
         raise HTTPException(500, str(e))
 
 @app.post("/api/entities/{name}/records")
-async def create_record(name: str, record: RecordCreate, db=Depends(get_db)):
+async def create_record(name: str, record: RecordCreate, request: Request, db=Depends(get_db)):
     """Create a new entity record."""
     try:
-        return await EnhancedCRUD.create_record(db, name, record.data)
+        user = get_user_from_token(request) if request else None
+        created_by = user.get("user_id") if user else None
+        return await EnhancedCRUD.create_record(db, name, record.data, created_by=created_by)
     except ValueError as e:
         raise HTTPException(400, str(e))
 
@@ -291,18 +296,22 @@ async def get_record(name: str, record_id: int, db=Depends(get_db)):
     return record
 
 @app.put("/api/entities/{name}/records/{record_id}")
-async def update_record(name: str, record_id: int, record: RecordUpdate, db=Depends(get_db)):
+async def update_record(name: str, record_id: int, record: RecordUpdate, request: Request, db=Depends(get_db)):
     """Update an entity record."""
     try:
-        return await EnhancedCRUD.update_record(db, name, record_id, record.data)
+        user = get_user_from_token(request) if request else None
+        user_id = user.get("user_id") if user else None
+        return await EnhancedCRUD.update_record(db, name, record_id, record.data, user_id=user_id)
     except ValueError as e:
         raise HTTPException(400, str(e))
 
 @app.delete("/api/entities/{name}/records/{record_id}")
-async def delete_record(name: str, record_id: int, db=Depends(get_db)):
+async def delete_record(name: str, record_id: int, request: Request, db=Depends(get_db)):
     """Delete an entity record."""
     try:
-        return await EnhancedCRUD.delete_record(db, name, record_id)
+        user = get_user_from_token(request) if request else None
+        user_id = user.get("user_id") if user else None
+        return await EnhancedCRUD.delete_record(db, name, record_id, user_id=user_id)
     except ValueError as e:
         raise HTTPException(400, str(e))
 
@@ -480,7 +489,9 @@ async def filter_records(name: str, filter_req: dict, db=Depends(get_db)):
         limit = filter_req.get("limit", 50)
         skip = filter_req.get("skip", 0)
         sort = filter_req.get("sort")
-        result = await EnhancedCRUD.list_records(db, name, limit=limit, skip=skip, filters=filters, sort=sort)
+        user = get_user_from_token(request) if request else None
+        user_id = user.get("user_id") if user else None
+        result = await EnhancedCRUD.list_records(db, name, limit=limit, skip=skip, filters=filters, sort=sort, user_id=user_id)
         return result
     except Exception as e:
         raise HTTPException(500, str(e))
