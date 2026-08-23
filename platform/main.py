@@ -104,6 +104,19 @@ class AgentUpdate(BaseModel):
     top_p: Optional[float] = None
     memory_enabled: Optional[bool] = None
     status: Optional[str] = None
+    stream: Optional[bool] = None
+    automation_model: Optional[str] = None
+    cross_app_access: Optional[bool] = None
+    avatar: Optional[str] = None
+    identity_doc: Optional[str] = None
+    share_enabled: Optional[bool] = None
+    collaborators: Optional[list] = None
+    channel_config: Optional[dict] = None
+    allow_update_data: Optional[bool] = None
+    allow_delete_data: Optional[bool] = None
+    auto_detect_secrets: Optional[bool] = None
+    agent_secrets: Optional[dict] = None
+    api_key: Optional[str] = None
 
 class AgentInvoke(BaseModel):
     message: str = Field(..., description="Message to the agent")

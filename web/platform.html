@@ -68,6 +68,14 @@
 .gradient-text { background: linear-gradient(135deg, #8b5cf6, #d946ef, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
 select option { background: #0a0a0f; }
+
+.settings-tab-btn { color: #6b7280; transition: all 0.2s; }
+.settings-tab-btn:hover { color: #d1d5db; }
+.settings-tab-btn.active { background: rgba(168,85,247,0.15); color: #c084fc; }
+.toggle-checkbox { width: 40px; height: 22px; appearance: none; background: #1f1f2a; border-radius: 11px; position: relative; cursor: pointer; transition: background 0.2s; }
+.toggle-checkbox:checked { background: #7c3aed; }
+.toggle-checkbox::before { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: #6b7280; border-radius: 50%; transition: all 0.2s; }
+.toggle-checkbox:checked::before { left: 20px; background: white; }
 </style>
 </head>
 <body class="bg-[#0a0a0f] text-gray-100 h-screen overflow-hidden">
@@ -1280,13 +1288,19 @@ async function sendAgentMessage() {
 }
 
 // Agent Settings
+var settingsAgentData = null;
+var settingsCollaborators = [];
+var settingsSecrets = {};
+
 async function openAgentSettings() {
   if (!currentAgent) return;
   try {
     const data = await api('/agents/' + currentAgent);
+    settingsAgentData = data;
     document.getElementById('settings-agent-name').value = data.name;
     document.getElementById('settings-system-prompt').value = data.system_prompt || '';
     document.getElementById('settings-model').value = data.model || 'auto';
+    document.getElementById('settings-automation-model').value = data.automation_model || 'auto';
     document.getElementById('settings-temperature').value = data.temperature != null ? data.temperature : 0.7;
     document.getElementById('settings-max-tokens').value = data.max_tokens != null ? data.max_tokens : 4096;
     document.getElementById('settings-top-p').value = data.top_p != null ? data.top_p : 0.9;
@@ -1294,40 +1308,90 @@ async function openAgentSettings() {
     document.getElementById('settings-stream').value = String(data.stream != null ? data.stream : false);
     document.getElementById('settings-tools').value = (data.tools || []).join(', ');
     document.getElementById('settings-status').value = data.status || 'active';
-    const memCount = (data.memory || []).length;
-    document.getElementById('settings-memory-info').textContent = 'Conversation memory: ' + memCount + ' messages stored (last 20 used in context)';
+    var memCount = (data.memory || []).length;
+    document.getElementById('settings-memory-info').textContent = 'Conversation memory: ' + memCount + ' messages (last 20 in context)';
+    document.getElementById('settings-title-name').textContent = data.name + ' Settings';
+    var av = data.avatar || data.name.charAt(0).toUpperCase();
+    document.getElementById('settings-avatar-display').textContent = av;
+    document.getElementById('settings-api-key-display').textContent = data.api_key ? ('Key: ' + data.api_key.substring(0,12) + '...') : '';
+    document.getElementById('settings-share-enabled').checked = data.share_enabled || false;
+    if (data.share_enabled && data.share_link) { document.getElementById('share-link-container').classList.remove('hidden'); document.getElementById('settings-share-link').value = 'https://evolvixos.com/platform/share/' + data.share_link; }
+    document.getElementById('settings-cross-app').checked = data.cross_app_access || false;
+    renderCollaborators(data.collaborators || []);
+    document.getElementById('settings-avatar').value = data.avatar || '';
+    document.getElementById('settings-identity-doc').value = data.identity_doc || '';
+    updateAvatarPreview(data.avatar || data.name.charAt(0).toUpperCase());
+    var channels = data.channel_config || {};
+    ['whatsapp','telegram','imessage','slack'].forEach(function(ch) { var el = document.getElementById('channel-status-' + ch); if (el) el.textContent = channels[ch] ? 'Connected' : 'Not connected'; });
+    document.getElementById('settings-allow-update').checked = data.allow_update_data || false;
+    document.getElementById('settings-allow-delete').checked = data.allow_delete_data || false;
+    document.getElementById('settings-auto-secrets').checked = data.auto_detect_secrets != false;
+    renderSecrets(data.agent_secrets || {});
+    document.getElementById('settings-api-key').value = data.api_key || '';
+    document.getElementById('dev-agent-name').textContent = data.name;
+    document.getElementById('dev-api-key').textContent = data.api_key || 'key';
+    document.getElementById('settings-created-date').textContent = data.created_date || 'Unknown';
+    switchSettingsTab('general');
     document.getElementById('agent-settings-modal').classList.remove('hidden');
-  } catch(e) { toast('Error loading settings: ' + e.message, 'error'); }
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-function closeAgentSettings() {
-  document.getElementById('agent-settings-modal').classList.add('hidden');
+function closeAgentSettings() { document.getElementById('agent-settings-modal').classList.add('hidden'); }
+function switchSettingsTab(tab) {
+  document.querySelectorAll('.settings-tab-content').forEach(function(el) { el.classList.add('hidden'); });
+  document.querySelectorAll('.settings-tab-btn').forEach(function(el) { el.classList.remove('active'); });
+  var t = document.getElementById('settings-tab-' + tab); if (t) t.classList.remove('hidden');
+  var b = document.getElementById('tab-btn-' + tab); if (b) b.classList.add('active');
 }
-
+function toggleShareLink() {
+  var c = document.getElementById('settings-share-enabled').checked;
+  if (c) { document.getElementById('share-link-container').classList.remove('hidden'); if (!document.getElementById('settings-share-link').value) document.getElementById('settings-share-link').value = 'https://evolvixos.com/platform/share/' + Math.random().toString(36).substr(2,8); }
+  else { document.getElementById('share-link-container').classList.add('hidden'); }
+}
+function copyShareLink() { var i = document.getElementById('settings-share-link'); i.select(); document.execCommand('copy'); toast('Copied', 'success'); }
+function renderCollaborators(list) { settingsCollaborators = list || []; var c = document.getElementById('settings-collaborator-list'); if (!settingsCollaborators.length) { c.innerHTML = '<div class="text-xs text-gray-600 py-2">No collaborators</div>'; return; } c.innerHTML = settingsCollaborators.map(function(e,i) { return '<div class="flex items-center justify-between bg-[#0a0a0f] rounded-lg px-3 py-1.5 text-sm"><span>' + e + '</span><button onclick="removeCollaborator(' + i + ')" class="text-red-400 text-xs">Remove</button></div>'; }).join(''); }
+function addCollaborator() { var e = document.getElementById('settings-collaborator-email').value.trim(); if (!e) return; settingsCollaborators.push(e); document.getElementById('settings-collaborator-email').value = ''; renderCollaborators(settingsCollaborators); }
+function removeCollaborator(i) { settingsCollaborators.splice(i,1); renderCollaborators(settingsCollaborators); }
+function updateAvatarPreview(v) { var e = document.getElementById('settings-avatar-preview'); if (v && v.startsWith('http')) e.innerHTML = '<img src="' + v + '" class="w-12 h-12 rounded-xl object-cover">'; else e.textContent = v || 'A'; document.getElementById('settings-avatar-display').textContent = v || (settingsAgentData ? settingsAgentData.name.charAt(0).toUpperCase() : 'A'); }
+function connectChannel(ch) { toast(ch + ' requires server-side setup in /opt/evolvixos/.env', 'info'); }
+function renderSecrets(s) { settingsSecrets = s || {}; var c = document.getElementById('settings-secrets-list'); var k = Object.keys(settingsSecrets); if (!k.length) { c.innerHTML = '<div class="text-xs text-gray-600 py-2">No secrets</div>'; return; } c.innerHTML = k.map(function(key) { return '<div class="flex items-center justify-between bg-[#0a0a0f] rounded-lg px-3 py-1.5 text-sm"><span class="font-mono">' + key + '</span><span class="text-gray-600">***</span><button onclick="removeSecret(\'' + key + '\')" class="text-red-400 text-xs">Remove</button></div>'; }).join(''); }
+function addSecret() { var k = document.getElementById('settings-secret-key').value.trim(); var v = document.getElementById('settings-secret-value').value; if (!k || !v) return; settingsSecrets[k] = v; document.getElementById('settings-secret-key').value = ''; document.getElementById('settings-secret-value').value = ''; renderSecrets(settingsSecrets); }
+function removeSecret(k) { delete settingsSecrets[k]; renderSecrets(settingsSecrets); }
+function copyApiKey() { var i = document.getElementById('settings-api-key'); i.select(); document.execCommand('copy'); toast('Key copied', 'success'); }
+async function regenerateApiKey() { if (!currentAgent || !confirm('Regenerate API key? Old key stops working.')) return; try { var k = 'evo_' + Array.from(crypto.getRandomValues(new Uint8Array(16)), function(b) { return b.toString(16).padStart(2,'0'); }).join(''); await api('/agents/' + currentAgent, 'PUT', {api_key: k}); document.getElementById('settings-api-key').value = k; document.getElementById('dev-api-key').textContent = k; document.getElementById('settings-api-key-display').textContent = 'Key: ' + k.substring(0,12) + '...'; toast('Key regenerated', 'success'); } catch(e) { toast('Error: ' + e.message, 'error'); } }
+async function exportAgentConfig() { if (!settingsAgentData) return; var b = new Blob([JSON.stringify(settingsAgentData,null,2)], {type:'application/json'}); var a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = (settingsAgentData.name||'agent')+'-config.json'; a.click(); toast('Exported', 'success'); }
+async function duplicateAgent() { if (!settingsAgentData) return; try { var d = settingsAgentData; await api('/agents','POST',{name:d.name+'_copy',system_prompt:d.system_prompt,model:d.model,temperature:d.temperature,tools:d.tools,max_tokens:d.max_tokens,top_p:d.top_p,memory_enabled:d.memory_enabled}); toast('Duplicated as ' + d.name + '_copy', 'success'); loadAgents(); } catch(e) { toast('Error: '+e.message,'error'); } }
+async function resetAgentMemory() { if (!currentAgent || !confirm('Clear all memory for ' + currentAgent + '?')) return; try { await api('/agents/' + currentAgent + '/clear-memory','POST'); toast('Memory cleared', 'success'); closeAgentSettings(); } catch(e) { toast('Error: '+e.message,'error'); } }
 async function saveAgentSettings() {
   if (!currentAgent) return;
-  const updates = {
+  var updates = {
     system_prompt: document.getElementById('settings-system-prompt').value,
     model: document.getElementById('settings-model').value,
+    automation_model: document.getElementById('settings-automation-model').value,
     temperature: parseFloat(document.getElementById('settings-temperature').value) || 0.7,
     max_tokens: parseInt(document.getElementById('settings-max-tokens').value) || 4096,
     top_p: parseFloat(document.getElementById('settings-top-p').value) || 0.9,
     memory_enabled: document.getElementById('settings-memory-enabled').value === 'true',
     stream: document.getElementById('settings-stream').value === 'true',
-    tools: document.getElementById('settings-tools').value.split(',').map(function(t) { return t.trim(); }).filter(Boolean),
+    tools: document.getElementById('settings-tools').value.split(',').map(function(t){return t.trim();}).filter(Boolean),
     status: document.getElementById('settings-status').value,
+    cross_app_access: document.getElementById('settings-cross-app').checked,
+    avatar: document.getElementById('settings-avatar').value,
+    identity_doc: document.getElementById('settings-identity-doc').value,
+    share_enabled: document.getElementById('settings-share-enabled').checked,
+    collaborators: settingsCollaborators,
+    channel_config: settingsAgentData ? (settingsAgentData.channel_config||{}) : {},
+    allow_update_data: document.getElementById('settings-allow-update').checked,
+    allow_delete_data: document.getElementById('settings-allow-delete').checked,
+    auto_detect_secrets: document.getElementById('settings-auto-secrets').checked,
+    agent_secrets: settingsSecrets
   };
   try {
     await api('/agents/' + currentAgent, 'PUT', updates);
-    closeAgentSettings();
-    toast('Settings saved', 'success');
-    loadAgents();
-    var _tools = (updates.tools || []).length;
-    var _mem = (currentAgentData && currentAgentData.memory) ? currentAgentData.memory.length : 0;
-    var hdr = document.getElementById('agent-chat-model');
-    if (hdr) hdr.textContent = updates.model + ' - ' + _tools + ' tools - ' + _mem + ' mem';
+    closeAgentSettings(); toast('Settings saved', 'success'); loadAgents();
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
+
 
 async function clearAgentMemory() {
   if (!currentAgent) return;
@@ -1419,5 +1483,102 @@ checkHealth();
 loadChatHistory();
 setInterval(checkHealth, 30000);
 </script>
+
+<!-- Agent Settings Modal (6 tabs) -->
+<div id="agent-settings-modal" class="fixed inset-0 bg-black/60 modal-overlay flex items-center justify-center z-50 hidden">
+  <div class="modal-content bg-[#0c0c12] border border-gray-800 rounded-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+    <div class="flex items-center justify-between p-5 border-b border-gray-800">
+      <div class="flex items-center gap-3">
+        <div id="settings-avatar-display" class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-lg font-bold text-purple-400">A</div>
+        <div>
+          <h3 class="text-lg font-semibold" id="settings-title-name">Agent Settings</h3>
+          <p class="text-xs text-gray-500" id="settings-api-key-display"></p>
+        </div>
+      </div>
+      <button onclick="closeAgentSettings()" class="text-gray-500 hover:text-white transition-colors text-xl">&times;</button>
+    </div>
+    <div class="flex gap-1 px-5 py-2 border-b border-gray-800/50 overflow-x-auto">
+      <button onclick="switchSettingsTab('general')" id="tab-btn-general" class="settings-tab-btn active px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">General</button>
+      <button onclick="switchSettingsTab('sharing')" id="tab-btn-sharing" class="settings-tab-btn px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">Sharing</button>
+      <button onclick="switchSettingsTab('identity')" id="tab-btn-identity" class="settings-tab-btn px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">Personalization</button>
+      <button onclick="switchSettingsTab('channels')" id="tab-btn-channels" class="settings-tab-btn px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">Channels</button>
+      <button onclick="switchSettingsTab('security')" id="tab-btn-security" class="settings-tab-btn px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">Security</button>
+      <button onclick="switchSettingsTab('developer')" id="tab-btn-developer" class="settings-tab-btn px-3 py-1.5 text-sm rounded-lg whitespace-nowrap">Developer</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-5">
+      <!-- GENERAL -->
+      <div id="settings-tab-general" class="settings-tab-content space-y-4">
+        <div><div class="text-xs text-gray-500 mb-1">Agent Name</div><input id="settings-agent-name" type="text" disabled class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm opacity-60"></div>
+        <div><div class="text-xs text-gray-500 mb-1">System Prompt</div><textarea id="settings-system-prompt" rows="4" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"></textarea></div>
+        <div><div class="text-xs text-gray-500 mb-1">Chat Model</div>
+          <select id="settings-model" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm">
+            <option value="auto">Automatic</option><option value="openai/gpt-oss-20b">GPT-OSS 20B</option><option value="openai/gpt-oss-120b">GPT-OSS 120B</option>
+            <option value="z-ai/glm-4.7-flash">GLM 4.7 Flash</option><option value="z-ai/glm-5">GLM 5</option><option value="z-ai/glm-5.2">GLM 5.2</option><option value="z-ai/glm-5.2:free">GLM 5.2 (Free)</option>
+            <option value="nvidia/nemotron-3-ultra-550b-a55b:free">Nemotron Ultra</option><option value="deepseek/deepseek-v4-flash">DeepSeek V4 Flash</option>
+            <option value="google/gemini-3.1-pro-preview">Gemini 3.1 Pro</option><option value="anthropic/claude-sonnet-5">Claude Sonnet 5</option>
+            <option value="moonshot/kimi-k2.5">Kimi K2.5</option><option value="qwen2.5:14b">Qwen 14B (Local)</option><option value="qwen2.5:7b">Qwen 7B (Local)</option>
+          </select>
+        </div>
+        <div><div class="text-xs text-gray-500 mb-1">Automation Model</div>
+          <select id="settings-automation-model" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm">
+            <option value="auto">Automatic</option><option value="qwen2.5:7b">Qwen 7B (Local)</option><option value="qwen2.5:14b">Qwen 14B (Local)</option><option value="z-ai/glm-5">GLM 5</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div><div class="text-xs text-gray-500 mb-1">Temperature</div><input id="settings-temperature" type="number" min="0" max="1" step="0.1" value="0.7" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"></div>
+          <div><div class="text-xs text-gray-500 mb-1">Max Tokens</div><input id="settings-max-tokens" type="number" min="256" max="32768" step="256" value="4096" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"></div>
+          <div><div class="text-xs text-gray-500 mb-1">Top-P</div><input id="settings-top-p" type="number" min="0" max="1" step="0.05" value="0.9" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><div class="text-xs text-gray-500 mb-1">Memory</div><select id="settings-memory-enabled" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"><option value="true">Enabled</option><option value="false">Disabled</option></select></div>
+          <div><div class="text-xs text-gray-500 mb-1">Stream</div><select id="settings-stream" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"><option value="false">Off</option><option value="true">On</option></select></div>
+        </div>
+        <div><div class="text-xs text-gray-500 mb-1">Tools</div><input id="settings-tools" type="text" placeholder="web_search, code_exec" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"></div>
+        <div><div class="text-xs text-gray-500 mb-1">Status</div><select id="settings-status" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"><option value="active">Active</option><option value="paused">Paused</option></select></div>
+        <div id="settings-memory-info" class="text-xs text-gray-600 bg-[#0a0a0f] rounded-lg p-3 border border-gray-800/40"></div>
+      </div>
+      <!-- SHARING -->
+      <div id="settings-tab-sharing" class="settings-tab-content hidden space-y-4">
+        <label class="flex items-center justify-between cursor-pointer"><div><div class="text-sm font-medium">Public Share Link</div><div class="text-xs text-gray-500">Allow anyone with the link to chat with this agent</div></div><input type="checkbox" id="settings-share-enabled" class="toggle-checkbox" onchange="toggleShareLink()"></label>
+        <div id="share-link-container" class="hidden"><div class="text-xs text-gray-500 mb-1">Share URL</div><div class="flex gap-2"><input id="settings-share-link" type="text" readonly class="flex-1 bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm font-mono text-gray-500"><button onclick="copyShareLink()" class="px-3 py-2 bg-gray-800 rounded-lg text-sm">Copy</button></div></div>
+        <div class="pt-4 border-t border-gray-800/50"><div class="text-sm font-medium mb-2">Collaborators</div><div class="flex gap-2 mb-2"><input id="settings-collaborator-email" type="email" placeholder="email@example.com" class="flex-1 bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"><button onclick="addCollaborator()" class="px-3 py-2 bg-purple-600 rounded-lg text-sm">Invite</button></div><div id="settings-collaborator-list" class="space-y-1"></div></div>
+        <div class="pt-4 border-t border-gray-800/50"><div class="text-sm font-medium mb-2">Cross-Entity Data Access</div><label class="flex items-center justify-between cursor-pointer"><div class="text-xs text-gray-500">Allow agent to read all platform entities</div><input type="checkbox" id="settings-cross-app" class="toggle-checkbox"></label></div>
+      </div>
+      <!-- PERSONALIZATION -->
+      <div id="settings-tab-identity" class="settings-tab-content hidden space-y-4">
+        <div><div class="text-xs text-gray-500 mb-1">Avatar (emoji or image URL)</div><div class="flex gap-2 items-center"><div id="settings-avatar-preview" class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center text-2xl">A</div><input id="settings-avatar" type="text" placeholder="Emoji or URL" class="flex-1 bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm" oninput="updateAvatarPreview(this.value)"></div></div>
+        <div><div class="text-xs text-gray-500 mb-1">Identity Document (Soul)</div><div class="text-xs text-gray-600 mb-2">Defines who the agent is. Prepended to system prompt on every interaction.</div><textarea id="settings-identity-doc" rows="10" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm font-mono" placeholder="You are [name], a [role]..."></textarea></div>
+      </div>
+      <!-- CHANNELS -->
+      <div id="settings-tab-channels" class="settings-tab-content hidden space-y-4">
+        <div class="text-sm text-gray-500 mb-2">Connect this agent to messaging channels.</div>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between p-3 bg-[#0a0a0f] rounded-lg border border-gray-800"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center text-sm">WA</div><div><div class="text-sm font-medium">WhatsApp</div><div class="text-xs text-gray-500" id="channel-status-whatsapp">Not connected</div></div></div><button onclick="connectChannel('whatsapp')" class="px-3 py-1.5 bg-green-600 rounded-lg text-xs">Connect</button></div>
+          <div class="flex items-center justify-between p-3 bg-[#0a0a0f] rounded-lg border border-gray-800"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center text-sm">TG</div><div><div class="text-sm font-medium">Telegram</div><div class="text-xs text-gray-500" id="channel-status-telegram">Not connected</div></div></div><button onclick="connectChannel('telegram')" class="px-3 py-1.5 bg-blue-600 rounded-lg text-xs">Connect</button></div>
+          <div class="flex items-center justify-between p-3 bg-[#0a0a0f] rounded-lg border border-gray-800"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-gray-500/10 flex items-center justify-center text-sm">iM</div><div><div class="text-sm font-medium">iMessage</div><div class="text-xs text-gray-500" id="channel-status-imessage">Not connected</div></div></div><button onclick="connectChannel('imessage')" class="px-3 py-1.5 bg-gray-700 rounded-lg text-xs">Connect</button></div>
+          <div class="flex items-center justify-between p-3 bg-[#0a0a0f] rounded-lg border border-gray-800"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center text-sm">SL</div><div><div class="text-sm font-medium">Slack</div><div class="text-xs text-gray-500" id="channel-status-slack">Not connected</div></div></div><button onclick="connectChannel('slack')" class="px-3 py-1.5 bg-purple-600 rounded-lg text-xs">Connect</button></div>
+        </div>
+      </div>
+      <!-- SECURITY -->
+      <div id="settings-tab-security" class="settings-tab-content hidden space-y-4">
+        <div class="text-sm font-medium mb-3">Agent Permissions</div>
+        <label class="flex items-center justify-between cursor-pointer p-3 bg-[#0a0a0f] rounded-lg border border-gray-800"><div><div class="text-sm">Update Data</div><div class="text-xs text-gray-500">Allow agent to update records without asking</div></div><input type="checkbox" id="settings-allow-update" class="toggle-checkbox"></label>
+        <label class="flex items-center justify-between cursor-pointer p-3 bg-[#0a0a0f] rounded-lg border border-gray-800"><div><div class="text-sm">Delete Data</div><div class="text-xs text-gray-500">Allow agent to delete records without asking</div></div><input type="checkbox" id="settings-allow-delete" class="toggle-checkbox"></label>
+        <label class="flex items-center justify-between cursor-pointer p-3 bg-[#0a0a0f] rounded-lg border border-gray-800"><div><div class="text-sm">Auto-detect Secrets</div><div class="text-xs text-gray-500">Mask API keys, tokens, passwords in output</div></div><input type="checkbox" id="settings-auto-secrets" class="toggle-checkbox" checked></label>
+        <div class="pt-4 border-t border-gray-800/50"><div class="text-sm font-medium mb-2">Stored Secrets</div><div class="flex gap-2 mb-2"><input id="settings-secret-key" type="text" placeholder="KEY" class="flex-1 bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm font-mono"><input id="settings-secret-value" type="password" placeholder="value" class="flex-1 bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm"><button onclick="addSecret()" class="px-3 py-2 bg-gray-800 rounded-lg text-sm">Add</button></div><div id="settings-secrets-list" class="space-y-1"></div></div>
+      </div>
+      <!-- DEVELOPER -->
+      <div id="settings-tab-developer" class="settings-tab-content hidden space-y-4">
+        <div><div class="text-xs text-gray-500 mb-1">Agent API Key</div><div class="flex gap-2"><input id="settings-api-key" type="text" readonly class="flex-1 bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm font-mono text-gray-500"><button onclick="copyApiKey()" class="px-3 py-2 bg-gray-800 rounded-lg text-sm">Copy</button><button onclick="regenerateApiKey()" class="px-3 py-2 bg-red-900/40 rounded-lg text-sm">Regen</button></div></div>
+        <div><div class="text-xs text-gray-500 mb-1">Base URL</div><input type="text" readonly value="https://evolvixos.com/platform/api/agents/" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm font-mono text-gray-500"></div>
+        <pre class="bg-[#0a0a0f] rounded-lg p-3 border border-gray-800/40 text-xs text-gray-400 overflow-x-auto">curl -X POST https://evolvixos.com/platform/api/agents/<span id="dev-agent-name">Name</span>/invoke -H "X-Agent-Key: <span id="dev-api-key">key</span>" -d '{"message":"Hi"}'</pre>
+        <div><div class="text-xs text-gray-500 mb-1">Created</div><div id="settings-created-date" class="text-sm text-gray-400"></div></div>
+        <div class="pt-4 border-t border-gray-800/50 flex gap-2"><button onclick="exportAgentConfig()" class="px-3 py-2 bg-gray-800 rounded-lg text-sm">Export</button><button onclick="duplicateAgent()" class="px-3 py-2 bg-gray-800 rounded-lg text-sm">Duplicate</button><button onclick="resetAgentMemory()" class="px-3 py-2 bg-yellow-900/40 rounded-lg text-sm">Reset Memory</button></div>
+      </div>
+    </div>
+    <div class="flex gap-2 justify-end p-5 border-t border-gray-800"><button onclick="closeAgentSettings()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button><button onclick="saveAgentSettings()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Save Settings</button></div>
+  </div>
+</div>
+
 </body>
 </html>
