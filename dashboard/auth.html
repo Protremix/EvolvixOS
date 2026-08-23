@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>EvolvixOS — Sign In</title>
 <style>
 :root {
@@ -161,6 +163,27 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); min-
     font-family: var(--font);
 }
 .otp-digit:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+
+/* ═══ MOBILE ENHANCEMENTS ═══ */
+@media (max-width: 480px) {
+  .form-wrapper { max-width: 100% !important; padding: 0 16px; }
+  .left-panel { padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) !important; }
+  /* OTP digits: shrink to fit small screens */
+  .otp-digit { width: 40px !important; height: 48px !important; font-size: 18px !important; }
+  .otp-box { gap: 6px !important; }
+  /* Prevent zoom on focus */
+  input[type="email"], input[type="password"], input[type="text"], input[type="tel"] { font-size: 16px !important; }
+  /* Tab buttons: equal width */
+  .tab { padding: 8px 12px !important; font-size: 13px !important; }
+}
+
+@media (max-width: 360px) {
+  .otp-digit { width: 36px !important; height: 44px !important; font-size: 16px !important; }
+  .otp-box { gap: 4px !important; }
+}
+
+/* Remove tap highlight */
+html, body { -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
 </style>
 </head>
 <body>

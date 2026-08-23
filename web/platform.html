@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>EvolvixOS Platform — Build Apps with AI</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -328,6 +331,7 @@ document.querySelectorAll('.nav-item').forEach(function(item) {
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
 * { font-family: 'Inter', sans-serif; }
 .mono { font-family: 'JetBrains Mono', monospace; }
 ::-webkit-scrollbar { width: 6px; }
@@ -427,11 +431,15 @@ document.querySelectorAll('.nav-item').forEach(function(item) {
   .page.max-w-4xl { max-width: 100% !important; }
   
   /* Hero section */
-  #builder-hero { padding-top: 24px !important; padding-bottom: 16px !important; }
-  #builder-hero h2 { font-size: 24px !important; }
-  #builder-hero p { font-size: 14px !important; }
-  #builder-hero .w-16 { width: 56px !important; height: 56px !important; }
-  #builder-hero svg { width: 28px !important; height: 28px !important; }
+  #builder-hero { padding-top: 20px !important; padding-bottom: 12px !important; }
+  #builder-hero h2 { font-size: 22px !important; }
+  #builder-hero p { font-size: 13px !important; }
+  #builder-hero .w-16 { width: 48px !important; height: 48px !important; }
+  #builder-hero svg { width: 24px !important; height: 24px !important; }
+  /* Suggestion card text: smaller on mobile */
+  .suggestion-card { padding: 12px !important; }
+  .suggestion-card .text-sm { font-size: 13px !important; }
+  .suggestion-card .text-xs { font-size: 11px !important; }
   
   /* Prompt box */
   .prompt-box { padding: 12px !important; }
@@ -441,11 +449,15 @@ document.querySelectorAll('.nav-item').forEach(function(item) {
   .prompt-controls { flex-wrap: wrap; gap: 8px; }
   .prompt-controls select { font-size: 11px !important; }
   
-  /* Suggestion cards: 1 column on small phones */
-  #builder-suggestions { grid-template-columns: 1fr !important; }
+  /* Suggestion cards: 2 columns on phones, 1 on very small */
+  #builder-suggestions { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+  @media (max-width: 380px) { #builder-suggestions { grid-template-columns: 1fr !important; } }
   
-  /* Entity/function cards: 1 column */
+  /* Entity/function cards: 1 column on mobile, but allow 2 on tablets */
   .grid { grid-template-columns: 1fr !important; }
+  /* But keep 2-col for small inline grids (temp/topp/etc) */
+  .grid.grid-cols-2 { grid-template-columns: 1fr 1fr !important; }
+  .grid.grid-cols-3 { grid-template-columns: 1fr 1fr 1fr !important; }
   
   /* Modals: full-screen on mobile */
   .modal-content {
@@ -504,6 +516,25 @@ document.querySelectorAll('.nav-item').forEach(function(item) {
   button[class*="w-8 h-8"], button[class*="w-9 h-9"] { width: 40px !important; height: 40px !important; }
   select { min-height: 36px; }
   .field-type { padding: 10px !important; }
+  /* Safe area for notched phones */
+  body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+  #mobile-sidebar { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+  .top-bar { padding-left: max(12px, env(safe-area-inset-left)) !important; padding-right: max(12px, env(safe-area-inset-right)) !important; }
+  /* Better text sizing */
+  .page { font-size: 14px; }
+  /* Entity record table: card-like on mobile */
+  .records-table table { min-width: 400px; }
+  /* Prompt box: sticky bottom on mobile for better UX */
+  .prompt-box { position: sticky; bottom: 0; background: #08080a; z-index: 10; }
+  /* Settings tab content: tighter spacing */
+  .settings-tab-content { gap: 12px !important; }
+  /* Agent chat messages: better spacing */
+  .chat-msg { padding: 10px 14px !important; }
+  .agent-msg-content { font-size: 14px !important; }
+  /* Top bar: smaller title on mobile */
+  .top-bar h1 { font-size: 13px !important; }
+  /* Bottom API status: safe area aware */
+  aside > div:last-child { padding-bottom: max(12px, env(safe-area-inset-bottom)) !important; }
 }
 
 /* Smooth scrolling on iOS */
