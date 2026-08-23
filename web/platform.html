@@ -434,7 +434,8 @@ async function sendChat() {
   addChatMessage('system', '<span class="text-gray-500">Thinking...</span>');
 
   try {
-    const data = await api('/chat', 'POST', {message: msg});
+    const selectedModel = document.getElementById('builder-model')?.value || '';
+    const data = await api('/chat', 'POST', {message: msg, model: selectedModel || undefined});
     const sysMsg = document.querySelector('#chat-messages > div:last-child');
 
     let html = '';

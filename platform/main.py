@@ -104,6 +104,7 @@ class AgentInvoke(BaseModel):
 class ChatMessage(BaseModel):
     message: str
     context: Optional[dict] = None
+    model: Optional[str] = None  # OpenRouter model ID, e.g. "z-ai/glm-5"
 
 
 # ─── Health ───
