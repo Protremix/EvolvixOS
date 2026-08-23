@@ -481,26 +481,40 @@ async def chat_build(msg: ChatMessage, db=Depends(get_db)):
     """
     import urllib.request
 
+    # Get existing entities so the LLM knows what's already built
+    existing_entities = await EntityManager.list_entities(db)
+    existing_names = [e["name"] for e in existing_entities] if existing_entities else []
+    existing_summary = ", ".join(existing_names) if existing_names else "none yet"
+
     # System prompt that teaches the LLM about platform capabilities
-    system_prompt = """You are EvolvixOS Platform Builder. You help users build apps by creating entities, backend functions, and workflows via natural language.
+    system_prompt = f"""You are EvolvixOS Platform Builder. You help users build apps by creating entities, backend functions, and workflows via natural language.
+
+CURRENT STATE — Entities already in the project: {existing_summary}
 
 Available API actions (respond with JSON):
-- Create entity: {"action": "create_entity", "name": "Task", "schema": {"type": "object", "properties": {"title": {"type": "string"}, "done": {"type": "boolean"}}, "required": ["title"]}}
-- List entities: {"action": "list_entities"}
-- Create function: {"action": "create_function", "name": "getJoke", "code": "def handler(input):\n    return {'joke': 'Why did the chicken cross the road?'}"}
-- Create workflow: {"action": "create_workflow", "name": "Daily Report", "trigger_type": "scheduled", "definition": {}}
+- Create entity: {{"action": "create_entity", "name": "Task", "schema": {{"type": "object", "properties": {{"title": {{"type": "string"}}, "done": {{"type": "boolean"}}}}, "required": ["title"]}}}}
+- List entities: {{"action": "list_entities"}}
+- Create function: {{"action": "create_function", "name": "getJoke", "code": "def handler(input):\n    return {{'joke': 'Why did the chicken cross the road?'}}"}}
+- Create workflow: {{"action": "create_workflow", "name": "Daily Report", "trigger_type": "scheduled", "definition": {{}}}}
 
-IMPORTANT - Be proactive, not interrogative. When the user gives a vague, high-level request (e.g. "website", "blog", "store", "CRM", "app", "portfolio"), do NOT just ask for clarification. Instead, make a reasonable assumption about the most common starter entity for that request and CREATE it immediately using the create_entity action, then briefly explain what you built. Only ask a clarifying question if the request is truly ambiguous with no sensible default.
+CRITICAL RULES:
+1. Be proactive, not interrogative. When the user gives a vague request, CREATE something immediately.
+2. CHECK the "CURRENT STATE" list above. If a suitable entity already exists, do NOT create a duplicate. Instead respond with {{"action": "chat", "message": "You already have a 'Post' entity for that — want me to add more fields or create a different entity?"}}.
+3. If the user asks for something related but different from existing entities, create a NEW entity with a distinct name. For example, if "Page" exists and the user wants a delivery app, create "Order" (not another "Page").
+4. Only ask a clarifying question if the request is truly ambiguous with no sensible default.
 
-Examples of proactive defaults (always use action "create_entity" for these, never just "chat"):
-- "website" or "landing page" -> create entity "Page": {title (string), slug (string), content (string), published (boolean)}
-- "blog" -> create entity "Post": {title (string), slug (string), content (string), author (string), published (boolean)}
-- "store" or "shop" or "ecommerce" -> create entity "Product": {name (string), description (string), price (number), stock (integer), image_url (string)}
-- "CRM" -> create entity "Contact": {name (string), email (string), phone (string), company (string), status (string)}
-- "portfolio" -> create entity "Project": {title (string), description (string), image_url (string), link (string), category (string)}
-- "booking" or "reservations" -> create entity "Booking": {name (string), email (string), date (string), time (string), status (string)}
+Proactive defaults (always use action "create_entity"):
+- "website" or "landing page" -> "Page": {{title, slug, content, published}}
+- "blog" -> "Post": {{title, slug, content, author, published}}
+- "store" or "shop" or "ecommerce" -> "Product": {{name, description, price, stock, image_url}}
+- "delivery" or "delivery business" -> "Order": {{order_id, customer_name, customer_email, items, status, delivery_address, estimated_delivery_time, completed}}
+- "CRM" -> "Contact": {{name, email, phone, company, status}}
+- "portfolio" -> "Project": {{title, description, image_url, link, category}}
+- "booking" or "reservations" -> "Booking": {{name, email, date, time, status}}
+- "fitness" or "workout tracker" -> "Workout": {{title, date, duration, calories_burned, type, notes}}
+- "task manager" or "todo" -> "Task": {{title, status, priority, due_date}}
 
-Always respond with a JSON action object. If the user just wants to chat or asks something truly unrelated to building, respond with {"action": "chat", "message": "your response"}."""
+Always respond with a JSON action object. If the user just wants to chat, respond with {{"action": "chat", "message": "your response"}}."""
 
     # Call Ollama
     ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
