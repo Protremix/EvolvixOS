@@ -51,16 +51,16 @@ def deduct_user_credits(user_id, model_id, tokens_in=0, tokens_out=0):
     model_lower = (model_id or "").lower()
     if ":free" in model_lower:
         cost = 1
-    elif any(m in model_lower for m in ["gpt-oss-20b", "gpt-oss-120b", "deepseek-v4-flash", "nemotron-3-super"]):
+    elif any(m in model_lower for m in ["gpt-oss-20b", "gpt-oss-120b", "deepseek-v4-flash", "nemotron-3-super", "gemma-4-31b"]):
         cost = 2
-    elif any(m in model_lower for m in ["gemini-3.1-pro-preview", "claude-opus"]):
+    elif any(m in model_lower for m in ["gemini-3.1-pro-preview", "claude-opus", "gemini-3.7-flash"]):
         cost = 20
-    elif any(m in model_lower for m in ["glm-5.2", "glm-5.3", "claude-sonnet-5", "gemini-3.1-pro", "kimi-k2.7", "nemotron-3-ultra"]):
+    elif any(m in model_lower for m in ["glm-5.2", "glm-5.3", "claude-sonnet-5", "gemini-3.1-pro", "kimi-k2.7", "nemotron-3-ultra", "qwen3.8"]):
         cost = 10
-    elif any(m in model_lower for m in ["glm-5", "kimi-k2", "qwen2.5"]):
+    elif any(m in model_lower for m in ["glm-5", "kimi-k2", "qwen2.5", "step-3.7"]):
         cost = 5
     else:
-        cost = 5
+        cost = 3
     try:
         conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
         c = conn.cursor()
@@ -667,14 +667,14 @@ async def chat_build(msg: ChatMessage, request: Request, db=Depends(get_db)):
         pre_model = msg.model or "auto"
         if pre_model == "auto":
             msg_lower = msg.message.lower()
-            if any(w in msg_lower for w in ["analyze", "reason", "think", "complex", "architect"]):
-                pre_model = "z-ai/glm-5.2"
-            elif any(w in msg_lower for w in ["build", "create", "make", "entity", "app"]):
-                pre_model = "z-ai/glm-5"
-            elif any(w in msg_lower for w in ["code", "function", "api", "deploy"]):
-                pre_model = "openai/gpt-oss-120b"
+            if any(w in msg_lower for w in ["build", "create", "make", "entity", "app", "store", "shop", "dashboard", "blog", "task", "project", "note", "feedback", "contact", "order"]):
+                pre_model = "qwen/qwen3.8-27b"        # 80.7% tool accuracy
+            elif any(w in msg_lower for w in ["code", "function", "api", "deploy", "python", "script", "backend", "endpoint"]):
+                pre_model = "deepseek/deepseek-v4-flash-0731"  # 76.3%, bash.010/task
+            elif any(w in msg_lower for w in ["analyze", "reason", "think", "complex", "architect", "design", "plan", "strategy"]):
+                pre_model = "google/gemini-3.7-flash"  # 80.6%, bash.077/task
             else:
-                pre_model = "openai/gpt-oss-20b"
+                pre_model = "google/gemma-4-31b"       # 76.5%, bash.016/task
         credit_check = deduct_user_credits(user_id, pre_model)
         if not credit_check.get("ok"):
             raise HTTPException(402, credit_check.get("error", "Insufficient credits"))
