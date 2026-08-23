@@ -122,7 +122,7 @@ def send_email_otp(to_email, otp_code, display_name=""):
 
     BREVO_API_KEY = os.environ.get("BREVO_API_KEY", os.environ.get("BRAVO_API_KEY", ""))
     BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
-    SENDER_EMAIL = os.environ.get("SMTP_USER", "noreply@evolvixos.com")
+    SENDER_EMAIL = os.environ.get("SMTP_USER", "info@protremix.com")
     SENDER_NAME = "EvolvixOS"
 
     html = f"""<html><body style="font-family:Inter,Arial,sans-serif;background:#0a0a0f;color:#fff;padding:40px;margin:0;">
