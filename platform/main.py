@@ -517,30 +517,114 @@ Proactive defaults (always use action "create_entity"):
 
 Always respond with a JSON action object. If the user just wants to chat, respond with {{"action": "chat", "message": "your response"}}."""
 
-    # Call Ollama (only as last resort if OpenRouter and GLM both failed)
-    if ai_response is None:
-      ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
-      payload = json.dumps({
-          "model": "qwen2.5:7b",
-          "messages": [
-              {"role": "system", "content": system_prompt},
-              {"role": "user", "content": msg.message}
-          ],
-          "stream": False,
-          "options": {"temperature": 0.3}
-      }).encode()
+    # ─── LLM Chain: OpenRouter (smart routing) → GLM direct → Ollama local ───
+    ai_response = None
 
-      try:
-          req = urllib.request.Request(f"{ollama_url}/api/chat", data=payload, headers={"Content-Type": "application/json"})
-          resp = urllib.request.urlopen(req, timeout=30)
-          ollama_data = json.loads(resp.read())
-          ai_response = ollama_data.get("message", {}).get("content", "")
-          resp.close()
-      except Exception as e:
-          return {"error": f"LLM error: {str(e)}", "message": "Sorry, I couldn't process that."}
+    # "auto" = smart routing — pick best model for the task
+    selected_model = msg.model or "auto"
+    if selected_model == "auto":
+        msg_lower = msg.message.lower()
+        if any(w in msg_lower for w in ["build", "create", "make", "add", "entity", "crm", "app", "store", "shop", "dashboard", "blog", "inventory", "task", "project", "social"]):
+            selected_model = "z-ai/glm-5"
+        elif any(w in msg_lower for w in ["code", "function", "api", "deploy", "python", "script", "backend", "endpoint"]):
+            selected_model = "openai/gpt-oss-120b"
+        elif any(w in msg_lower for w in ["analyze", "reason", "think", "complex", "architect", "design", "plan", "strategy"]):
+            selected_model = "z-ai/glm-5.2"
+        elif any(w in msg_lower for w in ["hello", "hi", "hey", "help", "what", "how", "why", "thanks", "thank"]):
+            selected_model = "openai/gpt-oss-20b"
+        elif len(msg.message) > 500:
+            selected_model = "z-ai/glm-5"
+        else:
+            selected_model = "openai/gpt-oss-20b"
 
+    # Try OpenRouter (unified gateway, 422+ models)
+    or_key = os.environ.get("OPENROUTER_API_KEY", "")
+    if or_key:
+        fallback_chain = list(dict.fromkeys([selected_model, "z-ai/glm-5", "openai/gpt-oss-20b", "z-ai/glm-5.2:free"]))
+        for try_model in fallback_chain:
+            try:
+                or_payload = json.dumps({
+                    "model": try_model,
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": msg.message}
+                    ],
+                    "stream": False,
+                    "temperature": 0.3,
+                    "max_tokens": 2000
+                }).encode()
+                or_req = urllib.request.Request(
+                    "https://openrouter.ai/api/v1/chat/completions",
+                    data=or_payload,
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {or_key}",
+                        "HTTP-Referer": "https://evolvixos.com",
+                        "X-Title": "EvolvixOS"
+                    }
+                )
+                or_resp = urllib.request.urlopen(or_req, timeout=60)
+                or_data = json.loads(or_resp.read())
+                or_resp.close()
+                or_msg = or_data.get("choices", [{}])[0].get("message", {})
+                ai_response = or_msg.get("content") or or_msg.get("reasoning", "") or ""
+                if ai_response and len(ai_response) > 5:
+                    break
+                ai_response = None
+            except Exception as or_err:
+                print(f"OpenRouter {try_model} failed: {or_err}")
+                continue
+
+    # Fallback: GLM direct (Z.ai)
+    zai_key = os.environ.get("ZAI_API_KEY", "")
+    if ai_response is None and zai_key:
+        try:
+            glm_payload = json.dumps({
+                "model": "glm-4.5-flash",
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": msg.message}
+                ],
+                "stream": False,
+                "temperature": 0.3,
+                "max_tokens": 2000
+            }).encode()
+            glm_req = urllib.request.Request(
+                "https://api.z.ai/api/paas/v4/chat/completions",
+                data=glm_payload,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {zai_key}",
+                    "Accept-Language": "en-US,en"
+                }
+            )
+            glm_resp = urllib.request.urlopen(glm_req, timeout=60)
+            glm_data = json.loads(glm_resp.read())
+            ai_response = glm_data.get("choices", [{}])[0].get("message", {}).get("content", "")
+            glm_resp.close()
+        except Exception as glm_err:
+            print(f"GLM failed: {glm_err}")
+
+    # Last resort: Ollama local
     if ai_response is None:
-        return {"error": "All LLM providers failed", "message": "Sorry, I couldn\'t process that."}
+        ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
+        ollama_payload = json.dumps({
+            "model": "qwen2.5:7b",
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": msg.message}
+            ],
+            "stream": False,
+            "options": {"temperature": 0.3}
+        }).encode()
+        try:
+            ollama_req = urllib.request.Request(f"{ollama_url}/api/chat", data=ollama_payload, headers={"Content-Type": "application/json"})
+            ollama_resp = urllib.request.urlopen(ollama_req, timeout=30)
+            ollama_data = json.loads(ollama_resp.read())
+            ai_response = ollama_data.get("message", {}).get("content", "")
+            ollama_resp.close()
+        except Exception as ollama_err:
+            return {"error": f"All LLM providers failed: {ollama_err}", "message": "Sorry, I couldn't process that."}
 
     # Try to parse AI response as JSON action
     try:
