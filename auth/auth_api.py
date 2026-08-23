@@ -116,10 +116,17 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 def send_email_otp(to_email, otp_code, display_name=""):
-    """Send OTP verification code via email."""
+    """Send OTP verification code via email using IONOS SMTP relay."""
+    import os
+
+    SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.ionos.es")
+    SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
+    SMTP_USER = os.environ.get("SMTP_USER", "info@protremix.com")
+    SMTP_PASS = os.environ.get("SMTP_PASS", "")
+
     try:
         msg = MIMEMultipart("alternative")
-        msg["From"] = "EvolvixOS <noreply@evolvixos.com>"
+        msg["From"] = f"EvolvixOS <{SMTP_USER}>"
         msg["To"] = to_email
         msg["Subject"] = f"Your EvolvixOS Verification Code: {otp_code}"
 
@@ -149,10 +156,20 @@ This code expires in 10 minutes.
         msg.attach(MIMEText(text, "plain"))
         msg.attach(MIMEText(html, "html"))
 
-        with smtplib.SMTP("127.0.0.1", 25, timeout=10) as server:
-            server.sendmail("noreply@evolvixos.com", to_email, msg.as_string())
-        print(f"Email OTP sent to {to_email}")
-        return True
+        # Try direct SMTP relay (port 587) first
+        if SMTP_PASS:
+            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as server:
+                server.starttls()
+                server.login(SMTP_USER, SMTP_PASS)
+                server.sendmail(SMTP_USER, to_email, msg.as_string())
+            print(f"Email OTP sent to {to_email} via {SMTP_HOST}")
+            return True
+        else:
+            # Fallback: try local postfix
+            with smtplib.SMTP("127.0.0.1", 25, timeout=10) as server:
+                server.sendmail("noreply@evolvixos.com", to_email, msg.as_string())
+            print(f"Email OTP sent to {to_email} via local postfix")
+            return True
     except Exception as e:
         print(f"Email OTP send error: {e}")
         return False
