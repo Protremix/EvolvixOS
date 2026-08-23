@@ -309,7 +309,7 @@ function toggleSidebar() {
   var sb = document.getElementById('mobile-sidebar');
   var ov = document.getElementById('mobile-overlay');
   if (sb.classList.contains('open')) {
-    sb.classList.remove('open');
+    sb.classList.remove('open'); haptic(8);
     ov.classList.remove('open');
   } else {
     sb.classList.add('open');
@@ -329,6 +329,7 @@ document.querySelectorAll('.nav-item').forEach(function(item) {
 });
 
 // ═══ Mobile bottom nav ═══
+function haptic(ms) { if (navigator.vibrate) navigator.vibrate(ms || 10); }
 function setActiveBottomNav(el) {
   document.querySelectorAll('.bottom-nav-item').forEach(function(item) {
     item.classList.remove('active');
@@ -341,9 +342,60 @@ if (origShowPage) {
   window.showPage = function(page) {
     origShowPage(page);
     var bnItem = document.querySelector('.bottom-nav-item[data-page="' + page + '"]');
-    if (bnItem) setActiveBottomNav(bnItem);
+    if (bnItem) setActiveBottomNav(bnItem); haptic(10);
   };
 }
+
+// ═══ Mobile swipe gestures for sidebar ═══
+(function() {
+  var touchStartX = 0;
+  var touchStartY = 0;
+  var touchStartTime = 0;
+  var isSwiping = false;
+
+  document.addEventListener("touchstart", function(e) {
+    if (e.touches.length !== 1) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+    isSwiping = false;
+  }, { passive: true });
+
+  document.addEventListener("touchmove", function(e) {
+    if (e.touches.length !== 1) return;
+    var dx = e.touches[0].clientX - touchStartX;
+    var dy = e.touches[0].clientY - touchStartY;
+    if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      isSwiping = true;
+    }
+  }, { passive: true });
+
+  document.addEventListener("touchend", function(e) {
+    if (!isSwiping) return;
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    var dt = Date.now() - touchStartTime;
+
+    // Must be a horizontal swipe, fast enough, long enough
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.7 || dt > 500) return;
+
+    var sb = document.getElementById("mobile-sidebar");
+    var ov = document.getElementById("mobile-overlay");
+    if (!sb || !ov) return;
+    if (window.innerWidth >= 768) return; // Only on mobile
+
+    if (dx > 0 && touchStartX < 30) {
+      // Swipe right from left edge → open sidebar
+      sb.classList.add("open");
+      ov.classList.add("open");
+    } else if (dx < 0 && sb.classList.contains("open")) {
+      // Swipe left → close sidebar
+      sb.classList.remove("open");
+      ov.classList.remove("open");
+    }
+  }, { passive: true });
+})();
+
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
