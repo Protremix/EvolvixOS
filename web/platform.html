@@ -11,12 +11,63 @@
 .mono { font-family: 'JetBrains Mono', monospace; }
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
-.page { display: none; }
+::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,0.5); }
+
+.page { display: none; animation: fadeIn 0.3s ease; }
 .page.active { display: block; }
-.nav-item.active { background: rgba(139,92,246,0.15); color: #a78bfa; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.15); } 50% { box-shadow: 0 0 40px rgba(139,92,246,0.3); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.nav-item { transition: all 0.2s ease; position: relative; }
+.nav-item.active { background: linear-gradient(90deg, rgba(139,92,246,0.15), transparent); color: #a78bfa; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, #8b5cf6, #d946ef); border-radius: 0 2px 2px 0; }
+.nav-item:hover { background: rgba(255,255,255,0.03); }
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.02) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.glow-border { animation: glow 4s ease-in-out infinite; }
+
+.chat-msg { animation: slideIn 0.3s ease; }
+
+.toast { animation: fadeIn 0.3s ease; }
+
 .field-type { cursor: pointer; transition: all 0.15s; }
-.field-type:hover { border-color: #8b5cf6; }
+.field-type:hover { border-color: #8b5cf6; transform: translateY(-1px); }
+
+.modal-overlay { backdrop-filter: blur(8px); }
+.modal-content { animation: fadeIn 0.2s ease; }
+
+.suggestion-card { transition: all 0.25s ease; }
+.suggestion-card:hover { transform: translateY(-3px); border-color: rgba(139,92,246,0.4); box-shadow: 0 8px 30px rgba(139,92,246,0.1); }
+
+.entity-card { transition: all 0.25s ease; }
+.entity-card:hover { transform: translateY(-2px); border-color: rgba(139,92,246,0.4); box-shadow: 0 8px 30px rgba(139,92,246,0.08); }
+
+.btn-primary { background: linear-gradient(135deg, #8b5cf6, #d946ef); transition: all 0.2s; }
+.btn-primary:hover { opacity: 0.9; box-shadow: 0 4px 20px rgba(139,92,246,0.3); }
+
+.prompt-box { transition: all 0.3s ease; }
+.prompt-box:focus-within { border-color: rgba(139,92,246,0.5); box-shadow: 0 0 0 4px rgba(139,92,246,0.08), 0 8px 30px rgba(139,92,246,0.08); }
+
+.spinner { animation: spin 0.8s linear infinite; }
+
+.typing-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #8b5cf6; margin: 0 2px; animation: pulse 1.4s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.gradient-text { background: linear-gradient(135deg, #8b5cf6, #d946ef, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+select option { background: #0a0a0f; }
 </style>
 </head>
 <body class="bg-[#0a0a0f] text-gray-100 h-screen overflow-hidden">
@@ -25,52 +76,55 @@
 <div class="flex h-screen">
 
   <!-- Sidebar -->
-  <aside class="w-60 bg-[#0f0f15] border-r border-gray-800 flex flex-col">
+  <aside class="w-60 bg-[#0c0c12] border-r border-gray-800/60 flex flex-col">
     <!-- Logo -->
-    <div class="p-4 border-b border-gray-800">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center font-bold text-sm">E</div>
-        <span class="font-semibold">EvolvixOS</span>
+    <div class="p-4 border-b border-gray-800/60">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 flex items-center justify-center font-bold text-sm shadow-lg shadow-purple-500/20" style="animation: float 3s ease-in-out infinite;">E</div>
+        <div>
+          <span class="font-semibold text-sm">EvolvixOS</span>
+          <p class="text-[10px] text-gray-500 -mt-0.5">Platform Builder</p>
+        </div>
       </div>
     </div>
 
     <!-- Navigation -->
-    <nav class="flex-1 overflow-y-auto py-2">
-      <div class="px-3 py-1 text-xs text-gray-500 uppercase tracking-wider">Build</div>
-      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="chat">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h8M8 8h8M8 16h5"/></svg>
+    <nav class="flex-1 overflow-y-auto py-3">
+      <div class="px-4 py-1 text-[10px] text-gray-600 uppercase tracking-widest font-semibold">Build</div>
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="chat">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         AI Builder
       </a>
-      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="entities">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="entities">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Entities
       </a>
-      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="functions">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="functions">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
         Functions
       </a>
-      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="workflows">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="workflows">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6m11-11h-6M7 12H1m17.07-7.07L14.14 8.86M9.14 14.14l-4.93 4.93m0-13.14l4.93 4.93m5.86 5.86l4.93 4.93"/></svg>
         Workflows
       </a>
-      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="storage">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7v10c0 2 4 3 8 3s8-1 8-3V7M4 7c0 2 4 3 8 3s8-1 8-3M4 7c0-2 4-3 8-3s8 1 8 3"/></svg>
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="storage">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg>
         Storage
       </a>
-      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="agents">
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="agents">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg>
         Agents
       </a>
 
-      <div class="px-3 py-1 mt-4 text-xs text-gray-500 uppercase tracking-wider">Data</div>
+      <div class="px-4 py-1 mt-4 text-[10px] text-gray-600 uppercase tracking-widest font-semibold">Data</div>
       <div id="entity-nav-items"></div>
     </nav>
 
     <!-- Bottom -->
-    <div class="p-3 border-t border-gray-800">
+    <div class="p-3 border-t border-gray-800/60">
       <div class="flex items-center gap-2 text-xs text-gray-500">
-        <div class="w-2 h-2 rounded-full bg-green-500"></div>
-        <span>Platform API: <span id="api-status">checking...</span></span>
+        <div class="w-2 h-2 rounded-full bg-green-500 shadow-sm shadow-green-500/50" style="animation: pulse 2s infinite;"></div>
+        <span class="text-[11px]">API: <span id="api-status">checking...</span></span>
       </div>
     </div>
   </aside>
@@ -79,39 +133,43 @@
   <main class="flex-1 flex flex-col overflow-hidden">
 
     <!-- Top Bar -->
-    <header class="h-12 border-b border-gray-800 bg-[#0f0f15] flex items-center justify-between px-4">
+    <header class="h-12 border-b border-gray-800/60 bg-[#0c0c12] flex items-center justify-between px-5">
       <div class="flex items-center gap-3">
         <h1 id="page-title" class="text-sm font-medium text-gray-300">AI Builder</h1>
       </div>
-      <div class="flex items-center gap-2 text-xs text-gray-500">
-        <a href="/platform/api/docs" target="_blank" class="hover:text-white">API Docs</a>
-        <span>·</span>
-        <a href="/" class="hover:text-white">Home</a>
+      <div class="flex items-center gap-3 text-xs text-gray-500">
+        <a href="/platform/api/docs" target="_blank" class="hover:text-purple-400 transition-colors">API Docs</a>
+        <span class="text-gray-700">·</span>
+        <a href="/" class="hover:text-purple-400 transition-colors">Home</a>
       </div>
     </header>
 
     <!-- Pages -->
     <div class="flex-1 overflow-y-auto">
 
-      <!-- AI Builder Page (Base44-style home) -->
+      <!-- AI Builder Page -->
       <div id="page-chat" class="page active p-6 max-w-3xl mx-auto">
 
-        <!-- Hero (shown until first message) -->
-        <div id="builder-hero" class="pt-12 pb-8 text-center">
-          <h2 class="text-3xl font-bold mb-2">Hi <span id="hero-username" class="text-purple-400">there</span>.<br>What will you build next?</h2>
+        <!-- Hero -->
+        <div id="builder-hero" class="pt-16 pb-10 text-center">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 mx-auto mb-5 flex items-center justify-center shadow-xl shadow-purple-500/20" style="animation: float 3s ease-in-out infinite;">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>
+          </div>
+          <h2 class="text-3xl font-bold mb-2">Hi <span id="hero-username" class="gradient-text">there</span>.</h2>
+          <p class="text-gray-500 text-base">What will you build next?</p>
         </div>
 
         <!-- Big prompt box -->
-        <div class="bg-[#0f0f15] border border-gray-700 rounded-2xl p-3 mb-8 focus-within:border-purple-500 transition-colors">
+        <div class="prompt-box bg-[#0c0c12] border border-gray-800 rounded-2xl p-4 mb-6">
           <textarea id="chat-input" rows="2" placeholder="Describe the app you want to create..."
-            class="w-full bg-transparent resize-none text-sm px-2 py-2 focus:outline-none placeholder-gray-500"></textarea>
-          <div class="flex items-center justify-between px-1 pt-1">
+            class="w-full bg-transparent resize-none text-sm px-1 py-1 focus:outline-none placeholder-gray-600"></textarea>
+          <div class="flex items-center justify-between px-1 pt-2">
             <div class="flex items-center gap-2">
-              <button title="Attach (coming soon)" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              <button title="Attach (coming soon)" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-800 hover:text-gray-300 transition-all">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
               </button>
-              <div class="w-px h-4 bg-gray-700"></div>
-              <select id="builder-model" class="bg-transparent text-xs text-gray-400 hover:text-white focus:outline-none cursor-pointer">
+              <div class="w-px h-4 bg-gray-800"></div>
+              <select id="builder-model" class="bg-transparent text-xs text-gray-500 hover:text-gray-300 focus:outline-none cursor-pointer transition-colors">
                 <option value="auto" selected>🤖 Automatic</option>
                 <option value="openai/gpt-oss-20b">⚡ GPT-OSS 20B</option>
                 <option value="openai/gpt-oss-120b">🧠 GPT-OSS 120B</option>
@@ -135,7 +193,8 @@
                 <option value="qwen2.5:14b">💻 Qwen 14B (Local)</option>
                 <option value="qwen2.5:7b">💻 Qwen 7B (Local)</option>
               </select>
-              <select id="builder-mode" class="bg-transparent text-xs text-gray-400 hover:text-white focus:outline-none cursor-pointer">
+              <div class="w-px h-4 bg-gray-800"></div>
+              <select id="builder-mode" class="bg-transparent text-xs text-gray-500 hover:text-gray-300 focus:outline-none cursor-pointer transition-colors">
                 <option value="app">Build: App</option>
                 <option value="entity">Build: Entity</option>
                 <option value="function">Build: Function</option>
@@ -143,10 +202,10 @@
               </select>
             </div>
             <div class="flex items-center gap-2">
-              <button id="builder-mic" onclick="toggleVoiceInput()" title="Voice input" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+              <button id="builder-mic" onclick="toggleVoiceInput()" title="Voice input" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-800 hover:text-gray-300 transition-all">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4"/></svg>
               </button>
-              <button onclick="sendChat()" class="w-9 h-9 flex items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-90 transition-opacity">
+              <button onclick="sendChat()" class="w-9 h-9 flex items-center justify-center rounded-xl btn-primary">
                 <svg class="w-4 h-4" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
               </button>
             </div>
@@ -154,153 +213,177 @@
         </div>
 
         <!-- Conversation (hidden until first message) -->
-        <div class="space-y-3 mb-8 hidden" id="chat-messages"></div>
+        <div class="space-y-3 mb-6 hidden" id="chat-messages"></div>
 
-        <!-- Category tabs -->
-        <div class="flex items-center gap-1 mb-4 text-sm border-b border-gray-800">
-          <button onclick="setBuildMode('app')" id="tab-app" class="px-3 py-2 font-medium border-b-2 border-purple-500 text-white">Apps</button>
-          <button onclick="setBuildMode('website')" id="tab-website" class="px-3 py-2 text-gray-400 hover:text-white border-b-2 border-transparent">Websites</button>
-          <button onclick="setBuildMode('tool')" id="tab-tool" class="px-3 py-2 text-gray-400 hover:text-white border-b-2 border-transparent">Tools</button>
-          <button onclick="setBuildMode('agent')" id="tab-agent" class="px-3 py-2 text-gray-400 hover:text-white border-b-2 border-transparent">Agents</button>
+        <!-- Suggestion cards (shown in hero) -->
+        <div id="builder-suggestions" class="grid grid-cols-2 gap-3 mb-6">
+          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="quickBuild('build a CRM app')">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-lg">📊</span>
+              <span class="text-sm font-medium">CRM App</span>
+            </div>
+            <p class="text-xs text-gray-500">Contacts, deals, pipeline</p>
+          </div>
+          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="quickBuild('build an online store')">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-lg">🛍️</span>
+              <span class="text-sm font-medium">E-Commerce</span>
+            </div>
+            <p class="text-xs text-gray-500">Products, orders, cart</p>
+          </div>
+          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="quickBuild('build a task management app')">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-lg">✅</span>
+              <span class="text-sm font-medium">Task Manager</span>
+            </div>
+            <p class="text-xs text-gray-500">Tasks, projects, teams</p>
+          </div>
+          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="quickBuild('build a blog platform')">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-lg">✍️</span>
+              <span class="text-sm font-medium">Blog</span>
+            </div>
+            <p class="text-xs text-gray-500">Posts, authors, comments</p>
+          </div>
         </div>
 
         <!-- Recent entities -->
         <div id="builder-recent-section">
           <div class="flex items-center gap-4 mb-4 text-sm">
             <span class="text-white font-medium border-b-2 border-purple-500 pb-1">Recent</span>
-            <span class="text-gray-500">·</span>
-            <a onclick="navigateTo('entities')" class="text-gray-400 hover:text-white cursor-pointer ml-auto flex items-center gap-1">Browse all <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
+            <span class="text-gray-700">·</span>
+            <a onclick="navigateTo('entities')" class="text-gray-400 hover:text-purple-400 cursor-pointer ml-auto flex items-center gap-1 transition-colors">Browse all <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg></a>
           </div>
           <div id="builder-recent-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
         </div>
       </div>
 
       <!-- Entities Page -->
-      <div id="page-entities" class="page p-6">
-        <div class="flex items-center justify-between mb-6">
+      <div id="page-entities" class="page p-6 max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
           <div>
             <h2 class="text-2xl font-bold">Entities</h2>
-            <p class="text-gray-400 text-sm mt-1">Define your data models. Each entity becomes a CRUD API automatically.</p>
+            <p class="text-gray-500 text-sm mt-1">Your data models. Each entity becomes a CRUD API automatically.</p>
           </div>
-          <button onclick="showCreateEntity()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium">+ New Entity</button>
+          <button onclick="showCreateEntity()" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">+ New Entity</button>
         </div>
         <div id="entities-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
         <!-- Create Entity Modal -->
-        <div id="entity-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
-          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-lg mx-4">
+        <div id="entity-modal" class="fixed inset-0 bg-black/60 modal-overlay flex items-center justify-center z-50 hidden">
+          <div class="modal-content bg-[#0c0c12] border border-gray-800 rounded-2xl p-6 w-full max-w-lg mx-4 shadow-2xl">
             <h3 class="text-lg font-semibold mb-4">New Entity</h3>
             <input id="entity-name" type="text" placeholder="Entity name (PascalCase, e.g. Task, Product, User)"
-              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-purple-500">
+              class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2.5 text-sm mb-3 focus:outline-none focus:border-purple-500 transition-colors">
             <div class="text-xs text-gray-500 mb-2">Fields:</div>
             <div id="entity-fields" class="space-y-2 mb-3"></div>
-            <button onclick="addFieldRow()" class="text-xs text-purple-400 hover:text-purple-300 mb-4">+ Add field</button>
+            <button onclick="addFieldRow()" class="text-xs text-purple-400 hover:text-purple-300 mb-4 transition-colors">+ Add field</button>
             <div class="flex gap-2 justify-end">
-              <button onclick="closeEntityModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
-              <button onclick="createEntity()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Create</button>
+              <button onclick="closeEntityModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+              <button onclick="createEntity()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Create</button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Records Page -->
-      <div id="page-records" class="page p-6">
-        <div class="flex items-center justify-between mb-6">
+      <div id="page-records" class="page p-6 max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
           <div class="flex items-center gap-3">
-            <button onclick="navigateTo('entities')" class="text-gray-400 hover:text-white text-sm">← Entities</button>
+            <button onclick="navigateTo('entities')" class="text-gray-500 hover:text-white text-sm transition-colors">← Entities</button>
             <h2 id="records-title" class="text-2xl font-bold"></h2>
           </div>
-          <button onclick="showCreateRecord()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium">+ New Record</button>
+          <button onclick="showCreateRecord()" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">+ New Record</button>
         </div>
-        <div id="records-table" class="bg-[#0f0f15] border border-gray-800 rounded-xl overflow-hidden"></div>
+        <div id="records-table" class="bg-[#0c0c12] border border-gray-800/60 rounded-xl overflow-hidden"></div>
 
-        <!-- Create Record Modal -->
-        <div id="record-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
-          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-lg mx-4">
+        <div id="record-modal" class="fixed inset-0 bg-black/60 modal-overlay flex items-center justify-center z-50 hidden">
+          <div class="modal-content bg-[#0c0c12] border border-gray-800 rounded-2xl p-6 w-full max-w-lg mx-4 shadow-2xl">
             <h3 class="text-lg font-semibold mb-4">New Record</h3>
             <div id="record-fields" class="space-y-3 mb-4"></div>
             <div class="flex gap-2 justify-end">
-              <button onclick="closeRecordModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
-              <button onclick="createRecord()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Create</button>
+              <button onclick="closeRecordModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+              <button onclick="createRecord()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Create</button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Functions Page -->
-      <div id="page-functions" class="page p-6">
-        <div class="flex items-center justify-between mb-6">
+      <div id="page-functions" class="page p-6 max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
           <div>
-            <h2 class="text-2xl font-bold">Backend Functions</h2>
-            <p class="text-gray-400 text-sm mt-1">Deploy Python functions as HTTP endpoints.</p>
+            <h2 class="text-2xl font-bold">Functions</h2>
+            <p class="text-gray-500 text-sm mt-1">Deploy Python code as HTTP endpoints.</p>
           </div>
-          <button onclick="showCreateFunction()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium">+ New Function</button>
+          <button onclick="showCreateFunction()" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">+ New Function</button>
         </div>
         <div id="functions-list" class="space-y-3"></div>
 
-        <!-- Create Function Modal -->
-        <div id="function-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
-          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4">
+        <div id="function-modal" class="fixed inset-0 bg-black/60 modal-overlay flex items-center justify-center z-50 hidden">
+          <div class="modal-content bg-[#0c0c12] border border-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4 shadow-2xl">
             <h3 class="text-lg font-semibold mb-4">New Function</h3>
-            <input id="function-name" type="text" placeholder="Function name (camelCase, e.g. getJoke)"
-              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-purple-500">
-            <div class="text-xs text-gray-500 mb-2">Code (define a handler function):</div>
-            <textarea id="function-code" rows="12"
-              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mono focus:outline-none focus:border-purple-500"
+            <input id="function-name" type="text" placeholder="Function name (e.g. getJoke)"
+              class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2.5 text-sm mb-3 focus:outline-none focus:border-purple-500 transition-colors">
+            <div class="text-xs text-gray-500 mb-2">Code:</div>
+            <textarea id="function-code" rows="10"
+              class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm mono focus:outline-none focus:border-purple-500 transition-colors"
               placeholder="def handler(input):&#10;    return {'message': 'Hello!'}"></textarea>
             <div class="flex gap-2 justify-end mt-4">
-              <button onclick="closeFunctionModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
-              <button onclick="createFunction()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Deploy</button>
+              <button onclick="closeFunctionModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+              <button onclick="createFunction()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Deploy</button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Workflows Page -->
-      <div id="page-workflows" class="page p-6">
-        <div class="flex items-center justify-between mb-6">
+      <div id="page-workflows" class="page p-6 max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
           <div>
             <h2 class="text-2xl font-bold">Workflows</h2>
-            <p class="text-gray-400 text-sm mt-1">Automations triggered on schedule or entity events.</p>
+            <p class="text-gray-500 text-sm mt-1">Automations triggered on schedule or entity events.</p>
           </div>
-          <button onclick="showCreateWorkflow()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium">+ New Workflow</button>
+          <button onclick="showCreateWorkflow()" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">+ New Workflow</button>
         </div>
         <div id="workflows-list" class="space-y-3"></div>
 
-        <!-- Create Workflow Modal -->
-        <div id="workflow-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
-          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4">
+        <div id="workflow-modal" class="fixed inset-0 bg-black/60 modal-overlay flex items-center justify-center z-50 hidden">
+          <div class="modal-content bg-[#0c0c12] border border-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4 shadow-2xl">
             <h3 class="text-lg font-semibold mb-4">New Workflow</h3>
             <input id="workflow-name" type="text" placeholder="Workflow name (e.g. Daily Report)"
-              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-purple-500">
+              class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2.5 text-sm mb-3 focus:outline-none focus:border-purple-500 transition-colors">
             <div class="text-xs text-gray-500 mb-2">Trigger type:</div>
-            <select id="workflow-trigger" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3">
+            <select id="workflow-trigger" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2.5 text-sm mb-3">
               <option value="scheduled">Scheduled (cron)</option>
               <option value="entity">Entity Event</option>
               <option value="connector">Connector Event</option>
             </select>
             <div class="text-xs text-gray-500 mb-2">Steps (JSON):</div>
             <textarea id="workflow-steps" rows="8"
-              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mono focus:outline-none focus:border-purple-500"
+              class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm mono focus:outline-none focus:border-purple-500 transition-colors"
               placeholder='{"steps": [{"type": "ai", "name": "greet", "prompt": "Say hello"}]}'></textarea>
             <div class="flex gap-2 justify-end mt-4">
-              <button onclick="closeWorkflowModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
-              <button onclick="createWorkflow()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Create</button>
+              <button onclick="closeWorkflowModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+              <button onclick="createWorkflow()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Create</button>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Storage Page -->
-      <div id="page-storage" class="page p-6">
-        <div class="mb-6">
+      <div id="page-storage" class="page p-6 max-w-3xl mx-auto">
+        <div class="mb-8">
           <h2 class="text-2xl font-bold mb-1">File Storage</h2>
-          <p class="text-gray-400 text-sm">Upload and manage files.</p>
+          <p class="text-gray-500 text-sm">Upload and manage files.</p>
         </div>
-        <div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-8 text-center">
+        <div class="bg-[#0c0c12] border border-gray-800/60 rounded-xl p-8 text-center">
           <input type="file" id="file-upload" class="hidden" onchange="uploadFile(event)">
-          <div class="drag-zone border-2 border-dashed border-gray-700 rounded-xl p-12 cursor-pointer hover:border-purple-500" onclick="document.getElementById('file-upload').click()">
-            <p class="text-gray-400">Click to upload a file</p>
+          <div class="border-2 border-dashed border-gray-800 rounded-xl p-12 cursor-pointer hover:border-purple-500/50 transition-all" onclick="document.getElementById('file-upload').click()">
+            <div class="w-12 h-12 rounded-xl bg-gray-800/50 mx-auto mb-3 flex items-center justify-center">
+              <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            </div>
+            <p class="text-gray-400 text-sm">Click to upload a file</p>
             <p class="text-xs text-gray-600 mt-2">Any file type supported</p>
           </div>
           <div id="upload-result" class="mt-4"></div>
@@ -308,61 +391,61 @@
       </div>
 
       <!-- Agents Page -->
-      <div id="page-agents" class="page p-6">
-        <div class="flex items-center justify-between mb-6">
+      <div id="page-agents" class="page p-6 max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
           <div>
             <h2 class="text-2xl font-bold">AI Agents</h2>
-            <p class="text-gray-400 text-sm mt-1">Create custom AI agents with system prompts and tools.</p>
+            <p class="text-gray-500 text-sm mt-1">Custom AI agents with system prompts and tools.</p>
           </div>
-          <button onclick="showCreateAgent()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium">+ New Agent</button>
+          <button onclick="showCreateAgent()" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">+ New Agent</button>
         </div>
         <div id="agents-list" class="space-y-3"></div>
 
-        <!-- Agent Chat Modal -->
-        <div id="agent-chat-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
-          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col">
+        <div id="agent-chat-modal" class="fixed inset-0 bg-black/60 modal-overlay flex items-center justify-center z-50 hidden">
+          <div class="modal-content bg-[#0c0c12] border border-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col shadow-2xl">
             <div class="flex items-center justify-between mb-4">
               <h3 id="agent-chat-title" class="text-lg font-semibold">Chat with Agent</h3>
-              <button onclick="closeAgentChat()" class="text-gray-400 hover:text-white">×</button>
+              <button onclick="closeAgentChat()" class="text-gray-500 hover:text-white transition-colors text-xl">×</button>
             </div>
             <div id="agent-chat-messages" class="flex-1 overflow-y-auto space-y-3 mb-4 max-h-96"></div>
             <div class="flex gap-2">
-              <input id="agent-chat-input" type="text" placeholder="Message..." class="flex-1 bg-[#0a0a0f] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-purple-500">
-              <button onclick="sendAgentMessage()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Send</button>
+              <input id="agent-chat-input" type="text" placeholder="Message..." class="flex-1 bg-[#0a0a0f] border border-gray-800 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-purple-500 transition-colors">
+              <button onclick="sendAgentMessage()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Send</button>
             </div>
           </div>
         </div>
 
-        <!-- Create Agent Modal -->
-        <div id="agent-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
-          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-lg mx-4">
+        <div id="agent-modal" class="fixed inset-0 bg-black/60 modal-overlay flex items-center justify-center z-50 hidden">
+          <div class="modal-content bg-[#0c0c12] border border-gray-800 rounded-2xl p-6 w-full max-w-lg mx-4 shadow-2xl">
             <h3 class="text-lg font-semibold mb-4">New Agent</h3>
             <input id="agent-name" type="text" placeholder="Agent name (e.g. CodeReviewer)"
-              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-purple-500">
+              class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2.5 text-sm mb-3 focus:outline-none focus:border-purple-500 transition-colors">
             <div class="text-xs text-gray-500 mb-2">System Prompt:</div>
             <textarea id="agent-prompt" rows="4" placeholder="You are a... agent. Your job is to..."
-              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-purple-500"></textarea>
+              class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-purple-500 transition-colors"></textarea>
             <div class="flex gap-2 mb-3">
               <div class="flex-1">
                 <div class="text-xs text-gray-500 mb-1">Model:</div>
-                <select id="agent-model" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm">
-                  <option value="qwen2.5:7b">qwen2.5:7b (fast)</option>
-                  <option value="qwen2.5:14b">qwen2.5:14b (smart)</option>
-                  <option value="qwen2.5:3b">qwen2.5:3b (ultra fast)</option>
+                <select id="agent-model" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm">
+                  <option value="auto">🤖 Automatic</option>
+                  <option value="openai/gpt-oss-20b">⚡ GPT-OSS 20B</option>
+                  <option value="z-ai/glm-5">🔮 GLM 5</option>
+                  <option value="qwen2.5:14b">💻 Qwen 14B (Local)</option>
+                  <option value="qwen2.5:7b">💻 Qwen 7B (Local)</option>
                 </select>
               </div>
               <div class="flex-1">
                 <div class="text-xs text-gray-500 mb-1">Temperature:</div>
                 <input id="agent-temp" type="number" min="0" max="1" step="0.1" value="0.7"
-                  class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                  class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm">
               </div>
             </div>
             <div class="text-xs text-gray-500 mb-1">Tools (comma-separated):</div>
             <input id="agent-tools" type="text" placeholder="read_files, search_code, aggregate"
-              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-4">
+              class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm mb-4">
             <div class="flex gap-2 justify-end">
-              <button onclick="closeAgentModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
-              <button onclick="createAgent()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Create</button>
+              <button onclick="closeAgentModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">Cancel</button>
+              <button onclick="createAgent()" class="btn-primary px-4 py-2 rounded-lg text-sm font-medium">Create</button>
             </div>
           </div>
         </div>
@@ -372,10 +455,23 @@
   </main>
 </div>
 
+<!-- Toast Container -->
+<div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
+
 <script>
 const API = '/platform/api';
 let currentEntity = null;
 let entitySchemas = {};
+
+// ─── Toast notifications ───
+function toast(message, type='info') {
+  const colors = { success: 'border-green-500/30 text-green-400', error: 'border-red-500/30 text-red-400', info: 'border-purple-500/30 text-purple-400' };
+  const div = document.createElement('div');
+  div.className = `toast bg-[#0c0c12] border ${colors[type]} rounded-xl px-4 py-3 text-sm shadow-lg backdrop-blur`;
+  div.textContent = message;
+  document.getElementById('toast-container').appendChild(div);
+  setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300); }, 3000);
+}
 
 // ─── Navigation ───
 function navigateTo(page) {
@@ -413,6 +509,7 @@ async function checkHealth() {
     entitySchemas = {};
     (data.entities || []).forEach(e => entitySchemas[e.name] = e.schema);
     updateEntityNav(data.entities || []);
+    updateRecentGrid(data.entities || []);
   } catch(e) {
     document.getElementById('api-status').textContent = 'offline';
     document.getElementById('api-status').className = 'text-red-400';
@@ -422,98 +519,32 @@ async function checkHealth() {
 function updateEntityNav(entities) {
   const nav = document.getElementById('entity-nav-items');
   nav.innerHTML = entities.map(e => `
-    <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" onclick="viewRecords('${e.name}')" data-entity="${e.name}">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+    <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" onclick="viewRecords('${e.name}')">
+      <svg class="w-4 h-4 text-purple-400/60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       ${e.name}
     </a>
   `).join('');
 }
 
-// ─── AI Chat Builder ───
-function revealConversation() {
-  document.getElementById('builder-hero').classList.add('hidden');
-  document.getElementById('builder-recent-section').classList.add('hidden');
-  document.getElementById('chat-messages').classList.remove('hidden');
-}
-
-async function sendChat() {
-  const input = document.getElementById('chat-input');
-  const msg = input.value.trim();
-  if (!msg) return;
-  input.value = '';
-  revealConversation();
-
-  addChatMessage('user', msg);
-  addChatMessage('system', '<span class="text-gray-500">Thinking...</span>');
-
-  try {
-    const selectedModel = document.getElementById('builder-model')?.value || '';
-    const data = await api('/chat', 'POST', {message: msg, model: selectedModel || undefined});
-    const sysMsg = document.querySelector('#chat-messages > div:last-child');
-
-    let html = '';
-    if (data.message) html += `<p>${data.message}</p>`;
-    if (data.action && data.action !== 'chat') html += `<p class="text-xs text-purple-400 mt-2 mono">Action: ${data.action}</p>`;
-    if (data.result) html += `<pre class="text-xs text-gray-500 mt-2 mono bg-[#0a0a0f] p-2 rounded overflow-x-auto">${JSON.stringify(data.result, null, 2)}</pre>`;
-    if (data.entities) html += `<pre class="text-xs text-gray-500 mt-2 mono bg-[#0a0a0f] p-2 rounded overflow-x-auto">${JSON.stringify(data.entities, null, 2)}</pre>`;
-    if (data.error) html += `<p class="text-red-400 mt-2">${data.error}</p>`;
-    sysMsg.innerHTML = `<p class="text-purple-400 font-medium mb-1">EvolvixOS Builder</p>${html}`;
-
-    checkHealth();
-    loadRecentEntities();
-  } catch(e) {
-    sysMsg.innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`;
-  }
-}
-
-document.getElementById('chat-input')?.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
-});
-
-// ─── Voice input (Web Speech API) ───
-let recognizing = false, recognizer = null;
-function toggleVoiceInput() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const micBtn = document.getElementById('builder-mic');
-  if (!SR) { alert('Voice input is not supported in this browser.'); return; }
-  if (recognizing) { recognizer?.stop(); return; }
-  recognizer = new SR();
-  recognizer.lang = 'en-US';
-  recognizer.interimResults = false;
-  recognizer.onstart = () => { recognizing = true; micBtn.classList.add('text-purple-400'); };
-  recognizer.onend = () => { recognizing = false; micBtn.classList.remove('text-purple-400'); };
-  recognizer.onresult = (e) => {
-    const text = e.results[0][0].transcript;
-    const input = document.getElementById('chat-input');
-    input.value = (input.value ? input.value + ' ' : '') + text;
-  };
-  recognizer.start();
-}
-
-// ─── Recent entities (hero home) ───
-async function loadRecentEntities() {
+function updateRecentGrid(entities) {
   const grid = document.getElementById('builder-recent-grid');
   if (!grid) return;
-  try {
-    const data = await api('/entities');
-    const entities = (data.entities || []).slice(0, 6);
-    if (entities.length === 0) {
-      grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500 text-sm">Nothing built yet — describe something above to get started.</div>';
-      return;
-    }
-    grid.innerHTML = entities.map(e => {
-      const fields = Object.keys(e.schema?.properties || {});
-      return `<div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-purple-500 transition-colors" onclick="navigateTo('entities'); viewRecords('${e.name}')">
-        <div class="flex items-center gap-2 mb-1">
-          <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
-          <h3 class="font-medium text-sm">${e.name}</h3>
-        </div>
-        <p class="text-xs text-gray-500">${fields.length} field${fields.length===1?'':'s'} · ${fields.slice(0,3).join(', ')}${fields.length>3?'…':''}</p>
-      </div>`;
-    }).join('');
-  } catch(e) {
-    grid.innerHTML = '';
+  if (entities.length === 0) {
+    grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-600 text-sm">Nothing built yet — try a suggestion above.</div>';
+    return;
   }
+  grid.innerHTML = entities.slice(0, 4).map(e => {
+    const fields = Object.keys(e.schema?.properties || {});
+    return `<div class="entity-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="viewRecords('${e.name}')">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center">
+          <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <h3 class="font-medium text-sm">${e.name}</h3>
+      </div>
+      <p class="text-xs text-gray-500">${fields.length} field${fields.length===1?'':'s'} · ${fields.slice(0,3).join(', ')}${fields.length>3?'…':''}</p>
+    </div>`;
+  }).join('');
 }
 
 // ─── Greeting name ───
@@ -528,16 +559,120 @@ async function loadRecentEntities() {
   } catch(e) {}
 })();
 
+// ─── Quick build ───
+function quickBuild(prompt) {
+  const input = document.getElementById('chat-input');
+  input.value = prompt;
+  input.focus();
+  sendChat();
+}
+
+// ─── Chat ───
+function revealConversation() {
+  document.getElementById('builder-hero').classList.add('hidden');
+  document.getElementById('builder-suggestions').classList.add('hidden');
+  document.getElementById('builder-recent-section').classList.add('hidden');
+  document.getElementById('chat-messages').classList.remove('hidden');
+}
+
 function addChatMessage(role, content) {
   const div = document.createElement('div');
-  div.className = role === 'user' 
-    ? 'bg-purple-600/10 border border-purple-800/30 rounded-xl p-4 text-sm ml-12'
-    : 'bg-[#0f0f15] border border-gray-800 rounded-xl p-4 text-sm';
-  div.innerHTML = role === 'user' 
+  div.className = 'chat-msg ' + (role === 'user'
+    ? 'bg-purple-600/8 border border-purple-800/20 rounded-xl p-4 text-sm ml-12'
+    : 'bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 text-sm');
+  div.innerHTML = role === 'user'
     ? `<p class="text-gray-300">${content}</p>`
-    : `<p class="text-purple-400 font-medium mb-1">EvolvixOS Builder</p>${content}`;
+    : `<div class="flex items-center gap-2 mb-2"><div class="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div><span class="text-purple-400 font-medium text-sm">EvolvixOS Builder</span></div>${content}`;
   document.getElementById('chat-messages').appendChild(div);
   div.scrollIntoView({behavior: 'smooth'});
+}
+
+function addTypingIndicator() {
+  const div = document.createElement('div');
+  div.id = 'typing-indicator';
+  div.className = 'chat-msg bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 text-sm';
+  div.innerHTML = `<div class="flex items-center gap-2"><div class="w-6 h-6 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center"><svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div><span class="text-gray-500">Thinking</span><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`;
+  document.getElementById('chat-messages').appendChild(div);
+  div.scrollIntoView({behavior: 'smooth'});
+}
+
+function removeTypingIndicator() {
+  document.getElementById('typing-indicator')?.remove();
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  revealConversation();
+  addChatMessage('user', msg);
+  addTypingIndicator();
+
+  try {
+    const selectedModel = document.getElementById('builder-model')?.value || '';
+    const data = await api('/chat', 'POST', {message: msg, model: selectedModel || undefined});
+    removeTypingIndicator();
+
+    let html = '';
+    if (data.message) html += `<p>${data.message}</p>`;
+    if (data.action && data.action !== 'chat') {
+      const actionIcons = {create_entity: '📦', create_function: '⚡', create_workflow: '⚙️', list_entities: '📋'};
+      const icon = actionIcons[data.action] || '✨';
+      html += `<div class="mt-3 inline-flex items-center gap-1.5 text-xs bg-purple-500/10 text-purple-400 px-2.5 py-1 rounded-full">${icon} ${data.action}</div>`;
+    }
+    if (data.result) {
+      const r = data.result;
+      if (r.name && r.schema) {
+        const fields = Object.keys(r.schema.properties || {});
+        html += `<div class="mt-3 bg-[#0a0a0f] rounded-lg p-3 border border-gray-800/60"><div class="text-xs text-gray-500 mb-2">Created entity:</div><div class="text-sm font-medium text-purple-400 mb-2">${r.name}</div><div class="flex flex-wrap gap-1.5">${fields.map(f => `<span class="text-xs bg-gray-800/60 text-gray-300 px-2 py-1 rounded-md mono">${f}</span>`).join('')}</div></div>`;
+      } else {
+        html += `<pre class="text-xs text-gray-500 mt-2 mono bg-[#0a0a0f] p-3 rounded-lg overflow-x-auto border border-gray-800/60">${JSON.stringify(data.result, null, 2)}</pre>`;
+      }
+    }
+    if (data.entities) html += `<pre class="text-xs text-gray-500 mt-2 mono bg-[#0a0a0f] p-3 rounded-lg overflow-x-auto border border-gray-800/60">${JSON.stringify(data.entities, null, 2)}</pre>`;
+    if (data.error) html += `<p class="text-red-400 mt-2">${data.error}</p>`;
+
+    addChatMessage('system', html);
+    if (data.action && data.action !== 'chat') toast(`${data.action} completed`, 'success');
+    checkHealth();
+  } catch(e) {
+    removeTypingIndicator();
+    addChatMessage('system', `<p class="text-red-400">Error: ${e.message}</p>`);
+    toast('Request failed', 'error');
+  }
+}
+
+document.getElementById('chat-input')?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+});
+
+// ─── Voice input ───
+let recognizing = false, recognizer = null;
+function toggleVoiceInput() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = document.getElementById('builder-mic');
+  if (!SR) { toast('Voice input not supported in this browser.', 'error'); return; }
+  if (recognizing) { recognizer?.stop(); return; }
+  recognizer = new SR();
+  recognizer.lang = 'en-US';
+  recognizer.interimResults = false;
+  recognizer.onstart = () => { recognizing = true; micBtn.classList.add('text-purple-400'); };
+  recognizer.onend = () => { recognizing = false; micBtn.classList.remove('text-purple-400'); };
+  recognizer.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    const input = document.getElementById('chat-input');
+    input.value = (input.value + ' ' + transcript).trim();
+    input.focus();
+  };
+  recognizer.start();
+}
+
+// ─── Build mode tabs ───
+function setBuildMode(mode) {
+  document.querySelectorAll('[id^="tab-"]').forEach(t => { t.classList.remove('border-purple-500', 'text-white'); t.classList.add('text-gray-400', 'border-transparent'); });
+  const tab = document.getElementById('tab-' + mode);
+  if (tab) { tab.classList.add('border-purple-500', 'text-white'); tab.classList.remove('text-gray-400', 'border-transparent'); }
 }
 
 // ─── Entities ───
@@ -548,14 +683,19 @@ async function loadEntities() {
     (data.entities || []).forEach(e => entitySchemas[e.name] = e.schema);
     const grid = document.getElementById('entities-grid');
     if (!data.entities || data.entities.length === 0) {
-      grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500"><p>No entities yet. Use AI Builder to create one.</p></div>';
+      grid.innerHTML = `<div class="col-span-full text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><p class="text-gray-500 text-sm">No entities yet. Use AI Builder to create one.</p></div>`;
       return;
     }
     grid.innerHTML = data.entities.map(e => {
       const fields = Object.keys(e.schema?.properties || {});
-      return `<div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4 cursor-pointer hover:border-purple-500 transition-colors" onclick="viewRecords('${e.name}')">
-        <h3 class="font-semibold text-lg mb-2">${e.name}</h3>
-        <div class="flex flex-wrap gap-1 mb-3">${fields.map(f => `<span class="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded">${f}</span>`).join('')}</div>
+      return `<div class="entity-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-5 cursor-pointer" onclick="viewRecords('${e.name}')">
+        <div class="flex items-center gap-2.5 mb-3">
+          <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          </div>
+          <h3 class="font-semibold">${e.name}</h3>
+        </div>
+        <div class="flex flex-wrap gap-1.5 mb-3">${fields.map(f => `<span class="text-xs bg-gray-800/60 text-gray-300 px-2 py-1 rounded-md mono">${f}</span>`).join('')}</div>
         <p class="text-xs text-gray-500">${fields.length} fields · <span class="text-purple-400">View records →</span></p>
       </div>`;
     }).join('');
@@ -572,19 +712,19 @@ function addFieldRow() {
   const div = document.createElement('div');
   div.className = 'flex gap-2';
   div.innerHTML = `
-    <input type="text" placeholder="field name" class="flex-1 bg-[#0a0a0f] border border-gray-700 rounded px-2 py-1.5 text-xs field-name">
-    <select class="bg-[#0a0a0f] border border-gray-700 rounded px-2 py-1.5 text-xs field-type">
+    <input type="text" placeholder="field name" class="flex-1 bg-[#0a0a0f] border border-gray-800 rounded px-2 py-1.5 text-xs field-name focus:outline-none focus:border-purple-500">
+    <select class="bg-[#0a0a0f] border border-gray-800 rounded px-2 py-1.5 text-xs field-type">
       <option value="string">string</option><option value="integer">integer</option><option value="number">number</option><option value="boolean">boolean</option><option value="array">array</option><option value="object">object</option>
     </select>
     <label class="flex items-center gap-1 text-xs text-gray-400"><input type="checkbox" class="field-required"> req</label>
-    <button onclick="this.parentElement.remove()" class="text-red-400 text-xs px-1">×</button>
+    <button onclick="this.parentElement.remove()" class="text-red-400/60 hover:text-red-400 text-xs px-1 transition-colors">×</button>
   `;
   document.getElementById('entity-fields').appendChild(div);
 }
 
 async function createEntity() {
   const name = document.getElementById('entity-name').value.trim();
-  if (!name) return alert('Enter entity name');
+  if (!name) return toast('Enter entity name', 'error');
   const props = {}, required = [];
   document.querySelectorAll('#entity-fields > div').forEach(row => {
     const fieldName = row.querySelector('.field-name').value.trim();
@@ -601,7 +741,8 @@ async function createEntity() {
     await api('/entities', 'POST', {name, schema});
     closeEntityModal();
     loadEntities();
-  } catch(e) { alert('Error: ' + e.message); }
+    toast(`Entity '${name}' created`, 'success');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 // ─── Records ───
@@ -614,22 +755,23 @@ async function viewRecords(name) {
     const data = await api(`/entities/${name}/records`);
     const table = document.getElementById('records-table');
     if (!data.records || data.records.length === 0) {
-      table.innerHTML = '<p class="text-gray-500 text-center py-8">No records yet. Click "+ New Record" to create one.</p>';
+      table.innerHTML = `<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><p class="text-gray-500 text-sm">No records yet. Click "+ New Record" to create one.</p></div>`;
       return;
     }
     const cols = Object.keys(data.records[0]);
     let html = '<table class="w-full text-sm"><thead><tr class="border-b border-gray-800">';
-    cols.forEach(c => html += `<th class="text-left px-4 py-3 text-gray-400 font-medium">${c}</th>`);
+    cols.forEach(c => html += `<th class="text-left px-4 py-3 text-gray-500 font-medium text-xs uppercase tracking-wider">${c}</th>`);
     html += '<th class="px-4 py-3"></th></tr></thead><tbody>';
     data.records.forEach((r, idx) => {
-      html += '<tr class="border-b border-gray-800/50 hover:bg-gray-900/30">';
+      html += `<tr class="border-b border-gray-800/40 hover:bg-purple-500/5 transition-colors">`;
       cols.forEach(c => {
         let val = r[c];
-        if (val === null) val = '<span class="text-gray-600">null</span>';
+        if (val === null) val = '<span class="text-gray-700">null</span>';
         else if (typeof val === 'object') val = JSON.stringify(val);
+        if (c === 'id') val = `<span class="text-purple-400/60 mono">${val}</span>`;
         html += `<td class="px-4 py-3 text-xs">${val}</td>`;
       });
-      html += `<td class="px-4 py-3"><button onclick="deleteRecord(${r.id})" class="text-red-400 text-xs hover:text-red-300">Delete</button></td>`;
+      html += `<td class="px-4 py-3"><button onclick="deleteRecord(${r.id})" class="text-red-400/40 hover:text-red-400 text-xs transition-colors">Delete</button></td>`;
       html += '</tr>';
     });
     html += '</tbody></table>';
@@ -646,9 +788,9 @@ function showCreateRecord() {
   div.innerHTML = Object.entries(props).map(([name, def]) => {
     const req = (schema.required || []).includes(name) ? '<span class="text-red-400">*</span>' : '';
     if (def.type === 'boolean') {
-      return `<div><label class="text-xs text-gray-400">${name} ${req}</label><select class="w-full bg-[#0a0a0f] border border-gray-700 rounded px-3 py-2 text-sm mt-1" data-field="${name}"><option value="true">true</option><option value="false">false</option></select></div>`;
+      return `<div><label class="text-xs text-gray-500">${name} ${req}</label><select class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm mt-1 focus:outline-none focus:border-purple-500 transition-colors" data-field="${name}"><option value="true">true</option><option value="false">false</option></select></div>`;
     }
-    return `<div><label class="text-xs text-gray-400">${name} ${req}</label><input type="text" data-field="${name}" data-type="${def.type}" class="w-full bg-[#0a0a0f] border border-gray-700 rounded px-3 py-2 text-sm mt-1 focus:outline-none focus:border-purple-500"></div>`;
+    return `<div><label class="text-xs text-gray-500">${name} ${req}</label><input type="text" data-field="${name}" data-type="${def.type}" class="w-full bg-[#0a0a0f] border border-gray-800 rounded-lg px-3 py-2 text-sm mt-1 focus:outline-none focus:border-purple-500 transition-colors"></div>`;
   }).join('');
   document.getElementById('record-modal').classList.remove('hidden');
 }
@@ -670,7 +812,8 @@ async function createRecord() {
     await api(`/entities/${currentEntity}/records`, 'POST', {data});
     closeRecordModal();
     viewRecords(currentEntity);
-  } catch(e) { alert('Error: ' + e.message); }
+    toast('Record created', 'success');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 async function deleteRecord(id) {
@@ -678,7 +821,8 @@ async function deleteRecord(id) {
   try {
     await api(`/entities/${currentEntity}/records/${id}`, 'DELETE');
     viewRecords(currentEntity);
-  } catch(e) { alert('Error: ' + e.message); }
+    toast('Record deleted', 'success');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 // ─── Functions ───
@@ -687,19 +831,24 @@ async function loadFunctions() {
     const data = await api('/functions');
     const list = document.getElementById('functions-list');
     if (!data.functions || data.functions.length === 0) {
-      list.innerHTML = '<div class="text-center py-12 text-gray-500"><p>No functions deployed yet.</p></div>';
+      list.innerHTML = `<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></div><p class="text-gray-500 text-sm">No functions deployed yet.</p></div>`;
       return;
     }
     list.innerHTML = data.functions.map(f => `
-      <div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4">
+      <div class="entity-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4">
         <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-semibold text-purple-400 mono">${f.name}</h3>
-            <p class="text-xs text-gray-500 mt-1">${f.language} · ${f.created_date?.split('T')[0] || ''}</p>
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+              <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-purple-400 mono text-sm">${f.name}</h3>
+              <p class="text-xs text-gray-600 mt-0.5">${f.language} · ${f.created_date?.split('T')[0] || ''}</p>
+            </div>
           </div>
           <div class="flex gap-2">
-            <button onclick="testFunction('${f.name}')" class="text-xs bg-gray-800 px-3 py-1.5 rounded hover:bg-gray-700">Test</button>
-            <button onclick="deleteFunction('${f.name}')" class="text-xs text-red-400 hover:text-red-300">Delete</button>
+            <button onclick="testFunction('${f.name}')" class="text-xs bg-gray-800/60 hover:bg-gray-700 px-3 py-1.5 rounded-lg transition-colors">Test</button>
+            <button onclick="deleteFunction('${f.name}')" class="text-xs text-red-400/40 hover:text-red-400 transition-colors">Delete</button>
           </div>
         </div>
       </div>
@@ -708,32 +857,34 @@ async function loadFunctions() {
 }
 
 function showCreateFunction() { document.getElementById('function-modal').classList.remove('hidden'); }
-function closeFunctionModal() { document.getElementById('function-modal').classList.add('hidden'); }
+function closeFunctionModal() { document.getElementById('function-modal').classList.add('hidden'); document.getElementById('function-name').value = ''; document.getElementById('function-code').value = ''; }
 
 async function createFunction() {
   const name = document.getElementById('function-name').value.trim();
   const code = document.getElementById('function-code').value;
-  if (!name || !code) return alert('Enter name and code');
+  if (!name || !code) return toast('Enter name and code', 'error');
   try {
-    await api('/functions', 'POST', {name, code});
+    await api('/functions', 'POST', {name, code, language: 'python'});
     closeFunctionModal();
-    document.getElementById('function-name').value = '';
-    document.getElementById('function-code').value = '';
     loadFunctions();
-  } catch(e) { alert('Error: ' + e.message); }
+    toast(`Function '${name}' deployed`, 'success');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 async function testFunction(name) {
   try {
-    const result = await api(`/fn/${name}`, 'POST', {});
-    alert(JSON.stringify(result, null, 2));
-  } catch(e) { alert('Error: ' + e.message); }
+    const data = await api(`/fn/${name}`, 'POST', {});
+    toast(`Response: ${JSON.stringify(data).slice(0, 80)}`, 'info');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 async function deleteFunction(name) {
-  if (!confirm('Delete this function?')) return;
-  // Note: delete endpoint not yet implemented — for now just show message
-  alert('Function deletion coming soon');
+  if (!confirm(`Delete function '${name}'?`)) return;
+  try {
+    await api(`/functions/${name}`, 'DELETE');
+    loadFunctions();
+    toast('Function deleted', 'success');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
 // ─── Workflows ───
@@ -742,20 +893,22 @@ async function loadWorkflows() {
     const data = await api('/workflows');
     const list = document.getElementById('workflows-list');
     if (!data.workflows || data.workflows.length === 0) {
-      list.innerHTML = '<div class="text-center py-12 text-gray-500"><p>No workflows yet.</p></div>';
+      list.innerHTML = `<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6m11-11h-6M7 12H1"/></svg></div><p class="text-gray-500 text-sm">No workflows yet.</p></div>`;
       return;
     }
     list.innerHTML = data.workflows.map(w => `
-      <div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4">
+      <div class="entity-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4">
         <div class="flex items-center justify-between">
-          <div>
-            <h3 class="font-semibold">${w.name}</h3>
-            <p class="text-xs text-gray-500 mt-1">Trigger: ${w.trigger_type} · Status: <span class="${w.status === 'active' ? 'text-green-400' : 'text-yellow-400'}">${w.status}</span></p>
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+              <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 10v6m11-11h-6M7 12H1"/></svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-sm">${w.name}</h3>
+              <p class="text-xs text-gray-600 mt-0.5">${w.trigger_type} · ${w.status || 'active'}</p>
+            </div>
           </div>
-          <div class="flex gap-2">
-            <button onclick="executeWorkflow('${w.name}')" class="text-xs bg-gray-800 px-3 py-1.5 rounded hover:bg-gray-700">Execute</button>
-            <button onclick="toggleWorkflow('${w.name}', '${w.status}')" class="text-xs ${w.status === 'active' ? 'text-yellow-400' : 'text-green-400'}">${w.status === 'active' ? 'Pause' : 'Activate'}</button>
-          </div>
+          <button onclick="deleteWorkflow(${w.id})" class="text-xs text-red-400/40 hover:text-red-400 transition-colors">Delete</button>
         </div>
       </div>
     `).join('');
@@ -763,80 +916,67 @@ async function loadWorkflows() {
 }
 
 function showCreateWorkflow() { document.getElementById('workflow-modal').classList.remove('hidden'); }
-function closeWorkflowModal() { document.getElementById('workflow-modal').classList.add('hidden'); }
+function closeWorkflowModal() { document.getElementById('workflow-modal').classList.add('hidden'); document.getElementById('workflow-name').value = ''; document.getElementById('workflow-steps').value = ''; }
 
 async function createWorkflow() {
   const name = document.getElementById('workflow-name').value.trim();
-  const triggerType = document.getElementById('workflow-trigger').value;
-  const stepsStr = document.getElementById('workflow-steps').value;
-  if (!name) return alert('Enter workflow name');
+  const trigger_type = document.getElementById('workflow-trigger').value;
+  const steps_raw = document.getElementById('workflow-steps').value;
+  if (!name) return toast('Enter workflow name', 'error');
   let definition = {};
-  try { definition = JSON.parse(stepsStr); } catch(e) { return alert('Invalid JSON for steps'); }
+  try { definition = JSON.parse(steps_raw); } catch(e) { return toast('Invalid JSON in steps', 'error'); }
   try {
-    await api('/workflows', 'POST', {name, definition, trigger_type: triggerType});
+    await api('/workflows', 'POST', {name, trigger_type, definition});
     closeWorkflowModal();
     loadWorkflows();
-  } catch(e) { alert('Error: ' + e.message); }
+    toast(`Workflow '${name}' created`, 'success');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-async function executeWorkflow(name) {
-  try {
-    const result = await api(`/workflows/${name}/execute`, 'POST');
-    alert(JSON.stringify(result, null, 2));
-    loadWorkflows();
-  } catch(e) { alert('Error: ' + e.message); }
+async function deleteWorkflow(id) {
+  if (!confirm('Delete this workflow?')) return;
+  try { await api(`/workflows/${id}`, 'DELETE'); loadWorkflows(); toast('Workflow deleted', 'success'); }
+  catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-async function toggleWorkflow(name, status) {
-  const action = status === 'active' ? 'deactivate' : 'activate';
-  try {
-    await api(`/workflows/${name}/${action}`, 'PUT');
-    loadWorkflows();
-  } catch(e) { alert('Error: ' + e.message); }
-}
-
-// ─── File Upload ───
+// ─── Storage ───
 async function uploadFile(event) {
   const file = event.target.files[0];
   if (!file) return;
   const formData = new FormData();
   formData.append('file', file);
   try {
-    const res = await fetch(API + '/files/upload', {method: 'POST', body: formData});
+    const res = await fetch(API + '/storage/upload', {method: 'POST', body: formData});
     const data = await res.json();
-    document.getElementById('upload-result').innerHTML = `
-      <div class="bg-green-500/10 border border-green-800/30 rounded-lg p-3 text-sm">
-        <p class="text-green-400">✓ Uploaded: ${data.filename}</p>
-        <p class="text-xs text-gray-500 mt-1">URL: ${data.url} · Size: ${data.size} bytes</p>
-      </div>`;
-  } catch(e) { document.getElementById('upload-result').innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`; }
+    document.getElementById('upload-result').innerHTML = `<div class="text-sm text-green-400 mt-4">✓ Uploaded: <a href="${data.url}" target="_blank" class="text-purple-400 hover:underline">${data.url || 'file'}</a></div>`;
+    toast('File uploaded', 'success');
+  } catch(e) { toast('Upload failed: ' + e.message, 'error'); }
 }
 
 // ─── Agents ───
-let currentChatAgent = null;
-
 async function loadAgents() {
   try {
     const data = await api('/agents');
     const list = document.getElementById('agents-list');
     if (!data.agents || data.agents.length === 0) {
-      list.innerHTML = '<div class="text-center py-12 text-gray-500"><p>No agents yet. Click "+ New Agent" to create one.</p></div>';
+      list.innerHTML = `<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg></div><p class="text-gray-500 text-sm">No agents yet.</p></div>`;
       return;
     }
     list.innerHTML = data.agents.map(a => `
-      <div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4">
+      <div class="entity-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4">
         <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold">${a.name.charAt(0)}</div>
-              <h3 class="font-semibold">${a.name}</h3>
-              <span class="text-xs ${a.status === 'active' ? 'text-green-400' : 'text-yellow-400'}">● ${a.status}</span>
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+              <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg>
             </div>
-            <p class="text-xs text-gray-500 mt-1 ml-10">Model: ${a.model} · Tools: ${a.tools.join(', ') || 'none'}</p>
+            <div>
+              <h3 class="font-semibold text-sm">${a.name}</h3>
+              <p class="text-xs text-gray-600 mt-0.5">Model: ${a.model} · Tools: ${(a.tools || []).join(', ') || 'none'}</p>
+            </div>
           </div>
           <div class="flex gap-2">
-            <button onclick="openAgentChat('${a.name}')" class="text-xs bg-purple-600/20 text-purple-400 px-3 py-1.5 rounded hover:bg-purple-600/30">Chat</button>
-            <button onclick="deleteAgent('${a.name}')" class="text-xs text-red-400 hover:text-red-300">Delete</button>
+            <button onclick="openAgentChat('${a.name}')" class="text-xs bg-gray-800/60 hover:bg-gray-700 px-3 py-1.5 rounded-lg transition-colors">Chat</button>
+            <button onclick="deleteAgent('${a.name}')" class="text-xs text-red-400/40 hover:text-red-400 transition-colors">Delete</button>
           </div>
         </div>
       </div>
@@ -849,70 +989,58 @@ function closeAgentModal() { document.getElementById('agent-modal').classList.ad
 
 async function createAgent() {
   const name = document.getElementById('agent-name').value.trim();
-  const prompt = document.getElementById('agent-prompt').value.trim();
+  const system_prompt = document.getElementById('agent-prompt').value;
   const model = document.getElementById('agent-model').value;
-  const temp = parseFloat(document.getElementById('agent-temp').value);
-  const tools = document.getElementById('agent-tools').value.split(',').map(t => t.trim()).filter(t => t);
-  if (!name || !prompt) return alert('Enter name and system prompt');
+  const temperature = parseFloat(document.getElementById('agent-temp').value) || 0.7;
+  const tools = document.getElementById('agent-tools').value.split(',').map(t => t.trim()).filter(Boolean);
+  if (!name || !system_prompt) return toast('Enter name and prompt', 'error');
   try {
-    await api('/agents', 'POST', {name, system_prompt: prompt, model, temperature: temp, tools});
+    await api('/agents', 'POST', {name, system_prompt, model, temperature, tools});
     closeAgentModal();
-    document.getElementById('agent-name').value = '';
-    document.getElementById('agent-prompt').value = '';
-    document.getElementById('agent-tools').value = '';
     loadAgents();
-  } catch(e) { alert('Error: ' + e.message); }
+    toast(`Agent '${name}' created`, 'success');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
 
-async function deleteAgent(name) {
-  if (!confirm('Delete agent "' + name + '"?')) return;
-  try { await api(`/agents/${name}`, 'DELETE'); loadAgents(); }
-  catch(e) { alert('Error: ' + e.message); }
-}
-
+let currentAgent = null;
 function openAgentChat(name) {
-  currentChatAgent = name;
-  document.getElementById('agent-chat-title').textContent = 'Chat with ' + name;
+  currentAgent = name;
+  document.getElementById('agent-chat-title').textContent = name;
   document.getElementById('agent-chat-messages').innerHTML = '';
   document.getElementById('agent-chat-modal').classList.remove('hidden');
 }
-
-function closeAgentChat() {
-  document.getElementById('agent-chat-modal').classList.add('hidden');
-  currentChatAgent = null;
-}
+function closeAgentChat() { document.getElementById('agent-chat-modal').classList.add('hidden'); }
 
 async function sendAgentMessage() {
   const input = document.getElementById('agent-chat-input');
   const msg = input.value.trim();
-  if (!msg || !currentChatAgent) return;
+  if (!msg || !currentAgent) return;
   input.value = '';
-  const messages = document.getElementById('agent-chat-messages');
-  messages.innerHTML += `<div class="bg-purple-600/10 rounded-lg p-3 ml-8 text-sm">${msg}</div>`;
-  messages.innerHTML += `<div id="agent-thinking" class="text-gray-500 text-sm p-3">Thinking...</div>`;
-  messages.scrollTop = messages.scrollHeight;
+  const msgs = document.getElementById('agent-chat-messages');
+  const userDiv = document.createElement('div');
+  userDiv.className = 'chat-msg bg-purple-600/8 border border-purple-800/20 rounded-xl p-3 text-sm ml-12';
+  userDiv.innerHTML = `<p class="text-gray-300">${msg}</p>`;
+  msgs.appendChild(userDiv);
+  const aiDiv = document.createElement('div');
+  aiDiv.className = 'chat-msg bg-[#0c0c12] border border-gray-800/60 rounded-xl p-3 text-sm';
+  aiDiv.innerHTML = `<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>`;
+  msgs.appendChild(aiDiv);
   try {
-    const data = await api(`/agents/${currentChatAgent}/invoke`, 'POST', {message: msg});
-    document.getElementById('agent-thinking').remove();
-    messages.innerHTML += `<div class="bg-[#0a0a0f] border border-gray-800 rounded-lg p-3 mr-8 text-sm"><span class="text-purple-400 text-xs">Agent · ${data.tokens} tokens</span><p class="mt-1">${data.response.replace(/\n/g, '<br>')}</p></div>`;
-    messages.scrollTop = messages.scrollHeight;
-  } catch(e) {
-    document.getElementById('agent-thinking').remove();
-    messages.innerHTML += `<div class="text-red-400 text-sm p-3">Error: ${e.message}</div>`;
-  }
+    const data = await api(`/agents/${currentAgent}/invoke`, 'POST', {message: msg});
+    aiDiv.innerHTML = `<p class="text-gray-300">${data.response || data.message || JSON.stringify(data)}</p>`;
+  } catch(e) { aiDiv.innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`; }
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
-// Enter key for agent chat
-document.addEventListener('keypress', function(e) {
-  if (e.key === 'Enter' && document.activeElement?.id === 'agent-chat-input') {
-    sendAgentMessage();
-  }
-});
+async function deleteAgent(name) {
+  if (!confirm(`Delete agent '${name}'?`)) return;
+  try { await api(`/agents/${name}`, 'DELETE'); loadAgents(); toast('Agent deleted', 'success'); }
+  catch(e) { toast('Error: ' + e.message, 'error'); }
+}
 
 // ─── Init ───
 checkHealth();
-loadEntities();
-loadRecentEntities();
+setInterval(checkHealth, 30000);
 </script>
 </body>
 </html>
