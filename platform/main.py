@@ -3,6 +3,18 @@ EvolvixOS Platform API — Base44-style platform layer.
 Provides: Entity system, Backend functions, Workflows, File storage, Chat builder.
 Runs on port 8080 alongside the existing Mr James API on port 8000.
 """
+# Load environment from .env file
+import os as _os
+from pathlib import Path as _Path
+_env_file = _Path(_os.path.dirname(__file__)).parent / '.env'
+if _env_file.exists():
+    for _line in _env_file.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith('#') and '=' in _line:
+            _k, _, _v = _line.partition('=')
+            _os.environ.setdefault(_k.strip(), _v.strip())
+
+
 import os
 import sys
 import json
