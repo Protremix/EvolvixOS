@@ -328,6 +328,22 @@ document.querySelectorAll('.nav-item').forEach(function(item) {
   });
 });
 
+// ═══ Mobile bottom nav ═══
+function setActiveBottomNav(el) {
+  document.querySelectorAll('.bottom-nav-item').forEach(function(item) {
+    item.classList.remove('active');
+  });
+  if (el) el.classList.add('active');
+}
+// Sync bottom nav when navigating from sidebar
+var origShowPage = window.showPage;
+if (origShowPage) {
+  window.showPage = function(page) {
+    origShowPage(page);
+    var bnItem = document.querySelector('.bottom-nav-item[data-page="' + page + '"]');
+    if (bnItem) setActiveBottomNav(bnItem);
+  };
+}
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -541,6 +557,54 @@ html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent
 @supports (-webkit-overflow-scrolling: touch) {
   .overflow-y-auto, .flex-1 { -webkit-overflow-scrolling: touch; }
 }
+/* ═══ MOBILE BOTTOM NAV ═══ */
+#mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 98;
+  background: rgba(12, 12, 18, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px max(8px, env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-bottom));
+  justify-content: space-around;
+  align-items: center;
+}
+#mobile-bottom-nav.show {
+  display: flex;
+}
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: #71717a;
+  font-size: 10px;
+  font-weight: 500;
+  min-width: 56px;
+}
+.bottom-nav-item:active { transform: scale(0.92); }
+.bottom-nav-item.active { color: #d946ef; background: rgba(217, 70, 239, 0.08); }
+.bottom-nav-item svg { width: 22px; height: 22px; }
+
+@media (max-width: 767px) {
+  /* Show bottom nav on mobile */
+  #mobile-bottom-nav { display: flex; }
+  /* Add bottom padding to content so it doesn't hide behind nav */
+  .flex-1.overflow-y-auto { padding-bottom: 64px; }
+}
+
+@media (min-width: 768px) {
+  #mobile-bottom-nav { display: none !important; }
+}
+
 .agent-list-item.active { background: rgba(139,92,246,0.12); }
 .tool-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; padding: 3px 9px; border-radius: 999px; background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.25); color: #c4b5fd; }
 .agent-msg-content code { background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
@@ -1082,6 +1146,29 @@ select option { background: #0a0a0f; }
   </main>
 </div>
 
+<!-- Mobile Bottom Navigation -->
+<nav id="mobile-bottom-nav">
+  <div class="bottom-nav-item active" onclick="showPage('chat'); setActiveBottomNav(this)" data-page="chat">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>
+    <span>Build</span>
+  </div>
+  <div class="bottom-nav-item" onclick="showPage('entities'); setActiveBottomNav(this)" data-page="entities">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+    <span>Data</span>
+  </div>
+  <div class="bottom-nav-item" onclick="showPage('functions'); setActiveBottomNav(this)" data-page="functions">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+    <span>Funcs</span>
+  </div>
+  <div class="bottom-nav-item" onclick="showPage('agents'); setActiveBottomNav(this)" data-page="agents">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a3 3 0 00-3 3v1a3 3 0 00-3 3v1a3 3 0 00-3 3v2a3 3 0 003 3h12a3 3 0 003-3v-2a3 3 0 00-3-3V7a3 3 0 00-3-3V5a3 3 0 00-3-3z"/></svg>
+    <span>Agents</span>
+  </div>
+  <div class="bottom-nav-item" onclick="showPage('memory'); setActiveBottomNav(this)" data-page="memory">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707M4.929 4.929A10 10 0 1020.071 4.929M2 12c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12z"/></svg>
+    <span>Memory</span>
+  </div>
+</nav>
 <!-- Toast Container -->
 <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2"></div>
 
