@@ -136,6 +136,14 @@
         <!-- Conversation (hidden until first message) -->
         <div class="space-y-3 mb-8 hidden" id="chat-messages"></div>
 
+        <!-- Category tabs -->
+        <div class="flex items-center gap-1 mb-4 text-sm border-b border-gray-800">
+          <button onclick="setBuildMode('app')" id="tab-app" class="px-3 py-2 font-medium border-b-2 border-purple-500 text-white">Apps</button>
+          <button onclick="setBuildMode('website')" id="tab-website" class="px-3 py-2 text-gray-400 hover:text-white border-b-2 border-transparent">Websites</button>
+          <button onclick="setBuildMode('tool')" id="tab-tool" class="px-3 py-2 text-gray-400 hover:text-white border-b-2 border-transparent">Tools</button>
+          <button onclick="setBuildMode('agent')" id="tab-agent" class="px-3 py-2 text-gray-400 hover:text-white border-b-2 border-transparent">Agents</button>
+        </div>
+
         <!-- Recent entities -->
         <div id="builder-recent-section">
           <div class="flex items-center gap-4 mb-4 text-sm">

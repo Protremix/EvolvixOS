@@ -6,464 +6,390 @@
 <title>EvolvixOS — Sign In</title>
 <style>
 :root {
-    --bg: #0a0a0c;
-    --card: #141418;
-    --border: rgba(255,255,255,0.08);
-    --text: #f0f0f5;
-    --muted: #8e8e93;
-    --primary: #8b5cf6;
-    --primary-glow: rgba(139,92,246,0.15);
-    --accent: #d946ef;
-    --success: #4ade80;
-    --danger: #f87171;
+    --bg: #0a0a0c; --card: #141418; --border: rgba(255,255,255,0.08);
+    --text: #f0f0f5; --muted: #8e8e93; --primary: #8b5cf6;
+    --primary-glow: rgba(139,92,246,0.15); --accent: #d946ef;
+    --success: #4ade80; --danger: #f87171;
     --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; display: flex; }
+
+/* Left panel — form */
+.left-panel {
+    flex: 1; max-width: 520px;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    padding: 40px; position: relative;
 }
-.auth-container {
-    width: 100%;
-    max-width: 440px;
-}
-.auth-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 40px 32px;
-    position: relative;
-    overflow: hidden;
-}
-.auth-card::before {
-    content: '';
-    position: absolute;
-    top: -2px; left: 0; right: 0;
-    height: 3px;
+.left-panel::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
     background: linear-gradient(90deg, var(--primary), var(--accent));
 }
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 28px;
-    justify-content: center;
-}
+.form-wrapper { width: 100%; max-width: 380px; }
+
+.logo { display: flex; align-items: center; gap: 10px; margin-bottom: 48px; }
 .logo-icon {
-    width: 36px; height: 36px;
+    width: 36px; height: 36px; border-radius: 10px;
     background: linear-gradient(135deg, var(--primary), var(--accent));
-    border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
+    font-size: 18px; font-weight: 800; color: #fff;
 }
-.logo-text {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-}
-.tagline {
-    text-align: center;
-    color: var(--muted);
-    font-size: 14px;
-    margin-bottom: 28px;
-}
-.field {
-    margin-bottom: 16px;
-}
-.field label {
-    display: block;
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 6px;
-    font-weight: 500;
-}
-.field input {
-    width: 100%;
-    padding: 12px 14px;
-    background: rgba(255,255,255,0.04);
+.logo-text { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+
+.welcome-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+.welcome-sub { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+
+.social-btn {
+    width: 100%; padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-size: 15px;
-    font-family: var(--font);
-    transition: all 0.2s;
-}
-.field input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-glow);
-}
-.field input::placeholder { color: #555; }
-.btn-primary {
-    width: 100%;
-    padding: 13px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    font-family: var(--font);
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-top: 8px;
-}
-.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.btn-link {
-    width: 100%;
-    padding: 10px;
-    background: transparent;
-    color: var(--muted);
-    border: none;
-    font-size: 14px;
-    font-family: var(--font);
-    cursor: pointer;
-    margin-top: 12px;
-    transition: color 0.2s;
-}
-.btn-link:hover { color: var(--primary); }
-.error-msg {
-    color: var(--danger);
-    font-size: 13px;
-    padding: 10px 14px;
-    background: rgba(248,113,113,0.1);
-    border-radius: 8px;
-    margin-bottom: 16px;
-    display: none;
-}
-.error-msg.show { display: block; }
-.success-msg {
-    color: var(--success);
-    font-size: 13px;
-    padding: 10px 14px;
-    background: rgba(74,222,128,0.1);
-    border-radius: 8px;
-    margin-bottom: 16px;
-    display: none;
-}
-.success-msg.show { display: block; }
-.otp-display {
-    text-align: center;
-    margin: 16px 0;
-    padding: 20px;
-    background: var(--primary-glow);
-    border: 1px solid var(--primary);
     border-radius: 12px;
+    color: var(--text); font-size: 14px; font-weight: 500;
+    font-family: var(--font);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    cursor: pointer; transition: all 0.2s;
+    margin-bottom: 10px;
 }
-.otp-display .code {
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: 8px;
-    color: var(--primary);
-    font-family: 'Courier New', monospace;
+.social-btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(139,92,246,0.3); }
+.social-btn svg { width: 18px; height: 18px; }
+
+.divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.divider span { color: var(--muted); font-size: 13px; }
+
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
+.form-group input {
+    width: 100%; padding: 12px 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); font-size: 14px;
+    font-family: var(--font); transition: all 0.2s;
 }
-.otp-display .label {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 8px;
+.form-group input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+.form-group input::placeholder { color: var(--muted); }
+
+.password-row { display: flex; justify-content: flex-end; margin: -8px 0 24px; }
+.password-row a { color: var(--primary); font-size: 13px; text-decoration: none; }
+.password-row a:hover { text-decoration: underline; }
+
+.btn-primary {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border: none; border-radius: 12px;
+    color: #fff; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    font-family: var(--font);
 }
-.title {
-    font-size: 22px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 6px;
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px var(--primary-glow); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-secondary {
+    width: 100%; padding: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 12px; color: var(--text);
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; font-family: var(--font);
+    margin-top: 10px; transition: all 0.2s;
 }
-.subtitle {
-    text-align: center;
-    color: var(--muted);
-    font-size: 14px;
-    margin-bottom: 24px;
+.btn-secondary:hover { background: rgba(255,255,255,0.08); }
+
+.form-footer { text-align: center; margin-top: 24px; font-size: 13px; color: var(--muted); }
+.form-footer a { color: var(--primary); text-decoration: none; }
+.form-footer a:hover { text-decoration: underline; }
+
+.alert { padding: 10px 14px; border-radius: 10px; font-size: 13px; margin-bottom: 16px; display: none; }
+.alert.error { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.2); color: var(--danger); display: block; }
+.alert.success { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.2); color: var(--success); display: block; }
+
+/* Right panel — decorative */
+.right-panel {
+    flex: 1; display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    background: linear-gradient(135deg, #0d0d12 0%, #141418 100%);
+    position: relative; overflow: hidden; padding: 60px;
 }
-.otp-input {
-    text-align: center;
-    letter-spacing: 8px;
-    font-size: 24px;
-    font-family: 'Courier New', monospace;
+.right-panel::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(139,92,246,0.08), transparent 50%);
 }
-.divider {
-    text-align: center;
-    color: var(--muted);
-    font-size: 12px;
-    margin: 20px 0;
-    position: relative;
-}
-.divider::before, .divider::after {
-    content: '';
+.right-content { position: relative; z-index: 1; max-width: 480px; }
+.right-tagline { font-size: 36px; font-weight: 700; line-height: 1.3; margin-bottom: 16px; }
+.right-tagline .accent { background: linear-gradient(90deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.right-desc { color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 40px; }
+
+/* Floating cards */
+.float-card {
     position: absolute;
-    top: 50%;
-    width: 35%;
-    height: 1px;
-    background: var(--border);
+    background: rgba(20,20,24,0.8);
+    border: 1px solid rgba(139,92,246,0.15);
+    border-radius: 16px; padding: 20px;
+    backdrop-filter: blur(10px);
 }
-.divider::before { left: 0; }
-.divider::after { right: 0; }
-.footer-note {
-    text-align: center;
-    color: var(--muted);
-    font-size: 12px;
-    margin-top: 20px;
+.float-card-1 { top: 15%; right: 10%; }
+.float-card-2 { bottom: 15%; left: 8%; }
+.float-card-stat { font-size: 32px; font-weight: 700; }
+.float-card-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+@media (max-width: 900px) {
+    body { flex-direction: column; }
+    .left-panel { max-width: 100%; }
+    .right-panel { display: none; }
 }
-.spinner {
-    display: inline-block;
-    width: 16px; height: 16px;
-    border: 2px solid rgba(255,255,255,0.2);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
+
+/* Tabs */
+.tab-row { display: flex; gap: 0; margin-bottom: 24px; }
+.tab {
+    padding: 10px 20px; font-size: 14px; font-weight: 500;
+    color: var(--muted); cursor: pointer; border: none; background: none;
+    font-family: var(--font); border-bottom: 2px solid transparent;
+    transition: all 0.2s;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-.view { display: none; }
-.view.active { display: block; }
+.tab.active { color: var(--text); border-bottom-color: var(--primary); }
+.tab:hover { color: var(--text); }
+
+/* OTP */
+.otp-box { display: flex; gap: 8px; justify-content: center; margin: 16px 0 24px; }
+.otp-digit {
+    width: 48px; height: 56px; text-align: center;
+    font-size: 22px; font-weight: 700;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text);
+    font-family: var(--font);
+}
+.otp-digit:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
 </style>
 </head>
 <body>
-<div class="auth-container">
-    <div class="auth-card">
+
+<!-- Left Panel: Auth Form -->
+<div class="left-panel">
+    <div class="form-wrapper">
         <div class="logo">
-            <div class="logo-icon">⚡</div>
+            <div class="logo-icon">E</div>
             <div class="logo-text">EvolvixOS</div>
         </div>
 
-        <div id="error" class="error-msg"></div>
-        <div id="success" class="success-msg"></div>
+        <div class="welcome-title">Welcome to EvolvixOS</div>
+        <div class="welcome-sub">Build apps, websites, and AI agents with natural language.</div>
 
-        <!-- LOGIN VIEW -->
-        <div id="view-login" class="view active">
-            <div class="title">Welcome back</div>
-            <div class="subtitle">Sign in to access your Studio</div>
-            <div class="field">
+        <!-- Tab switcher -->
+        <div class="tab-row">
+            <button class="tab active" id="tab-login" onclick="switchTab('login')">Sign In</button>
+            <button class="tab" id="tab-register" onclick="switchTab('register')">Create Account</button>
+        </div>
+
+        <!-- Alert -->
+        <div id="alert" class="alert"></div>
+
+        <!-- Login Form -->
+        <div id="form-login">
+            <div class="form-group">
                 <label>Email</label>
                 <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
             </div>
-            <div class="field">
+            <div class="form-group">
                 <label>Password</label>
                 <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
             </div>
-            <button class="btn-primary" id="btn-login">Sign In</button>
-            <button class="btn-link" onclick="switchView('register')">No account? Create one →</button>
+            <div class="password-row">
+                <a href="/forgot-password">Forgot Password?</a>
+            </div>
+            <button class="btn-primary" id="btn-login" onclick="doLogin()">Sign In</button>
+            <button class="btn-secondary" onclick="window.location.href='/platform/'">Explore Platform →</button>
         </div>
 
-        <!-- REGISTER VIEW -->
-        <div id="view-register" class="view">
-            <div class="title">Create your account</div>
-            <div class="subtitle">Get OTP-verified access to EvolvixOS</div>
-            <div class="field">
-                <label>Display Name</label>
-                <input type="text" id="reg-name" placeholder="Your name" autocomplete="name">
-            </div>
-            <div class="field">
+        <!-- Register Form -->
+        <div id="form-register" style="display:none">
+            <div class="form-group">
                 <label>Email</label>
                 <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
             </div>
-            <div class="field">
+            <div class="form-group">
+                <label>Display Name</label>
+                <input type="text" id="reg-name" placeholder="Your name" autocomplete="name">
+            </div>
+            <div class="form-group">
                 <label>Password (min 6 chars)</label>
                 <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password">
             </div>
-            <div class="field">
-                <label>Telegram Username (optional — for OTP delivery)</label>
-                <input type="text" id="reg-telegram" placeholder="@username" autocomplete="off">
-            </div>
-            <button class="btn-primary" id="btn-register">Register & Send OTP</button>
-            <button class="btn-link" onclick="switchView('login')">Already have an account? Sign in →</button>
+            <button class="btn-primary" id="btn-register" onclick="doRegister()">Create Account</button>
         </div>
 
-        <!-- OTP VERIFY VIEW -->
-        <div id="view-otp" class="view">
-            <div class="title">Verify your email</div>
-            <div class="subtitle">Enter the 6-digit code we sent you</div>
-            <div id="otp-display-box" class="otp-display" style="display:none">
-                <div class="label">A verification code has been sent to your Telegram. Enter it below.</div>
+        <!-- OTP Verify (hidden until needed) -->
+        <div id="form-verify" style="display:none">
+            <p style="color:var(--muted);font-size:14px;margin-bottom:8px;">Enter the 6-digit code sent to your email:</p>
+            <div class="otp-box" id="otp-box">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="0">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="1">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="2">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="3">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="4">
+                <input class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]" data-idx="5">
             </div>
-            <div class="field">
-                <label>OTP Code</label>
-                <input type="text" id="otp-input" class="otp-input" maxlength="6" placeholder="000000" inputmode="numeric" pattern="[0-9]*">
-            </div>
-            <input type="hidden" id="otp-email">
-            <button class="btn-primary" id="btn-verify">Verify & Enter Studio</button>
-            <button class="btn-link" id="btn-resend">Resend OTP</button>
-            <button class="btn-link" onclick="switchView('login')">← Back to login</button>
+            <button class="btn-primary" id="btn-verify" onclick="doVerify()">Verify & Enter Platform</button>
+            <button class="btn-secondary" onclick="resendOTP()">Resend Code</button>
+        </div>
+
+        <div class="form-footer">
+            <span id="footer-text">No account? <a onclick="switchTab('register')" style="cursor:pointer">Create one →</a></span>
         </div>
     </div>
-    <div class="footer-note">
-        Each user gets isolated memory, projects, and conversation history.
+</div>
+
+<!-- Right Panel: Decorative -->
+<div class="right-panel">
+    <div class="right-content">
+        <div class="right-tagline">Turn your ideas into <span class="accent">apps</span>.</div>
+        <div class="right-desc">EvolvixOS orchestrates AI agents, development pipelines, and blockchain infrastructure into a single autonomous platform. From specification to production — without the friction.</div>
+    </div>
+    <div class="float-card float-card-1">
+        <div class="float-card-stat" style="color: var(--primary);">281</div>
+        <div class="float-card-label">AI Models</div>
+    </div>
+    <div class="float-card float-card-2">
+        <div class="float-card-stat" style="color: var(--accent);">44+</div>
+        <div class="float-card-label">Integrated Tools</div>
     </div>
 </div>
 
 <script>
 const API = '/auth';
+let regEmail = '';
 
-function showError(msg) {
-    const el = document.getElementById('error');
-    el.textContent = msg;
-    el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 5000);
+function switchTab(tab) {
+    document.getElementById('form-login').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('form-verify').style.display = 'none';
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    document.getElementById('footer-text').innerHTML = tab === 'login'
+        ? 'No account? <a onclick="switchTab(\'register\')" style="cursor:pointer">Create one →</a>'
+        : 'Already have an account? <a onclick="switchTab(\'login\')" style="cursor:pointer">Sign in →</a>';
+    hideAlert();
 }
 
-function showSuccess(msg) {
-    const el = document.getElementById('success');
-    el.textContent = msg;
-    el.classList.add('show');
+function showAlert(msg, type) {
+    const el = document.getElementById('alert');
+    el.textContent = msg; el.className = 'alert ' + type;
 }
+function hideAlert() { document.getElementById('alert').className = 'alert'; }
 
-function switchView(name) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('view-' + name).classList.add('active');
-    document.getElementById('error').classList.remove('show');
-    document.getElementById('success').classList.remove('show');
-}
-
-async function apiCall(endpoint, body) {
-    const res = await fetch(API + endpoint, {
+async function apiCall(path, data) {
+    const resp = await fetch(API + path, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify(data)
     });
-    return res.json();
+    return resp.json();
 }
 
-// ─── Login ───
-document.getElementById('btn-login').addEventListener('click', async () => {
+async function doLogin() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-    if (!email || !password) { showError('Please fill in all fields'); return; }
+    if (!email || !password) { showAlert('Please fill in all fields', 'error'); return; }
 
     const btn = document.getElementById('btn-login');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>';
+    btn.disabled = true; btn.textContent = 'Signing in...';
 
     try {
         const data = await apiCall('/login', { email, password });
-        if (data.ok) {
-            localStorage.setItem('evolvix_token', data.token);
-            localStorage.setItem('evolvix_user', JSON.stringify(data.user));
-            window.location.href = '/platform/';
+        if (data.ok && data.token) {
+            localStorage.setItem('evolvixos_token', data.token);
+            localStorage.setItem('evolvixos_user', JSON.stringify(data.user));
+            showAlert('Success! Redirecting...', 'success');
+            setTimeout(() => window.location.href = '/platform/', 800);
         } else {
-            showError(data.error || 'Login failed');
-            btn.disabled = false;
-            btn.innerHTML = 'Sign In';
+            showAlert(data.error || 'Login failed', 'error');
         }
-    } catch (e) {
-        showError('Network error. Is the auth service running?');
-        btn.disabled = false;
-        btn.innerHTML = 'Sign In';
+    } catch(e) {
+        showAlert('Network error. Please try again.', 'error');
     }
-});
+    btn.disabled = false; btn.textContent = 'Sign In';
+}
 
-// ─── Register ───
-document.getElementById('btn-register').addEventListener('click', async () => {
+async function doRegister() {
+    const email = document.getElementById('reg-email').value.trim();
     const display_name = document.getElementById('reg-name').value.trim();
-    const email = document.getElementById('reg-email').value.trim().toLowerCase();
     const password = document.getElementById('reg-password').value;
-    const telegram_username = document.getElementById('reg-telegram').value.trim();
-
-    if (!email || !password) { showError('Email and password required'); return; }
+    if (!email || !password) { showAlert('Email and password required', 'error'); return; }
 
     const btn = document.getElementById('btn-register');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>';
+    btn.disabled = true; btn.textContent = 'Creating...';
 
     try {
-        const data = await apiCall('/register', { email, password, display_name, telegram_username });
+        const data = await apiCall('/register', { email, password, display_name });
         if (data.ok) {
-            document.getElementById('otp-email').value = email;
-            if (data.otp_display) {
-                document.getElementById('otp-display-box').style.display = 'block';
-                // OTP is never displayed on screen for security
-            } else {
-                document.getElementById('otp-display-box').style.display = 'none';
-            }
-            switchView('otp');
-            showSuccess(data.otp_sent_via_telegram ? 'OTP sent to your Telegram!' : 'OTP generated. Contact admin for your code.');
+            regEmail = email;
+            document.getElementById('form-register').style.display = 'none';
+            document.getElementById('form-verify').style.display = 'block';
+            showAlert('Code sent to ' + email, 'success');
         } else {
-            showError(data.error || 'Registration failed');
-            btn.disabled = false;
-            btn.innerHTML = 'Register & Send OTP';
+            showAlert(data.error || 'Registration failed', 'error');
         }
-    } catch (e) {
-        showError('Network error. Is the auth service running?');
-        btn.disabled = false;
-        btn.innerHTML = 'Register & Send OTP';
+    } catch(e) {
+        showAlert('Network error', 'error');
     }
-});
+    btn.disabled = false; btn.textContent = 'Create Account';
+}
 
-// ─── Verify OTP ───
-document.getElementById('btn-verify').addEventListener('click', async () => {
-    const email = document.getElementById('otp-email').value;
-    const otp = document.getElementById('otp-input').value.trim();
-    if (!otp || otp.length !== 6) { showError('Enter the 6-digit code'); return; }
+async function doVerify() {
+    const digits = document.querySelectorAll('.otp-digit');
+    const otp = Array.from(digits).map(d => d.value).join('');
+    if (otp.length !== 6) { showAlert('Enter the 6-digit code', 'error'); return; }
 
     const btn = document.getElementById('btn-verify');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>';
+    btn.disabled = true; btn.textContent = 'Verifying...';
 
     try {
-        const data = await apiCall('/verify', { email, otp });
+        const data = await apiCall('/verify', { email: regEmail, otp });
         if (data.ok) {
-            localStorage.setItem('evolvix_token', data.token);
-            localStorage.setItem('evolvix_user', JSON.stringify(data.user));
-            showSuccess('Verified! Redirecting...');
-            setTimeout(() => window.location.href = '/platform/', 1000);
+            showAlert('Verified! Redirecting...', 'success');
+            setTimeout(() => {
+                apiCall('/login', {
+                    email: regEmail,
+                    password: document.getElementById('reg-password').value
+                }).then(d => {
+                    if (d.ok && d.token) {
+                        localStorage.setItem('evolvixos_token', d.token);
+                        localStorage.setItem('evolvixos_user', JSON.stringify(d.user));
+                    }
+                    window.location.href = '/platform/';
+                });
+            }, 500);
         } else {
-            showError(data.error || 'Verification failed');
-            btn.disabled = false;
-            btn.innerHTML = 'Verify & Enter Studio';
+            showAlert(data.error || 'Verification failed', 'error');
         }
-    } catch (e) {
-        showError('Network error');
-        btn.disabled = false;
-        btn.innerHTML = 'Verify & Enter Studio';
+    } catch(e) {
+        showAlert('Network error', 'error');
     }
-});
-
-// ─── Resend OTP ───
-document.getElementById('btn-resend').addEventListener('click', async () => {
-    const email = document.getElementById('otp-email').value;
-    if (!email) return;
-    const btn = document.getElementById('btn-resend');
-    btn.textContent = 'Sending...';
-    try {
-        const data = await apiCall('/resend-otp', { email });
-        if (data.ok) {
-            if (data.otp_display) {
-                document.getElementById('otp-display-box').style.display = 'block';
-                // OTP is never displayed on screen for security
-            }
-            showSuccess('New OTP sent!');
-        } else {
-            showError(data.error || 'Failed to resend');
-        }
-    } catch (e) {
-        showError('Network error');
-    }
-    btn.textContent = 'Resend OTP';
-});
-
-// Enter key support
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        const activeView = document.querySelector('.view.active').id;
-        if (activeView === 'view-login') document.getElementById('btn-login').click();
-        else if (activeView === 'view-register') document.getElementById('btn-register').click();
-        else if (activeView === 'view-otp') document.getElementById('btn-verify').click();
-    }
-});
-
-// Check if already logged in
-const existingToken = localStorage.getItem('evolvix_token');
-if (existingToken) {
-    fetch(API + '/me', { headers: { 'Authorization': 'Bearer ' + existingToken } })
-        .then(r => r.json())
-        .then(d => { if (d.user) window.location.href = '/platform/'; })
-        .catch(() => {});
+    btn.disabled = false; btn.textContent = 'Verify & Enter Platform';
 }
+
+async function resendOTP() {
+    if (!regEmail) return;
+    try {
+        await apiCall('/resend-otp', { email: regEmail });
+        showAlert('New code sent!', 'success');
+    } catch(e) { showAlert('Failed to resend', 'error'); }
+}
+
+// OTP auto-advance
+document.querySelectorAll('.otp-digit').forEach((input, idx, inputs) => {
+    input.addEventListener('input', () => {
+        if (input.value && idx < inputs.length - 1) inputs[idx + 1].focus();
+    });
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && idx > 0) inputs[idx - 1].focus();
+    });
+});
+
+// Enter key for login
+document.getElementById('login-password').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('reg-password').addEventListener('keypress', e => { if (e.key === 'Enter') doRegister(); });
 </script>
-<div style="text-align:center;margin-top:20px;"><a href="/forgot-password" style="color:#8b5cf6;text-decoration:none;font-size:14px;">Forgot Password?</a></div>
 </body>
 </html>
