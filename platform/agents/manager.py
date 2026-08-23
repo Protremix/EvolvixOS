@@ -14,7 +14,11 @@ class AgentManager:
                           model: str = "auto", temperature: float = 0.7,
                           tools: list = None, created_by: str = None,
                           max_tokens: int = 4096, top_p: float = 0.9,
-                          memory_enabled: bool = True, stream: bool = False):
+                          memory_enabled: bool = True, stream: bool = False,
+                          automation_model: str = "auto", cross_app_access: bool = False,
+                          avatar: str = None, identity_doc: str = None,
+                          allow_update_data: bool = False, allow_delete_data: bool = False,
+                          auto_detect_secrets: bool = True):
         if not name or not system_prompt:
             raise ValueError("Name and system_prompt are required")
         result = await db.execute(
@@ -23,13 +27,17 @@ class AgentManager:
         if result.fetchone():
             raise ValueError(f"Agent '{name}' already exists")
         await db.execute(text("""
-            INSERT INTO platform_agents (name, system_prompt, model, temperature, tools, created_by, max_tokens, top_p, memory_enabled, stream)
-            VALUES (:name, :prompt, :model, :temp, :tools, :created_by, :max_tokens, :top_p, :memory_enabled, :stream)
+            INSERT INTO platform_agents (name, system_prompt, model, temperature, tools, created_by, max_tokens, top_p, memory_enabled, stream, automation_model, cross_app_access, avatar, identity_doc, allow_update_data, allow_delete_data, auto_detect_secrets, api_key)
+            VALUES (:name, :prompt, :model, :temp, :tools, :created_by, :max_tokens, :top_p, :memory_enabled, :stream, :auto_model, :cross_app, :avatar, :identity, :allow_update, :allow_delete, :auto_secrets, :api_key)
         """), {
             "name": name, "prompt": system_prompt, "model": model,
             "temp": temperature, "tools": json.dumps(tools or []),
             "created_by": created_by, "max_tokens": max_tokens,
-            "top_p": top_p, "memory_enabled": memory_enabled, "stream": stream
+            "top_p": top_p, "memory_enabled": memory_enabled, "stream": stream,
+            "auto_model": automation_model, "cross_app": cross_app_access,
+            "avatar": avatar, "identity": identity_doc,
+            "allow_update": allow_update_data, "allow_delete": allow_delete_data,
+            "auto_secrets": auto_detect_secrets, "api_key": "evo_" + __import__("secrets").token_hex(16)
         })
         await db.commit()
         return {"name": name, "model": model, "tools": tools or [], "message": f"Agent '{name}' created"}
@@ -37,7 +45,7 @@ class AgentManager:
     @staticmethod
     async def list_agents(db: AsyncSession):
         result = await db.execute(text(
-            "SELECT name, model, temperature, tools, status, created_date, max_tokens, top_p, memory_enabled, stream FROM platform_agents ORDER BY created_date DESC"
+            "SELECT name, model, temperature, tools, status, created_date, max_tokens, top_p, memory_enabled, stream, avatar, share_enabled FROM platform_agents ORDER BY created_date DESC"
         ))
         rows = result.fetchall()
         return [{
@@ -47,13 +55,15 @@ class AgentManager:
             "max_tokens": r[6] if r[6] else 4096,
             "top_p": r[7] if r[7] else 0.9,
             "memory_enabled": r[8] if r[8] is not None else True,
-            "stream": r[9] if r[9] is not None else False
+            "stream": r[9] if r[9] is not None else False,
+            "avatar": r[10] or "",
+            "share_enabled": r[11] if r[11] is not None else False
         } for r in rows]
 
     @staticmethod
     async def get_agent(db: AsyncSession, name: str):
         result = await db.execute(text(
-            "SELECT name, system_prompt, model, temperature, tools, memory, status, max_tokens, top_p, memory_enabled, stream FROM platform_agents WHERE name = :name"
+            "SELECT name, system_prompt, model, temperature, tools, memory, status, max_tokens, top_p, memory_enabled, stream, automation_model, cross_app_access, avatar, identity_doc, share_enabled, share_link, collaborators, channel_config, allow_update_data, allow_delete_data, auto_detect_secrets, agent_secrets, api_key, created_date FROM platform_agents WHERE name = :name"
         ), {"name": name})
         row = result.fetchone()
         if not row:
@@ -67,7 +77,21 @@ class AgentManager:
             "max_tokens": row[7] if row[7] else 4096,
             "top_p": row[8] if row[8] else 0.9,
             "memory_enabled": row[9] if row[9] is not None else True,
-            "stream": row[10] if row[10] is not None else False
+            "stream": row[10] if row[10] is not None else False,
+            "automation_model": row[11] or "auto",
+            "cross_app_access": row[12] if row[12] is not None else False,
+            "avatar": row[13] or "",
+            "identity_doc": row[14] or "",
+            "share_enabled": row[15] if row[15] is not None else False,
+            "share_link": row[16] or "",
+            "collaborators": json.loads(row[17]) if row[17] else [],
+            "channel_config": json.loads(row[18]) if row[18] else {},
+            "allow_update_data": row[19] if row[19] is not None else False,
+            "allow_delete_data": row[20] if row[20] is not None else False,
+            "auto_detect_secrets": row[21] if row[21] is not None else True,
+            "agent_secrets": json.loads(row[22]) if row[22] else {},
+            "api_key": row[23] or "",
+            "created_date": row[24].isoformat() if row[24] else None
         }
 
     @staticmethod
@@ -86,9 +110,6 @@ class AgentManager:
         if "tools" in updates:
             set_clauses.append("tools = :tools")
             params["tools"] = json.dumps(updates["tools"])
-        if "status" in updates:
-            set_clauses.append("status = :status")
-            params["status"] = updates["status"]
         if "max_tokens" in updates:
             set_clauses.append("max_tokens = :max_tokens")
             params["max_tokens"] = updates["max_tokens"]
@@ -101,6 +122,46 @@ class AgentManager:
         if "stream" in updates:
             set_clauses.append("stream = :stream")
             params["stream"] = updates["stream"]
+        if "automation_model" in updates:
+            set_clauses.append("automation_model = :auto_model")
+            params["auto_model"] = updates["automation_model"]
+        if "cross_app_access" in updates:
+            set_clauses.append("cross_app_access = :cross_app")
+            params["cross_app"] = updates["cross_app_access"]
+        if "avatar" in updates:
+            set_clauses.append("avatar = :avatar")
+            params["avatar"] = updates["avatar"]
+        if "identity_doc" in updates:
+            set_clauses.append("identity_doc = :identity")
+            params["identity"] = updates["identity_doc"]
+        if "share_enabled" in updates:
+            set_clauses.append("share_enabled = :share_enabled")
+            params["share_enabled"] = updates["share_enabled"]
+            if updates["share_enabled"] and not params.get("share_link"):
+                import uuid as _uuid
+                set_clauses.append("share_link = :share_link")
+                params["share_link"] = str(_uuid.uuid4())
+        if "collaborators" in updates:
+            set_clauses.append("collaborators = :collaborators")
+            params["collaborators"] = json.dumps(updates["collaborators"])
+        if "channel_config" in updates:
+            set_clauses.append("channel_config = :channel_config")
+            params["channel_config"] = json.dumps(updates["channel_config"])
+        if "allow_update_data" in updates:
+            set_clauses.append("allow_update_data = :allow_update")
+            params["allow_update"] = updates["allow_update_data"]
+        if "allow_delete_data" in updates:
+            set_clauses.append("allow_delete_data = :allow_delete")
+            params["allow_delete"] = updates["allow_delete_data"]
+        if "auto_detect_secrets" in updates:
+            set_clauses.append("auto_detect_secrets = :auto_secrets")
+            params["auto_secrets"] = updates["auto_detect_secrets"]
+        if "agent_secrets" in updates:
+            set_clauses.append("agent_secrets = :agent_secrets")
+            params["agent_secrets"] = json.dumps(updates["agent_secrets"])
+        if "status" in updates:
+            set_clauses.append("status = :status")
+            params["status"] = updates["status"]
         if not set_clauses:
             raise ValueError("No fields to update")
         set_clauses.append("updated_date = NOW()")
