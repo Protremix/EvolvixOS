@@ -507,6 +507,7 @@ Always respond with a JSON action object. If the user just wants to chat or asks
         resp = urllib.request.urlopen(req, timeout=30)
         ollama_data = json.loads(resp.read())
         ai_response = ollama_data.get("message", {}).get("content", "")
+        resp.close()
     except Exception as e:
         return {"error": f"LLM error: {str(e)}", "message": "Sorry, I couldn't process that."}
 

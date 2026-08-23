@@ -118,6 +118,25 @@ class LLMRegistry:
         self._privacy_mode: PrivacyMode = PrivacyMode.HYBRID
         self._default_local: Optional[str] = None
         self._default_cloud: Optional[str] = None
+        self._auto_register()
+
+    def _auto_register(self):
+        """Auto-register all available providers."""
+        for mod_name, cls_name in [
+            ("v10.providers.ollama", "OllamaProvider"),
+            ("v10.providers.groq", "GroqProvider"),
+            ("v10.providers.gemini", "GeminiProvider"),
+            ("v10.providers.kimi", "KimiProvider"),
+            ("v10.providers.glm", "GLMProvider"),
+        ]:
+            try:
+                mod = __import__(mod_name, fromlist=[cls_name])
+                cls = getattr(mod, cls_name)
+                provider = cls()
+                if provider.is_available():
+                    self.register(provider)
+            except Exception as e:
+                logger.debug(f"Could not auto-register {cls_name}: {e}")
 
     def register(self, provider: LLMProvider):
         self._providers[provider.name] = provider
