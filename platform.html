@@ -57,6 +57,10 @@
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7v10c0 2 4 3 8 3s8-1 8-3V7M4 7c0 2 4 3 8 3s8-1 8-3M4 7c0-2 4-3 8-3s8 1 8 3"/></svg>
         Storage
       </a>
+      <a class="nav-item flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800/50 cursor-pointer" data-page="agents">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg>
+        Agents
+      </a>
 
       <div class="px-3 py-1 mt-4 text-xs text-gray-500 uppercase tracking-wider">Data</div>
       <div id="entity-nav-items"></div>
@@ -245,6 +249,67 @@
         </div>
       </div>
 
+      <!-- Agents Page -->
+      <div id="page-agents" class="page p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-2xl font-bold">AI Agents</h2>
+            <p class="text-gray-400 text-sm mt-1">Create custom AI agents with system prompts and tools.</p>
+          </div>
+          <button onclick="showCreateAgent()" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg text-sm font-medium">+ New Agent</button>
+        </div>
+        <div id="agents-list" class="space-y-3"></div>
+
+        <!-- Agent Chat Modal -->
+        <div id="agent-chat-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[80vh] flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+              <h3 id="agent-chat-title" class="text-lg font-semibold">Chat with Agent</h3>
+              <button onclick="closeAgentChat()" class="text-gray-400 hover:text-white">×</button>
+            </div>
+            <div id="agent-chat-messages" class="flex-1 overflow-y-auto space-y-3 mb-4 max-h-96"></div>
+            <div class="flex gap-2">
+              <input id="agent-chat-input" type="text" placeholder="Message..." class="flex-1 bg-[#0a0a0f] border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-purple-500">
+              <button onclick="sendAgentMessage()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Send</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Create Agent Modal -->
+        <div id="agent-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+          <div class="bg-[#0f0f15] border border-gray-800 rounded-2xl p-6 w-full max-w-lg mx-4">
+            <h3 class="text-lg font-semibold mb-4">New Agent</h3>
+            <input id="agent-name" type="text" placeholder="Agent name (e.g. CodeReviewer)"
+              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-purple-500">
+            <div class="text-xs text-gray-500 mb-2">System Prompt:</div>
+            <textarea id="agent-prompt" rows="4" placeholder="You are a... agent. Your job is to..."
+              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:border-purple-500"></textarea>
+            <div class="flex gap-2 mb-3">
+              <div class="flex-1">
+                <div class="text-xs text-gray-500 mb-1">Model:</div>
+                <select id="agent-model" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                  <option value="qwen2.5:7b">qwen2.5:7b (fast)</option>
+                  <option value="qwen2.5:14b">qwen2.5:14b (smart)</option>
+                  <option value="qwen2.5:3b">qwen2.5:3b (ultra fast)</option>
+                </select>
+              </div>
+              <div class="flex-1">
+                <div class="text-xs text-gray-500 mb-1">Temperature:</div>
+                <input id="agent-temp" type="number" min="0" max="1" step="0.1" value="0.7"
+                  class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm">
+              </div>
+            </div>
+            <div class="text-xs text-gray-500 mb-1">Tools (comma-separated):</div>
+            <input id="agent-tools" type="text" placeholder="read_files, search_code, aggregate"
+              class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm mb-4">
+            <div class="flex gap-2 justify-end">
+              <button onclick="closeAgentModal()" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
+              <button onclick="createAgent()" class="bg-purple-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">Create</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
 </div>
@@ -261,11 +326,12 @@ function navigateTo(page) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
   if (navItem) navItem.classList.add('active');
-  const titles = {chat: 'AI Builder', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', records: 'Records'};
+  const titles = {chat: 'AI Builder', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', agents: 'Agents', records: 'Records'};
   document.getElementById('page-title').textContent = titles[page] || page;
   if (page === 'entities') loadEntities();
   if (page === 'functions') loadFunctions();
   if (page === 'workflows') loadWorkflows();
+  if (page === 'agents') loadAgents();
 }
 
 document.querySelectorAll('.nav-item').forEach(item => {
@@ -616,6 +682,103 @@ async function uploadFile(event) {
       </div>`;
   } catch(e) { document.getElementById('upload-result').innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`; }
 }
+
+// ─── Agents ───
+let currentChatAgent = null;
+
+async function loadAgents() {
+  try {
+    const data = await api('/agents');
+    const list = document.getElementById('agents-list');
+    if (!data.agents || data.agents.length === 0) {
+      list.innerHTML = '<div class="text-center py-12 text-gray-500"><p>No agents yet. Click "+ New Agent" to create one.</p></div>';
+      return;
+    }
+    list.innerHTML = data.agents.map(a => `
+      <div class="bg-[#0f0f15] border border-gray-800 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold">${a.name.charAt(0)}</div>
+              <h3 class="font-semibold">${a.name}</h3>
+              <span class="text-xs ${a.status === 'active' ? 'text-green-400' : 'text-yellow-400'}">● ${a.status}</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1 ml-10">Model: ${a.model} · Tools: ${a.tools.join(', ') || 'none'}</p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openAgentChat('${a.name}')" class="text-xs bg-purple-600/20 text-purple-400 px-3 py-1.5 rounded hover:bg-purple-600/30">Chat</button>
+            <button onclick="deleteAgent('${a.name}')" class="text-xs text-red-400 hover:text-red-300">Delete</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { document.getElementById('agents-list').innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`; }
+}
+
+function showCreateAgent() { document.getElementById('agent-modal').classList.remove('hidden'); }
+function closeAgentModal() { document.getElementById('agent-modal').classList.add('hidden'); }
+
+async function createAgent() {
+  const name = document.getElementById('agent-name').value.trim();
+  const prompt = document.getElementById('agent-prompt').value.trim();
+  const model = document.getElementById('agent-model').value;
+  const temp = parseFloat(document.getElementById('agent-temp').value);
+  const tools = document.getElementById('agent-tools').value.split(',').map(t => t.trim()).filter(t => t);
+  if (!name || !prompt) return alert('Enter name and system prompt');
+  try {
+    await api('/agents', 'POST', {name, system_prompt: prompt, model, temperature: temp, tools});
+    closeAgentModal();
+    document.getElementById('agent-name').value = '';
+    document.getElementById('agent-prompt').value = '';
+    document.getElementById('agent-tools').value = '';
+    loadAgents();
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteAgent(name) {
+  if (!confirm('Delete agent "' + name + '"?')) return;
+  try { await api(`/agents/${name}`, 'DELETE'); loadAgents(); }
+  catch(e) { alert('Error: ' + e.message); }
+}
+
+function openAgentChat(name) {
+  currentChatAgent = name;
+  document.getElementById('agent-chat-title').textContent = 'Chat with ' + name;
+  document.getElementById('agent-chat-messages').innerHTML = '';
+  document.getElementById('agent-chat-modal').classList.remove('hidden');
+}
+
+function closeAgentChat() {
+  document.getElementById('agent-chat-modal').classList.add('hidden');
+  currentChatAgent = null;
+}
+
+async function sendAgentMessage() {
+  const input = document.getElementById('agent-chat-input');
+  const msg = input.value.trim();
+  if (!msg || !currentChatAgent) return;
+  input.value = '';
+  const messages = document.getElementById('agent-chat-messages');
+  messages.innerHTML += `<div class="bg-purple-600/10 rounded-lg p-3 ml-8 text-sm">${msg}</div>`;
+  messages.innerHTML += `<div id="agent-thinking" class="text-gray-500 text-sm p-3">Thinking...</div>`;
+  messages.scrollTop = messages.scrollHeight;
+  try {
+    const data = await api(`/agents/${currentChatAgent}/invoke`, 'POST', {message: msg});
+    document.getElementById('agent-thinking').remove();
+    messages.innerHTML += `<div class="bg-[#0a0a0f] border border-gray-800 rounded-lg p-3 mr-8 text-sm"><span class="text-purple-400 text-xs">Agent · ${data.tokens} tokens</span><p class="mt-1">${data.response.replace(/\n/g, '<br>')}</p></div>`;
+    messages.scrollTop = messages.scrollHeight;
+  } catch(e) {
+    document.getElementById('agent-thinking').remove();
+    messages.innerHTML += `<div class="text-red-400 text-sm p-3">Error: ${e.message}</div>`;
+  }
+}
+
+// Enter key for agent chat
+document.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter' && document.activeElement?.id === 'agent-chat-input') {
+    sendAgentMessage();
+  }
+});
 
 // ─── Init ───
 checkHealth();

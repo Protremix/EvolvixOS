@@ -27,6 +27,7 @@ from entities.manager import EntityManager
 from entities.crud import EntityCRUD as EnhancedCRUD
 from auth.middleware import optional_auth, require_auth, require_admin, get_user_from_token
 from workflows.engine import WorkflowEngine
+from agents.manager import AgentManager
 
 # ─── App ───
 app = FastAPI(
@@ -69,6 +70,24 @@ class WorkflowCreate(BaseModel):
     definition: dict
     trigger_type: str = Field(..., description="scheduled | entity | connector")
     trigger_config: Optional[dict] = None
+
+class AgentCreate(BaseModel):
+    name: str = Field(..., description="Agent name")
+    system_prompt: str = Field(..., description="System prompt for the agent")
+    model: str = Field("qwen2.5:7b", description="Ollama model")
+    temperature: float = Field(0.7, description="Temperature 0-1")
+    tools: list = Field(default_factory=list, description="Available tools")
+
+class AgentUpdate(BaseModel):
+    system_prompt: Optional[str] = None
+    model: Optional[str] = None
+    temperature: Optional[float] = None
+    tools: Optional[list] = None
+    status: Optional[str] = None
+
+class AgentInvoke(BaseModel):
+    message: str = Field(..., description="Message to the agent")
+    context: Optional[dict] = None
 
 class ChatMessage(BaseModel):
     message: str
@@ -343,6 +362,62 @@ async def filter_records(name: str, filter_req: dict, db=Depends(get_db)):
         return result
     except Exception as e:
         raise HTTPException(500, str(e))
+
+
+# ─── Agents ───
+@app.get("/api/agents")
+async def list_agents(db=Depends(get_db)):
+    """List all AI agents."""
+    agents = await AgentManager.list_agents(db)
+    return {"agents": agents}
+
+@app.post("/api/agents")
+async def create_agent(agent: AgentCreate, db=Depends(get_db)):
+    """Create a new AI agent with custom system prompt."""
+    try:
+        return await AgentManager.create_agent(db, agent.name, agent.system_prompt,
+            agent.model, agent.temperature, agent.tools)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@app.get("/api/agents/{name}")
+async def get_agent(name: str, db=Depends(get_db)):
+    """Get agent details including system prompt and memory."""
+    agent = await AgentManager.get_agent(db, name)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+    return agent
+
+@app.put("/api/agents/{name}")
+async def update_agent(name: str, updates: AgentUpdate, db=Depends(get_db)):
+    """Update agent configuration."""
+    try:
+        update_data = {k: v for k, v in updates.dict().items() if v is not None}
+        return await AgentManager.update_agent(db, name, update_data)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@app.delete("/api/agents/{name}")
+async def delete_agent(name: str, db=Depends(get_db)):
+    """Delete an agent."""
+    try:
+        return await AgentManager.delete_agent(db, name)
+    except ValueError as e:
+        raise HTTPException(404, str(e))
+
+@app.post("/api/agents/{name}/invoke")
+async def invoke_agent(name: str, msg: AgentInvoke, db=Depends(get_db)):
+    """Invoke an agent — send a message and get a response."""
+    try:
+        return await AgentManager.invoke_agent(db, name, msg.message, msg.context)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@app.post("/api/agents/{name}/clear-memory")
+async def clear_agent_memory(name: str, db=Depends(get_db)):
+    """Clear agent conversation memory."""
+    return await AgentManager.clear_memory(db, name)
+
 
 # ─── File Storage ───
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/opt/evolvixos/uploads")
