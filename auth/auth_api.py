@@ -531,6 +531,115 @@ class AuthHandler(BaseHTTPRequestHandler):
             return
 
         # ─── API Keys (POST) ───
+        if path == "/auth/forgot-password":
+            email = body.get("email", "").lower().strip()
+            if not email:
+                self._send_json(400, {"error": "Email required"})
+                return
+            
+            conn = sqlite3.connect(DB_PATH)
+            c = conn.cursor()
+            c.execute("SELECT id, display_name FROM users WHERE email=?", (email,))
+            row = c.fetchone()
+            if not row:
+                # Don't reveal if email exists or not
+                self._send_json(200, {"ok": True, "message": "If the email exists, a reset code has been sent."})
+                return
+            
+            user_id, display_name = row
+            otp_code = generate_otp()
+            otp_expires = (datetime.utcnow() + timedelta(minutes=10)).isoformat()
+            
+            c.execute("UPDATE users SET otp_code=?, otp_expires=?, otp_attempts=0 WHERE id=?",
+                       (otp_code, otp_expires, user_id))
+            conn.commit()
+            conn.close()
+            
+            # Send reset code via Brevo
+            try:
+                import urllib.request
+                BREVO_API_KEY = os.environ.get("BREVO_API_KEY", os.environ.get("BRAVO_API_KEY", ""))
+                SENDER_EMAIL = os.environ.get("SMTP_USER", "support@evolvixos.com")
+                SENDER_NAME = "EvolvixOS Support"
+                
+                html_content = f"""<html><body style='font-family:Inter,Arial,sans-serif;background:#0a0a0f;color:#fff;padding:40px;'><div style='max-width:480px;margin:0 auto;background:#111113;border:1px solid #1f1f23;border-radius:16px;padding:40px;'><h1 style='color:#8b5cf6;margin-bottom:8px;'>Password Reset</h1><p style='color:#ccc;font-size:16px;margin-bottom:24px;'>Hello {display_name or "there"},</p><p style='color:#ccc;font-size:15px;margin-bottom:20px;'>You requested a password reset for your EvolvixOS account. Use the code below to reset your password:</p><div style='background:#0a0a0f;border:1px solid #1f1f23;border-radius:12px;padding:24px;text-align:center;margin:24px 0;'><span style='font-size:32px;font-weight:700;color:#8b5cf6;letter-spacing:8px;'>{otp_code}</span></div><p style='color:#888;font-size:13px;'>This code expires in 10 minutes. If you didn't request this, you can safely ignore this email.</p></div></body></html>"""
+                
+                payload = json.dumps({
+                    "sender": {"email": SENDER_EMAIL, "name": SENDER_NAME},
+                    "to": [{"email": email}],
+                    "subject": f"EvolvixOS Password Reset Code: {otp_code}",
+                    "htmlContent": html_content,
+                    "textContent": f"Your EvolvixOS password reset code is: {otp_code}\n\nThis code expires in 10 minutes."
+                }).encode()
+                
+                req = urllib.request.Request("https://api.brevo.com/v3/smtp/email", data=payload, headers={
+                    "Content-Type": "application/json",
+                    "api-key": BREVO_API_KEY
+                })
+                urllib.request.urlopen(req, timeout=15)
+                logger.info(f"Password reset OTP sent to {email}")
+            except Exception as e:
+                logger.error(f"Failed to send reset email: {e}")
+            
+            self._send_json(200, {"ok": True, "message": "If the email exists, a reset code has been sent."})
+            return
+
+        if path == "/auth/reset-password":
+            email = body.get("email", "").lower().strip()
+            otp = body.get("otp", "").strip()
+            new_password = body.get("new_password", "").strip()
+            
+            if not email or not otp or not new_password:
+                self._send_json(400, {"error": "Email, reset code, and new password are required"})
+                return
+            
+            if len(new_password) < 8:
+                self._send_json(400, {"error": "Password must be at least 8 characters"})
+                return
+            
+            conn = sqlite3.connect(DB_PATH)
+            c = conn.cursor()
+            c.execute("SELECT id, otp_code, otp_expires, otp_attempts FROM users WHERE email=?", (email,))
+            row = c.fetchone()
+            if not row:
+                self._send_json(400, {"error": "Invalid email or reset code"})
+                return
+            
+            user_id, stored_otp, otp_expires, otp_attempts = row
+            
+            # Check OTP expiry
+            if not otp_expires:
+                self._send_json(400, {"error": "No reset code found. Please request a new one."})
+                return
+            
+            expires_dt = datetime.fromisoformat(otp_expires)
+            if datetime.utcnow() > expires_dt:
+                self._send_json(400, {"error": "Reset code expired. Please request a new one."})
+                return
+            
+            # Check attempts
+            if otp_attempts >= 5:
+                self._send_json(400, {"error": "Too many attempts. Please request a new reset code."})
+                return
+            
+            # Verify OTP
+            if otp != stored_otp:
+                c.execute("UPDATE users SET otp_attempts=otp_attempts+1 WHERE id=?", (user_id,))
+                conn.commit()
+                remaining = 5 - (otp_attempts + 1)
+                self._send_json(400, {"error": f"Invalid reset code. {remaining} attempt(s) left."})
+                return
+            
+            # Update password
+            new_hash = hash_password(new_password)
+            c.execute("UPDATE users SET password_hash=?, otp_code=NULL, otp_expires=NULL, otp_attempts=0 WHERE id=?",
+                       (new_hash, user_id))
+            conn.commit()
+            conn.close()
+            
+            self._send_json(200, {"ok": True, "message": "Password reset successfully! You can now login with your new password."})
+            return
+
         if path == "/auth/api-keys/generate":
             user_id = is_authorized(self)
             if not user_id:
