@@ -8,6 +8,7 @@ import GlobalSearch from './components/GlobalSearch';
 // Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Verify from './pages/Verify';
 import Dashboard from './pages/Dashboard';
 import Webhooks from './pages/Webhooks';
 import SystemSettings from './pages/SystemSettings';
@@ -61,6 +62,7 @@ function App() {
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/verify" element={<Verify />} />
       <Route path="/" element={<Landing />} />
 
       {/* Protected Routes Wrapper */}

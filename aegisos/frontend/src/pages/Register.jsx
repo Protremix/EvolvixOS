@@ -7,6 +7,7 @@ const Register = () => {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -14,31 +15,18 @@ const Register = () => {
     setLoading(true);
     setError("");
     try {
-      // Register
-      const res = await fetch("/api/v1/auth/register", {
+      const res = await fetch("/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, full_name: name }),
+        body: JSON.stringify({ email, password, display_name: name }),
       });
-      if (!res.ok) throw new Error("Registration failed");
-      
-      // Auto-login after register
-      const formData = new URLSearchParams();
-      formData.append("email", email);
-      formData.append("password", password);
-      const loginRes = await fetch("/api/v1/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: formData,
-      });
-      if (loginRes.ok) {
-        const loginData = await loginRes.json();
-        localStorage.setItem("evolvixos_token", loginData.access_token);
-        localStorage.setItem("evolvixos_user", JSON.stringify({ email, full_name: name }));
-        navigate("/dashboard");
-      } else {
-        navigate("/login");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Registration failed");
       }
+
+      // Backend requires OTP verification before login — go to verify page
+      navigate("/verify", { state: { email } });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -88,8 +76,9 @@ const Register = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               className="w-full px-4 py-2.5 bg-[#0a0a0b] border border-[#1f1f23] rounded-lg text-white placeholder-gray-600 focus:outline-none focus:border-teal-400/50 focus:ring-1 focus:ring-teal-400/20 transition-all"
-              placeholder="••••••••"
+              placeholder="•••••••• (min 6 chars)"
             />
           </div>
           <button
