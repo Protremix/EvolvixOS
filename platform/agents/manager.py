@@ -84,12 +84,12 @@ class AgentManager:
             "identity_doc": row[14] or "",
             "share_enabled": row[15] if row[15] is not None else False,
             "share_link": row[16] or "",
-            "collaborators": json.loads(row[17]) if row[17] else [],
-            "channel_config": json.loads(row[18]) if row[18] else {},
+            "collaborators": row[17] if isinstance(row[17], (list, dict)) else (json.loads(row[17]) if row[17] else []),
+            "channel_config": row[18] if isinstance(row[18], (list, dict)) else (json.loads(row[18]) if row[18] else {}),
             "allow_update_data": row[19] if row[19] is not None else False,
             "allow_delete_data": row[20] if row[20] is not None else False,
             "auto_detect_secrets": row[21] if row[21] is not None else True,
-            "agent_secrets": json.loads(row[22]) if row[22] else {},
+            "agent_secrets": row[22] if isinstance(row[22], (list, dict)) else (json.loads(row[22]) if row[22] else {}),
             "api_key": row[23] or "",
             "created_date": row[24].isoformat() if row[24] else None
         }
