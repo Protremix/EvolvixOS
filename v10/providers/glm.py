@@ -43,10 +43,10 @@ class GLMProvider(LLMProvider):
     # Model selection by task — default to free flash model
     models_by_task = {
         "chat": "glm-4.5-flash",       # Free — general chat
-        "code": "glm-4.5-flash",       # Free — coding (upgrades to 5.3 if key supports it)
+        "code": "glm-4.5-flash",       # Free — coding
         "reasoning": "glm-4.5-flash",  # Free — reasoning
         "simple": "glm-4.5-flash",    # Free — quick responses
-        "complex": "glm-5.3",          # Paid — flagship coding (falls back to flash)
+        "complex": "glm-4.5-flash",   # Free — complex (5.3 needs paid plan)
     }
     default_model = "glm-4.5-flash"
 
@@ -108,8 +108,8 @@ class GLMProvider(LLMProvider):
         except urllib.error.HTTPError as e:
             error_body = e.read().decode() if e.fp else ""
             logger.error(f"GLM API error {e.code}: {error_body[:500]}")
-            # If 5.3 fails (paid model), fall back to free flash
-            if _model != "glm-4.5-flash" and ("401" in str(e.code) or "403" in str(e.code)):
+            # If paid model fails (401/403/429), fall back to free flash
+            if _model != "glm-4.5-flash" and e.code in (401, 402, 403, 429):
                 logger.info("GLM: Falling back from %s to glm-4.5-flash (free)", _model)
                 return self.chat(messages, tools, stream, temperature, max_tokens, "glm-4.5-flash")
             raise RuntimeError(f"GLM API error {e.code}: {error_body[:200]}")
