@@ -23,7 +23,10 @@ from sqlalchemy import text
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from database import get_db, init_db, async_session
-from entities.manager import EntityManager, EntityCRUD
+from entities.manager import EntityManager
+from entities.crud import EntityCRUD as EnhancedCRUD
+from auth.middleware import optional_auth, require_auth, require_admin, get_user_from_token
+from workflows.engine import WorkflowEngine
 
 # ─── App ───
 app = FastAPI(
@@ -138,7 +141,7 @@ async def list_records(
         # Extract filters from query params
         filters = {}
         # Note: In a real implementation, we'd extract non-standard query params
-        result = await EntityCRUD.list_records(db, name, limit=limit, skip=skip, filters=filters, sort=sort)
+        result = await EnhancedCRUD.list_records(db, name, limit=limit, skip=skip, filters=filters, sort=sort)
         return result
     except Exception as e:
         raise HTTPException(500, str(e))
@@ -147,14 +150,14 @@ async def list_records(
 async def create_record(name: str, record: RecordCreate, db=Depends(get_db)):
     """Create a new entity record."""
     try:
-        return await EntityCRUD.create_record(db, name, record.data)
+        return await EnhancedCRUD.create_record(db, name, record.data)
     except ValueError as e:
         raise HTTPException(400, str(e))
 
 @app.get("/api/entities/{name}/records/{record_id}")
 async def get_record(name: str, record_id: int, db=Depends(get_db)):
     """Get a single entity record."""
-    record = await EntityCRUD.get_record(db, name, record_id)
+    record = await EnhancedCRUD.get_record(db, name, record_id)
     if not record:
         raise HTTPException(404, f"Record {record_id} not found")
     return record
@@ -163,7 +166,7 @@ async def get_record(name: str, record_id: int, db=Depends(get_db)):
 async def update_record(name: str, record_id: int, record: RecordUpdate, db=Depends(get_db)):
     """Update an entity record."""
     try:
-        return await EntityCRUD.update_record(db, name, record_id, record.data)
+        return await EnhancedCRUD.update_record(db, name, record_id, record.data)
     except ValueError as e:
         raise HTTPException(400, str(e))
 
@@ -171,7 +174,7 @@ async def update_record(name: str, record_id: int, record: RecordUpdate, db=Depe
 async def delete_record(name: str, record_id: int, db=Depends(get_db)):
     """Delete an entity record."""
     try:
-        return await EntityCRUD.delete_record(db, name, record_id)
+        return await EnhancedCRUD.delete_record(db, name, record_id)
     except ValueError as e:
         raise HTTPException(400, str(e))
 
@@ -294,6 +297,52 @@ async def delete_workflow(name: str, db=Depends(get_db)):
     await db.commit()
     return {"name": name, "deleted": True}
 
+
+
+# ─── Workflow Execution ───
+@app.post("/api/workflows/{name}/execute")
+async def execute_workflow(name: str, db=Depends(get_db)):
+    """Manually execute a workflow."""
+    result = await WorkflowEngine.execute_workflow(db, name)
+    return result
+
+@app.get("/api/workflows/{name}/logs")
+async def workflow_logs(name: str, limit: int = 10, db=Depends(get_db)):
+    """Get workflow execution logs."""
+    result = await db.execute(text(
+        "SELECT id, results, executed_at FROM platform_workflow_logs WHERE workflow_name = :name ORDER BY executed_at DESC LIMIT :limit"
+    ), {"name": name, "limit": limit})
+    rows = result.fetchall()
+    return {"logs": [{"id": r[0], "results": r[1] if isinstance(r[1], dict) else json.loads(r[1] or "{}"), "executed_at": r[2].isoformat() if r[2] else None} for r in rows]}
+
+
+# ─── Entity Aggregation ───
+class AggregationPipeline(BaseModel):
+    pipeline: list = Field(..., description="MongoDB-style aggregation pipeline")
+
+@app.post("/api/entities/{name}/aggregate")
+async def aggregate_entity(name: str, agg: AggregationPipeline, db=Depends(get_db)):
+    """Run aggregation pipeline on entity (group by, count, sum, avg)."""
+    try:
+        result = await EnhancedCRUD.aggregate(db, name, agg.pipeline)
+        return {"result": result}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+# ─── Enhanced filter endpoint ───
+@app.post("/api/entities/{name}/filter")
+async def filter_records(name: str, filter_req: dict, db=Depends(get_db)):
+    """Filter entity records with operators. POST body: {"filters": {"priority": {"operator": "gte", "value": 3}}, "limit": 50, "skip": 0, "sort": "-created_date"}"""
+    try:
+        filters = filter_req.get("filters", {})
+        limit = filter_req.get("limit", 50)
+        skip = filter_req.get("skip", 0)
+        sort = filter_req.get("sort")
+        result = await EnhancedCRUD.list_records(db, name, limit=limit, skip=skip, filters=filters, sort=sort)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
 
 # ─── File Storage ───
 UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/opt/evolvixos/uploads")
