@@ -219,8 +219,9 @@ class EntityCRUD:
                         for op_type, field in op.items():
                             field = field.replace("$", "").replace("data.", "") if isinstance(field, str) else str(field)
                             if op_type == "$sum":
-                                if field:
-                                    aggregations.append(f'SUM("{field}") AS {alias}')
+                                if isinstance(field, str) and field.startswith("$"):
+                                    field_clean = field.replace("$", "").replace("data.", "")
+                                    aggregations.append(f'SUM("{field_clean}") AS {alias}')
                                 else:
                                     aggregations.append(f'COUNT(*) AS {alias}')
                             elif op_type == "$avg":
