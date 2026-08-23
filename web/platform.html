@@ -403,7 +403,7 @@ select option { background: #0a0a0f; }
       </div>
 
       <!-- Agents Page -->
-      <div id="page-agents" class="page p-6 max-w-5xl mx-auto">
+      <div id="page-agents" class="page flex h-full" style="max-height: calc(100vh - 3rem);">
         <div class="flex items-center justify-between mb-8">
           <div>
             <h2 class="text-2xl font-bold">AI Agents</h2>
@@ -1099,29 +1099,22 @@ async function loadAgents() {
     const data = await api('/agents');
     const list = document.getElementById('agents-list');
     if (!data.agents || data.agents.length === 0) {
-      list.innerHTML = `<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg></div><p class="text-gray-500 text-sm">No agents yet.</p></div>`;
+      list.innerHTML = `<div class="px-4 py-8 text-center"><div class="w-12 h-12 rounded-xl bg-gray-800/30 mx-auto mb-3 flex items-center justify-center"><svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg></div><p class="text-gray-500 text-xs">No agents yet.<br>Click + to create one.</p></div>`;
       return;
     }
     list.innerHTML = data.agents.map(a => `
-      <div class="entity-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg>
-            </div>
-            <div>
-              <h3 class="font-semibold text-sm">${a.name}</h3>
-              <p class="text-xs text-gray-600 mt-0.5">Model: ${a.model} · Tools: ${(a.tools || []).join(', ') || 'none'}</p>
-            </div>
-          </div>
-          <div class="flex gap-2">
-            <button onclick="openAgentChat('${a.name}')" class="text-xs bg-gray-800/60 hover:bg-gray-700 px-3 py-1.5 rounded-lg transition-colors">Chat</button>
-            <button onclick="deleteAgent('${a.name}')" class="text-xs text-red-400/40 hover:text-red-400 transition-colors">Delete</button>
-          </div>
+      <a class="agent-list-item nav-item flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-agent="${a.name}" onclick="openAgentChat('${a.name}')">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center shrink-0">
+          <span class="text-[10px] font-bold text-purple-400">${a.name.charAt(0).toUpperCase()}</span>
         </div>
-      </div>
+        <div class="flex-1 min-w-0">
+          <div class="truncate">${a.name}</div>
+          <div class="text-[10px] text-gray-600 truncate">${a.model} · ${(a.tools||[]).length} tools</div>
+        </div>
+        <button onclick="event.stopPropagation(); deleteAgent('${a.name}')" class="text-red-400/30 hover:text-red-400 text-xs shrink-0 transition-colors" title="Delete">×</button>
+      </a>
     `).join('');
-  } catch(e) { document.getElementById('agents-list').innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`; }
+  } catch(e) { document.getElementById('agents-list').innerHTML = `<p class="text-red-400 text-xs p-4">Error: ${e.message}</p>`; }
 }
 
 function showCreateAgent() { document.getElementById('agent-modal').classList.remove('hidden'); }
@@ -1143,37 +1136,131 @@ async function createAgent() {
 }
 
 let currentAgent = null;
-function openAgentChat(name) {
+let currentAgentData = null;
+
+async function openAgentChat(name) {
   currentAgent = name;
+  // Get agent details
+  try {
+    const data = await api(`/agents/${name}`);
+    currentAgentData = data;
+  } catch(e) { currentAgentData = {name}; }
+  
+  // Show chat panel
+  document.getElementById('agent-chat-empty').classList.add('hidden');
+  document.getElementById('agent-chat-active').classList.remove('hidden');
   document.getElementById('agent-chat-title').textContent = name;
+  document.getElementById('agent-chat-avatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('agent-chat-model').textContent = currentAgentData?.model || 'auto';
   document.getElementById('agent-chat-messages').innerHTML = '';
-  document.getElementById('agent-chat-modal').classList.remove('hidden');
+  
+  // Load past conversation history for this agent
+  try {
+    const histData = await api('/entities/ChatHistory/records');
+    const agentMsgs = (histData.records || []).filter(r => r.agent_name === name);
+    if (agentMsgs.length > 0) {
+      agentMsgs.forEach(r => {
+        addAgentChatBubble(r.role, r.content);
+      });
+    } else {
+      // Show welcome message
+      addAgentChatBubble('system', `Hi! I'm **${name}**. ${currentAgentData?.system_prompt ? currentAgentData.system_prompt.split('\n')[0].slice(0, 100) : 'How can I help you today?'}'}`);
+    }
+  } catch(e) {
+    addAgentChatBubble('system', `Hi! I'm **${name}**. How can I help you?`);
+  }
+  
+  // Highlight active agent in list
+  document.querySelectorAll('.agent-list-item').forEach(el => el.classList.remove('active'));
+  const activeEl = document.querySelector(`.agent-list-item[data-agent="${name}"]`);
+  if (activeEl) activeEl.classList.add('active');
+  
+  // Focus input
+  setTimeout(() => document.getElementById('agent-chat-input')?.focus(), 100);
 }
-function closeAgentChat() { document.getElementById('agent-chat-modal').classList.add('hidden'); }
+
+function closeAgentChat() {
+  document.getElementById('agent-chat-active').classList.add('hidden');
+  document.getElementById('agent-chat-empty').classList.remove('hidden');
+  currentAgent = null;
+  document.querySelectorAll('.agent-list-item').forEach(el => el.classList.remove('active'));
+}
+
+function addAgentChatBubble(role, content) {
+  const msgs = document.getElementById('agent-chat-messages');
+  if (!msgs) return;
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + (role === 'user'
+    ? 'flex justify-end'
+    : '');
+  if (role === 'user') {
+    div.innerHTML = `<div class="bg-purple-600/15 border border-purple-800/20 rounded-2xl rounded-br-md px-4 py-3 text-sm max-w-md"><p class="text-gray-200">${content}</p></div>`;
+  } else {
+    div.innerHTML = `<div class="flex items-start gap-2.5"><div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0"><span class="text-[10px] font-bold text-white">${(currentAgent||'A').charAt(0)}</span></div><div class="bg-[#0c0c12] border border-gray-800/60 rounded-2xl rounded-bl-md px-4 py-3 text-sm max-w-md"><p class="text-gray-300">${content}</p></div></div>`;
+  }
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
 
 async function sendAgentMessage() {
   const input = document.getElementById('agent-chat-input');
   const msg = input.value.trim();
   if (!msg || !currentAgent) return;
   input.value = '';
-  const msgs = document.getElementById('agent-chat-messages');
-  const userDiv = document.createElement('div');
-  userDiv.className = 'chat-msg bg-purple-600/8 border border-purple-800/20 rounded-xl p-3 text-sm ml-12';
-  userDiv.innerHTML = `<p class="text-gray-300">${msg}</p>`;
-  msgs.appendChild(userDiv);
+  input.style.height = '38px';
+  
+  addAgentChatBubble('user', msg);
   saveChatMessage('user', msg, null, null, currentAgent);
-  const aiDiv = document.createElement('div');
-  aiDiv.className = 'chat-msg bg-[#0c0c12] border border-gray-800/60 rounded-xl p-3 text-sm';
-  aiDiv.innerHTML = `<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>`;
-  msgs.appendChild(aiDiv);
+  
+  // Typing indicator
+  const msgs = document.getElementById('agent-chat-messages');
+  const typingDiv = document.createElement('div');
+  typingDiv.id = 'agent-typing';
+  typingDiv.className = 'chat-msg';
+  typingDiv.innerHTML = `<div class="flex items-start gap-2.5"><div class="w-7 h-7 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0"><span class="text-[10px] font-bold text-white">${currentAgent.charAt(0)}</span></div><div class="bg-[#0c0c12] border border-gray-800/60 rounded-2xl rounded-bl-md px-4 py-3"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div></div>`;
+  msgs.appendChild(typingDiv);
+  msgs.scrollTop = msgs.scrollHeight;
+  
   try {
     const data = await api(`/agents/${currentAgent}/invoke`, 'POST', {message: msg});
+    document.getElementById('agent-typing')?.remove();
     const agentResponse = data.response || data.message || JSON.stringify(data);
-    aiDiv.innerHTML = `<p class="text-gray-300">${agentResponse}</p>`;
+    addAgentChatBubble('system', agentResponse);
     saveChatMessage('system', agentResponse, null, null, currentAgent);
-  } catch(e) { aiDiv.innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`; }
-  msgs.scrollTop = msgs.scrollHeight;
+    // Update model display
+    if (data.model) document.getElementById('agent-chat-model').textContent = data.model;
+  } catch(e) {
+    document.getElementById('agent-typing')?.remove();
+    addAgentChatBubble('system', `Error: ${e.message}`);
+  }
 }
+
+async function clearAgentMemory() {
+  if (!currentAgent) return;
+  if (!confirm(`Clear conversation memory for ${currentAgent}?`)) return;
+  try {
+    await api(`/agents/${currentAgent}/clear-memory`, 'POST');
+    document.getElementById('agent-chat-messages').innerHTML = '';
+    addAgentChatBubble('system', 'Memory cleared. Starting fresh.');
+    toast('Agent memory cleared', 'success');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// Auto-resize agent chat input
+document.addEventListener('input', (e) => {
+  if (e.target?.id === 'agent-chat-input') {
+    e.target.style.height = '38px';
+    e.target.style.height = Math.min(e.target.scrollHeight, 128) + 'px';
+  }
+});
+
+// Enter to send on agent chat
+document.addEventListener('keydown', (e) => {
+  if (e.target?.id === 'agent-chat-input' && e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendAgentMessage();
+  }
+});
 
 async function deleteAgent(name) {
   if (!confirm(`Delete agent '${name}'?`)) return;
