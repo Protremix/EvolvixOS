@@ -148,6 +148,105 @@ async function revokeSession(id) {
   if (data.message) { toast('Session revoked', 'success'); loadSessions(user.token); }
 }
 
+
+// Billing
+async function loadBilling() {
+  try {
+    var raw = localStorage.getItem('evolvixos_user');
+    if (!raw) return;
+    var user = JSON.parse(raw);
+    var token = user.token || '';
+
+    // Load plans
+    var plansResp = await fetch('https://evolvixos.com/auth/plans');
+    var plansData = await plansResp.json();
+    var plans = plansData.plans || [];
+
+    // Load subscription
+    var subResp = await fetch('https://evolvixos.com/auth/subscription', { headers: { 'Authorization': 'Bearer ' + token } });
+    var sub = await subResp.json();
+
+    // Load credits
+    var creditsResp = await fetch('https://evolvixos.com/auth/credits', { headers: { 'Authorization': 'Bearer ' + token } });
+    var credits = await creditsResp.json();
+
+    // Current plan banner
+    document.getElementById('current-plan-name').textContent = sub.plan_name || 'Free';
+    document.getElementById('current-credits-display').textContent = (credits.remaining || 0) + ' credits remaining';
+    document.getElementById('current-credits-used').textContent = credits.used || 0;
+    document.getElementById('current-period-end').textContent = sub.period_end ? sub.period_end.split(' ')[0] : '--';
+    var pct = sub.credits_monthly > 0 ? ((credits.used || 0) / sub.credits_monthly * 100) : 0;
+    document.getElementById('credits-bar').style.width = Math.min(pct, 100) + '%';
+
+    // Plans grid
+    var grid = document.getElementById('plans-grid');
+    grid.innerHTML = plans.map(function(p) {
+      var isCurrent = p.name === sub.plan_name;
+      var priceStr = p.price_monthly === 0 ? 'Free' : '$' + p.price_monthly + '/mo';
+      var yearStr = p.price_yearly > 0 ? '$' + p.price_yearly + '/yr' : '';
+      var features = (p.features || []).map(function(f) { return '<div class="flex items-center gap-2 text-sm text-gray-400"><svg class="w-3.5 h-3.5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 011.4-1.4l3.3 3.3 7.3-7.3a1 1 0 011.4 0z"/></svg>' + f + '</div>'; }).join('');
+      return '<div class="bg-[#0c0c12] border ' + (isCurrent ? 'border-purple-600' : 'border-gray-800') + ' rounded-xl p-5 flex flex-col' + (p.name === 'Pro' ? ' ring-2 ring-purple-600/30' : '') + '">' +
+        '<div class="text-lg font-bold mb-1">' + p.name + (isCurrent ? ' <span class="text-xs text-green-400">Current</span>' : '') + '</div>' +
+        '<div class="text-3xl font-bold mb-1">' + priceStr + '</div>' +
+        (yearStr ? '<div class="text-xs text-gray-500 mb-3">' + yearStr + '</div>' : '<div class="mb-3"></div>') +
+        '<div class="text-sm text-purple-400 mb-3">' + p.credits_monthly + ' credits/mo</div>' +
+        '<div class="space-y-1.5 mb-4 flex-1">' + features + '</div>' +
+        (isCurrent ? '<button disabled class="w-full py-2 bg-gray-800 rounded-lg text-sm text-gray-500">Current Plan</button>' :
+          '<button onclick="subscribe(\'' + p.name + '\')" class="w-full py-2 ' + (p.price_monthly === 0 ? 'bg-gray-800' : 'btn-primary') + ' rounded-lg text-sm font-medium hover:opacity-90">' + (p.price_monthly === 0 ? 'Downgrade' : 'Upgrade to ' + p.name) + '</button>') +
+        '</div>';
+    }).join('');
+
+    // Billing history
+    var histResp = await fetch('https://evolvixos.com/auth/billing-history', { headers: { 'Authorization': 'Bearer ' + token } });
+    var hist = await histResp.json();
+    var histEl = document.getElementById('billing-history-list');
+    if (!hist.payments || !hist.payments.length) {
+      histEl.innerHTML = '<div class="text-xs text-gray-600 py-4">No billing history yet</div>';
+    } else {
+      histEl.innerHTML = hist.payments.map(function(p) {
+        return '<div class="flex items-center justify-between bg-[#0c0c12] border border-gray-800 rounded-lg p-3"><div><div class="text-sm">' + p.plan + ' (' + p.cycle + ')</div><div class="text-xs text-gray-500">' + (p.date || '') + '</div></div><div class="text-right"><div class="text-sm font-mono">$' + p.amount + '</div><div class="text-xs ' + (p.status === 'paid' ? 'text-green-400' : 'text-yellow-400') + '">' + p.status + '</div></div></div>';
+      }).join('');
+    }
+
+    // Credit usage history
+    var creditHist = credits.history || [];
+    var chEl = document.getElementById('credit-history-list');
+    if (!creditHist.length) {
+      chEl.innerHTML = '<div class="text-xs text-gray-600 py-4">No credit usage yet</div>';
+    } else {
+      chEl.innerHTML = creditHist.map(function(h) {
+        var isDebit = h.type === 'debit';
+        return '<div class="flex items-center justify-between text-sm py-1.5 border-b border-gray-800/30"><div class="flex items-center gap-2"><span class="' + (isDebit ? 'text-red-400' : 'text-green-400') + '">' + (isDebit ? '-' : '+') + h.amount + '</span><span class="text-gray-500 text-xs">' + (h.description || '') + '</span></div><span class="text-xs text-gray-600">' + (h.time || '') + '</span></div>';
+      }).join('');
+    }
+  } catch(e) { console.error('Billing load error:', e); }
+}
+
+async function subscribe(planName) {
+  var cycle = confirm('Monthly billing? Click OK for monthly, Cancel for yearly (20% off)') ? 'monthly' : 'yearly';
+  var raw = localStorage.getItem('evolvixos_user');
+  var user = JSON.parse(raw);
+  var resp = await fetch('https://evolvixos.com/auth/subscribe', {
+    method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plan: planName, cycle: cycle })
+  });
+  var data = await resp.json();
+  if (data.message) { toast('Subscribed to ' + planName + '!', 'success'); loadBilling(); }
+  else { toast('Error: ' + (data.error || 'Unknown'), 'error'); }
+}
+
+async function buyCredits(credits, price) {
+  var raw = localStorage.getItem('evolvixos_user');
+  var user = JSON.parse(raw);
+  var resp = await fetch('https://evolvixos.com/auth/buy-credits', {
+    method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ credits: credits, price: price })
+  });
+  var data = await resp.json();
+  if (data.message) { toast(data.message, 'success'); loadBilling(); }
+  else { toast('Error: ' + (data.error || 'Unknown'), 'error'); }
+}
+
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>

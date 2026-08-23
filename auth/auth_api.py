@@ -29,6 +29,80 @@ AUTH_DIR = "/opt/evolvixos/auth"
 os.makedirs(AUTH_DIR, exist_ok=True)
 
 # Rate limiting
+
+# ─── Billing & Credits ───
+MODEL_CREDIT_COST = {"free": 1, "cheap": 2, "standard": 5, "premium": 10, "ultra": 20}
+
+def get_model_tier(model_id):
+    model_lower = model_id.lower()
+    ultra = ["gemini-3.1-pro-preview", "claude-opus"]
+    premium = ["glm-5.2", "glm-5.3", "claude-sonnet-5", "gemini-3.1-pro", "kimi-k2.7", "nemotron-3-ultra"]
+    standard = ["glm-5", "kimi-k2", "qwen2.5"]
+    cheap = ["gpt-oss-20b", "gpt-oss-120b", "deepseek-v4-flash", "nemotron-3-super"]
+    for m in ultra:
+        if m in model_lower: return "ultra"
+    for m in premium:
+        if m in model_lower and ":free" not in model_lower: return "premium"
+    for m in standard:
+        if m in model_lower and ":free" not in model_lower and "5.2" not in model_lower: return "standard"
+    for m in cheap:
+        if m in model_lower: return "cheap"
+    if ":free" in model_lower: return "free"
+    return "standard"
+
+def deduct_credits(user_id, model_id, tokens_in=0, tokens_out=0):
+    tier = get_model_tier(model_id)
+    cost = MODEL_CREDIT_COST.get(tier, 5)
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("SELECT id, credits_remaining FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
+        row = c.fetchone()
+        if not row:
+            return {"ok": False, "error": "No active subscription"}
+        sub_id, remaining = row
+        if remaining < cost:
+            return {"ok": False, "error": "Insufficient credits", "remaining": remaining, "cost": cost}
+        new_balance = remaining - cost
+        c.execute("UPDATE subscriptions SET credits_remaining = ?, credits_used = credits_used + ? WHERE id = ?", (new_balance, cost, sub_id))
+        c.execute("INSERT INTO credit_transactions (user_id, amount, type, description, model_used, tokens_in, tokens_out, balance_after, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (user_id, cost, "debit", "API call: " + model_id, model_id, tokens_in, tokens_out, new_balance, time.strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+    return {"ok": True, "cost": cost, "remaining": new_balance, "tier": tier}
+
+def get_user_subscription(user_id):
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("SELECT s.id, s.credits_remaining, s.credits_used, s.current_period_end, p.name, p.price_monthly, p.credits_monthly, p.max_agents, p.max_entities, p.max_functions, p.max_workflows, p.allowed_models, p.features FROM subscriptions s JOIN plans p ON s.plan_id = p.id WHERE s.user_id = ? AND s.status = ?", (user_id, "active"))
+        row = c.fetchone()
+        if not row: return None
+        return {
+            "subscription_id": row[0], "credits_remaining": row[1], "credits_used": row[2],
+            "period_end": row[3], "plan_name": row[4], "price": row[5],
+            "credits_monthly": row[6], "max_agents": row[7], "max_entities": row[8],
+            "max_functions": row[9], "max_workflows": row[10],
+            "allowed_models": json.loads(row[11]) if row[11] else [],
+            "features": json.loads(row[12]) if row[12] else []
+        }
+
+def check_resource_limit(user_id, resource_type):
+    limits_map = {"agent": "max_agents", "entity": "max_entities", "function": "max_functions", "workflow": "max_workflows"}
+    limit_col = limits_map.get(resource_type)
+    if not limit_col: return {"ok": True}
+    sub = get_user_subscription(user_id)
+    if not sub: return {"ok": False, "error": "No active subscription"}
+    limit = sub.get(limit_col, 0)
+    if limit >= 999: return {"ok": True}
+    import urllib.request
+    try:
+        url_map = {"agent": "agents", "entity": "entities", "function": "functions", "workflow": "workflows"}
+        resp = urllib.request.urlopen("http://127.0.0.1:8080/api/" + url_map.get(resource_type, ""))
+        count = len(json.loads(resp.read()).get(url_map.get(resource_type, []), []))
+    except: count = 0
+    if count >= limit:
+        return {"ok": False, "error": "Limit reached: " + str(limit) + " " + resource_type + "s on " + sub["plan_name"] + " plan. Upgrade to create more."}
+    return {"ok": True, "current": count, "limit": limit}
+
+
 RATE_LIMIT = defaultdict(list)  # ip -> [timestamps]
 MAX_REQUESTS = 10  # per 60 seconds per IP
 OTP_MAX_ATTEMPTS = 5  # max OTP attempts before lockout
@@ -347,6 +421,52 @@ class AuthHandler(BaseHTTPRequestHandler):
                 c.execute("SELECT id, token, created_date, expires, ip_address FROM user_sessions WHERE user_id = ? ORDER BY created_date DESC", (user_id,))
                 sessions = [{"id": r[0], "created": r[2], "expires": r[3], "ip": r[4] or "unknown"} for r in c.fetchall()]
             self._send_json(200, {"sessions": sessions})
+            return
+        if self.path == "/auth/plans":
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute("SELECT id, name, price_monthly, price_yearly, credits_monthly, max_agents, max_entities, max_functions, max_workflows, allowed_models, features, sort_order FROM plans WHERE is_active = 1 ORDER BY sort_order")
+                plans = []
+                for r in c.fetchall():
+                    plans.append({"id": r[0], "name": r[1], "price_monthly": r[2], "price_yearly": r[3], "credits_monthly": r[4], "max_agents": r[5], "max_entities": r[6], "max_functions": r[7], "max_workflows": r[8], "allowed_models": json.loads(r[9]) if r[9] else [], "features": json.loads(r[10]) if r[10] else [], "sort_order": r[11]})
+            self._send_json(200, {"plans": plans})
+            return
+        if self.path == "/auth/subscription":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            sub = get_user_subscription(user_id)
+            if not sub:
+                self._send_json(404, {"error": "No subscription"})
+                return
+            self._send_json(200, sub)
+            return
+        if self.path == "/auth/credits":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            sub = get_user_subscription(user_id)
+            if not sub:
+                self._send_json(404, {"error": "No subscription"})
+                return
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute("SELECT amount, type, description, model_used, timestamp FROM credit_transactions WHERE user_id = ? ORDER BY id DESC LIMIT 20", (user_id,))
+                history = [{"amount": r[0], "type": r[1], "description": r[2], "model": r[3], "time": r[4]} for r in c.fetchall()]
+            self._send_json(200, {"remaining": sub["credits_remaining"], "used": sub["credits_used"], "monthly_total": sub["credits_monthly"], "plan": sub["plan_name"], "history": history})
+            return
+        if self.path == "/auth/billing-history":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute("SELECT id, amount, currency, plan_name, billing_cycle, status, created_date, invoice_url FROM payments WHERE user_id = ? ORDER BY id DESC", (user_id,))
+                payments = [{"id": r[0], "amount": r[1], "currency": r[2], "plan": r[3], "cycle": r[4], "status": r[5], "date": r[6], "invoice": r[7]} for r in c.fetchall()]
+            self._send_json(200, {"payments": payments})
             return
         self._send_json(404, {"error": "Not found"})
 
@@ -750,6 +870,58 @@ class AuthHandler(BaseHTTPRequestHandler):
                 c.execute("DELETE FROM user_sessions WHERE id = ? AND user_id = ?", (body.get("session_id"), user_id))
                 conn.commit()
             self._send_json(200, {"message": "Session revoked"})
+            return
+        if path == "/auth/subscribe":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            plan_name = body.get("plan", "Free")
+            billing_cycle = body.get("cycle", "monthly")
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute("SELECT id, credits_monthly, price_monthly, price_yearly FROM plans WHERE name = ? AND is_active = 1", (plan_name,))
+                plan = c.fetchone()
+                if not plan:
+                    self._send_json(404, {"error": "Plan not found"})
+                    return
+                plan_id, credits, price_m, price_y = plan
+                price = price_y if billing_cycle == "yearly" else price_m
+                c.execute("SELECT id FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
+                existing = c.fetchone()
+                now = time.strftime("%Y-%m-%d %H:%M:%S")
+                days = 365 if billing_cycle == "yearly" else 30
+                period_end = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time() + days * 86400))
+                if existing:
+                    c.execute("UPDATE subscriptions SET plan_id = ?, billing_cycle = ?, credits_remaining = ?, current_period_start = ?, current_period_end = ?, updated_date = ? WHERE id = ?", (plan_id, billing_cycle, credits, now, period_end, now, existing[0]))
+                else:
+                    c.execute("INSERT INTO subscriptions (user_id, plan_id, status, billing_cycle, credits_remaining, credits_used, current_period_start, current_period_end, created_date, updated_date) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?)", (user_id, plan_id, "active", billing_cycle, credits, now, period_end, now, now))
+                if price > 0:
+                    c.execute("INSERT INTO payments (user_id, amount, currency, plan_name, billing_cycle, status, provider, created_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (user_id, price, "USD", plan_name, billing_cycle, "pending", "stripe", now))
+                conn.commit()
+            self._send_json(200, {"message": "Subscribed to " + plan_name, "plan": plan_name, "price": price, "credits": credits})
+            return
+        if path == "/auth/buy-credits":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            amount = body.get("credits", 1000)
+            pack_price = body.get("price", 5)
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                c.execute("SELECT id, credits_remaining FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
+                row = c.fetchone()
+                if not row:
+                    self._send_json(404, {"error": "No subscription"})
+                    return
+                sub_id, current = row
+                new_balance = current + amount
+                c.execute("UPDATE subscriptions SET credits_remaining = ? WHERE id = ?", (new_balance, sub_id))
+                c.execute("INSERT INTO credit_transactions (user_id, amount, type, description, timestamp) VALUES (?, ?, ?, ?, ?)", (user_id, amount, "credit", "Purchased credits", time.strftime("%Y-%m-%d %H:%M:%S")))
+                c.execute("INSERT INTO payments (user_id, amount, currency, plan_name, billing_cycle, status, provider, created_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", (user_id, pack_price, "USD", "Credit Pack", "one-time", "pending", "stripe", time.strftime("%Y-%m-%d %H:%M:%S")))
+                conn.commit()
+            self._send_json(200, {"message": "Added " + str(amount) + " credits", "new_balance": new_balance})
             return
         self._send_json(404, {"error": "Endpoint not found"})
 
