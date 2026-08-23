@@ -118,6 +118,14 @@ select option { background: #0a0a0f; }
 
       <div class="px-4 py-1 mt-4 text-[10px] text-gray-600 uppercase tracking-widest font-semibold">Data</div>
       <div id="entity-nav-items"></div>
+
+      <div class="px-4 py-1 mt-4 flex items-center justify-between">
+        <span class="text-[10px] text-gray-600 uppercase tracking-widest font-semibold">History</span>
+        <button onclick="startNewChat()" class="text-gray-600 hover:text-purple-400 transition-colors" title="New chat">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <div id="chat-history-list" class="pb-2"></div>
     </nav>
 
     <!-- Bottom -->
@@ -462,6 +470,8 @@ select option { background: #0a0a0f; }
 const API = '/platform/api';
 let currentEntity = null;
 let entitySchemas = {};
+let currentConversationId = null;
+let conversations = [];
 
 // ─── Toast notifications ───
 function toast(message, type='info') {
@@ -471,6 +481,95 @@ function toast(message, type='info') {
   div.textContent = message;
   document.getElementById('toast-container').appendChild(div);
   setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300); }, 3000);
+}
+
+// ─── Chat History ───
+async function saveChatMessage(role, content, action, model, agentName) {
+  try {
+    const convId = currentConversationId || ('conv-' + Date.now());
+    if (!currentConversationId) currentConversationId = convId;
+    const title = role === 'user' ? content.slice(0, 50) : '';
+    await api('/entities/ChatHistory/records', 'POST', {
+      data: {
+        role, content,
+        conversation_id: convId,
+        title: title || undefined,
+        model: model || undefined,
+        agent_name: agentName || undefined,
+        action: action || undefined,
+        timestamp: new Date().toISOString()
+      }
+    });
+    loadChatHistory();
+  } catch(e) { console.error('saveChatMessage:', e); }
+}
+
+async function loadChatHistory() {
+  try {
+    const data = await api('/entities/ChatHistory/records', 'GET');
+    const records = data.records || [];
+    // Group by conversation_id
+    const convMap = {};
+    records.forEach(r => {
+      const cid = r.conversation_id || 'unknown';
+      if (!convMap[cid]) convMap[cid] = { id: cid, title: 'Untitled', messages: [], lastTime: '', agent: '' };
+      convMap[cid].messages.push(r);
+      if (r.role === 'user' && !convMap[cid].titleSet) { convMap[cid].title = r.title || r.content.slice(0, 40); convMap[cid].titleSet = true; }
+      if (r.agent_name) convMap[cid].agent = r.agent_name;
+      const ts = r.timestamp || r.created_date || '';
+      if (ts > convMap[cid].lastTime) convMap[cid].lastTime = ts;
+    });
+    conversations = Object.values(convMap).sort((a,b) => (b.lastTime || '').localeCompare(a.lastTime || ''));
+    renderChatHistory();
+  } catch(e) { console.error('loadChatHistory:', e); }
+}
+
+function renderChatHistory() {
+  const list = document.getElementById('chat-history-list');
+  if (!list) return;
+  if (conversations.length === 0) {
+    list.innerHTML = '<div class="px-4 py-2 text-[11px] text-gray-700">No conversations yet</div>';
+    return;
+  }
+  list.innerHTML = conversations.map(c => {
+    const active = c.id === currentConversationId;
+    const time = c.lastTime ? new Date(c.lastTime).toLocaleDateString([], {month:'short',day:'numeric'}) : '';
+    const agentTag = c.agent ? '<span class="text-[9px] text-purple-400/60 ml-1">agent</span>' : '';
+    return `<a class="nav-item flex items-start gap-2 px-4 py-2 text-xs text-gray-500 cursor-pointer ${active?'active':''}" onclick="loadConversation('${c.id}')">
+      <svg class="w-3 h-3 mt-0.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span class="flex-1 truncate">${c.title}${agentTag}</span>
+      <span class="text-[9px] text-gray-700 shrink-0">${time}</span>
+    </a>`;
+  }).join('');
+}
+
+function startNewChat() {
+  currentConversationId = null;
+  document.getElementById('chat-messages').innerHTML = '';
+  document.getElementById('chat-messages').classList.add('hidden');
+  document.getElementById('builder-hero').classList.remove('hidden');
+  document.getElementById('builder-suggestions').classList.remove('hidden');
+  document.getElementById('builder-recent-section').classList.remove('hidden');
+  document.getElementById('chat-input').value = '';
+  document.getElementById('chat-input').focus();
+  renderChatHistory();
+  navigateTo('chat');
+}
+
+async function loadConversation(convId) {
+  currentConversationId = convId;
+  navigateTo('chat');
+  try {
+    const data = await api('/entities/ChatHistory/records');
+    const records = (data.records || []).filter(r => r.conversation_id === convId);
+    if (records.length === 0) return;
+    revealConversation();
+    document.getElementById('chat-messages').innerHTML = '';
+    records.forEach(r => {
+      addChatMessage(r.role, r.content + (r.action && r.action !== 'chat' ? `<div class="mt-2 inline-flex items-center gap-1.5 text-xs bg-purple-500/10 text-purple-400 px-2.5 py-1 rounded-full">${r.action}</div>` : ''));
+    });
+    renderChatHistory();
+  } catch(e) { console.error('loadConversation:', e); }
 }
 
 // ─── Navigation ───
@@ -613,6 +712,9 @@ async function sendChat() {
     const selectedModel = document.getElementById('builder-model')?.value || '';
     const data = await api('/chat', 'POST', {message: msg, model: selectedModel || undefined});
     removeTypingIndicator();
+
+    // Save AI response to history
+    saveChatMessage('system', data.message || '', data.action || '', document.getElementById('builder-model')?.value, null);
 
     let html = '';
     if (data.message) html += `<p>${data.message}</p>`;
@@ -1021,13 +1123,16 @@ async function sendAgentMessage() {
   userDiv.className = 'chat-msg bg-purple-600/8 border border-purple-800/20 rounded-xl p-3 text-sm ml-12';
   userDiv.innerHTML = `<p class="text-gray-300">${msg}</p>`;
   msgs.appendChild(userDiv);
+  saveChatMessage('user', msg, null, null, currentAgent);
   const aiDiv = document.createElement('div');
   aiDiv.className = 'chat-msg bg-[#0c0c12] border border-gray-800/60 rounded-xl p-3 text-sm';
   aiDiv.innerHTML = `<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>`;
   msgs.appendChild(aiDiv);
   try {
     const data = await api(`/agents/${currentAgent}/invoke`, 'POST', {message: msg});
-    aiDiv.innerHTML = `<p class="text-gray-300">${data.response || data.message || JSON.stringify(data)}</p>`;
+    const agentResponse = data.response || data.message || JSON.stringify(data);
+    aiDiv.innerHTML = `<p class="text-gray-300">${agentResponse}</p>`;
+    saveChatMessage('system', agentResponse, null, null, currentAgent);
   } catch(e) { aiDiv.innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`; }
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -1040,6 +1145,7 @@ async function deleteAgent(name) {
 
 // ─── Init ───
 checkHealth();
+loadChatHistory();
 setInterval(checkHealth, 30000);
 </script>
 </body>
