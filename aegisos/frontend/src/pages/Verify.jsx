@@ -9,6 +9,7 @@ const Verify = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [resent, setResent] = useState(false);
+  const [infoMsg] = useState(location.state?.message || "");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,9 +63,14 @@ const Verify = () => {
             {error}
           </div>
         )}
+        {infoMsg && (
+          <div className="mb-4 p-3 bg-teal-500/10 text-teal-400 rounded-lg text-sm border border-teal-500/20">
+            {infoMsg}
+          </div>
+        )}
         {resent && (
           <div className="mb-4 p-3 bg-teal-500/10 text-teal-400 rounded-lg text-sm border border-teal-500/20">
-            A new code has been generated.
+            A new code has been generated and sent to your email.
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-4">

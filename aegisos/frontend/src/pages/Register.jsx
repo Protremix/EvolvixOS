@@ -25,8 +25,8 @@ const Register = () => {
         throw new Error(data.error || "Registration failed");
       }
 
-      // Backend requires OTP verification before login — go to verify page
-      navigate("/verify", { state: { email } });
+      // OTP sent via email — go to verify page
+      navigate("/verify", { state: { email, message: data.message } });
     } catch (err) {
       setError(err.message);
     } finally {

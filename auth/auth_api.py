@@ -111,6 +111,53 @@ def generate_otp():
 def generate_token():
     return secrets.token_urlsafe(48)
 
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+def send_email_otp(to_email, otp_code, display_name=""):
+    """Send OTP verification code via email."""
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["From"] = "EvolvixOS <noreply@evolvixos.com>"
+        msg["To"] = to_email
+        msg["Subject"] = f"Your EvolvixOS Verification Code: {otp_code}"
+
+        text = f"""EvolvixOS Email Verification
+
+Hello {display_name or 'there'}!
+
+Your verification code is: {otp_code}
+
+This code expires in 10 minutes.
+
+— EvolvixOS Team"""
+
+        html = f"""<html><body style="font-family:Inter,sans-serif;background:#0a0a0f;color:#fff;padding:40px;">
+<div style="max-width:480px;margin:0 auto;background:#111113;border:1px solid #1f1f23;border-radius:16px;padding:40px;">
+<h1 style="color:#fff;font-size:24px;margin:0 0 8px;">EvolvixOS</h1>
+<p style="color:#888;font-size:14px;margin:0 0 24px;">AI Engineering Platform</p>
+<p style="color:#ccc;font-size:16px;">Hello {display_name or 'there'},</p>
+<p style="color:#ccc;font-size:16px;">Your verification code is:</p>
+<div style="background:#0a0a0b;border:1px solid #333;border-radius:12px;padding:20px;text-align:center;margin:20px 0;">
+<span style="font-size:32px;font-weight:700;color:#2dd4bf;letter-spacing:8px;">{otp_code}</span>
+</div>
+<p style="color:#888;font-size:13px;">This code expires in 10 minutes. If you didn't create an account, ignore this email.</p>
+<p style="color:#555;font-size:12px;margin-top:32px;">— EvolvixOS Team</p>
+</div></body></html>"""
+
+        msg.attach(MIMEText(text, "plain"))
+        msg.attach(MIMEText(html, "html"))
+
+        with smtplib.SMTP("127.0.0.1", 25, timeout=10) as server:
+            server.sendmail("noreply@evolvixos.com", to_email, msg.as_string())
+        print(f"Email OTP sent to {to_email}")
+        return True
+    except Exception as e:
+        print(f"Email OTP send error: {e}")
+        return False
+
+
 def send_telegram_otp(chat_id, otp_code, display_name=""):
     if not TELEGRAM_TOKEN:
         return False
@@ -206,7 +253,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                 return
             user = get_user_by_id(user_id)
             if not user:
-                self._send_json(401, {"error": "User not found"})
+                self._send_json(401, {"error": "Invalid credentials"})
                 return
             self._send_json(200, {"user": user})
             return
@@ -280,19 +327,21 @@ class AuthHandler(BaseHTTPRequestHandler):
                 self._send_json(500, {"error": "Database error"})
                 return
 
-            # Try to send OTP via Telegram
+            # Send OTP via email (always) and Telegram (if linked)
+            otp_sent_via_email = send_email_otp(email, otp, display_name or email.split("@")[0])
+
             otp_sent_via_telegram = False
             if telegram_username:
                 chat_id = get_telegram_chat_id(telegram_username)
                 if chat_id:
                     otp_sent_via_telegram = send_telegram_otp(chat_id, otp, display_name or email)
 
-            # FIX: Never return OTP in API response — always require Telegram or manual admin delivery
             self._send_json(200, {
                 "ok": True,
                 "user_id": user_id,
+                "otp_sent_via_email": otp_sent_via_email,
                 "otp_sent_via_telegram": otp_sent_via_telegram,
-                "message": "OTP generated. Check your Telegram for the verification code." if otp_sent_via_telegram else "OTP generated. Contact admin to get your verification code (Telegram not linked)."
+                "message": "Verification code sent to your email." if otp_sent_via_email else ("OTP generated. Check your Telegram." if otp_sent_via_telegram else "OTP generated but email delivery failed. Contact admin.")
             })
             return
 
@@ -311,7 +360,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                     c.execute("SELECT id, otp_code, otp_expires, display_name FROM users WHERE email = ?", (email,))
                     row = c.fetchone()
                     if not row:
-                        self._send_json(404, {"error": "User not found. Please register first."})
+                        self._send_json(404, {"error": "Invalid credentials"})
                         return
 
                     user_id, stored_otp, otp_expires_str, display_name = row
@@ -375,12 +424,12 @@ class AuthHandler(BaseHTTPRequestHandler):
                     c.execute("SELECT id, password_hash, verified, display_name FROM users WHERE email = ?", (email,))
                     row = c.fetchone()
                     if not row:
-                        self._send_json(404, {"error": "No account found. Please register first."})
+                        self._send_json(404, {"error": "Invalid credentials"})
                         return
 
                     user_id, pw_hash, verified, display_name = row
                     if not verify_password(password, pw_hash):
-                        self._send_json(401, {"error": "Invalid password"})
+                        self._send_json(401, {"error": "Invalid credentials"})
                         return
 
                     if not verified:
@@ -426,7 +475,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                     c.execute("SELECT id, telegram_username, display_name FROM users WHERE email = ?", (email,))
                     row = c.fetchone()
                     if not row:
-                        self._send_json(404, {"error": "User not found"})
+                        self._send_json(404, {"error": "Invalid credentials"})
                         return
 
                     user_id, tg_username, display_name = row
