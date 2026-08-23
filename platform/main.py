@@ -666,8 +666,8 @@ Always respond with a JSON action object. If the user just wants to chat, respon
             try:
                 import asyncpg
                 conn = await asyncpg.connect(
-                    host="localhost", port=5432,
-                    database="evolvixos", user="aegis", password="aegis"
+                    host="127.0.0.1", port=5432,
+                    database="evolvixos", user="evolvixos", password="evolvixos"
                 )
                 await conn.execute(
                     "INSERT INTO entity_platformmemory (data, created_date, updated_date) VALUES ($1, NOW(), NOW())",
