@@ -487,10 +487,25 @@ async def chat_build(msg: ChatMessage, db=Depends(get_db)):
     existing_names = [e["name"] for e in existing_entities] if existing_entities else []
     existing_summary = ", ".join(existing_names) if existing_names else "none yet"
 
+    # Load persistent memory to give the builder context
+    memory_text = ""
+    try:
+        mem_result = await db.execute(text(
+            "SELECT content, category, scope FROM platform_entity_records "
+            "WHERE entity_name = 'PlatformMemory' "
+            "ORDER BY created_date DESC LIMIT 20"
+        ))
+        mem_rows = mem_result.fetchall()
+        if mem_rows:
+            memory_items = [r[0] for r in mem_rows if r[0]]
+            memory_text = "\n\nUSER MEMORY — Things to remember about this user and project:\n" + "\n".join(f"- {m}" for m in memory_items)
+    except Exception:
+        pass
+
     # System prompt that teaches the LLM about platform capabilities
     system_prompt = f"""You are EvolvixOS Platform Builder. You help users build apps by creating entities, backend functions, and workflows via natural language.
 
-CURRENT STATE — Entities already in the project: {existing_summary}
+CURRENT STATE — Entities already in the project: {existing_summary}{memory_text}
 
 Available API actions (respond with JSON):
 - Create entity: {{"action": "create_entity", "name": "Task", "schema": {{"type": "object", "properties": {{"title": {{"type": "string"}}, "done": {{"type": "boolean"}}}}, "required": ["title"]}}}}
@@ -625,6 +640,29 @@ Always respond with a JSON action object. If the user just wants to chat, respon
             ollama_resp.close()
         except Exception as ollama_err:
             return {"error": f"All LLM providers failed: {ollama_err}", "message": "Sorry, I couldn't process that."}
+
+    # Extract and save memories from the conversation
+    try:
+        user_msg_lower = msg.message.lower()
+        # Detect preferences, decisions, instructions
+        memory_triggers = ["prefer", "always", "never", "use", "don't", "remember", "should", "want", "need", "like", "default"]
+        should_save = any(t in user_msg_lower for t in memory_triggers) and len(msg.message) > 10
+        if should_save:
+            await db.execute(text(
+                "INSERT INTO platform_entity_records (entity_name, data, created_date, updated_date) "
+                "VALUES ('PlatformMemory', :data, NOW(), NOW())"
+            ), {"data": json.dumps({
+                "content": msg.message[:200],
+                "category": "preference",
+                "scope": "builder",
+                "confidence": "inferred",
+                "source": currentConversationId if 'currentConversationId' in dir() else 'chat',
+                "timestamp": datetime.now().isoformat()
+            })}
+            )
+            await db.commit()
+    except Exception as mem_err:
+        print(f"Memory save failed: {mem_err}")
 
     # Try to parse AI response as JSON action
     try:
