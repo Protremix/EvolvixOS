@@ -491,14 +491,20 @@ async def chat_build(msg: ChatMessage, db=Depends(get_db)):
     memory_text = ""
     try:
         mem_result = await db.execute(text(
-            "SELECT content, category, scope FROM platform_entity_records "
-            "WHERE entity_name = 'PlatformMemory' "
+            "SELECT data FROM entity_platformmemory "
             "ORDER BY created_date DESC LIMIT 20"
         ))
         mem_rows = mem_result.fetchall()
         if mem_rows:
-            memory_items = [r[0] for r in mem_rows if r[0]]
-            memory_text = "\n\nUSER MEMORY — Things to remember about this user and project:\n" + "\n".join(f"- {m}" for m in memory_items)
+            memory_items = []
+            for r in mem_rows:
+                try:
+                    d = json.loads(r[0]) if isinstance(r[0], str) else r[0]
+                    if isinstance(d, dict) and d.get("content"):
+                        memory_items.append(d["content"])
+                except: pass
+            if memory_items:
+                memory_text = "\n\nUSER MEMORY — Things to remember about this user and project:\n" + "\n".join(f"- {m}" for m in memory_items)
     except Exception:
         pass
 
@@ -648,19 +654,32 @@ Always respond with a JSON action object. If the user just wants to chat, respon
         memory_triggers = ["prefer", "always", "never", "use", "don't", "remember", "should", "want", "need", "like", "default"]
         should_save = any(t in user_msg_lower for t in memory_triggers) and len(msg.message) > 10
         if should_save:
-            await db.execute(text(
-                "INSERT INTO platform_entity_records (entity_name, data, created_date, updated_date) "
-                "VALUES ('PlatformMemory', :data, NOW(), NOW())"
-            ), {"data": json.dumps({
+            mem_data = json.dumps({
                 "content": msg.message[:200],
                 "category": "preference",
                 "scope": "builder",
                 "confidence": "inferred",
-                "source": currentConversationId if 'currentConversationId' in dir() else 'chat',
+                "source": "chat",
                 "timestamp": datetime.now().isoformat()
-            })}
-            )
-            await db.commit()
+            })
+            # Use separate connection to avoid transaction issues
+            from sqlalchemy import create_engine
+            db_url = os.environ.get("DATABASE_URL", "postgresql+asyncpg://aegis:aegis@localhost:5432/evolvixos")
+            sync_url = db_url.replace("asyncpg", "psycopg2").replace("+psycopg2", "")
+            try:
+                import psycopg2
+                conn = psycopg2.connect("dbname=evolvixos user=aegis password=aegis host=localhost")
+                cur = conn.cursor()
+                cur.execute(
+                    "INSERT INTO entity_platformmemory (data, created_date, updated_date) VALUES (%s, NOW(), NOW())",
+                    (mem_data,)
+                )
+                conn.commit()
+                cur.close()
+                conn.close()
+                print(f"Memory saved: {msg.message[:40]}")
+            except Exception as sync_err:
+                print(f"Sync memory save failed: {sync_err}")
     except Exception as mem_err:
         print(f"Memory save failed: {mem_err}")
 
