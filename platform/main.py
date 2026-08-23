@@ -475,10 +475,20 @@ async def chat_build(msg: ChatMessage, db=Depends(get_db)):
 Available API actions (respond with JSON):
 - Create entity: {"action": "create_entity", "name": "Task", "schema": {"type": "object", "properties": {"title": {"type": "string"}, "done": {"type": "boolean"}}, "required": ["title"]}}
 - List entities: {"action": "list_entities"}
-- Create function: {"action": "create_function", "name": "getJoke", "code": "def handler(input):\\n    return {'joke': 'Why did the chicken cross the road?'}"}
+- Create function: {"action": "create_function", "name": "getJoke", "code": "def handler(input):\n    return {'joke': 'Why did the chicken cross the road?'}"}
 - Create workflow: {"action": "create_workflow", "name": "Daily Report", "trigger_type": "scheduled", "definition": {}}
 
-Always respond with a JSON action object. If the user just wants to chat, respond with {"action": "chat", "message": "your response"}."""
+IMPORTANT - Be proactive, not interrogative. When the user gives a vague, high-level request (e.g. "website", "blog", "store", "CRM", "app", "portfolio"), do NOT just ask for clarification. Instead, make a reasonable assumption about the most common starter entity for that request and CREATE it immediately using the create_entity action, then briefly explain what you built. Only ask a clarifying question if the request is truly ambiguous with no sensible default.
+
+Examples of proactive defaults (always use action "create_entity" for these, never just "chat"):
+- "website" or "landing page" -> create entity "Page": {title (string), slug (string), content (string), published (boolean)}
+- "blog" -> create entity "Post": {title (string), slug (string), content (string), author (string), published (boolean)}
+- "store" or "shop" or "ecommerce" -> create entity "Product": {name (string), description (string), price (number), stock (integer), image_url (string)}
+- "CRM" -> create entity "Contact": {name (string), email (string), phone (string), company (string), status (string)}
+- "portfolio" -> create entity "Project": {title (string), description (string), image_url (string), link (string), category (string)}
+- "booking" or "reservations" -> create entity "Booking": {name (string), email (string), date (string), time (string), status (string)}
+
+Always respond with a JSON action object. If the user just wants to chat or asks something truly unrelated to building, respond with {"action": "chat", "message": "your response"}."""
 
     # Call Ollama
     ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
