@@ -999,6 +999,111 @@ body.light-mode .bg-black\/40{background:rgba(0,0,0,.2) !important}
 body.light-mode .bg-black\/50{background:rgba(0,0,0,.2) !important}
 body.light-mode .bg-black\/60{background:rgba(0,0,0,.3) !important}
 
+
+/* ═══ Platform Animation Polish ═══ */
+@keyframes slideInUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slideInLeft { from { opacity:0; transform:translateX(-20px); } to { opacity:1; transform:translateX(0); } }
+@keyframes slideInRight { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+@keyframes scaleIn { from { opacity:0; transform:scale(0.92); } to { opacity:1; transform:scale(1); } }
+@keyframes shimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
+@keyframes pulseGlow { 0%,100% { box-shadow:0 0 20px rgba(217,70,239,0.15); } 50% { box-shadow:0 0 30px rgba(217,70,239,0.35); } }
+@keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+@keyframes gradientShift { 0% { background-position:0% 50%; } 50% { background-position:100% 50%; } 100% { background-position:0% 50%; } }
+@keyframes barShimmer { 0% { transform:translateX(-100%); } 100% { transform:translateX(200%); } }
+@keyframes countUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes neonPulse { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
+@keyframes cardLift { from { transform:translateY(0) scale(1); } to { transform:translateY(-6px) scale(1.02); } }
+@keyframes spinSlow { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+@keyframes ripple { 0% { transform:scale(0); opacity:0.6; } 100% { transform:scale(4); opacity:0; } }
+
+/* Staggered entrance for page elements */
+.page.active > * { animation: slideInUp 0.5s cubic-bezier(0.16,1,0.3,1) backwards; }
+.page.active > *:nth-child(1) { animation-delay: 0ms; }
+.page.active > *:nth-child(2) { animation-delay: 60ms; }
+.page.active > *:nth-child(3) { animation-delay: 120ms; }
+.page.active > *:nth-child(4) { animation-delay: 180ms; }
+.page.active > *:nth-child(5) { animation-delay: 240ms; }
+.page.active > *:nth-child(6) { animation-delay: 300ms; }
+.page.active > *:nth-child(7) { animation-delay: 360ms; }
+.page.active > *:nth-child(8) { animation-delay: 420ms; }
+
+/* Nav item entrance */
+.nav-item { transition: all 0.2s cubic-bezier(0.4,0,0.2,1); }
+.nav-item:hover { transform: translateX(3px); }
+.nav-item.active { background: rgba(217,70,239,0.1); }
+
+/* Token pack card hover lift */
+.tpk-card { transition: all 0.3s cubic-bezier(0.16,1,0.3,1); position: relative; overflow: hidden; }
+.tpk-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(217,70,239,0.15); border-color: rgba(217,70,239,0.4) !important; }
+.tpk-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,#d946ef,transparent); opacity:0; transition:opacity 0.3s; }
+.tpk-card:hover::before { opacity:1; }
+
+/* Buy button pulse */
+.tpk-buy-btn { transition: all 0.2s ease; position: relative; overflow: hidden; }
+.tpk-buy-btn:hover { animation: pulseGlow 1.5s ease-in-out infinite; transform: scale(1.03); }
+.tpk-buy-btn::after { content:''; position:absolute; top:50%; left:50%; width:0; height:0; border-radius:50%; background:rgba(255,255,255,0.3); transform:translate(-50%,-50%); }
+.tpk-buy-btn:active::after { animation: ripple 0.6s ease-out; width:200px; height:200px; }
+
+/* Progress bar shimmer */
+.billing-bar-shimmer { position: relative; overflow: hidden; }
+.billing-bar-shimmer::after { content:''; position:absolute; top:0; left:0; right:0; bottom:0; width:40%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent); animation: barShimmer 2s ease-in-out infinite; }
+
+/* Animated gradient border for featured card */
+.tpk-featured { position: relative; }
+.tpk-featured::before { content:''; position:absolute; inset:-1px; border-radius:inherit; padding:1px; background:linear-gradient(135deg,#d946ef,#a855f7,#d946ef,#ec4899); background-size:200% 200%; animation: gradientShift 3s ease infinite; -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+
+/* Quick start card hover */
+.quick-start-card { transition: all 0.3s cubic-bezier(0.16,1,0.3,1); cursor: pointer; }
+.quick-start-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 8px 30px rgba(217,70,239,0.12); border-color: rgba(217,70,239,0.3) !important; }
+
+/* Hero icon float */
+.hero-icon-float { animation: float 3s ease-in-out infinite; }
+
+/* Stat card entrance */
+.stat-card-enter { animation: scaleIn 0.5s cubic-bezier(0.16,1,0.3,1) backwards; }
+.stat-card-enter:nth-child(1) { animation-delay: 100ms; }
+.stat-card-enter:nth-child(2) { animation-delay: 200ms; }
+.stat-card-enter:nth-child(3) { animation-delay: 300ms; }
+
+/* Credit cost reference cards */
+.credit-tier-card { transition: all 0.25s ease; }
+.credit-tier-card:hover { transform: translateX(4px); background: rgba(217,70,239,0.05) !important; }
+
+/* Transaction list slide-in */
+.tx-item { animation: slideInLeft 0.3s ease backwards; }
+.tx-item:nth-child(1) { animation-delay: 0ms; }
+.tx-item:nth-child(2) { animation-delay: 30ms; }
+.tx-item:nth-child(3) { animation-delay: 60ms; }
+.tx-item:nth-child(4) { animation-delay: 90ms; }
+.tx-item:nth-child(5) { animation-delay: 120ms; }
+.tx-item:nth-child(6) { animation-delay: 150ms; }
+.tx-item:nth-child(7) { animation-delay: 180ms; }
+.tx-item:nth-child(8) { animation-delay: 210ms; }
+
+/* Button hover effects */
+button { transition: all 0.15s ease; }
+button:hover { transform: translateY(-1px); }
+button:active { transform: translateY(0) scale(0.98); }
+
+/* Input focus glow */
+input:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(217,70,239,0.1); }
+
+/* Page transition */
+.page { animation: pageIn 0.4s cubic-bezier(0.16,1,0.3,1); }
+@keyframes pageIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* Sidebar slide-in on load */
+aside.sidebar { animation: slideInLeft 0.4s ease; }
+
+/* Status dot pulse */
+.status-dot { animation: neonPulse 2s ease-in-out infinite; }
+
+/* Smooth scrollbar */
+.flex-1.overflow-y-auto::-webkit-scrollbar { width: 6px; }
+.flex-1.overflow-y-auto::-webkit-scrollbar-track { background: transparent; }
+.flex-1.overflow-y-auto::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.2); border-radius: 3px; }
+.flex-1.overflow-y-auto::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,0.4); }
+
 </style>
   <link rel="stylesheet" href="/studio-friendly.css">
 </head>
@@ -1853,13 +1958,13 @@ body.light-mode .bg-black\/60{background:rgba(0,0,0,.3) !important}
 
   <!-- Credit Balance Widget -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-    <div class="bg-gradient-to-br from-[#1a1a22] to-[#12121a] border border-gray-800 rounded-2xl p-6 relative overflow-hidden">
+    <div class="bg-gradient-to-br from-[#1a1a22] to-[#12121a] border border-gray-800 rounded-2xl p-6 relative overflow-hidden stat-card-enter">
       <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500"></div>
       <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Credits Remaining</div>
       <div class="text-4xl font-bold font-mono" id="billing-credits-remaining">--</div>
       <div class="text-sm text-gray-400 mt-2" id="billing-plan-name">Loading...</div>
     </div>
-    <div class="bg-[#1a1a22] border border-gray-800 rounded-2xl p-6">
+    <div class="bg-[#1a1a22] border border-gray-800 rounded-2xl p-6 stat-card-enter">
       <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Credits Used This Month</div>
       <div class="text-4xl font-bold font-mono text-gray-400" id="billing-credits-used">--</div>
       <div class="mt-3 h-2 bg-gray-800 rounded-full overflow-hidden">
@@ -1867,7 +1972,7 @@ body.light-mode .bg-black\/60{background:rgba(0,0,0,.3) !important}
       </div>
       <div class="text-xs text-gray-500 mt-1" id="billing-usage-percent">0% used</div>
     </div>
-    <div class="bg-[#1a1a22] border border-gray-800 rounded-2xl p-6">
+    <div class="bg-[#1a1a22] border border-gray-800 rounded-2xl p-6 stat-card-enter">
       <div class="text-xs text-gray-500 uppercase tracking-wider mb-2">Monthly Allowance</div>
       <div class="text-4xl font-bold font-mono text-gray-300" id="billing-monthly-allowance">--</div>
       <div class="text-sm text-gray-500 mt-2">Resets every billing cycle</div>
@@ -4403,6 +4508,137 @@ async function loadActivityFeed() {
   } catch(e) {
     document.getElementById('activity-feed').innerHTML = '<div class="text-center py-8 text-gray-600 text-xs">Error loading activity</div>';
   }
+}
+
+
+// ═══ Animation Enhancements ═══
+
+// Animated counter for credit numbers
+function animateCounter(elementId, targetValue, duration = 1200) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const start = 0;
+  const startTime = performance.now();
+  const isLarge = targetValue >= 10000;
+  
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // Ease out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(start + (targetValue - start) * eased);
+    el.textContent = current.toLocaleString();
+    if (progress < 1) requestAnimationFrame(update);
+    else el.textContent = targetValue.toLocaleString();
+  }
+  requestAnimationFrame(update);
+}
+
+// Wrap loadBillingData to add animations
+var origLoadBilling = window.loadBillingData;
+if (origLoadBilling) {
+  window.loadBillingData = function() {
+    origLoadBilling();
+    // After data loads, animate the counters
+    setTimeout(function() {
+      var remEl = document.getElementById('billing-credits-remaining');
+      var usedEl = document.getElementById('billing-credits-used');
+      var allowEl = document.getElementById('billing-monthly-allowance');
+      
+      if (remEl) {
+        var val = parseInt(remEl.textContent.replace(/,/g,'')) || 0;
+        animateCounter('billing-credits-remaining', val);
+      }
+      if (usedEl) {
+        var val2 = parseInt(usedEl.textContent.replace(/,/g,'')) || 0;
+        animateCounter('billing-credits-used', val2);
+      }
+      if (allowEl) {
+        var val3 = parseInt(allowEl.textContent.replace(/,/g,'')) || 0;
+        animateCounter('billing-monthly-allowance', val3);
+      }
+      
+      // Add shimmer class to progress bar
+      var bar = document.getElementById('billing-usage-bar');
+      if (bar) bar.parentElement.classList.add('billing-bar-shimmer');
+    }, 300);
+    
+    // Add hover classes to token pack cards
+    setTimeout(function() {
+      var packs = document.querySelectorAll('#billing-token-packs > div');
+      packs.forEach(function(card, i) {
+        if (!card.classList.contains('tpk-card')) {
+          card.classList.add('tpk-card');
+          card.style.animationDelay = (i * 80) + 'ms';
+          card.style.animation = 'scaleIn 0.4s cubic-bezier(0.16,1,0.3,1) backwards';
+          card.style.animationDelay = (i * 80) + 'ms';
+        }
+        // Mark the featured one
+        var hasBadge = card.textContent.includes('Best Value') || card.textContent.includes('BEST VALUE');
+        if (hasBadge) card.classList.add('tpk-featured');
+        // Add hover class to buy buttons
+        var btn = card.querySelector('button, a');
+        if (btn && !btn.classList.contains('tpk-buy-btn')) {
+          btn.classList.add('tpk-buy-btn');
+        }
+      });
+      
+      // Add credit tier card hover
+      document.querySelectorAll('#page-billing .grid .flex.items-center').forEach(function(el) {
+        el.classList.add('credit-tier-card');
+      });
+      
+      // Add stat card entrance
+      var statCards = document.querySelectorAll('#page-billing .grid.grid-cols-1 > div');
+      statCards.forEach(function(card) {
+        card.classList.add('stat-card-enter');
+      });
+      
+      // Add tx-item class to transaction entries
+      document.querySelectorAll('#billing-transactions > div').forEach(function(tx, i) {
+        tx.classList.add('tx-item');
+        tx.style.animationDelay = (Math.min(i, 8) * 30) + 'ms';
+      });
+    }, 500);
+  };
+}
+
+// Add quick-start card classes
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    // Quick start cards on the AI Builder page
+    var quickCards = document.querySelectorAll('#page-chat .grid > div');
+    quickCards.forEach(function(card) {
+      if (card.onclick || card.getAttribute('onclick')) {
+        card.classList.add('quick-start-card');
+      }
+    });
+    
+    // Hero icon float
+    var heroIcon = document.querySelector('#page-chat .text-center svg, #page-chat .text-center img, #page-chat > div > div svg');
+    if (heroIcon) heroIcon.classList.add('hero-icon-float');
+  }, 1000);
+});
+
+// Ripple effect on all clickable cards
+document.addEventListener('click', function(e) {
+  var card = e.target.closest('.quick-start-card, .tpk-card');
+  if (!card) return;
+  var ripple = document.createElement('span');
+  var rect = card.getBoundingClientRect();
+  var size = Math.max(rect.width, rect.height);
+  ripple.style.cssText = 'position:absolute;border-radius:50%;background:rgba(217,70,239,0.15);width:'+size+'px;height:'+size+'px;left:'+(e.clientX-rect.left-size/2)+'px;top:'+(e.clientY-rect.top-size/2)+'px;pointer-events:none;animation:ripple 0.6s ease-out;';
+  card.style.position = card.style.position || 'relative';
+  card.style.overflow = 'hidden';
+  card.appendChild(ripple);
+  setTimeout(function() { ripple.remove(); }, 600);
+});
+
+// Smooth scroll for transaction list
+function smoothScrollTo(elementId, target) {
+  var el = document.getElementById(elementId);
+  if (!el) return;
+  el.scrollTo({ top: target, behavior: 'smooth' });
 }
 
 </script>
