@@ -123,6 +123,7 @@ app.add_middleware(
 class EntityCreate(BaseModel):
     name: str = Field(..., description="PascalCase entity name")
     schema: dict = Field(..., description="JSON schema for entity fields")
+    app_id: Optional[int] = Field(None, description="App ID to scope entity to")
 
 class EntityUpdate(BaseModel):
     schema: dict = Field(..., description="Updated JSON schema")
@@ -196,25 +197,25 @@ async def health():
 
 # ─── Entity Routes ───
 @app.get("/api/entities")
-async def list_entities(db=Depends(get_db), request: Request = None):
-    """List all entity schemas — requires auth."""
+async def list_entities(db=Depends(get_db), request: Request = None, app_id: int = None):
+    """List all entity schemas — optionally scoped to an app. Requires auth."""
     user = get_user_from_token(request) if request else None
     if not user:
         raise HTTPException(401, "Authentication required")
     try:
-        entities = await EntityManager.list_entities(db)
+        entities = await EntityManager.list_entities(db, app_id=app_id)
         return {"entities": entities}
     except Exception as e:
         raise HTTPException(500, str(e))
 
 @app.post("/api/entities")
 async def create_entity(entity: EntityCreate, db=Depends(get_db), request: Request = None):
-    """Create a new entity — requires auth."""
+    """Create a new entity — requires auth. Optionally scoped to an app."""
     user = get_user_from_token(request) if request else None
     if not user:
         raise HTTPException(401, "Authentication required")
     try:
-        result = await EntityManager.create_entity(db, entity.name, entity.schema, created_by=user.get("user_id") if user else None)
+        result = await EntityManager.create_entity(db, entity.name, entity.schema, created_by=user.get("user_id") if user else None, app_id=entity.app_id)
         return result
     except ValueError as e:
         raise HTTPException(400, str(e))
@@ -254,6 +255,34 @@ async def delete_entity(name: str, db=Depends(get_db), request: Request = None):
     except ValueError as e:
         raise HTTPException(400, str(e))
 
+# ─── Entity Relations ───
+@app.get("/api/entities/{name}/relations")
+async def get_entity_relations(name: str, db=Depends(get_db), request: Request = None):
+    """Get all relation fields for an entity."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    try:
+        relations = await EntityManager.get_relations(db, name)
+        return {"relations": relations}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.get("/api/entities/{name}/records/{record_id}/expanded")
+async def get_record_expanded(name: str, record_id: int, db=Depends(get_db), request: Request = None):
+    """Get a record with all relation fields expanded."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    try:
+        record = await EntityManager.fetch_with_relations(db, name, record_id)
+        if not record:
+            raise HTTPException(404, f"Record {record_id} not found in {name}")
+        return record
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
 
 # ─── Entity Records (CRUD) ───
 @app.get("/api/entities/{name}/records")
@@ -262,17 +291,38 @@ async def list_records(
     limit: int = Query(50, ge=1, le=500),
     skip: int = Query(0, ge=0),
     sort: Optional[str] = None,
+    expand: bool = Query(False, description="Expand relation fields with related data"),
     request: Request = None,
     db=Depends(get_db)
 ):
-    """List entity records with pagination and sorting."""
+    """List entity records with pagination, sorting, and optional relation expansion."""
     try:
-        # Extract filters from query params
         filters = {}
-        # Note: In a real implementation, we'd extract non-standard query params
         user = get_user_from_token(request) if request else None
         user_id = user.get("user_id") if user else None
         result = await EnhancedCRUD.list_records(db, name, limit=limit, skip=skip, filters=filters, sort=sort, user_id=user_id)
+        if expand:
+            # Expand relations for each record
+            entity = await EntityManager.get_entity(db, name)
+            if entity:
+                expanded = []
+                for record in result.get("records", []):
+                    for fn, fd in entity["schema"].get("properties", {}).items():
+                        if fd.get("type") == "relation" and record.get(fn):
+                            target = fd["relation"]["target"]
+                            display = fd.get("relation", {}).get("display", "name")
+                            try:
+                                rel_res = await db.execute(text(f'SELECT * FROM entity_{target.lower()} WHERE id = :id'), {"id": record[fn]})
+                                rel_row = rel_res.fetchone()
+                                if rel_row:
+                                    rel_cols = rel_res.keys() if hasattr(rel_res, 'keys') else [d[0] for d in rel_res.cursor.description]
+                                    rel_rec = {rel_cols[j]: (rel_row[j].isoformat() if isinstance(rel_row[j], datetime) else rel_row[j]) for j in range(len(rel_cols))}
+                                    record[f"_rel_{fn}"] = rel_rec
+                                    record[f"_rel_{fn}_label"] = rel_rec.get(display, f"#{record[fn]}")
+                            except Exception:
+                                pass
+                    expanded.append(record)
+                result["records"] = expanded
         return result
     except Exception as e:
         raise HTTPException(500, str(e))
