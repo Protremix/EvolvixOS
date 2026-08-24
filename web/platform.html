@@ -1200,6 +1200,208 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
   background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, rgba(217,70,239,0.06) 30%, transparent 60%) !important;
 }
 
+
+/* === 3D ICON UPGRADE === */
+
+/* Sidebar nav icons — 3D gradient containers */
+.nav-item svg {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4)) drop-shadow(0 0 3px rgba(139,92,246,0.15));
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+.nav-item:hover svg {
+  transform: scale(1.15) rotate(-5deg) rotateX(15deg) rotateY(-10deg);
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)) drop-shadow(0 0 8px rgba(139,92,246,0.4));
+}
+.nav-item.active svg {
+  filter: drop-shadow(0 2px 6px rgba(139,92,246,0.4)) drop-shadow(0 0 6px rgba(217,70,239,0.3));
+  color: #a78bfa;
+}
+
+/* Logo icon — 3D glass effect */
+.logo-glow {
+  background: linear-gradient(145deg, #1e1e28 0%, #12121a 100%) !important;
+  border: 1px solid rgba(139,92,246,0.3) !important;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.4),
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 2px 6px rgba(139,92,246,0.2) inset,
+    0 -2px 6px rgba(0,0,0,0.3) inset !important;
+  position: relative;
+  filter: drop-shadow(0 2px 6px rgba(139,92,246,0.25));
+}
+.logo-glow::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(145deg, rgba(255,255,255,0.1), transparent 50%);
+  pointer-events: none;
+}
+
+/* Bottom nav — 3D icons */
+.bottom-nav-item svg {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+.bottom-nav-item:active svg {
+  transform: scale(0.9) rotateX(10deg);
+}
+.bottom-nav-item.active svg {
+  filter: drop-shadow(0 2px 6px rgba(217,70,239,0.4)) drop-shadow(0 0 6px rgba(217,70,239,0.3));
+  transform: scale(1.1) rotate(-3deg) rotateX(10deg) rotateY(-5deg);
+}
+
+/* Command palette icons — 3D depth */
+.cmd-item-icon {
+  background: linear-gradient(145deg, rgba(139,92,246,0.15), rgba(139,92,246,0.05)) !important;
+  border: 1px solid rgba(139,92,246,0.2);
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.3),
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 2px 4px rgba(139,92,246,0.15) inset;
+  position: relative;
+  filter: drop-shadow(0 2px 4px rgba(139,92,246,0.2));
+}
+.cmd-item-icon::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(145deg, rgba(255,255,255,0.08), transparent 50%);
+  pointer-events: none;
+}
+.cmd-item-icon svg {
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+
+/* Quick-start cards — 3D hover with depth */
+.quick-start-card {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  transform-style: preserve-3d; perspective: 800px;
+}
+.quick-start-card:hover {
+  transform: translateY(-6px) scale(1.03) rotateX(5deg) !important;
+  box-shadow:
+    0 16px 40px rgba(0,0,0,0.4),
+    0 0 30px rgba(217,70,239,0.15),
+    0 0 0 1px rgba(255,255,255,0.03) inset !important;
+}
+
+/* Stat cards — 3D depth with inner glow */
+.stat-card-enter {
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.3),
+    0 0 0 1px rgba(255,255,255,0.02) inset;
+}
+.stat-card-enter:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.4),
+    0 0 20px rgba(139,92,246,0.1),
+    0 0 0 1px rgba(255,255,255,0.03) inset;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Entity/function list items — 3D hover */
+.entity-card, .function-card, .workflow-card, .agent-card {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+.entity-card:hover, .function-card:hover, .workflow-card:hover, .agent-card:hover {
+  transform: translateY(-3px) scale(1.01) rotateX(3deg);
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.35),
+    0 0 15px rgba(139,92,246,0.1);
+}
+
+/* Page Builder component palette icons — 3D */
+.palette-item, .component-item {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.palette-item:hover, .component-item:hover {
+  transform: scale(1.05) rotateX(5deg) rotateY(-3deg);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3), 0 0 10px rgba(139,92,246,0.15);
+}
+
+/* Connector cards — 3D depth */
+.connector-card {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.connector-card:hover {
+  transform: translateY(-4px) scale(1.02) rotateX(5deg);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.35), 0 0 16px rgba(139,92,246,0.12);
+}
+
+/* SDK page cards — 3D */
+.sdk-card {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.sdk-card:hover {
+  transform: translateY(-4px) scale(1.02) rotateX(5deg) rotateY(-3deg);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.35), 0 0 16px rgba(139,92,246,0.12);
+}
+
+/* Memory/History cards — 3D */
+.history-item, .memory-card {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.history-item:hover, .memory-card:hover {
+  transform: translateY(-3px) scale(1.01) rotateX(3deg);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 12px rgba(139,92,246,0.1);
+}
+
+/* Buttons — 3D press effect */
+.btn-primary, .btn-secondary, button[class*="gradient"] {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 12px rgba(139,92,246,0.2), 0 0 0 1px rgba(255,255,255,0.05) inset;
+}
+.btn-primary:hover, button[class*="gradient"]:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(139,92,246,0.3), 0 0 0 1px rgba(255,255,255,0.08) inset;
+}
+.btn-primary:active, button[class*="gradient"]:active {
+  transform: translateY(0) scale(0.97) rotateX(5deg);
+}
+
+/* 3D keyframe animations */
+@keyframes icon3DFloat {
+  0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); }
+  50% { transform: translateY(-2px) rotateX(5deg) rotateY(-3deg); }
+}
+.nav-item.active svg {
+  animation: icon3DFloat 3s ease-in-out infinite;
+}
+
+/* Stat card entrance — 3D */
+@keyframes statCard3D {
+  from { opacity: 0; transform: translateY(20px) rotateX(-15deg) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) rotateX(0) scale(1); }
+}
+.stat-card-enter {
+  animation: statCard3D 0.5s cubic-bezier(0.16,1,0.3,1) backwards;
+}
+
+/* Glow on active nav item — 3D pulse */
+@keyframes navGlow3D {
+  0%, 100% { box-shadow: 0 0 8px rgba(139,92,246,0.2); }
+  50% { box-shadow: 0 0 16px rgba(139,92,246,0.4); }
+}
+.nav-item.active::before {
+  animation: navGlow3D 2s ease-in-out infinite;
+}
+
+/* Light mode adjustments */
+body.light-mode .logo-glow {
+  background: linear-gradient(145deg, #f5f5f9 0%, #e8e8ee 100%) !important;
+  box-shadow:
+    0 4px 12px rgba(139,92,246,0.15),
+    0 0 0 1px rgba(0,0,0,0.03) inset,
+    0 2px 6px rgba(139,92,246,0.1) inset !important;
+}
+body.light-mode .cmd-item-icon {
+  background: linear-gradient(145deg, rgba(139,92,246,0.08), rgba(139,92,246,0.03)) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.03) inset;
+}
+
+/* === END 3D ICON UPGRADE === */
 </style>
   <link rel="stylesheet" href="/studio-friendly.css">
 </head>
