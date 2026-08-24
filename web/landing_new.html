@@ -1456,17 +1456,17 @@ a { color: inherit; text-decoration: none; }
 
 /* ═══ Animated Background System ═══ */
 .bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.5; }
-.bg-aurora { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden; }
+.bg-aurora { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
 .bg-aurora-band { position: absolute; width: 200%; height: 300px; opacity: 0.15; border-radius: 50%; filter: blur(60px); }
 .bg-aurora-1 { background: linear-gradient(90deg, transparent, #a855f7, #d946ef, transparent); top: -10%; left: -50%; animation: auroraDrift 20s ease-in-out infinite; }
 .bg-aurora-2 { background: linear-gradient(90deg, transparent, #ec4899, #6366f1, transparent); top: 30%; left: -60%; animation: auroraDrift 25s ease-in-out infinite reverse; animation-delay: -8s; }
 .bg-aurora-3 { background: linear-gradient(90deg, transparent, #6366f1, #a855f7, transparent); bottom: -10%; left: -50%; animation: auroraDrift 30s ease-in-out infinite; animation-delay: -15s; }
 @keyframes auroraDrift { 0% { transform: translateX(0) translateY(0) rotate(0deg); } 33% { transform: translateX(30%) translateY(20px) rotate(5deg); } 66% { transform: translateX(-10%) translateY(-15px) rotate(-3deg); } 100% { transform: translateX(0) translateY(0) rotate(0deg); } }
-.bg-grid { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.03;
+.bg-grid { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.03;
   background-image: linear-gradient(rgba(139,92,246,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.3) 1px, transparent 1px);
   background-size: 50px 50px; animation: gridMove 40s linear infinite; }
 @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 50px 50px; } }
-.bg-noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.015;
+.bg-noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.015;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
 
@@ -1477,7 +1477,7 @@ a { color: inherit; text-decoration: none; }
 .plat-orb { opacity: 0.15 !important; filter: blur(80px) !important; }
 
 /* Mouse-following glow */
-.bg-mouse-glow {
+.bg-mouse-glow { z-index: -1;
   position: fixed; width: 600px; height: 600px; border-radius: 50%;
   background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 60%);
   pointer-events: none; z-index: 0; transition: transform 0.15s ease-out;
@@ -1526,14 +1526,14 @@ a { color: inherit; text-decoration: none; }
 
 
 /* ═══ DRAMATIC Background Override ═══ */
-.bg-canvas { opacity: 1 !important; z-index: 0 !important; }
+.bg-canvas { opacity: 0.7 !important; z-index: -1 !important; }
 .bg-aurora-band { opacity: 0.35 !important; filter: blur(40px) !important; height: 400px !important; }
 .bg-aurora-1 { animation-duration: 15s !important; }
 .bg-aurora-2 { animation-duration: 18s !important; }
 .bg-aurora-3 { animation-duration: 22s !important; }
 .bg-grid { opacity: 0.06 !important; background-size: 40px 40px !important; }
 .plat-orb { opacity: 0.2 !important; filter: blur(60px) !important; }
-.bg-mouse-glow {
+.bg-mouse-glow { z-index: -1;
   width: 800px !important; height: 800px !important;
   background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, rgba(217,70,239,0.06) 30%, transparent 60%) !important;
 }
@@ -2996,7 +2996,7 @@ document.addEventListener('mousemove', e => {
   function resize() {
     W = canvas.width = window.innerWidth;
     H = canvas.height = window.innerHeight;
-    maxParticles = W < 768 ? 50 : 120;
+    maxParticles = W < 768 ? 35 : 80;
     connectionDist = W < 768 ? 120 : 200;
   }
   resize();
