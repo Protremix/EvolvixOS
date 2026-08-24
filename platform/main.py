@@ -1378,6 +1378,141 @@ async def create_entity_with_version(entity_data: dict = Body(...), request: Req
     return result
 
 
+
+# ─── Billing & Token Packs API ───
+
+@app.get('/api/billing/token-packs')
+async def list_token_packs():
+    """List all available token packs."""
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT id, name, credits, price, discount_percent, is_popular, description, features, color FROM token_packs WHERE is_active = 1 ORDER BY sort_order')
+        rows = c.fetchall()
+        conn.close()
+        packs = []
+        for r in rows:
+            packs.append({
+                'id': r[0], 'name': r[1], 'credits': r[2], 'price': r[3],
+                'discount_percent': r[4], 'is_popular': bool(r[5]),
+                'description': r[6],
+                'features': json.loads(r[7]) if r[7] else [],
+                'color': r[8]
+            })
+        return {'packs': packs}
+    except Exception as e:
+        return {'packs': [], 'error': str(e)}
+
+
+@app.get('/api/billing/plans')
+async def list_billing_plans():
+    """List all subscription plans."""
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT id, name, price_monthly, price_yearly, credits_monthly, max_agents, max_entities, max_functions, max_workflows, max_api_calls, features FROM plans WHERE is_active = 1 ORDER BY sort_order')
+        rows = c.fetchall()
+        conn.close()
+        plans = []
+        for r in rows:
+            plans.append({
+                'id': r[0], 'name': r[1], 'price_monthly': r[2], 'price_yearly': r[3],
+                'credits_monthly': r[4], 'max_agents': r[5], 'max_entities': r[6],
+                'max_functions': r[7], 'max_workflows': r[8], 'max_api_calls': r[9],
+                'features': json.loads(r[10]) if r[10] else []
+            })
+        return {'plans': plans}
+    except Exception as e:
+        return {'plans': [], 'error': str(e)}
+
+
+@app.get('/api/billing/credits')
+async def get_user_credits(request: Request):
+    """Get current user credit balance and usage."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, 'Authentication required')
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT s.credits_remaining, s.credits_used, p.name, p.credits_monthly FROM subscriptions s JOIN plans p ON s.plan_id = p.id WHERE s.user_id = ? AND s.status = ?', (user['user_id'], 'active'))
+        row = c.fetchone()
+        conn.close()
+        if row:
+            return {'remaining': row[0], 'used': row[1], 'plan': row[2], 'monthly_allowance': row[3], 'usage_percent': round((row[1] / max(row[3], 1)) * 100, 1)}
+        return {'remaining': 0, 'used': 0, 'plan': 'none', 'monthly_allowance': 0, 'usage_percent': 0}
+    except Exception as e:
+        return {'remaining': 0, 'used': 0, 'plan': 'none', 'monthly_allowance': 0, 'error': str(e)}
+
+
+@app.get('/api/billing/transactions')
+async def get_credit_transactions(request: Request, limit: int = 50):
+    """Get user credit transaction history."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, 'Authentication required')
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT amount, type, description, model_used, tokens_in, tokens_out, balance_after, timestamp FROM credit_transactions WHERE user_id = ? ORDER BY timestamp DESC LIMIT ?', (user['user_id'], limit))
+        rows = c.fetchall()
+        conn.close()
+        return {'transactions': [{'amount': r[0], 'type': r[1], 'description': r[2], 'model': r[3], 'tokens_in': r[4], 'tokens_out': r[5], 'balance_after': r[6], 'timestamp': r[7]} for r in rows]}
+    except Exception as e:
+        return {'transactions': [], 'error': str(e)}
+
+
+@app.get('/api/billing/token-packs/purchases')
+async def get_token_pack_purchases(request: Request):
+    """Get user token pack purchase history."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, 'Authentication required')
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT id, pack_name, credits_added, amount_paid, status, created_date FROM token_pack_purchases WHERE user_id = ? ORDER BY created_date DESC', (user['user_id'],))
+        rows = c.fetchall()
+        conn.close()
+        return {'purchases': [{'id': r[0], 'pack_name': r[1], 'credits_added': r[2], 'amount_paid': r[3], 'status': r[4], 'date': r[5]} for r in rows]}
+    except Exception as e:
+        return {'purchases': [], 'error': str(e)}
+
+
+@app.post('/api/billing/token-packs/{pack_id}/purchase')
+async def purchase_token_pack(pack_id: int, request: Request):
+    """Purchase a token pack — adds credits to user account."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, 'Authentication required')
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT name, credits, price FROM token_packs WHERE id = ? AND is_active = 1', (pack_id,))
+        pack = c.fetchone()
+        if not pack:
+            conn.close()
+            raise HTTPException(404, 'Token pack not found')
+        pack_name, credits, price = pack
+        # Create purchase record
+        c.execute('INSERT INTO token_pack_purchases (user_id, pack_id, pack_name, credits_added, amount_paid, status, created_date) VALUES (?, ?, ?, ?, ?, ?, ?)', (user['user_id'], pack_id, pack_name, credits, price, 'completed', time.strftime('%Y-%m-%d %H:%M:%S')))
+        purchase_id = c.lastrowid
+        # Add credits to subscription
+        c.execute('UPDATE subscriptions SET credits_remaining = credits_remaining + ? WHERE user_id = ? AND status = ?', (credits, user['user_id'], 'active'))
+        # Record credit transaction
+        c.execute('SELECT credits_remaining FROM subscriptions WHERE user_id = ? AND status = ?', (user['user_id'], 'active'))
+        row = c.fetchone()
+        balance_after = row[0] if row else 0
+        c.execute('INSERT INTO credit_transactions (user_id, amount, type, description, model_used, tokens_in, tokens_out, balance_after, timestamp) VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?)', (user['user_id'], credits, 'credit', 'Purchased ' + pack_name, 'token-pack', balance_after, time.strftime('%Y-%m-%d %H:%M:%S')))
+        conn.commit()
+        conn.close()
+        return {'ok': True, 'purchase_id': purchase_id, 'pack_name': pack_name, 'credits_added': credits, 'new_balance': balance_after, 'message': 'Successfully purchased ' + pack_name + '! ' + str(credits) + ' credits added.'}
+    except HTTPException:
+        raise
+    except Exception as e:
+        return {'ok': False, 'error': str(e)}
+
+
 # ─── Startup ───
 @app.on_event("startup")
 async def startup():

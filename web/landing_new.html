@@ -479,6 +479,102 @@ a { color: inherit; text-decoration: none; }
   position: relative; z-index: 1;
 }
 
+/* ─── Token Packs ─── */
+.token-packs-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
+.token-packs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 56px; }
+.token-pack-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 36px 28px; text-align: center; position: relative; overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.4s, border-color 0.4s;
+  cursor: pointer;
+}
+.token-pack-card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+
+/* Color-specific glow effects */
+.token-pack-card[data-color="emerald"]:hover { border-color: rgba(52, 211, 153, 0.4); box-shadow: 0 20px 50px rgba(52, 211, 153, 0.12); }
+.token-pack-card[data-color="purple"]:hover { border-color: rgba(168, 85, 247, 0.4); box-shadow: 0 20px 50px rgba(168, 85, 247, 0.12); }
+.token-pack-card[data-color="pink"]:hover { border-color: rgba(236, 72, 153, 0.4); box-shadow: 0 20px 50px rgba(236, 72, 153, 0.12); }
+.token-pack-card[data-color="blue"]:hover { border-color: rgba(129, 140, 248, 0.4); box-shadow: 0 20px 50px rgba(129, 140, 248, 0.12); }
+.token-pack-card[data-color="amber"]:hover { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 20px 50px rgba(245, 158, 11, 0.12); }
+
+/* Mouse-follow glow */
+.token-pack-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(168, 85, 247, 0.06) 0%, transparent 40%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.token-pack-card:hover::after { opacity: 1; }
+
+.token-pack-card .pack-icon {
+  width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center; font-size: 28px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.token-pack-card:hover .pack-icon { transform: scale(1.15) rotate(-6deg); }
+
+.token-pack-card .pack-name { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.token-pack-card .pack-credits {
+  font-size: 40px; font-weight: 900; font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -1.5px; margin-bottom: 4px;
+  background: linear-gradient(135deg, #fff, #c084fc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.token-pack-card .pack-credits-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+.token-pack-card .pack-price { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+.token-pack-card .pack-price .currency { font-size: 18px; color: var(--text-muted); font-weight: 600; }
+.token-pack-card .pack-save {
+  display: inline-block; padding: 4px 12px; border-radius: 100px;
+  font-size: 12px; font-weight: 700;
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(34, 197, 94, 0.15));
+  color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3);
+  margin-bottom: 20px;
+}
+.token-pack-card .pack-features { list-style: none; text-align: left; margin-bottom: 24px; }
+.token-pack-card .pack-features li {
+  display: flex; align-items: flex-start; gap: 8px; padding: 6px 0;
+  font-size: 13px; color: var(--text-muted); line-height: 1.5;
+}
+.token-pack-card .pack-features li::before { content: '✓'; color: var(--success); font-weight: 800; flex-shrink: 0; font-size: 12px; }
+
+.token-pack-card .pack-cta {
+  display: block; text-align: center; padding: 12px 20px; border-radius: 100px;
+  font-size: 14px; font-weight: 700; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text);
+}
+.token-pack-card:hover .pack-cta { border-color: var(--primary); background: rgba(168, 85, 247, 0.08); transform: scale(1.05); }
+
+/* Popular badge for token packs */
+.token-pack-card .popular-badge {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  padding: 4px 16px; border-radius: 100px; font-size: 11px; font-weight: 700;
+  background: linear-gradient(135deg, #a855f7, #ec4899); color: #fff;
+  text-transform: uppercase; letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+  animation: badgeBounce 2s ease-in-out infinite; z-index: 3;
+  white-space: nowrap;
+}
+
+/* Animated coin float */
+@keyframes coinFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(5deg); }
+}
+.token-pack-card .pack-icon { animation: coinFloat 3s ease-in-out infinite; }
+.token-pack-card:nth-child(2) .pack-icon { animation-delay: 0.5s; }
+.token-pack-card:nth-child(3) .pack-icon { animation-delay: 1s; }
+.token-pack-card:nth-child(4) .pack-icon { animation-delay: 1.5s; }
+.token-pack-card:nth-child(5) .pack-icon { animation-delay: 2s; }
+
+/* 3D tilt for token packs */
+.token-pack-tilt { perspective: 1000px; }
+
 /* ─── Pricing ─── */
 .pricing-section { padding: 140px 40px 100px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
 
@@ -1208,6 +1304,7 @@ a { color: inherit; text-decoration: none; }
     <a href="#tools">Tools</a>
     <a href="#architecture">Architecture</a>
     <a href="#pricing">Pricing</a>
+    <a href="#token-packs">Token Packs</a>
     <a href="/platform/">Studio</a>
     <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
   </div>
@@ -1660,71 +1757,96 @@ a { color: inherit; text-decoration: none; }
 
   <div class="pricing-grid">
     <div class="pricing-card reveal" data-tilt>
-      <div class="pricing-feature-count">6 features</div>
-      <div class="pricing-name">🌱 Starter</div>
+      <div class="pricing-feature-count">5 features</div>
+      <div class="pricing-name">🆓 Free</div>
       <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="0" data-monthly="0" data-annual="0">0</span><span class="period">/month</span></div>
       <p class="pricing-desc">Perfect for exploring the platform and building your first AI apps.</p>
       <ul class="pricing-features">
-        <li><span class="check">✓</span> 3 Entities / Apps</li>
-        <li><span class="check">✓</span> 5 Pages per App</li>
-        <li><span class="check">✓</span> Local LLM Access (Ollama)</li>
-        <li><span class="check">✓</span> 10 API Calls / minute</li>
+        <li><span class="check">✓</span> 1 AI Agent</li>
+        <li><span class="check">✓</span> 3 Entities</li>
+        <li><span class="check">✓</span> 1 Backend Function</li>
+        <li><span class="check">✓</span> Free AI Models (GLM, Nemotron, GPT-OSS)</li>
         <li><span class="check">✓</span> Community Support</li>
-        <li><span class="check">✓</span> Page Builder + App Viewer</li>
-        <li><span class="x">✕</span> <span class="label-muted">Cloud AI Models (Groq/Gemini)</span></li>
-        <li><span class="x">✕</span> <span class="label-muted">Media Production (4K Video)</span></li>
-        <li><span class="x">✕</span> <span class="label-muted">Workflow Automation</span></li>
       </ul>
       <a href="/platform/" class="pricing-cta secondary" data-magnetic>Start Free</a>
     </div>
+    <div class="pricing-card reveal" data-tilt>
+      <div class="pricing-feature-count">7 features</div>
+      <div class="pricing-name">🌱 Starter</div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="9" data-monthly="9" data-annual="7">0</span><span class="period">/month</span></div>
+      <p class="pricing-desc">For hobbyists and indie devs building their first AI projects.</p>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> 5 AI Agents</li>
+        <li><span class="check">✓</span> 10 Entities</li>
+        <li><span class="check">✓</span> 5 Backend Functions</li>
+        <li><span class="check">✓</span> 3 Workflows</li>
+        <li><span class="check">✓</span> Standard AI Models (GLM 5, GPT-OSS, DeepSeek, Kimi)</li>
+        <li><span class="check">✓</span> Email Support</li>
+        <li><span class="check">✓</span> No rate limits</li>
+      </ul>
+      <a href="/platform/" class="pricing-cta secondary" data-magnetic>Start Starter</a>
+    </div>
     <div class="pricing-card featured reveal" data-tilt>
       <div class="pricing-badge">★ Most Popular</div>
-      <div class="pricing-feature-count">10 features</div>
+      <div class="pricing-feature-count">8 features</div>
       <div class="pricing-name">🚀 Professional</div>
       <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="29" data-monthly="29" data-annual="23">0</span><span class="period">/month</span></div>
       <p class="pricing-desc">For developers building production AI apps with cloud model access.</p>
       <ul class="pricing-features">
-        <li><span class="check">✓</span> Unlimited Entities / Apps</li>
-        <li><span class="check">✓</span> Unlimited Pages per App</li>
-        <li><span class="check">✓</span> Local + Cloud AI (Groq, Gemini, Kimi)</li>
-        <li><span class="check">✓</span> 100 API Calls / minute</li>
-        <li><span class="check">✓</span> Workflow Automation</li>
-        <li><span class="check">✓</span> Backend Functions (deploy Python)</li>
-        <li><span class="check">✓</span> Auto-Generated SDKs (TS/JS)</li>
-        <li><span class="check">✓</span> Priority Email Support</li>
-        <li><span class="x">✕</span> <span class="label-muted">4K Video Production</span></li>
-        <li><span class="x">✕</span> <span class="label-muted">Voice Command Interface</span></li>
+        <li><span class="check">✓</span> 20 AI Agents</li>
+        <li><span class="check">✓</span> 50 Entities</li>
+        <li><span class="check">✓</span> 20 Backend Functions</li>
+        <li><span class="check">✓</span> Unlimited Workflows</li>
+        <li><span class="check">✓</span> All AI Models (Claude Sonnet 5, Gemini 3.1 Pro)</li>
+        <li><span class="check">✓</span> Priority Support</li>
+        <li><span class="check">✓</span> Scheduled Tasks</li>
+        <li><span class="check">✓</span> Custom Agent Training</li>
       </ul>
       <a href="/platform/" class="pricing-cta primary" data-magnetic>Start Pro Trial →</a>
     </div>
     <div class="pricing-card reveal" data-tilt>
-      <div class="pricing-feature-count">10 features</div>
+      <div class="pricing-feature-count">9 features</div>
       <div class="pricing-name">💼 Business</div>
-      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="99" data-monthly="99" data-annual="79">0</span><span class="period">/month</span></div>
-      <p class="pricing-desc">Full media production, voice commands, and higher limits for growing teams.</p>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="49" data-monthly="49" data-annual="39">0</span><span class="period">/month</span></div>
+      <p class="pricing-desc">For growing teams needing more power and collaboration.</p>
       <ul class="pricing-features">
-        <li><span class="check">✓</span> Everything in Professional</li>
-        <li><span class="check">✓</span> 4K Video Production (ffmpeg)</li>
-        <li><span class="check">✓</span> AI Voiceover + Neural TTS</li>
-        <li><span class="check">✓</span> Voice Command Interface</li>
-        <li><span class="check">✓</span> 1,000 API Calls / minute</li>
-        <li><span class="check">✓</span> 3D Logo Generation (Blender)</li>
-        <li><span class="check">✓</span> Analytics Dashboard (Chart.js)</li>
-        <li><span class="check">✓</span> Team Memory Hub</li>
-        <li><span class="check">✓</span> WhatsApp + Telegram Bots</li>
-        <li><span class="x">✕</span> <span class="label-muted">Dedicated GPU Server</span></li>
+        <li><span class="check">✓</span> 50 AI Agents</li>
+        <li><span class="check">✓</span> 200 Entities</li>
+        <li><span class="check">✓</span> 50 Backend Functions</li>
+        <li><span class="check">✓</span> Unlimited Workflows</li>
+        <li><span class="check">✓</span> All AI Models + Gemini 3.6 Flash</li>
+        <li><span class="check">✓</span> Scheduled Tasks</li>
+        <li><span class="check">✓</span> Analytics Dashboard</li>
+        <li><span class="check">✓</span> Team Collaboration (3 seats)</li>
+        <li><span class="check">✓</span> Email Support</li>
       </ul>
-      <a href="/platform/" class="pricing-cta secondary" data-magnetic>Start Business Trial</a>
+      <a href="/platform/" class="pricing-cta secondary" data-magnetic>Start Business</a>
+    </div>
+    <div class="pricing-card reveal" data-tilt>
+      <div class="pricing-feature-count">8 features</div>
+      <div class="pricing-name">🏢 Team</div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="99" data-monthly="99" data-annual="79">0</span><span class="period">/month</span></div>
+      <p class="pricing-desc">Unlimited everything for growing teams with advanced needs.</p>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> Unlimited AI Agents</li>
+        <li><span class="check">✓</span> Unlimited Entities</li>
+        <li><span class="check">✓</span> Unlimited Functions</li>
+        <li><span class="check">✓</span> Unlimited Workflows</li>
+        <li><span class="check">✓</span> All AI Models + Early Access</li>
+        <li><span class="check">✓</span> Team Collaboration (5 seats)</li>
+        <li><span class="check">✓</span> Custom Model Hosting</li>
+        <li><span class="check">✓</span> SLA 99.9%</li>
+      </ul>
+      <a href="/platform/" class="pricing-cta secondary" data-magnetic>Start Team</a>
     </div>
     <div class="pricing-card reveal" data-tilt>
       <div class="pricing-feature-count">10 features</div>
-      <div class="pricing-name">🏆 Enterprise</div>
-      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="299" data-monthly="299" data-annual="239">0</span><span class="period">/month</span></div>
+      <div class="pricing-name">🏛️ Enterprise</div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="199" data-monthly="199" data-annual="158">0</span><span class="period">/month</span></div>
       <p class="pricing-desc">Dedicated infrastructure, GPU access, and enterprise-grade support.</p>
       <ul class="pricing-features">
-        <li><span class="check">✓</span> Everything in Business</li>
+        <li><span class="check">✓</span> Everything Unlimited</li>
         <li><span class="check">✓</span> Dedicated GPU Server (Wan2.1)</li>
-        <li><span class="check">✓</span> Unlimited API Calls</li>
         <li><span class="check">✓</span> MicroVM Sandboxing (CubeSandbox)</li>
         <li><span class="check">✓</span> Tencent Cloud Integration</li>
         <li><span class="check">✓</span> Custom AI Model Fine-tuning</li>
@@ -1734,6 +1856,119 @@ a { color: inherit; text-decoration: none; }
         <li><span class="check">✓</span> Source Code Access</li>
       </ul>
       <a href="mailto:admin@evolvixos.com" class="pricing-cta secondary" data-magnetic>Contact Sales</a>
+    </div>
+    <div class="pricing-card reveal" data-tilt>
+      <div class="pricing-feature-count">8 features</div>
+      <div class="pricing-name">👑 Enterprise+</div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="299" data-monthly="299" data-annual="239">0</span><span class="period">/month</span></div>
+      <p class="pricing-desc">Maximum power. Dedicated server, white-label, and a dedicated AI engineer.</p>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> Everything in Enterprise</li>
+        <li><span class="check">✓</span> Dedicated Server Infrastructure</li>
+        <li><span class="check">✓</span> White-label Platform</li>
+        <li><span class="check">✓</span> Custom Integrations</li>
+        <li><span class="check">✓</span> Dedicated AI Engineer</li>
+        <li><span class="check">✓</span> 24/7 Phone Support</li>
+        <li><span class="check">✓</span> Quarterly Strategy Review</li>
+        <li><span class="check">✓</span> Custom SLA Terms</li>
+      </ul>
+      <a href="mailto:admin@evolvixos.com" class="pricing-cta secondary" data-magnetic>Contact Sales</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TOKEN PACKS ═══ -->
+<section class="token-packs-section" id="token-packs">
+  <div class="section-center reveal">
+    <div class="section-tag">🪙 Token Packs</div>
+    <h2 class="section-title">Need More Credits? <span class="grad">Buy a Token Pack</span></h2>
+    <p class="section-subtitle">
+      One-time credit purchases that never expire. Top up your account anytime —
+      no subscription needed. Credits work with all AI models on the platform.
+    </p>
+  </div>
+
+  <div class="token-packs-grid">
+    <div class="token-pack-card reveal" data-color="emerald" data-tilt>
+      <div class="pack-icon">🔋</div>
+      <div class="pack-name">Starter Pack</div>
+      <div class="pack-credits" data-count="2000" data-suffix="">0</div>
+      <div class="pack-credits-label">Credits</div>
+      <div class="pack-price"><span class="currency">$</span>5</div>
+      <div style="height: 24px;"></div>
+      <ul class="pack-features">
+        <li>All Standard Models</li>
+        <li>No Expiry</li>
+        <li>Instant Delivery</li>
+      </ul>
+      <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
+    </div>
+    <div class="token-pack-card reveal" data-color="purple" data-tilt>
+      <div class="popular-badge">★ Best Value</div>
+      <div class="pack-icon">⚡</div>
+      <div class="pack-name">Boost Pack</div>
+      <div class="pack-credits" data-count="10000" data-suffix="">0</div>
+      <div class="pack-credits-label">Credits</div>
+      <div class="pack-price"><span class="currency">$</span>20</div>
+      <div style="height: 24px;"></div>
+      <ul class="pack-features">
+        <li>All Standard + Pro Models</li>
+        <li>No Expiry</li>
+        <li>Instant Delivery</li>
+        <li>Priority Queue</li>
+      </ul>
+      <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
+    </div>
+    <div class="token-pack-card reveal" data-color="pink" data-tilt>
+      <div class="pack-icon">🚀</div>
+      <div class="pack-name">Pro Pack</div>
+      <div class="pack-credits" data-count="50000" data-suffix="">0</div>
+      <div class="pack-credits-label">Credits</div>
+      <div class="pack-price"><span class="currency">$</span>80</div>
+      <div class="pack-save">Save 20%</div>
+      <ul class="pack-features">
+        <li>All Models Including Premium</li>
+        <li>No Expiry</li>
+        <li>Instant Delivery</li>
+        <li>Priority Queue</li>
+        <li>Extended Rate Limits</li>
+      </ul>
+      <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
+    </div>
+    <div class="token-pack-card reveal" data-color="blue" data-tilt>
+      <div class="pack-icon">💎</div>
+      <div class="pack-name">Mega Pack</div>
+      <div class="pack-credits" data-count="200000" data-suffix="">0</div>
+      <div class="pack-credits-label">Credits</div>
+      <div class="pack-price"><span class="currency">$</span>250</div>
+      <div class="pack-save">Save 37%</div>
+      <ul class="pack-features">
+        <li>All Models + Early Access</li>
+        <li>No Expiry</li>
+        <li>Instant Delivery</li>
+        <li>Dedicated Queue</li>
+        <li>Extended Rate Limits</li>
+        <li>Team Sharing (5 seats)</li>
+      </ul>
+      <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
+    </div>
+    <div class="token-pack-card reveal" data-color="amber" data-tilt>
+      <div class="pack-icon">🐋</div>
+      <div class="pack-name">Whale Pack</div>
+      <div class="pack-credits" data-count="1000000" data-suffix="">0</div>
+      <div class="pack-credits-label">Credits</div>
+      <div class="pack-price"><span class="currency">$</span>1,000</div>
+      <div class="pack-save">Save 50%</div>
+      <ul class="pack-features">
+        <li>All Models + Early Access + Beta</li>
+        <li>No Expiry</li>
+        <li>Instant Delivery</li>
+        <li>Dedicated Server Queue</li>
+        <li>Unlimited Rate Limits</li>
+        <li>Team Sharing (20 seats)</li>
+        <li>Custom Model Access</li>
+      </ul>
+      <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
     </div>
   </div>
 </section>
@@ -1766,6 +2001,7 @@ a { color: inherit; text-decoration: none; }
         <a href="#tools">Tools</a>
     <a href="#architecture">Architecture</a>
         <a href="#pricing">Pricing</a>
+    <a href="#token-packs">Token Packs</a>
       </div>
       <div class="footer-col">
         <h4>Resources</h4>
@@ -2169,6 +2405,51 @@ const navObserver = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' });
 Object.values(navSections).forEach(s => navObserver.observe(s.el));
+
+
+// ─── 3D tilt for token pack cards ───
+document.querySelectorAll('.token-pack-card[data-tilt]').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotateX = ((y - cy) / cy) * -8;
+    const rotateY = ((x - cx) / cx) * 8;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+    card.style.setProperty('--mx', `${(x / rect.width) * 100}%`);
+    card.style.setProperty('--my', `${(y / rect.height) * 100}%`);
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+// ─── Token pack credits counter ───
+document.querySelectorAll('.token-pack-card .pack-credits[data-count]').forEach(el => {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !el.dataset.animated) {
+        el.dataset.animated = 'true';
+        const target = parseInt(el.dataset.count);
+        const suffix = el.dataset.suffix || '';
+        const duration = 2000;
+        const start = performance.now();
+        function update(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = Math.floor(eased * target).toLocaleString() + suffix;
+          if (progress < 1) requestAnimationFrame(update);
+          else el.textContent = target.toLocaleString() + suffix;
+        }
+        requestAnimationFrame(update);
+        obs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.3 });
+  obs.observe(el);
+});
 
 // ─── Parallax orbs on mouse ───
 document.addEventListener('mousemove', e => {
