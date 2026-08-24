@@ -197,8 +197,8 @@
         var p = comp.props || comp;
         var btn = document.createElement('button');
         btn.className = 'btn-primary mb-4';
-        btn.textContent = p.text || comp.content || 'Button';
-        if (p.action === 'new_record') btn.onclick = function() { openNewRecordModal(p.entity); };
+        btn.textContent = p.label || p.text || comp.content || 'Button';
+        if (p.action === 'new_record' || p.action === 'create') btn.onclick = function() { openNewRecordModal(p.entity); };
         container.appendChild(btn);
       },
 
