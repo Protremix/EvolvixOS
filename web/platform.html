@@ -430,14 +430,7 @@ async function buyTokenPack(packId, packName) {
   } catch(e) { toast('Purchase failed: ' + e.message, 'error'); }
 }
 
-// Load billing data when billing page is shown
-var origShowPageBilling = window.showPage;
-if (origShowPageBilling) {
-  window.showPage = function(page) {
-    origShowPageBilling(page);
-    if (page === 'billing') { loadBillingData(); }
-  };
-}
+// Billing data loaded via navigateTo() when page === 'billing'
 
 // ═══ Mobile sidebar toggle ═══
 function toggleSidebar() {
@@ -2077,7 +2070,7 @@ function navigateTo(page) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
   if (navItem) navItem.classList.add('active');
-  const titles = {chat: 'AI Builder', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', agents: 'Agents', memory: 'Memory', records: 'Records', analytics: 'Analytics', apps: 'Apps', pagebuilder: 'Page Builder', connectors: 'Connectors', sdk: 'SDK Generator', versions: 'Version History'};
+  const titles = {chat: 'AI Builder', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', agents: 'Agents', memory: 'Memory', records: 'Records', analytics: 'Analytics', apps: 'Apps', pagebuilder: 'Page Builder', connectors: 'Connectors', sdk: 'SDK Generator', versions: 'Version History', billing: 'Billing & Credits'};
   document.getElementById('page-title').textContent = titles[page] || page;
   if (page === 'entities') loadEntities();
   if (page === 'functions') loadFunctions();
@@ -2090,6 +2083,7 @@ function navigateTo(page) {
   if (page === 'sdk') loadSDK();
   if (page === 'versions') loadVersions();
   if (page === 'pagebuilder') loadPageBuilder();
+  if (page === 'billing') loadBillingData();
 }
 
 document.querySelectorAll('.nav-item').forEach(item => {
