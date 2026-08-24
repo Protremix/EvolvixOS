@@ -37,6 +37,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from database import get_db, init_db, async_session
 from entities.manager import EntityManager
 from entities.crud import EntityCRUD as EnhancedCRUD
+from templates import get_template_list, get_template, instantiate_template
 from auth.middleware import optional_auth, require_auth, require_admin, get_user_from_token
 from routing_bridge import unified_chat
 import sqlite3 as sqlite3_billing
@@ -1064,6 +1065,32 @@ async def delete_page(page_id: int, db=Depends(get_db)):
 @app.get("/api/components/palette")
 async def get_component_palette():
     return PageGenerator.get_component_palette()
+
+# ─── App Templates ───
+@app.get("/api/templates")
+async def list_templates():
+    """List available one-click app templates."""
+    return get_template_list()
+
+@app.get("/api/templates/{template_id}")
+async def get_template_detail(template_id: str):
+    """Get full template definition."""
+    t = get_template(template_id)
+    if not t:
+        raise HTTPException(404, "Template not found")
+    return t
+
+@app.post("/api/templates/{template_id}/create")
+async def create_from_template(template_id: str, body: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    """Create a complete app from a template: app + entities + pages + auto-publish."""
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    app_name = body.get("name")
+    try:
+        result = await instantiate_template(db, template_id, app_name, uid)
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
 
 # ─── SDK Generator (Feature 5) ───
 @app.get("/api/sdk")

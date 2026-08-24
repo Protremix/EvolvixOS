@@ -98,7 +98,7 @@ class EntityManager:
             )
         else:
             result = await db.execute(
-                text("SELECT id FROM platform_entities WHERE name = :name AND app_id IS NULL"),
+                text("SELECT id FROM platform_entities WHERE name = :name AND (app_id IS NULL OR app_id = 0)"),
                 {"name": name}
             )
         if result.fetchone():

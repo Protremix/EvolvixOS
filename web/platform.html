@@ -1091,28 +1091,28 @@ body.light-mode .bg-black\/60{background:rgba(0,0,0,.3) !important}
 
         <!-- Suggestion cards (shown in hero) -->
         <div id="builder-suggestions" class="grid grid-cols-2 gap-3 mb-6">
-          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="quickBuild('build a CRM app')">
+          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="createFromTemplate('crm')">
             <div class="flex items-center gap-2 mb-1">
               <span class="text-lg">📊</span>
               <span class="text-sm font-medium">CRM App</span>
             </div>
             <p class="text-xs text-gray-500">Contacts, deals, pipeline</p>
           </div>
-          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="quickBuild('build an online store')">
+          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="createFromTemplate('ecommerce')">
             <div class="flex items-center gap-2 mb-1">
               <span class="text-lg">🛍️</span>
               <span class="text-sm font-medium">E-Commerce</span>
             </div>
             <p class="text-xs text-gray-500">Products, orders, cart</p>
           </div>
-          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="quickBuild('build a task management app')">
+          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="createFromTemplate('tasks')">
             <div class="flex items-center gap-2 mb-1">
               <span class="text-lg">✅</span>
               <span class="text-sm font-medium">Task Manager</span>
             </div>
             <p class="text-xs text-gray-500">Tasks, projects, teams</p>
           </div>
-          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="quickBuild('build a blog platform')">
+          <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="createFromTemplate('blog')">
             <div class="flex items-center gap-2 mb-1">
               <span class="text-lg">✍️</span>
               <span class="text-sm font-medium">Blog</span>
@@ -1519,6 +1519,7 @@ body.light-mode .bg-black\/60{background:rgba(0,0,0,.3) !important}
       <select id="pagebuilder-app-select" class="bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300" onchange="loadAppPages()">
         <option value="">Select app...</option>
       </select>
+      <button onclick="pbPreview()" class="px-4 py-2 rounded-lg bg-[#1e1e28] border border-gray-700 text-gray-300 text-sm font-medium hover:bg-[#252530] transition">👁 Preview</button>
       <button onclick="savePageLayout()" class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-sm font-medium hover:opacity-90 transition">Save</button>
     </div>
   </div>
@@ -1876,6 +1877,43 @@ function quickBuild(prompt) {
   input.value = prompt;
   input.focus();
   sendChat();
+}
+
+async function createFromTemplate(templateId) {
+  // Ask for app name
+  var defaultName = {crm: 'My CRM', ecommerce: 'My Store', tasks: 'My Tasks', blog: 'My Blog'}[templateId] || 'New App';
+  var appName = prompt('App name:', defaultName);
+  if (!appName) return;
+  
+  // Show loading state
+  toast('Creating app from template...', 'info');
+  revealConversation();
+  addChatMessage('user', 'Create a ' + templateId + ' app called ' + appName);
+  addTypingIndicator();
+  
+  try {
+    var res = await api('/templates/' + templateId + '/create', 'POST', {name: appName});
+    removeTypingIndicator();
+    
+    var msg = '<div class="space-y-2">';
+    msg += '<p class="text-white font-medium">✅ App created successfully!</p>';
+    msg += '<div class="bg-[#0a0a0f] rounded-lg p-3 space-y-1 text-xs">';
+    msg += '<p class="text-gray-400">App: <span class="text-purple-400">' + escapeHtml(res.app.name) + '</span></p>';
+    msg += '<p class="text-gray-400">Entities: <span class="text-white">' + res.entities_created.length + '</span> (' + res.entities_created.join(', ') + ')</p>';
+    msg += '<p class="text-gray-400">Pages: <span class="text-white">' + res.pages_created + '</span></p>';
+    msg += '<p class="text-gray-400">Status: <span class="text-green-400">Published</span></p>';
+    msg += '</div>';
+    msg += '<a href="' + res.url + '" target="_blank" class="inline-block mt-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-xs font-medium hover:opacity-90 transition">View Live App →</a>';
+    msg += '<a href="/platform/#apps" class="inline-block mt-2 px-4 py-2 rounded-lg bg-[#1e1e28] text-white text-xs font-medium hover:bg-[#252530] transition ml-2">Open in Apps</a>';
+    msg += '</div>';
+    
+    addChatMessage('assistant', msg);
+    toast('App created with ' + res.entities_created.length + ' entities and ' + res.pages_created + ' pages', 'success');
+  } catch(e) {
+    removeTypingIndicator();
+    addChatMessage('assistant', '<p class="text-red-400">Error: ' + escapeHtml(e.message) + '</p>');
+    toast('Failed to create app: ' + e.message, 'error');
+  }
 }
 
 // ─── Chat ───
@@ -3221,9 +3259,12 @@ function pbAddToCanvas(comp) {
   item.className = 'flex items-center justify-between p-3 rounded-lg bg-white/5 border border-gray-800 cursor-pointer hover:border-purple-500/30 transition';
   item.draggable = true;
   var label = comp.props.text || comp.props.title || comp.props.label || comp.props.content || comp.label;
-  item.innerHTML = '<div class="flex items-center gap-2"><span class="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center text-[10px] text-purple-400 font-bold">' + (comp.type.charAt(0).toUpperCase()) + '</span><span class="text-xs text-gray-300">' + label + '</span></div><div class="flex items-center gap-2"><span class="text-[10px] text-gray-600">' + comp.type + '</span><button onclick="event.stopPropagation();this.closest(\'div\').parentElement.remove()" class="text-red-400 hover:text-red-300 text-xs">✕</button></div>';
+  item.innerHTML = '<div class="flex items-center gap-2"><span class="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center text-[10px] text-purple-400 font-bold">' + (comp.type.charAt(0).toUpperCase()) + '</span><span class="text-xs text-gray-300">' + escapeHtml(label) + '</span></div><div class="flex items-center gap-2"><span class="text-[10px] text-gray-600">' + comp.type + '</span><button onclick="event.stopPropagation();this.closest(\'div\').parentElement.remove()" class="text-red-400 hover:text-red-300 text-xs">✕</button></div>';
   item.onclick = function() { pbSelectComponent(item, comp); };
+  // Store full component data on the element for save/preview
+  item._compData = { component: comp.type, props: Object.assign({}, comp.props) };
   canvas.appendChild(item);
+  pbUpdatePreview();
 }
 
 function pbSelectComponent(elem, comp) {
@@ -3256,8 +3297,12 @@ function pbSelectComponent(elem, comp) {
 function pbUpdateProp(key, value) {
   if (!pbSelectedComp) return;
   pbSelectedComp.props[key] = isNaN(value) ? value : Number(value);
+  // Update stored data on canvas element
+  var selected = document.querySelector('#page-canvas .border-purple-500');
+  if (selected && selected._compData) selected._compData.props[key] = isNaN(value) ? value : Number(value);
   // Update canvas label
   pbRefreshCanvasLabels();
+  pbUpdatePreview();
 }
 
 function pbRefreshCanvasLabels() {
@@ -3275,6 +3320,7 @@ function pbRemoveSelected() {
   if (selected) selected.remove();
   document.getElementById('properties-panel').innerHTML = '<div class="flex items-center justify-center py-8 text-gray-600 text-xs">Select a component to edit</div>';
   pbSelectedComp = null;
+  pbUpdatePreview();
 }
 
 async function loadAppPages() {
@@ -3326,6 +3372,7 @@ function pbRenderCanvas(layout) {
   canvas.ondrop = pbOnDrop;
   if (!layout || layout.length === 0) {
     canvas.innerHTML = '<div class="flex items-center justify-center py-16 text-gray-600 text-xs">Drag components here to build your page</div>';
+    pbUpdatePreview();
     return;
   }
   canvas.innerHTML = '';
@@ -3336,18 +3383,118 @@ function pbRenderCanvas(layout) {
 }
 
 
+function pbGetLayout() {
+  var layout = [];
+  document.querySelectorAll('#page-canvas > div').forEach(function(d) {
+    if (d._compData) layout.push(d._compData);
+  });
+  return layout;
+}
+
 async function savePageLayout() {
   if (!pbCurrentPageId) return toast('No page selected', 'error');
-  var layout = [];
-  document.querySelectorAll('#page-canvas > div:not(.flex.items-center.justify-center)').forEach(function(d) {
-    var labelSpan = d.querySelector('.text-gray-300');
-    var typeSpan = d.querySelector('.text-gray-600');
-    layout.push({ component: typeSpan ? typeSpan.textContent.trim() : 'custom', props: { label: labelSpan ? labelSpan.textContent : d.textContent.trim() } });
-  });
+  var layout = pbGetLayout();
   try {
     await api('/pages/' + pbCurrentPageId, 'PUT', { layout: layout });
     toast('Page saved!', 'success');
   } catch(e) { toast('Error saving: ' + (e.message || ''), 'error'); }
+}
+
+// Live Preview
+function pbPreview() {
+  var layout = pbGetLayout();
+  if (layout.length === 0) return toast('Add components first', 'error');
+  var overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+  var frame = document.createElement('div');
+  frame.style.cssText = 'background:#0a0a0f;border:1px solid #1e1e28;border-radius:16px;width:100%;max-width:960px;max-height:85vh;overflow-y:auto;position:relative';
+  var header = '<div style="position:sticky;top:0;background:#13131a;border-bottom:1px solid #1e1e28;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;z-index:10;border-radius:16px 16px 0 0">' +
+    '<span style="color:#a855f7;font-weight:600;font-size:14px">Live Preview</span>' +
+    '<div style="display:flex;gap:8px">' +
+    '<button onclick="pbPreview()" style="background:#1e1e28;border:1px solid #333;color:#a1a1aa;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">↻ Refresh</button>' +
+    '<button onclick="this.closest(\'.modal-overlay\').remove()" style="background:#1e1e28;border:1px solid #333;color:#a1a1aa;padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer">✕ Close</button>' +
+    '</div></div>';
+  var content = '<div id="pb-preview-content" style="padding:24px;min-height:400px"></div>';
+  frame.innerHTML = header + content;
+  overlay.appendChild(frame);
+  document.body.appendChild(overlay);
+  pbRenderPreview(layout);
+}
+
+function pbUpdatePreview() {
+  // Auto-update preview if modal is open
+  var previewContent = document.getElementById('pb-preview-content');
+  if (!previewContent) return;
+  var layout = pbGetLayout();
+  pbRenderPreview(layout);
+}
+
+function pbRenderPreview(layout) {
+  var container = document.getElementById('pb-preview-content');
+  if (!container) return;
+  container.innerHTML = '';
+  // Inline mini-renderer (simplified version of app_renderer)
+  layout.forEach(function(comp) {
+    var type = comp.component || comp.type || '';
+    var p = comp.props || {};
+    var el = document.createElement('div');
+    if (type === 'header') {
+      el.className = 'mb-6';
+      el.innerHTML = '<h1 style="font-size:24px;font-weight:700;color:#fff">' + escapeHtml(p.title || p.text || '') + '</h1>' +
+        (p.subtitle ? '<p style="color:#71717a;font-size:14px;margin-top:4px">' + escapeHtml(p.subtitle) + '</p>' : '');
+    } else if (type === 'datatable') {
+      el.className = 'rounded-xl border border-[#1e1e28] overflow-hidden mb-6';
+      el.innerHTML = '<div style="padding:16px;border-bottom:1px solid #1e1e28"><span style="color:#fff;font-weight:600;font-size:14px">' + escapeHtml(p.entity || 'Data') + '</span></div>' +
+        '<div style="padding:40px;text-align:center;color:#71717a;font-size:13px">DataTable: ' + escapeHtml(p.entity || 'No entity') + ' (preview)</div>';
+    } else if (type === 'statcard') {
+      el.className = 'inline-block';
+      el.innerHTML = '<div style="background:#13131a;border:1px solid #1e1e28;border-radius:12px;padding:20px;margin-right:16px;margin-bottom:16px;min-width:200px">' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#71717a;font-size:13px;font-weight:500">' + escapeHtml(p.label || p.entity || 'Total') + '</span><span style="font-size:18px">📊</span></div>' +
+        '<div style="font-size:30px;font-weight:700;color:#fff">—</div></div>';
+    } else if (type === 'chart') {
+      el.className = 'rounded-xl border border-[#1e1e28] p-6 mb-6';
+      el.innerHTML = '<h3 style="color:#fff;font-size:18px;font-weight:600;margin-bottom:16px">' + escapeHtml(p.title || 'Chart') + '</h3>' +
+        '<div style="height:192px;display:flex;align-items:end;gap:8px;background:#13131a;border-radius:8px;padding:16px">' +
+        '<div style="flex:1;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:4px 4px 0 0;height:40%"></div>' +
+        '<div style="flex:1;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:4px 4px 0 0;height:65%"></div>' +
+        '<div style="flex:1;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:4px 4px 0 0;height:80%"></div>' +
+        '<div style="flex:1;background:linear-gradient(to top,#7c3aed,#a855f7);border-radius:4px 4px 0 0;height:30%"></div>' +
+        '</div>';
+    } else if (type === 'form') {
+      el.className = 'rounded-xl border border-[#1e1e28] p-6 mb-6';
+      el.innerHTML = '<h3 style="color:#fff;font-size:18px;font-weight:600;margin-bottom:16px">New ' + escapeHtml(p.entity || 'Record') + '</h3>' +
+        '<div style="display:flex;flex-direction:column;gap:12px"><div><label style="display:block;color:#a1a1aa;font-size:13px;margin-bottom:4px">Field 1</label><div style="background:#13131a;border:1px solid #1e1e28;border-radius:8px;padding:10px 14px;color:#71717a;font-size:14px">Input...</div></div>' +
+        '<div><label style="display:block;color:#a1a1aa;font-size:13px;margin-bottom:4px">Field 2</label><div style="background:#13131a;border:1px solid #1e1e28;border-radius:8px;padding:10px 14px;color:#71717a;font-size:14px">Input...</div></div>' +
+        '<button style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;padding:10px 20px;border-radius:8px;border:none;font-size:14px;cursor:pointer;margin-top:8px">Save Record</button></div>';
+    } else if (type === 'grid') {
+      var cols = p.columns || 2;
+      var children = p.children || [];
+      el.style.cssText = 'display:grid;gap:16px;margin-bottom:24px;grid-template-columns:repeat(' + cols + ',minmax(0,1fr))';
+      if (children.length === 0) el.innerHTML = '<div style="grid-column:span ' + cols + ';padding:20px;text-align:center;color:#71717a;font-size:13px">Grid: ' + cols + ' columns (empty)</div>';
+      children.forEach(function(child) {
+        var childEl = document.createElement('div');
+        var cp = child.props || {};
+        if (child.component === 'statcard') {
+          childEl.innerHTML = '<div style="background:#13131a;border:1px solid #1e1e28;border-radius:12px;padding:20px"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#71717a;font-size:13px">' + escapeHtml(cp.label || cp.entity || 'Total') + '</span></div><div style="font-size:30px;font-weight:700;color:#fff">—</div></div>';
+        } else {
+          childEl.innerHTML = '<div style="background:#13131a;border:1px solid #1e1e28;border-radius:8px;padding:20px;color:#71717a;font-size:13px">' + escapeHtml(child.component || 'Component') + '</div>';
+        }
+        el.appendChild(childEl);
+      });
+    } else if (type === 'button') {
+      el.style.marginBottom = '16px';
+      el.innerHTML = '<button style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;padding:10px 20px;border-radius:8px;border:none;font-size:14px;cursor:pointer">' + escapeHtml(p.text || p.content || 'Button') + '</button>';
+    } else if (type === 'text') {
+      el.style.cssText = 'color:#d4d4d8;font-size:14px;margin-bottom:16px';
+      el.textContent = p.text || p.content || '';
+    } else {
+      el.style.cssText = 'padding:16px;background:#13131a;border:1px solid #1e1e28;border-radius:8px;margin-bottom:16px;color:#71717a;font-size:13px';
+      el.textContent = type + ' (preview)';
+    }
+    container.appendChild(el);
+  });
 }
 
 // ════ Connectors ════
