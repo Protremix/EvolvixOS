@@ -1271,7 +1271,7 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
 </svg></div>
         <div>
           <span class="font-semibold text-sm">EvolvixOS</span>
-          <p class="text-[10px] text-gray-500 -mt-0.5">Platform Builder</p>
+          <p class="text-[10px] text-gray-500 -mt-0.5">Engineering Platform</p>
         </div>
         </div>
         <button onclick="openUserSettings()" class="text-gray-500 hover:text-purple-400 transition-colors p-1.5 rounded-lg hover:bg-purple-500/10" title="Account Settings">
@@ -1285,7 +1285,7 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
       <div class="px-4 py-1 text-[10px] text-gray-600 uppercase tracking-widest font-semibold">Build</div>
       <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="chat">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        AI Builder
+        Workbench
       </a>
       <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="entities">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -1370,7 +1370,7 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
         <div id="hamburger" onclick="toggleSidebar()">
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
         </div>
-        <h1 id="page-title" class="text-sm font-medium text-gray-300">AI Builder</h1>
+        <h1 id="page-title" class="text-sm font-medium text-gray-300">Workbench</h1>
       </div>
       <div class="header-links flex items-center gap-3 text-xs text-gray-500">
         <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Toggle theme">
@@ -1386,7 +1386,7 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
     <!-- Pages -->
     <div class="flex-1 overflow-y-auto">
 
-      <!-- AI Builder Page -->
+      <!-- Workbench Page -->
       <div id="page-chat" class="page active p-6 max-w-3xl mx-auto">
 
         <!-- Hero -->
@@ -1447,12 +1447,12 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
   </circle>
 </svg></div>
           <h2 class="text-3xl font-bold mb-2">Hi <span id="hero-username" class="gradient-text">there</span>.</h2>
-          <p class="text-gray-500 text-base">What will you build next?</p>
+          <p class="text-gray-500 text-base">What will you engineer next?</p>
         </div>
 
         <!-- Big prompt box -->
         <div class="prompt-box bg-[#0c0c12] border border-gray-800 rounded-2xl p-4 mb-6">
-          <textarea id="chat-input" rows="2" placeholder="Describe the app you want to create..."
+          <textarea id="chat-input" rows="2" placeholder="Describe the system you want to engineer..."
             class="w-full bg-transparent resize-none text-sm px-1 py-1 focus:outline-none placeholder-gray-600"></textarea>
           <div class="prompt-controls flex items-center justify-between px-1 pt-2">
             <div class="flex items-center gap-2">
@@ -1480,10 +1480,10 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
               </select>
               <div class="w-px h-4 bg-gray-800"></div>
               <select id="builder-mode" class="bg-transparent text-xs text-gray-500 hover:text-gray-300 focus:outline-none cursor-pointer transition-colors">
-                <option value="app">Build: App</option>
-                <option value="entity">Build: Entity</option>
+                <option value="app">Build: Service</option>
+                <option value="entity">Build: Schema</option>
                 <option value="function">Build: Function</option>
-                <option value="workflow">Build: Workflow</option>
+                <option value="workflow">Build: Pipeline</option>
               </select>
             </div>
             <div class="flex items-center gap-2">
@@ -1504,31 +1504,31 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
         <div id="builder-suggestions" class="grid grid-cols-2 gap-3 mb-6">
           <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="createFromTemplate('crm')">
             <div class="flex items-center gap-2 mb-1">
-              <span class="text-lg">📊</span>
-              <span class="text-sm font-medium">CRM App</span>
+              <span class="text-lg">🌐</span>
+              <span class="text-sm font-medium">API Gateway</span>
             </div>
-            <p class="text-xs text-gray-500">Contacts, deals, pipeline</p>
+            <p class="text-xs text-gray-500">Routes, middleware, rate limits</p>
           </div>
           <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="createFromTemplate('ecommerce')">
             <div class="flex items-center gap-2 mb-1">
-              <span class="text-lg">🛍️</span>
-              <span class="text-sm font-medium">E-Commerce</span>
+              <span class="text-lg">⚙️</span>
+              <span class="text-sm font-medium">ML Pipeline</span>
             </div>
-            <p class="text-xs text-gray-500">Products, orders, cart</p>
+            <p class="text-xs text-gray-500">Training, inference, evaluation</p>
           </div>
           <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="createFromTemplate('tasks')">
             <div class="flex items-center gap-2 mb-1">
-              <span class="text-lg">✅</span>
-              <span class="text-sm font-medium">Task Manager</span>
+              <span class="text-lg">🔗</span>
+              <span class="text-sm font-medium">Data Pipeline</span>
             </div>
-            <p class="text-xs text-gray-500">Tasks, projects, teams</p>
+            <p class="text-xs text-gray-500">ETL, transforms, scheduling</p>
           </div>
           <div class="suggestion-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4 cursor-pointer" onclick="createFromTemplate('blog')">
             <div class="flex items-center gap-2 mb-1">
-              <span class="text-lg">✍️</span>
-              <span class="text-sm font-medium">Blog</span>
+              <span class="text-lg">🔐</span>
+              <span class="text-sm font-medium">Auth Service</span>
             </div>
-            <p class="text-xs text-gray-500">Posts, authors, comments</p>
+            <p class="text-xs text-gray-500">JWT, OAuth, sessions</p>
           </div>
         </div>
 
@@ -2114,7 +2114,7 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
         <div class="flex items-center justify-between mb-8">
           <div>
             <h2 class="text-2xl font-bold">Memory</h2>
-            <p class="text-gray-500 text-sm mt-1">Persistent context the AI Builder remembers across conversations.</p>
+            <p class="text-gray-500 text-sm mt-1">Persistent context the Workbench remembers across conversations.</p>
           </div>
           <button onclick="showAddMemory()" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">+ Add Memory</button>
         </div>
@@ -2187,7 +2187,7 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
 
   <!-- Credit Cost Reference -->
   <div class="bg-[#1a1a22] border border-gray-800 rounded-2xl p-6 mb-8">
-    <h3 class="text-lg font-semibold mb-4">📊 Credit Cost Per AI Call</h3>
+    <h3 class="text-lg font-semibold mb-4">🌐 Credit Cost Per AI Call</h3>
     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
       <div class="flex items-center gap-3 p-3 bg-[#0c0c12] rounded-xl border border-gray-800/50">
         <div class="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center font-bold font-mono text-emerald-400 text-sm">1</div>
@@ -2372,7 +2372,7 @@ function navigateTo(page) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
   if (navItem) navItem.classList.add('active');
-  const titles = {chat: 'AI Builder', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', agents: 'Agents', memory: 'Memory', records: 'Records', analytics: 'Analytics', apps: 'Apps', pagebuilder: 'Page Builder', connectors: 'Connectors', sdk: 'SDK Generator', versions: 'Version History', billing: 'Billing & Credits'};
+  const titles = {chat: 'Workbench', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', agents: 'Agents', memory: 'Memory', records: 'Records', analytics: 'Analytics', apps: 'Apps', pagebuilder: 'Page Builder', connectors: 'Connectors', sdk: 'SDK Generator', versions: 'Version History', billing: 'Billing & Credits'};
   document.getElementById('page-title').textContent = titles[page] || page;
   if (page === 'entities') loadEntities();
   if (page === 'functions') loadFunctions();
@@ -2485,7 +2485,7 @@ function quickBuild(prompt) {
 
 async function createFromTemplate(templateId) {
   // Ask for app name
-  var defaultName = {crm: 'My CRM', ecommerce: 'My Store', tasks: 'My Tasks', blog: 'My Blog'}[templateId] || 'New App';
+  var defaultName = {crm: 'My CRM', ecommerce: 'My Store', tasks: 'My Tasks', blog: 'My Auth Service'}[templateId] || 'New App';
   var appName = prompt('App name:', defaultName);
   if (!appName) return;
   
@@ -2500,7 +2500,7 @@ async function createFromTemplate(templateId) {
     removeTypingIndicator();
     
     var msg = '<div class="space-y-2">';
-    msg += '<p class="text-white font-medium">✅ App created successfully!</p>';
+    msg += '<p class="text-white font-medium">🔗 App created successfully!</p>';
     msg += '<div class="bg-[#0a0a0f] rounded-lg p-3 space-y-1 text-xs">';
     msg += '<p class="text-gray-400">App: <span class="text-purple-400">' + escapeHtml(res.app.name) + '</span></p>';
     msg += '<p class="text-gray-400">Entities: <span class="text-white">' + res.entities_created.length + '</span> (' + res.entities_created.join(', ') + ')</p>';
@@ -2639,7 +2639,7 @@ async function loadEntities() {
     (data.entities || []).forEach(e => entitySchemas[e.name] = e.schema);
     const grid = document.getElementById('entities-grid');
     if (!data.entities || data.entities.length === 0) {
-      grid.innerHTML = `<div class="col-span-full text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><p class="text-gray-500 text-sm">No entities yet. Use AI Builder to create one.</p></div>`;
+      grid.innerHTML = `<div class="col-span-full text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><p class="text-gray-500 text-sm">No entities yet. Use Workbench to create one.</p></div>`;
       return;
     }
     grid.innerHTML = data.entities.map(e => {
@@ -3441,7 +3441,7 @@ async function loadMemory() {
     if (!list) return;
     const records = data.records || [];
     if (records.length === 0) {
-      list.innerHTML = '<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg></div><p class="text-gray-500 text-sm">No memories yet. The AI Builder will learn your preferences over time.</p></div>';
+      list.innerHTML = '<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg></div><p class="text-gray-500 text-sm">No memories yet. The Workbench will learn your preferences over time.</p></div>';
       return;
     }
     const catColors = {preference: 'text-purple-400 bg-purple-500/10', fact: 'text-blue-400 bg-blue-500/10', decision: 'text-green-400 bg-green-500/10', instruction: 'text-orange-400 bg-orange-500/10', project_context: 'text-pink-400 bg-pink-500/10'};
@@ -4135,7 +4135,7 @@ function pbRenderPreview(layout) {
     } else if (type === 'statcard') {
       el.className = 'inline-block';
       el.innerHTML = '<div style="background:#13131a;border:1px solid #1e1e28;border-radius:12px;padding:20px;margin-right:16px;margin-bottom:16px;min-width:200px">' +
-        '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#71717a;font-size:13px;font-weight:500">' + escapeHtml(p.label || p.entity || 'Total') + '</span><span style="font-size:18px">📊</span></div>' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#71717a;font-size:13px;font-weight:500">' + escapeHtml(p.label || p.entity || 'Total') + '</span><span style="font-size:18px">🌐</span></div>' +
         '<div style="font-size:30px;font-weight:700;color:#fff">—</div></div>';
     } else if (type === 'chart') {
       el.className = 'rounded-xl border border-[#1e1e28] p-6 mb-6';
@@ -4336,7 +4336,7 @@ setTimeout(initWebSocket, 2000);
 
 // ═══ Command Palette ═══
 var cmdItems = [
-  {label:'AI Builder',desc:'Open the AI chat builder',page:'chat',icon:'M12 2L2 7l10 5 10-5-10-5z'},
+  {label:'Workbench',desc:'Open the AI chat builder',page:'chat',icon:'M12 2L2 7l10 5 10-5-10-5z'},
   {label:'Entities',desc:'View and manage data models',page:'entities',icon:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'},
   {label:'Functions',desc:'Deploy Python code as endpoints',page:'functions',icon:'M16 18l6-6-6-6M8 6l-6 6 6 6'},
   {label:'Workflows',desc:'Automations and scheduled tasks',page:'workflows',icon:'M12 1v6m0 10v6m11-11h-6M7 12H1'},
@@ -4803,7 +4803,7 @@ if (origLoadBilling) {
 // Add quick-start card classes
 document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() {
-    // Quick start cards on the AI Builder page
+    // Quick start cards on the Workbench page
     var quickCards = document.querySelectorAll('#page-chat .grid > div');
     quickCards.forEach(function(card) {
       if (card.onclick || card.getAttribute('onclick')) {
