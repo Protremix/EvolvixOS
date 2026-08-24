@@ -39,6 +39,7 @@ from entities.manager import EntityManager
 from entities.crud import EntityCRUD as EnhancedCRUD
 from templates import get_template_list, get_template, instantiate_template
 from auth.middleware import optional_auth, require_auth, require_admin, get_user_from_token
+JWT_SECRET = os.environ.get('JWT_SECRET', 'evolvixos-platform-secret-2026')
 from routing_bridge import unified_chat
 import sqlite3 as sqlite3_billing
 
@@ -1091,6 +1092,106 @@ async def create_from_template(template_id: str, body: dict = Body(...), request
         return result
     except ValueError as e:
         raise HTTPException(400, str(e))
+
+# ─── App Authentication ───
+import hashlib as _hl
+import hmac as _hmac
+import time as _time
+import base64 as _b64
+
+def _hash_password(password: str) -> str:
+    salt = "evolvixos_app_salt_2026"
+    return _hl.sha256((salt + password).encode()).hexdigest()
+
+def _make_app_jwt(user_id: int, email: str, app_id: int) -> str:
+    payload = {"sub": str(user_id), "email": email, "app_id": app_id, "exp": int(_time.time()) + 86400 * 30}
+    payload_json = json.dumps(payload)
+    payload_b64 = _b64.urlsafe_b64encode(payload_json.encode()).decode().rstrip("=")
+    header_b64 = _b64.urlsafe_b64encode(b'{"alg":"HS256","typ":"JWT"}').decode().rstrip("=")
+    signature = _hmac.new(JWT_SECRET.encode(), f"{header_b64}.{payload_b64}".encode(), _hl.sha256).hexdigest()
+    return f"{header_b64}.{payload_b64}.{signature}"
+
+def _verify_app_jwt(token: str) -> dict | None:
+    parts = token.split(".")
+    if len(parts) != 3:
+        return None
+    try:
+        payload_bytes = _b64.urlsafe_b64decode(parts[1] + "==")
+        payload = json.loads(payload_bytes)
+        if payload.get("exp", 0) < _time.time():
+            return None
+        return payload
+    except Exception:
+        return None
+
+@app.post("/api/apps/{app_id}/auth/register")
+async def app_register(app_id: int, body: dict = Body(...), db=Depends(get_db)):
+    """Register a new user for a published app."""
+    email = body.get("email", "").strip().lower()
+    password = body.get("password", "")
+    name = body.get("name", "")
+    if not email or not password or len(password) < 6:
+        raise HTTPException(400, "Email and password (min 6 chars) required")
+    
+    # Check app exists
+    app = await AppsManager.get_app(db, app_id)
+    if not app:
+        raise HTTPException(404, "App not found")
+    
+    # Check if user already exists
+    existing = await db.execute(
+        text("SELECT id FROM app_users WHERE app_id = :aid AND email = :email"),
+        {"aid": app_id, "email": email}
+    )
+    if existing.fetchone():
+        raise HTTPException(409, "Email already registered for this app")
+    
+    # Create user
+    pwd_hash = _hash_password(password)
+    result = await db.execute(
+        text("INSERT INTO app_users (app_id, email, password_hash, name) VALUES (:aid, :email, :pwd, :name) RETURNING id"),
+        {"aid": app_id, "email": email, "pwd": pwd_hash, "name": name}
+    )
+    user_id = result.fetchone()[0]
+    await db.commit()
+    
+    token = _make_app_jwt(user_id, email, app_id)
+    return {"token": token, "user": {"id": user_id, "email": email, "name": name}}
+
+@app.post("/api/apps/{app_id}/auth/login")
+async def app_login(app_id: int, body: dict = Body(...), db=Depends(get_db)):
+    """Login to a published app."""
+    email = body.get("email", "").strip().lower()
+    password = body.get("password", "")
+    if not email or not password:
+        raise HTTPException(400, "Email and password required")
+    
+    pwd_hash = _hash_password(password)
+    result = await db.execute(
+        text("SELECT id, name FROM app_users WHERE app_id = :aid AND email = :email AND password_hash = :pwd"),
+        {"aid": app_id, "email": email, "pwd": pwd_hash}
+    )
+    row = result.fetchone()
+    if not row:
+        raise HTTPException(401, "Invalid credentials")
+    
+    user_id, name = row
+    token = _make_app_jwt(user_id, email, app_id)
+    return {"token": token, "user": {"id": user_id, "email": email, "name": name}}
+
+@app.put("/api/apps/{app_id}/auth-toggle")
+async def toggle_app_auth(app_id: int, body: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    """Toggle requires_auth on an app (platform builder only)."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    requires = body.get("requires_auth", False)
+    await db.execute(
+        text("UPDATE platform_apps SET requires_auth = :ra, updated_date = NOW() WHERE id = :id"),
+        {"ra": requires, "id": app_id}
+    )
+    await db.commit()
+    return {"app_id": app_id, "requires_auth": requires}
 
 # ─── SDK Generator (Feature 5) ───
 @app.get("/api/sdk")

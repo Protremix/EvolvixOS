@@ -222,6 +222,14 @@ class AppsManager:
     def _row_to_dict(row):
         if not row:
             return None
+        # Get column names from the row's cursor description for robust mapping
+        try:
+            cols = row._mapping.keys() if hasattr(row, '_mapping') else []
+            if cols:
+                return {k: (row[k] if not isinstance(row[k], (dict,)) else row[k]) for k in cols}
+        except Exception:
+            pass
+        # Fallback: positional mapping
         return {
             "id": row[0], "name": row[1], "description": row[2],
             "slug": row[3], "status": row[4], "is_public": row[5],
@@ -229,5 +237,6 @@ class AppsManager:
             "theme": row[7] if isinstance(row[7], dict) else json.loads(row[7] or '{}'),
             "settings": row[8] if isinstance(row[8], dict) else json.loads(row[8] or '{}'),
             "version": row[9], "created_date": str(row[10]), "updated_date": str(row[11]),
-            "created_by": row[12]
+            "created_by": row[12],
+            "requires_auth": row[13] if len(row) > 13 else False
         }

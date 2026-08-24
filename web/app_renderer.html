@@ -52,7 +52,9 @@
   <div id="modal-root"></div>
 
   <script>
-    var App = { data: null, entities: [], pages: [], currentPage: 0, records: {}, slug: null };
+    var App = { data: null, entities: [], pages: [], currentPage: 0, records: {}, slug: null, authToken: null, user: null };
+    function getAppToken() { return localStorage.getItem('app_token_' + (App.data ? App.data.id : '')); }
+    function authHeaders() { var t = getAppToken(); return t ? { 'Authorization': 'Bearer ' + t } : {}; }
     var pathParts = window.location.pathname.split('/');
     App.slug = pathParts[2] || '';
 
@@ -325,6 +327,7 @@
     async function fetchRecords(entityName) {
       if (App.records[entityName]) return App.records[entityName];
       var url = '/platform/api/apps/slug/' + App.slug + '/records/' + entityName + '?limit=100';
+      var fetchOpts = { headers: authHeaders() };
       try {
         var res = await fetch(url);
         if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -471,21 +474,112 @@
         var app = await res.json();
         if (!app || app.detail) { showNotFound(); return; }
         App.data = app;
-        // Get entities for this app
-        var entRes = await fetch('/platform/api/apps/slug/' + App.slug + '/entities');
-        if (entRes.ok) App.entities = await entRes.json() || [];
-        // Get pages
-        if (app.pages) {
-          App.pages = app.pages;
-        } else {
-          var pageRes = await fetch('/platform/api/apps/' + app.id + '/pages');
-          if (pageRes.ok) App.pages = await pageRes.json() || [];
+        
+        // Auth gate: if app requires auth, check for token
+        if (app.requires_auth) {
+          var token = getAppToken();
+          if (!token) {
+            showAuthGate(app);
+            return;
+          }
+          App.authToken = token;
         }
-        if (!App.pages || App.pages.length === 0) {
-          App.pages = [{ name: 'Data', slug: 'data', layout: App.entities.map(function(e) { return { component: 'datatable', props: { entity: e.name } }; })}];
-        }
-        renderCurrentPage();
+        
+        await loadAppData();
       } catch(e) { console.error('Init error:', e); showNotFound(); }
+    }
+    
+    async function loadAppData() {
+      var app = App.data;
+      // Get entities for this app
+      var entRes = await fetch('/platform/api/apps/slug/' + App.slug + '/entities', { headers: authHeaders() });
+      if (entRes.ok) App.entities = await entRes.json() || [];
+      // Get pages
+      if (app.pages) {
+        App.pages = app.pages;
+      } else {
+        var pageRes = await fetch('/platform/api/apps/' + app.id + '/pages', { headers: authHeaders() });
+        if (pageRes.ok) App.pages = await pageRes.json() || [];
+      }
+      if (!App.pages || App.pages.length === 0) {
+        App.pages = [{ name: 'Data', slug: 'data', layout: App.entities.map(function(e) { return { component: 'datatable', props: { entity: e.name } }; })}];
+      }
+      renderCurrentPage();
+    }
+    
+    function showAuthGate(app) {
+      document.getElementById('app-root').innerHTML = 
+        '<div class="flex items-center justify-center min-h-screen px-4">' +
+        '<div class="w-full max-w-sm">' +
+          '<div class="text-center mb-8">' +
+            '<div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-fuchsia-600 mb-4">' +
+              '<span class="text-2xl font-bold text-white">' + escapeHtml((app.name || "A").charAt(0)) + '</span>' +
+            '</div>' +
+            '<h1 class="text-2xl font-bold text-white">' + escapeHtml(app.name || 'App') + '</h1>' +
+            '<p class="text-sm text-gray-500 mt-1">Sign in to continue</p>' +
+          '</div>' +
+          '<div id="auth-form" class="space-y-4">' +
+            '<div id="auth-name-field" class="hidden"><input id="auth-name" type="text" placeholder="Your name" class="form-input" /></div>' +
+            '<input id="auth-email" type="email" placeholder="Email address" class="form-input" />' +
+            '<input id="auth-password" type="password" placeholder="Password" class="form-input" />' +
+            '<p id="auth-error" class="text-sm text-red-400 hidden"></p>' +
+            '<button onclick="authSubmit()" class="btn-primary w-full" id="auth-btn">Sign In</button>' +
+            '<p class="text-center text-sm text-gray-500">' +
+              '<span id="auth-toggle-text">Don\'t have an account? </span>' +
+              '<a onclick="authToggleMode()" class="text-purple-400 hover:text-purple-300 cursor-pointer" id="auth-toggle-link">Sign up</a>' +
+            '</p>' +
+          '</div>' +
+        '</div></div>';
+    }
+    
+    var authMode = 'login';
+    function authToggleMode() {
+      authMode = authMode === 'login' ? 'register' : 'login';
+      document.getElementById('auth-name-field').classList.toggle('hidden', authMode === 'login');
+      document.getElementById('auth-btn').textContent = authMode === 'login' ? 'Sign In' : 'Create Account';
+      document.getElementById('auth-toggle-text').textContent = authMode === 'login' ? "Don\'t have an account? " : "Already have an account? ";
+      document.getElementById('auth-toggle-link').textContent = authMode === 'login' ? 'Sign up' : 'Sign in';
+      document.getElementById('auth-error').classList.add('hidden');
+    }
+    
+    async function authSubmit() {
+      var email = document.getElementById('auth-email').value.trim();
+      var password = document.getElementById('auth-password').value;
+      var name = authMode === 'register' ? (document.getElementById('auth-name').value.trim() || email.split('@')[0]) : '';
+      var errEl = document.getElementById('auth-error');
+      errEl.classList.add('hidden');
+      
+      if (!email || !password || password.length < 6) {
+        errEl.textContent = 'Email and password (min 6 chars) required';
+        errEl.classList.remove('hidden');
+        return;
+      }
+      
+      var btn = document.getElementById('auth-btn');
+      btn.textContent = 'Please wait...';
+      btn.disabled = true;
+      
+      try {
+        var endpoint = authMode === 'login' ? '/login' : '/register';
+        var res = await fetch('/platform/api/apps/' + App.data.id + '/auth' + endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: password, name: name })
+        });
+        var data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.detail || 'Authentication failed');
+        }
+        localStorage.setItem('app_token_' + App.data.id, data.token);
+        App.authToken = data.token;
+        App.user = data.user;
+        await loadAppData();
+      } catch(e) {
+        errEl.textContent = e.message;
+        errEl.classList.remove('hidden');
+        btn.textContent = authMode === 'login' ? 'Sign In' : 'Create Account';
+        btn.disabled = false;
+      }
     }
 
     function showNotFound() {
