@@ -1158,5 +1158,7 @@ init_api_keys_table()
 if __name__ == "__main__":
     port = 5022
     print(f"EvolvixOS Auth API v8.1 starting on port {port}")
+    import socket
+    ThreadingHTTPServer.allow_reuse_address = True
     server = ThreadingHTTPServer(("127.0.0.1", port), AuthHandler)
     server.serve_forever()

@@ -1505,7 +1505,7 @@ body.light-mode .bg-black\/60{background:rgba(0,0,0,.3) !important}
     </button>
   </div>
   <div id="apps-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <div class="flex items-center justify-center py-16 text-gray-600 text-sm">Loading apps...</div>
+    <div class="flex items-center justify-center py-16"><div class="loading-spinner" style="width:32px;height:32px;border:3px solid rgba(124,58,237,0.2);border-top-color:#7c3aed;border-radius:50%;animation:spin 0.8s linear infinite"></div></div>
   </div>
 </div>
 
@@ -1575,6 +1575,7 @@ body.light-mode .bg-black\/60{background:rgba(0,0,0,.3) !important}
         <option value="ts">TypeScript</option>
       </select>
       <button onclick="copySDK()" class="px-3 py-2 rounded-lg bg-purple-600/20 border border-purple-500/30 text-purple-300 text-sm hover:bg-purple-600/30 transition">Copy</button>
+      <button onclick="downloadSDK()" class="px-3 py-2 rounded-lg bg-purple-600/20 border border-purple-500/30 text-purple-300 text-sm hover:bg-purple-600/30 transition">Download</button>
     </div>
   </div>
   <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-4">
@@ -3090,8 +3091,8 @@ async function openApp(appId) {
 async function publishApp(appId) {
   try {
     var resp = await api('/apps/' + appId + '/publish', 'POST');
-    toast('App published! Share at /app/' + result.slug, 'success');
-    document.getElementById('create-app-modal-overlay').remove();
+    toast('App published! Share at /app/' + resp.slug, 'success');
+    var m = document.querySelector('.modal-overlay'); if (m) m.remove();
     loadApps();
   } catch(e) { toast('Error publishing', 'error'); }
 }
@@ -3100,7 +3101,7 @@ async function deleteApp(appId) {
   try {
     await api('/apps/' + appId, 'DELETE');
     toast('App deleted', 'success');
-    document.getElementById('create-app-modal-overlay').remove();
+    var m = document.querySelector('.modal-overlay'); if (m) m.remove();
     loadApps();
   } catch(e) { toast('Error deleting', 'error'); }
 }
@@ -3118,106 +3119,201 @@ function editAppInBuilder(appId) {
 var pbComponents = [];
 var pbSelectedComponent = null;
 var pbCurrentPageId = null;
+var pbSelectedAppId = null;
+var pbPages = [];
+var pbSelectedComp = null;
+var pbComponents = [
+  {type:'header', label:'Header', icon:'H', defaultProps:{text:'Page Title', size:'large'}},
+  {type:'table', label:'Data Table', icon:'T', defaultProps:{entity:'', columns:'auto', pageSize:10}},
+  {type:'form', label:'Form', icon:'F', defaultProps:{entity:'', fields:'auto', submitLabel:'Save'}},
+  {type:'stat', label:'Stat Card', icon:'S', defaultProps:{label:'Total', value:'0', icon:'chart'}},
+  {type:'chart', label:'Chart', icon:'C', defaultProps:{type:'bar', entity:'', field:'count'}},
+  {type:'list', label:'Field List', icon:'L', defaultProps:{entity:'', fields:'all'}},
+  {type:'button', label:'Button', icon:'B', defaultProps:{label:'Click Me', action:'navigate', color:'purple'}},
+  {type:'grid', label:'Grid', icon:'G', defaultProps:{columns:3, gap:'4'}},
+  {type:'text', label:'Text', icon:'T', defaultProps:{content:'Enter text here...', size:'medium'}},
+  {type:'image', label:'Image', icon:'I', defaultProps:{src:'', alt:'Image', width:'full'}},
+  {type:'container', label:'Container', icon:'C', defaultProps:{padding:'4', background:'transparent'}},
+  {type:'tabs', label:'Tabs', icon:'T', defaultProps:{tabs:'Tab 1, Tab 2, Tab 3'}},
+  {type:'card', label:'Card', icon:'C', defaultProps:{title:'Card Title', shadow:'small'}}
+];
 
 async function loadPageBuilder() {
-  // Load apps for dropdown
   try {
     var apps = await api('/apps');
     var select = document.getElementById('pagebuilder-app-select');
     select.innerHTML = '<option value="">Select app...</option>' + apps.map(function(a) {
-      return '<option value="' + a.id + '">' + a.name + '</option>';
+      return '<option value="' + a.id + '">' + a.name + ' (' + a.status + ')</option>';
     }).join('');
-  } catch(e) {}
-  // Load component palette
-  try {
-    var comps = await api('/components/palette');
-    pbComponents = comps;
     var palette = document.getElementById('component-palette');
-    palette.innerHTML = comps.map(function(c, i) {
-      return '<div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-purple-500/10 cursor-pointer transition" onclick="addComponentToCanvas(' + i + ')">' +
-        '<svg class="w-3 h-3 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/></svg>' +
-        '<span class="text-xs text-gray-300">' + c.name + '</span>' +
+    palette.innerHTML = pbComponents.map(function(comp, i) {
+      return '<div draggable="true" ondragstart="pbDragStart(' + i + ')" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-purple-500/10 cursor-grab transition border border-transparent hover:border-purple-500/30">' +
+        '<span class="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center text-[10px] text-purple-400 font-bold">' + comp.icon + '</span>' +
+        '<span class="text-xs text-gray-300">' + comp.label + '</span>' +
       '</div>';
     }).join('');
   } catch(e) {
-    document.getElementById('component-palette').innerHTML = '<div class="text-xs text-gray-600">Error loading components</div>';
+    document.getElementById('component-palette').innerHTML = '<div class="text-red-400 text-xs">Error loading components</div>';
   }
+}
+
+var pbDraggedComp = null;
+function pbDragStart(idx) {
+  pbDraggedComp = pbComponents[idx];
+}
+
+function pbOnDragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('border-purple-500');
+}
+function pbOnDragLeave(e) {
+  e.currentTarget.classList.remove('border-purple-500');
+}
+function pbOnDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('border-purple-500');
+  if (!pbDraggedComp) return;
+  var comp = {type: pbDraggedComp.type, label: pbDraggedComp.label, props: Object.assign({}, pbDraggedComp.defaultProps)};
+  pbAddToCanvas(comp);
+  pbDraggedComp = null;
+}
+
+function pbAddToCanvas(comp) {
+  var canvas = document.getElementById('page-canvas');
+  // Remove empty placeholder
+  var placeholder = canvas.querySelector('.text-gray-600');
+  if (placeholder) placeholder.parentElement.remove();
+  var item = document.createElement('div');
+  item.className = 'flex items-center justify-between p-3 rounded-lg bg-white/5 border border-gray-800 cursor-pointer hover:border-purple-500/30 transition';
+  item.draggable = true;
+  var label = comp.props.text || comp.props.title || comp.props.label || comp.props.content || comp.label;
+  item.innerHTML = '<div class="flex items-center gap-2"><span class="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center text-[10px] text-purple-400 font-bold">' + (comp.type.charAt(0).toUpperCase()) + '</span><span class="text-xs text-gray-300">' + label + '</span></div><div class="flex items-center gap-2"><span class="text-[10px] text-gray-600">' + comp.type + '</span><button onclick="event.stopPropagation();this.closest(\'div\').parentElement.remove()" class="text-red-400 hover:text-red-300 text-xs">✕</button></div>';
+  item.onclick = function() { pbSelectComponent(item, comp); };
+  canvas.appendChild(item);
+}
+
+function pbSelectComponent(elem, comp) {
+  document.querySelectorAll('#page-canvas > div').forEach(function(d) {
+    d.classList.remove('border-purple-500', 'bg-purple-500/5');
+    d.classList.add('border-gray-800');
+  });
+  elem.classList.remove('border-gray-800');
+  elem.classList.add('border-purple-500', 'bg-purple-500/5');
+  pbSelectedComp = comp;
+  var panel = document.getElementById('properties-panel');
+  var propHtml = '<div class="space-y-3">';
+  propHtml += '<div class="text-[10px] text-purple-400 uppercase tracking-wider">' + comp.type + ' Component</div>';
+  Object.keys(comp.props || {}).forEach(function(key) {
+    var val = comp.props[key];
+    var inputType = typeof val === 'number' ? 'number' : 'text';
+    propHtml += '<div><label class="text-xs text-gray-400 block mb-1">' + key.replace(/_/g, ' ').replace(/\b\w/g, function(c){return c.toUpperCase()}) + '</label>';
+    if (typeof val === 'string' && val.length > 30) {
+      propHtml += '<textarea class="w-full bg-[#0a0a0f] border border-gray-700 rounded px-2 py-1.5 text-xs text-gray-200" onchange="pbUpdateProp(\'' + key + '\', this.value)">' + val + '</textarea>';
+    } else {
+      propHtml += '<input type="' + inputType + '" value="' + val + '" class="w-full bg-[#0a0a0f] border border-gray-700 rounded px-2 py-1.5 text-xs text-gray-200" onchange="pbUpdateProp(\'' + key + '\', this.value)" />';
+    }
+    propHtml += '</div>';
+  });
+  propHtml += '<button onclick="pbRemoveSelected()" class="mt-2 px-3 py-1.5 rounded bg-red-600/20 border border-red-500/30 text-red-400 text-xs w-full hover:bg-red-600/30 transition">Remove Component</button>';
+  propHtml += '</div>';
+  panel.innerHTML = propHtml;
+}
+
+function pbUpdateProp(key, value) {
+  if (!pbSelectedComp) return;
+  pbSelectedComp.props[key] = isNaN(value) ? value : Number(value);
+  // Update canvas label
+  pbRefreshCanvasLabels();
+}
+
+function pbRefreshCanvasLabels() {
+  // Update the label of the selected component in canvas
+  var selected = document.querySelector('#page-canvas .border-purple-500');
+  if (selected && pbSelectedComp) {
+    var label = pbSelectedComp.props.text || pbSelectedComp.props.title || pbSelectedComp.props.label || pbSelectedComp.props.content || pbSelectedComp.label;
+    var span = selected.querySelector('.text-gray-300');
+    if (span) span.textContent = label;
+  }
+}
+
+function pbRemoveSelected() {
+  var selected = document.querySelector('#page-canvas .border-purple-500');
+  if (selected) selected.remove();
+  document.getElementById('properties-panel').innerHTML = '<div class="flex items-center justify-center py-8 text-gray-600 text-xs">Select a component to edit</div>';
+  pbSelectedComp = null;
 }
 
 async function loadAppPages() {
   var appId = document.getElementById('pagebuilder-app-select').value;
-  if (!appId) return;
+  pbSelectedAppId = appId;
+  if (!appId) {
+    document.getElementById('page-canvas').innerHTML = '<div class="flex items-center justify-center py-16 text-gray-600 text-xs">Drag components here or select an app to edit its pages</div>';
+    return;
+  }
   try {
     var pages = await api('/apps/' + appId + '/pages');
-    if (pages.length === 0) {
-      document.getElementById('page-canvas').innerHTML = '<div class="flex items-center justify-center py-16 text-gray-600 text-xs">No pages. Create one with auto-generate.</div>';
+    pbPages = pages || [];
+    var canvas = document.getElementById('page-canvas');
+    if (!pages || pages.length === 0) {
+      // Create a new page automatically
+      var newPage = await api('/apps/' + appId + '/pages', 'POST', {name: 'Home', layout: [], type: 'custom', is_home: true});
+      pbCurrentPageId = newPage.id;
+      canvas.innerHTML = '<div class="flex items-center justify-center py-16 text-gray-600 text-xs">Drag components here to build your page</div>';
       return;
     }
     pbCurrentPageId = pages[0].id;
-    renderPageCanvas(pages[0].layout || []);
+    pbRenderCanvas(pages[0].layout || []);
+    // Add page tabs above canvas
+    var existingTabs = document.getElementById('pb-page-tabs');
+    if (existingTabs) existingTabs.remove();
+    var tabsDiv = document.createElement('div');
+    tabsDiv.id = 'pb-page-tabs';
+    tabsDiv.className = 'flex gap-1 mb-2 overflow-x-auto';
+    pages.forEach(function(pg, i) {
+      tabsDiv.innerHTML += '<button onclick="pbSelectPage(' + i + ')" class="px-3 py-1.5 text-xs rounded-lg whitespace-nowrap ' + (i === 0 ? 'bg-purple-600/20 text-purple-300 border border-purple-500/30' : 'bg-white/5 text-gray-400 hover:text-white') + '">' + pg.name + '</button>';
+    });
+    canvas.parentNode.insertBefore(tabsDiv, canvas);
   } catch(e) {
-    document.getElementById('page-canvas').innerHTML = '<div class="text-xs text-gray-600">Error loading pages</div>';
+    document.getElementById('page-canvas').innerHTML = '<div class="text-red-400 text-xs py-8">Error loading pages: ' + (e.message || '') + '</div>';
   }
 }
 
-function addComponentToCanvas(idx) {
-  var comp = JSON.parse(JSON.stringify(pbComponents[idx]));
+function pbSelectPage(idx) {
+  var pg = pbPages[idx];
+  if (!pg) return;
+  pbCurrentPageId = pg.id;
+  pbRenderCanvas(pg.layout || []);
+}
+
+function pbRenderCanvas(layout) {
   var canvas = document.getElementById('page-canvas');
-  var item = document.createElement('div');
-  item.className = 'flex items-center justify-between p-3 rounded-lg bg-white/5 border border-gray-800 cursor-pointer hover:border-purple-500/30 transition';
-  item.onclick = function() { selectComponent(item, comp); };
-  item.innerHTML = '<div class="flex items-center gap-2"><svg class="w-3 h-3 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/></svg><span class="text-xs text-gray-300">' + comp.name + '</span></div><button onclick="event.stopPropagation();this.parentElement.remove()" class="text-gray-600 hover:text-red-400 text-xs">✕</button>';
-  canvas.appendChild(item);
-  if (canvas.querySelector('.flex.items-center.justify-center')) {
-    canvas.querySelector('.flex.items-center.justify-center').remove();
+  canvas.ondragover = pbOnDragOver;
+  canvas.ondragleave = pbOnDragLeave;
+  canvas.ondrop = pbOnDrop;
+  if (!layout || layout.length === 0) {
+    canvas.innerHTML = '<div class="flex items-center justify-center py-16 text-gray-600 text-xs">Drag components here to build your page</div>';
+    return;
   }
+  canvas.innerHTML = '';
+  layout.forEach(function(item) {
+    var comp = {type: item.component || 'custom', label: (item.props && item.props.label) || item.component || 'Component', props: item.props || {}};
+    pbAddToCanvas(comp);
+  });
 }
 
-function selectComponent(elem, comp) {
-  document.querySelectorAll('#page-canvas > div').forEach(function(d) { d.classList.remove('border-purple-500'); });
-  elem.classList.add('border-purple-500');
-  pbSelectedComponent = comp;
-  var panel = document.getElementById('properties-panel');
-  var props = comp.props || {};
-  panel.innerHTML = '<h4 class="text-xs text-gray-400 uppercase mb-2">' + comp.name + ' Properties</h4>' +
-    Object.keys(props).map(function(key) {
-      var val = typeof props[key] === 'object' ? JSON.stringify(props[key]) : props[key];
-      return '<div><label class="text-[10px] text-gray-500 uppercase">' + key + '</label><input value="' + val + '" class="w-full bg-[#0a0a0f] border border-gray-700 rounded px-2 py-1.5 text-xs text-gray-200 mt-1" onchange="updateComponentProp(\'' + key + '\', this.value)" /></div>';
-    }).join('');
-}
-
-function updateComponentProp(key, value) {
-  if (pbSelectedComponent && pbSelectedComponent.props) {
-    pbSelectedComponent.props[key] = value;
-  }
-}
 
 async function savePageLayout() {
   if (!pbCurrentPageId) return toast('No page selected', 'error');
   var layout = [];
   document.querySelectorAll('#page-canvas > div:not(.flex.items-center.justify-center)').forEach(function(d) {
-    layout.push({ component: 'custom', props: { label: d.textContent.trim() } });
+    var labelSpan = d.querySelector('.text-gray-300');
+    var typeSpan = d.querySelector('.text-gray-600');
+    layout.push({ component: typeSpan ? typeSpan.textContent.trim() : 'custom', props: { label: labelSpan ? labelSpan.textContent : d.textContent.trim() } });
   });
   try {
     await api('/pages/' + pbCurrentPageId, 'PUT', { layout: layout });
     toast('Page saved!', 'success');
-  } catch(e) { toast('Error saving', 'error'); }
-}
-
-function renderPageCanvas(layout) {
-  var canvas = document.getElementById('page-canvas');
-  if (!layout || layout.length === 0) {
-    canvas.innerHTML = '<div class="flex items-center justify-center py-16 text-gray-600 text-xs">Drag components here</div>';
-    return;
-  }
-  canvas.innerHTML = layout.map(function(item) {
-    var name = (item.component || 'Component');
-    var label = (item.props && item.props.title) || (item.props && item.props.label) || name;
-    return '<div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-gray-800 cursor-pointer hover:border-purple-500/30 transition" onclick="selectComponent(this, ' + JSON.stringify(item).replace(/"/g, '&quot;') + ')">' +
-      '<div class="flex items-center gap-2"><span class="text-xs text-gray-300">' + label + '</span></div>' +
-      '<span class="text-[10px] text-gray-600">' + name + '</span>' +
-    '</div>';
-  }).join('');
+  } catch(e) { toast('Error saving: ' + (e.message || ''), 'error'); }
 }
 
 // ════ Connectors ════

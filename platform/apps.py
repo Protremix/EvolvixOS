@@ -104,11 +104,18 @@ class AppsManager:
         rows = result.fetchall()
         pages = []
         for row in rows:
-            layout = row[3] if isinstance(row[3], list) else json.loads(row[3] or '[]')
+            # Columns: id(0), app_id(1), name(2), slug(3), layout(4), page_type(5), is_home(6), sort_order(7), created_date(8), updated_date(9), created_by(10)
+            layout_raw = row[4]
+            if isinstance(layout_raw, str):
+                layout = json.loads(layout_raw) if layout_raw else []
+            elif isinstance(layout_raw, list):
+                layout = layout_raw
+            else:
+                layout = []
             pages.append({
-                "id": row[0], "app_id": row[1], "name": row[2], "slug": row[3] if len(row) > 3 else "",
-                "layout": layout, "page_type": row[4], "is_home": row[5],
-                "sort_order": row[6], "created_date": str(row[7]), "updated_date": str(row[8])
+                "id": row[0], "app_id": row[1], "name": row[2], "slug": row[3],
+                "layout": layout, "page_type": row[5], "is_home": row[6],
+                "sort_order": row[7], "created_date": str(row[8]), "updated_date": str(row[9])
             })
         return pages
 
