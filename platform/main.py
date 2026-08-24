@@ -1250,6 +1250,95 @@ async def get_versions(entity_type: str = None, entity_id: str = None, limit: in
     return await AppsManager.get_versions(db, entity_type, entity_id, limit)
 
 # ─── Activity Feed ───
+
+@app.get("/api/analytics/overview")
+async def analytics_overview(db=Depends(get_db)):
+    """Platform-wide analytics overview."""
+    # Count entities
+    entity_tables = await db.execute(text("""
+        SELECT tablename FROM pg_tables 
+        WHERE schemaname='public' AND tablename LIKE 'entity_%'
+    """))
+    entity_count = len(entity_tables.fetchall())
+    
+    # Count total records across all entity tables
+    total_records = 0
+    entity_records = []
+    for row in await db.execute(text("""
+        SELECT tablename FROM pg_tables 
+        WHERE schemaname='public' AND tablename LIKE 'entity_%'
+    """)):
+        tbl = row[0]
+        try:
+            cnt = await db.execute(text(f"SELECT count(*) FROM {tbl}"))
+            c = cnt.fetchone()[0]
+            total_records += c
+            entity_name = tbl.replace('entity_', '')
+            entity_records.append({"name": entity_name, "records": c})
+        except:
+            pass
+    entity_records.sort(key=lambda x: x["records"], reverse=True)
+    
+    # Count functions
+    fn_result = await db.execute(text("SELECT count(*) FROM platform_functions"))
+    fn_count = fn_result.fetchone()[0]
+    
+    # Count agents
+    agent_result = await db.execute(text("SELECT count(*) FROM platform_agents"))
+    agent_count = agent_result.fetchone()[0]
+    
+    # Count workflows
+    wf_result = await db.execute(text("SELECT count(*) FROM platform_workflows"))
+    wf_count = wf_result.fetchone()[0]
+    wf_active = await db.execute(text("SELECT count(*) FROM platform_workflows WHERE status='active'"))
+    wf_active_count = wf_active.fetchone()[0]
+    
+    # Count apps
+    app_result = await db.execute(text("SELECT count(*) FROM platform_apps"))
+    app_count = app_result.fetchone()[0]
+    
+    # Count pages
+    page_result = await db.execute(text("SELECT count(*) FROM platform_pages"))
+    page_count = page_result.fetchone()[0]
+    
+    # Workflow executions
+    wf_logs = await db.execute(text("SELECT count(*) FROM platform_workflow_logs"))
+    wf_exec_count = wf_logs.fetchone()[0]
+    
+    # Activity by type (last 30 days)
+    activity_by_type = await db.execute(text("""
+        SELECT entity_type, count(*) as cnt 
+        FROM platform_activity 
+        WHERE created_date > NOW() - INTERVAL '30 days'
+        GROUP BY entity_type 
+        ORDER BY cnt DESC
+    """))
+    activity_data = [{"type": r[0], "count": r[1]} for r in activity_by_type.fetchall()]
+    
+    # Activity over last 7 days (for sparkline)
+    activity_7d = await db.execute(text("""
+        SELECT DATE(created_date) as d, count(*) as cnt 
+        FROM platform_activity 
+        WHERE created_date > NOW() - INTERVAL '7 days'
+        GROUP BY d ORDER BY d
+    """))
+    activity_timeline = [{"date": r[0].isoformat(), "count": r[1]} for r in activity_7d.fetchall()]
+    
+    return {
+        "entities": entity_count,
+        "total_records": total_records,
+        "entity_records": entity_records[:10],
+        "functions": fn_count,
+        "agents": agent_count,
+        "workflows": wf_count,
+        "active_workflows": wf_active_count,
+        "apps": app_count,
+        "pages": page_count,
+        "workflow_executions": wf_exec_count,
+        "activity_by_type": activity_data,
+        "activity_timeline": activity_timeline
+    }
+
 @app.get("/api/activity")
 async def get_activity(request: Request, limit: int = 20, db=Depends(get_db)):
     user = get_user_from_token(request)
