@@ -11,9 +11,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════════════
-   EvolvixOS Landing — Friendly Redesign
-   Warm dark theme with softer borders, generous spacing,
-   gradient accents, and approachable personality
+   EvolvixOS Landing — MAXIMUM WOW Edition
+   Particles, 3D tilt, animated counters, magnetic buttons,
+   scroll progress, glow trails, text reveals, gradient shifts
    ═══════════════════════════════════════════════════════════════ */
 :root {
   --bg: #0a0a0f;
@@ -33,18 +33,11 @@
   --accent: #818cf8;
   --accent-glow: rgba(129, 140, 248, 0.25);
   --warm: #f59e0b;
-  --warm-glow: rgba(245, 158, 11, 0.2);
   --success: #34d399;
   --gradient-1: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #818cf8 100%);
   --gradient-2: linear-gradient(135deg, #818cf8 0%, #a855f7 100%);
-  --gradient-warm: linear-gradient(135deg, #a855f7 0%, #f59e0b 100%);
-  --gradient-hero: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(168, 85, 247, 0.12) 0%, transparent 60%),
-                   radial-gradient(ellipse 60% 40% at 80% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
-                   radial-gradient(ellipse 50% 40% at 20% 70%, rgba(129, 140, 248, 0.08) 0%, transparent 50%);
-  --radius-sm: 12px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
+  --gradient-anim: linear-gradient(90deg, #a855f7, #ec4899, #818cf8, #a855f7);
+  background-size: 200% 100%;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -66,6 +59,31 @@ a { color: inherit; text-decoration: none; }
 ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.2); border-radius: 10px; border: 2px solid var(--bg-soft); }
 ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.4); }
 
+/* ─── Scroll Progress Bar ─── */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; height: 4px; width: 0%;
+  background: var(--gradient-1);
+  z-index: 9999;
+  transition: width 0.1s ease;
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+/* ─── Cursor Glow ─── */
+.cursor-glow {
+  position: fixed; width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 60%);
+  pointer-events: none; z-index: 1;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease-out;
+  mix-blend-mode: screen;
+}
+
+/* ─── Particle Canvas ─── */
+#particles {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none; opacity: 0.6;
+}
+
 /* ─── Nav ─── */
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
@@ -82,14 +100,14 @@ a { color: inherit; text-decoration: none; }
   font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
 }
 .nav-logo-icon {
-  width: 40px; height: 40px; border-radius: var(--radius-sm);
+  width: 40px; height: 40px; border-radius: 12px;
   background: var(--gradient-1);
   display: flex; align-items: center; justify-content: center;
   font-size: 20px; font-weight: 900; color: #fff;
   box-shadow: 0 4px 20px var(--primary-glow);
-  transition: transform 0.3s;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.nav-logo:hover .nav-logo-icon { transform: scale(1.05) rotate(-3deg); }
+.nav-logo:hover .nav-logo-icon { transform: scale(1.1) rotate(-8deg); }
 .nav-links { display: flex; gap: 36px; align-items: center; }
 .nav-links a {
   color: var(--text-muted); font-size: 15px; font-weight: 500;
@@ -111,17 +129,16 @@ a { color: inherit; text-decoration: none; }
 .nav-cta .btn-ghost:hover { color: var(--text); border-color: var(--primary); background: rgba(168, 85, 247, 0.05); }
 .nav-cta .btn-primary {
   padding: 10px 24px; border-radius: 100px; font-size: 14px; font-weight: 700;
-  background: var(--gradient-2); color: #fff;
+  background: var(--gradient-1); color: #fff;
   box-shadow: 0 4px 20px var(--primary-glow);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
 }
-.nav-cta .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--primary-glow); }
+.nav-cta .btn-primary:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 30px var(--primary-glow); }
 
 /* ─── Hero ─── */
 .hero {
   min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
   text-align: center; padding: 140px 40px 80px;
-  background: var(--gradient-hero);
   position: relative; overflow: hidden;
 }
 .hero::before {
@@ -133,68 +150,107 @@ a { color: inherit; text-decoration: none; }
   mask-image: radial-gradient(ellipse 70% 60% at center, black 20%, transparent 80%);
   -webkit-mask-image: radial-gradient(ellipse 70% 60% at center, black 20%, transparent 80%);
 }
+.hero::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(168, 85, 247, 0.12) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 40% at 80% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+              radial-gradient(ellipse 50% 40% at 20% 70%, rgba(129, 140, 248, 0.08) 0%, transparent 50%);
+  z-index: 0;
+}
 .hero-badge {
   display: inline-flex; align-items: center; gap: 10px;
   padding: 8px 20px; border-radius: 100px;
   background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.2);
   font-size: 14px; font-weight: 600; color: var(--primary-light);
-  margin-bottom: 36px; position: relative; z-index: 1;
+  margin-bottom: 36px; position: relative; z-index: 2;
   backdrop-filter: blur(10px);
+  animation: badgeFloat 4s ease-in-out infinite;
 }
+@keyframes badgeFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 .hero-badge .dot {
   width: 10px; height: 10px; border-radius: 50%; background: var(--success);
   box-shadow: 0 0 12px var(--success);
   animation: pulse 2s ease-in-out infinite;
 }
 @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+
+/* Hero headline with scramble reveal */
 .hero h1 {
   font-size: clamp(42px, 7vw, 88px); font-weight: 900; letter-spacing: -3px;
-  line-height: 1.02; margin-bottom: 28px; position: relative; z-index: 1;
+  line-height: 1.02; margin-bottom: 28px; position: relative; z-index: 2;
   background: linear-gradient(180deg, #fff 0%, #d0d0e0 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 .hero h1 .grad {
-  background: var(--gradient-1);
+  background: var(--gradient-anim);
+  background-size: 200% auto;
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: gradientShift 4s ease infinite;
 }
+@keyframes gradientShift { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+
 .hero p {
   font-size: clamp(17px, 2.2vw, 22px); color: var(--text-muted);
-  max-width: 720px; margin-bottom: 48px; position: relative; z-index: 1;
+  max-width: 720px; margin-bottom: 48px; position: relative; z-index: 2;
   line-height: 1.6;
+  animation: fadeInUp 1s ease 0.3s both;
 }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
 .hero-actions {
-  display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; position: relative; z-index: 1;
+  display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; position: relative; z-index: 2;
+  animation: fadeInUp 1s ease 0.5s both;
 }
-.btn-lg-primary {
+
+/* Magnetic button */
+.btn-magnetic {
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
   padding: 16px 36px; border-radius: 100px; font-size: 17px; font-weight: 700;
+  border: none; cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+}
+.btn-magnetic.primary {
   background: var(--gradient-1); color: #fff;
   box-shadow: 0 10px 40px var(--primary-glow);
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: inline-flex; align-items: center; gap: 8px;
-  border: none; cursor: pointer;
 }
-.btn-lg-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 50px var(--primary-glow); }
-.btn-lg-ghost {
-  padding: 16px 36px; border-radius: 100px; font-size: 17px; font-weight: 600;
+.btn-magnetic.primary:hover { box-shadow: 0 16px 50px var(--primary-glow), 0 0 60px rgba(168, 85, 247, 0.15); }
+.btn-magnetic.primary::before {
+  content: ''; position: absolute; inset: 0; border-radius: 100px;
+  background: var(--gradient-1);
+  opacity: 0; transition: opacity 0.3s;
+  z-index: -1;
+}
+.btn-magnetic.primary::after {
+  content: ''; position: absolute; inset: -3px; border-radius: 100px;
+  background: var(--gradient-1); opacity: 0;
+  filter: blur(20px); transition: opacity 0.3s;
+  z-index: -2;
+}
+.btn-magnetic.primary:hover::after { opacity: 0.5; }
+.btn-magnetic.ghost {
   background: rgba(255,255,255,0.04); color: var(--text);
   border: 1px solid var(--border);
-  transition: all 0.2s;
-  display: inline-flex; align-items: center; gap: 8px;
   backdrop-filter: blur(10px);
 }
-.btn-lg-ghost:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); transform: translateY(-2px); }
+.btn-magnetic.ghost:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); }
+.btn-magnetic .arrow { transition: transform 0.3s; }
+.btn-magnetic:hover .arrow { transform: translateX(6px); }
+
 .hero-stats {
   display: flex; gap: 56px; margin-top: 72px; flex-wrap: wrap; justify-content: center;
-  position: relative; z-index: 1;
+  position: relative; z-index: 2;
+  animation: fadeInUp 1s ease 0.7s both;
 }
 .hero-stat { text-align: center; }
 .hero-stat-num {
-  font-size: 40px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+  font-size: 44px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
   background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
+  transition: transform 0.3s;
 }
+.hero-stat:hover .hero-stat-num { transform: scale(1.1); }
 .hero-stat-label { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 6px; font-weight: 600; }
 
 /* ─── Floating orbs ─── */
@@ -209,7 +265,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ─── Sections ─── */
-.section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; }
+.section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
 .section-center { text-align: center; }
 .section-tag {
   display: inline-flex; align-items: center; gap: 8px;
@@ -222,96 +278,132 @@ a { color: inherit; text-decoration: none; }
   font-size: clamp(30px, 4.5vw, 52px); font-weight: 800; letter-spacing: -1.5px;
   margin-bottom: 20px; line-height: 1.1;
 }
-.section-title .grad { background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.section-title .grad { background: var(--gradient-anim); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: gradientShift 4s ease infinite; }
 .section-subtitle { font-size: 18px; color: var(--text-muted); max-width: 640px; margin: 0 auto 64px; line-height: 1.7; }
 
-/* ─── Feature Grid ─── */
+/* ─── Feature Grid with 3D Tilt ─── */
 .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
 .feature-card {
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-  padding: 36px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 36px; transition: transform 0.2s ease-out, border-color 0.4s, box-shadow 0.4s; position: relative; overflow: hidden;
+  transform-style: preserve-3d; will-change: transform;
 }
 .feature-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: var(--gradient-1); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: var(--gradient-1); border-radius: 24px 24px 0 0;
   transform: scaleX(0); transition: transform 0.4s;
   transform-origin: left;
 }
-.feature-card:hover { border-color: var(--border-hover); transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+.feature-card::after {
+  content: ''; position: absolute; inset: 0; border-radius: 24px;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: none;
+}
+.feature-card:hover { border-color: var(--border-hover); box-shadow: 0 20px 50px rgba(0,0,0,0.3), 0 0 40px rgba(168, 85, 247, 0.08); }
 .feature-card:hover::before { transform: scaleX(1); }
+.feature-card:hover::after { opacity: 1; }
 .feature-icon {
-  width: 56px; height: 56px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
+  width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
   font-size: 28px; margin-bottom: 24px;
   background: var(--bg-elevated); border: 1px solid var(--border);
-  transition: transform 0.3s;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateZ(40px);
 }
-.feature-card:hover .feature-icon { transform: scale(1.08); }
-.feature-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.5px; }
-.feature-card p { font-size: 15px; color: var(--text-muted); line-height: 1.7; }
+.feature-card:hover .feature-icon { transform: translateZ(40px) scale(1.12) rotate(-5deg); }
+.feature-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.5px; transform: translateZ(30px); }
+.feature-card p { font-size: 15px; color: var(--text-muted); line-height: 1.7; transform: translateZ(20px); }
 .feature-card .tag {
   display: inline-block; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600;
   margin-top: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+  transform: translateZ(15px);
 }
 
 /* ─── AI Models Showcase ─── */
-.models-section { background: linear-gradient(180deg, var(--bg) 0%, #0c0c14 50%, var(--bg) 100%); padding: 120px 0; }
+.models-section { background: linear-gradient(180deg, var(--bg) 0%, #0c0c14 50%, var(--bg) 100%); padding: 120px 0; position: relative; z-index: 2; }
 .models-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1280px; margin: 0 auto; padding: 0 40px; }
 .model-card {
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
-  padding: 28px 24px; text-align: center; transition: all 0.3s;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 28px 24px; text-align: center; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative; overflow: hidden;
 }
-.model-card:hover { border-color: var(--primary); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
-.model-card .emoji { font-size: 36px; margin-bottom: 14px; transition: transform 0.3s; }
-.model-card:hover .emoji { transform: scale(1.15); }
-.model-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-.model-card .count { font-size: 32px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--primary-light); }
-.model-card .label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.model-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.06) 0%, transparent 50%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.model-card:hover { border-color: var(--primary); transform: translateY(-8px) scale(1.03); box-shadow: 0 16px 50px rgba(0,0,0,0.3), 0 0 30px rgba(168, 85, 247, 0.1); }
+.model-card:hover::before { opacity: 1; }
+.model-card .emoji { font-size: 36px; margin-bottom: 14px; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); display: inline-block; }
+.model-card:hover .emoji { transform: scale(1.25) rotate(-8deg); }
+.model-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; position: relative; }
+.model-card .count { font-size: 36px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--primary-light); position: relative; }
+.model-card .label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; position: relative; }
 
-/* ─── Platform Architecture ─── */
-.arch-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; }
+/* ─── Architecture with animated flow ─── */
+.arch-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
 .arch-flow { display: flex; flex-direction: column; gap: 16px; margin-top: 48px; }
 .arch-layer {
   display: flex; align-items: center; gap: 20px; padding: 24px 32px;
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
-  transition: all 0.3s;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative; overflow: hidden;
 }
-.arch-layer:hover { border-color: var(--border-hover); transform: translateX(10px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+.arch-layer::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.08), transparent);
+  transition: width 0.4s ease;
+}
+.arch-layer:hover::before { width: 100%; }
+.arch-layer:hover { border-color: var(--border-hover); transform: translateX(12px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
 .arch-layer-num {
-  width: 44px; height: 44px; border-radius: var(--radius-sm); flex-shrink: 0;
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
   background: var(--gradient-2); display: flex; align-items: center; justify-content: center;
   font-size: 18px; font-weight: 800; color: #fff;
   box-shadow: 0 4px 15px var(--primary-glow);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative; z-index: 1;
 }
-.arch-layer-content h4 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
-.arch-layer-content p { font-size: 14px; color: var(--text-muted); margin-top: 2px; }
+.arch-layer:hover .arch-layer-num { transform: scale(1.15) rotate(-5deg); }
+.arch-layer-content h4 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; position: relative; z-index: 1; }
+.arch-layer-content p { font-size: 14px; color: var(--text-muted); margin-top: 2px; position: relative; z-index: 1; }
 .arch-layer-tag {
   margin-left: auto; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 600;
   background: rgba(168, 85, 247, 0.08); color: var(--primary-light);
   text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+  position: relative; z-index: 1;
 }
 
 /* ─── Pricing ─── */
-.pricing-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; }
+.pricing-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
 .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 64px; }
 .pricing-card {
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-xl);
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 32px;
   padding: 44px 36px; position: relative; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
-.pricing-card:hover { transform: translateY(-8px); box-shadow: 0 25px 60px rgba(0,0,0,0.4); }
+.pricing-card:hover { transform: translateY(-12px); box-shadow: 0 30px 70px rgba(0,0,0,0.4); }
 .pricing-card.featured {
   border-color: rgba(168, 85, 247, 0.4); background: linear-gradient(180deg, rgba(168, 85, 247, 0.06) 0%, var(--bg-card) 100%);
   box-shadow: 0 0 50px rgba(168, 85, 247, 0.12);
+  animation: featuredPulse 4s ease-in-out infinite;
+}
+@keyframes featuredPulse {
+  0%, 100% { box-shadow: 0 0 50px rgba(168, 85, 247, 0.12); }
+  50% { box-shadow: 0 0 70px rgba(168, 85, 247, 0.2); }
 }
 .pricing-card.featured::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-  background: var(--gradient-1); border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--gradient-1); border-radius: 32px 32px 0 0;
 }
 .pricing-badge {
   position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
   padding: 6px 20px; border-radius: 100px; font-size: 12px; font-weight: 700;
   background: var(--gradient-1); color: #fff; text-transform: uppercase; letter-spacing: 1.5px;
   box-shadow: 0 4px 15px var(--primary-glow);
+  animation: badgeBounce 2s ease-in-out infinite;
 }
+@keyframes badgeBounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-4px); } }
 .pricing-name { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 16px; }
 .pricing-price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 6px; }
 .pricing-price .amount { font-size: 52px; font-weight: 900; letter-spacing: -2.5px; }
@@ -322,7 +414,9 @@ a { color: inherit; text-decoration: none; }
 .pricing-features li {
   display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
   font-size: 15px; color: var(--text); border-bottom: 1px solid rgba(168, 85, 247, 0.06);
+  transition: transform 0.2s;
 }
+.pricing-features li:hover { transform: translateX(6px); }
 .pricing-features li:last-child { border-bottom: none; }
 .pricing-features li .check {
   flex-shrink: 0; width: 22px; height: 22px; border-radius: 7px;
@@ -337,28 +431,36 @@ a { color: inherit; text-decoration: none; }
 .pricing-features li .label-muted { color: var(--text-dim); }
 .pricing-cta {
   display: block; text-align: center; padding: 16px; border-radius: 100px;
-  font-size: 16px; font-weight: 700; transition: all 0.2s;
+  font-size: 16px; font-weight: 700; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .pricing-cta.primary { background: var(--gradient-1); color: #fff; box-shadow: 0 6px 25px var(--primary-glow); }
-.pricing-cta.primary:hover { transform: translateY(-2px); box-shadow: 0 12px 35px var(--primary-glow); }
+.pricing-cta.primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 35px var(--primary-glow); }
 .pricing-cta.secondary { background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text); }
-.pricing-cta.secondary:hover { border-color: var(--primary); background: rgba(168, 85, 247, 0.08); }
+.pricing-cta.secondary:hover { border-color: var(--primary); background: rgba(168, 85, 247, 0.08); transform: translateY(-2px); }
 
 /* ─── Content/Info Section ─── */
-.content-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; }
+.content-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
 .content-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 48px; }
 .content-block {
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-  padding: 40px; transition: all 0.3s;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 40px; transition: all 0.4s; position: relative; overflow: hidden;
 }
-.content-block:hover { border-color: var(--border-hover); transform: translateY(-4px); }
+.content-block::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: var(--gradient-1); transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.content-block:hover { border-color: var(--border-hover); transform: translateY(-6px); box-shadow: 0 16px 50px rgba(0,0,0,0.3); }
+.content-block:hover::after { transform: scaleX(1); }
 .content-block h3 { font-size: 24px; font-weight: 700; margin-bottom: 14px; letter-spacing: -0.5px; }
 .content-block p { font-size: 16px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.7; }
 .content-block ul { list-style: none; }
 .content-block ul li {
   display: flex; align-items: flex-start; gap: 12px; padding: 10px 0;
   font-size: 15px; color: var(--text); line-height: 1.5;
+  transition: transform 0.2s, color 0.2s;
 }
+.content-block ul li:hover { transform: translateX(8px); color: var(--primary-light); }
 .content-block ul li::before {
   content: '▸'; color: var(--primary-light); font-weight: 700; flex-shrink: 0; font-size: 18px;
 }
@@ -369,20 +471,29 @@ a { color: inherit; text-decoration: none; }
   padding: 72px 40px; margin: 48px 0;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
+  position: relative; z-index: 2; overflow: hidden;
 }
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 32px; max-width: 1280px; margin: 0 auto; text-align: center; }
+.stats-band::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse 60% 80% at center, rgba(168, 85, 247, 0.04) 0%, transparent 60%);
+}
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 32px; max-width: 1280px; margin: 0 auto; text-align: center; position: relative; }
+.stat-item { transition: transform 0.3s; }
+.stat-item:hover { transform: translateY(-6px); }
 .stat-item .num {
-  font-size: 44px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+  font-size: 48px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
   background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+.stat-item:hover .num { transform: scale(1.12); }
 .stat-item .label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 8px; font-weight: 600; }
 
 /* ─── CTA ─── */
-.cta-section { padding: 120px 40px; text-align: center; max-width: 900px; margin: 0 auto; position: relative; }
+.cta-section { padding: 120px 40px; text-align: center; max-width: 900px; margin: 0 auto; position: relative; z-index: 2; }
 .cta-box {
   background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(236, 72, 153, 0.04) 50%, rgba(129, 140, 248, 0.06) 100%);
-  border: 1px solid rgba(168, 85, 247, 0.2); border-radius: var(--radius-xl);
+  border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 32px;
   padding: 72px 48px; position: relative; overflow: hidden;
   backdrop-filter: blur(10px);
 }
@@ -391,35 +502,55 @@ a { color: inherit; text-decoration: none; }
   background: radial-gradient(circle, rgba(168, 85, 247, 0.04) 0%, transparent 50%);
   animation: rotate 30s linear infinite;
 }
+.cta-box::after {
+  content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
+  border-radius: 32px;
+  background: var(--gradient-1); opacity: 0; filter: blur(30px);
+  transition: opacity 0.5s; z-index: -1;
+}
+.cta-box:hover::after { opacity: 0.15; }
 @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .cta-box h2 { font-size: clamp(30px, 4.5vw, 46px); font-weight: 800; margin-bottom: 20px; position: relative; letter-spacing: -1.5px; }
+.cta-box h2 .grad { background: var(--gradient-anim); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: gradientShift 4s ease infinite; }
 .cta-box p { font-size: 18px; color: var(--text-muted); margin-bottom: 36px; position: relative; }
 .cta-box .hero-actions { position: relative; }
 
 /* ─── Footer ─── */
-.footer { border-top: 1px solid var(--border); padding: 72px 40px 36px; background: #08080d; }
+.footer { border-top: 1px solid var(--border); padding: 72px 40px 36px; background: #08080d; position: relative; z-index: 2; }
 .footer-content { max-width: 1280px; margin: 0 auto; }
 .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
 .footer-brand h3 { font-size: 22px; font-weight: 800; margin-bottom: 14px; letter-spacing: -0.5px; }
 .footer-brand p { font-size: 15px; color: var(--text-muted); max-width: 320px; line-height: 1.7; }
 .footer-col h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 18px; }
-.footer-col a { display: block; font-size: 15px; color: var(--text); padding: 6px 0; transition: color 0.2s; }
-.footer-col a:hover { color: var(--primary-light); }
+.footer-col a { display: block; font-size: 15px; color: var(--text); padding: 6px 0; transition: color 0.2s, transform 0.2s; }
+.footer-col a:hover { color: var(--primary-light); transform: translateX(6px); }
 .footer-bottom {
   padding-top: 32px; border-top: 1px solid var(--border);
   display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--text-dim);
 }
 .footer-social { display: flex; gap: 12px; }
 .footer-social a {
-  width: 40px; height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+  width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center; font-size: 18px;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.footer-social a:hover { border-color: var(--primary); background: rgba(168, 85, 247, 0.08); transform: translateY(-2px); }
+.footer-social a:hover { border-color: var(--primary); background: rgba(168, 85, 247, 0.08); transform: translateY(-4px) scale(1.1); }
 
 /* ─── Reveal Animation ─── */
 .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
 .reveal.active { opacity: 1; transform: translateY(0); }
+
+/* ─── Shimmer effect on scroll ─── */
+.shimmer-text {
+  background: var(--gradient-anim);
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease infinite;
+}
+
+/* ─── Tilt wrapper ─── */
+.tilt-wrapper { perspective: 1000px; }
 
 /* ─── Mobile ─── */
 @media (max-width: 768px) {
@@ -436,10 +567,21 @@ a { color: inherit; text-decoration: none; }
   .cta-box { padding: 48px 28px; }
   .pricing-card { padding: 32px 24px; }
   .pricing-price .amount { font-size: 44px; }
+  .cursor-glow { display: none; }
+  #particles { opacity: 0.3; }
 }
 </style>
 </head>
 <body>
+
+<!-- Scroll progress bar -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Cursor glow follower -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- Particle network canvas -->
+<canvas id="particles"></canvas>
 
 <!-- ═══ NAV ═══ -->
 <nav class="nav" id="nav">
@@ -471,9 +613,9 @@ a { color: inherit; text-decoration: none; }
     <span class="dot"></span>
     Open Source • Self-Hosted • 281+ AI Models
   </div>
-  <h1>
+  <h1 id="heroTitle">
     Build AI Apps<br>
-    <span class="grad">Without Limits</span>
+    <span class="grad" id="heroGrad">Without Limits</span>
   </h1>
   <p>
     The open-source AI engineering platform that combines a no-code app builder,
@@ -481,30 +623,18 @@ a { color: inherit; text-decoration: none; }
     all running on your own infrastructure. No vendor lock-in, no limits.
   </p>
   <div class="hero-actions">
-    <a href="/platform/" class="btn-lg-primary">
-      Launch Studio →
+    <a href="/platform/" class="btn-magnetic primary" data-magnetic>
+      Launch Studio <span class="arrow">→</span>
     </a>
-    <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn-lg-ghost">
+    <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn-magnetic ghost" data-magnetic>
       ⭐ Star on GitHub
     </a>
   </div>
   <div class="hero-stats">
-    <div class="hero-stat">
-      <div class="hero-stat-num">281+</div>
-      <div class="hero-stat-label">AI Models</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">12</div>
-      <div class="hero-stat-label">Categories</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">44</div>
-      <div class="hero-stat-label">Built-in Tools</div>
-    </div>
-    <div class="hero-stat">
-      <div class="hero-stat-num">100%</div>
-      <div class="hero-stat-label">Open Source</div>
-    </div>
+    <div class="hero-stat"><div class="hero-stat-num" data-count="281" data-suffix="+">0</div><div class="hero-stat-label">AI Models</div></div>
+    <div class="hero-stat"><div class="hero-stat-num" data-count="12">0</div><div class="hero-stat-label">Categories</div></div>
+    <div class="hero-stat"><div class="hero-stat-num" data-count="44">0</div><div class="hero-stat-label">Built-in Tools</div></div>
+    <div class="hero-stat"><div class="hero-stat-num" data-count="100" data-suffix="%">0</div><div class="hero-stat-label">Open Source</div></div>
   </div>
 </section>
 
@@ -519,64 +649,56 @@ a { color: inherit; text-decoration: none; }
     </p>
   </div>
 
-  <div class="feature-grid">
-    <div class="feature-card reveal">
+  <div class="feature-grid" id="featureGrid">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">🏗️</div>
       <h3>No-Code App Builder</h3>
       <p>Build full-stack applications with a drag-and-drop page builder, entity-based CRUD APIs, and auto-generated SDKs. No code required — just describe what you want and watch it come to life.</p>
       <span class="tag" style="background: rgba(168, 85, 247, 0.08); color: var(--primary-light);">Base44-style</span>
     </div>
-
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">🧠</div>
       <h3>281+ AI Models</h3>
       <p>Access 281 AI models across 12 categories — LLMs, image generation, video, vision, 3D, audio, and more. Auto-routed to the best engine for each task via intent-based ModelRouter.</p>
       <span class="tag" style="background: rgba(129, 140, 248, 0.08); color: var(--accent);">12 Categories</span>
     </div>
-
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">🎬</div>
       <h3>Full-Stack Media Production</h3>
       <p>Generate 4K video, AI voiceovers, professional logos, and cinematic content — all from a single prompt. Powered by SDXL, ffmpeg, Blender 3D, and neural TTS.</p>
       <span class="tag" style="background: rgba(236, 72, 153, 0.08); color: var(--secondary);">4K Ready</span>
     </div>
-
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">⚡</div>
       <h3>Entity CRUD API</h3>
       <p>Define data models as JSON schemas and get instant PostgreSQL-backed CRUD APIs with pagination, filtering, sorting, row-level security, and auto-generated documentation.</p>
       <span class="tag" style="background: rgba(52, 211, 153, 0.08); color: var(--success);">Auto-Generated</span>
     </div>
-
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">🔄</div>
       <h3>Workflow Automation</h3>
       <p>Schedule recurring tasks, trigger actions on entity changes, and orchestrate multi-step workflows with a visual builder. Connector-triggered automations for Slack, Calendar, and more.</p>
       <span class="tag" style="background: rgba(168, 85, 247, 0.08); color: var(--primary-light);">Visual Builder</span>
     </div>
-
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">🔐</div>
       <h3>Privacy-First Architecture</h3>
       <p>Three privacy modes — LOCAL, HYBRID, CLOUD. Run everything on your own servers with zero reliance on paid external APIs. Your data never leaves your infrastructure.</p>
       <span class="tag" style="background: rgba(129, 140, 248, 0.08); color: var(--accent);">Self-Hosted</span>
     </div>
-
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">🎙️</div>
       <h3>Voice-Command Interface</h3>
       <p>Alexa-style voice experience for all platform commands. Control media generation, server management, and app building through natural language voice commands.</p>
       <span class="tag" style="background: rgba(236, 72, 153, 0.08); color: var(--secondary);">Hands-Free</span>
     </div>
-
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">🔗</div>
       <h3>REST API & SDK</h3>
       <p>Connect EvolvixOS to any external project via REST API. Auto-generate TypeScript and JavaScript SDKs from your entity schemas. Deploy backend functions as HTTP endpoints.</p>
       <span class="tag" style="background: rgba(52, 211, 153, 0.08); color: var(--success);">TypeScript + JS</span>
     </div>
-
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">📊</div>
       <h3>Analytics Dashboard</h3>
       <p>Real-time analytics with Chart.js visualizations. Track entity counts, API usage, workflow executions, and user activity. Zero-knowledge dashboard for non-technical users.</p>
@@ -597,30 +719,30 @@ a { color: inherit; text-decoration: none; }
   </div>
 
   <div class="models-grid">
-    <div class="model-card reveal"><div class="emoji">💬</div><h4>LLM & Text</h4><div class="count">42</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🖼️</div><h4>Image Generation</h4><div class="count">30</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🎥</div><h4>Video Generation</h4><div class="count">61</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">👁️</div><h4>Vision & Multimodal</h4><div class="count">16</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🎙️</div><h4>Speech & Voice</h4><div class="count">21</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🎵</div><h4>Music & Audio</h4><div class="count">14</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🧊</div><h4>3D Generation</h4><div class="count">21</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">💻</div><h4>AI Coding</h4><div class="count">16</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🔍</div><h4>RAG & Agents</h4><div class="count">19</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🎛️</div><h4>Image Control</h4><div class="count">17</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">⚙️</div><h4>Local Engines</h4><div class="count">18</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🧩</div><h4>Frameworks</h4><div class="count">6</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">💬</div><h4>LLM & Text</h4><div class="count" data-count="42">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🖼️</div><h4>Image Generation</h4><div class="count" data-count="30">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🎥</div><h4>Video Generation</h4><div class="count" data-count="61">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">👁️</div><h4>Vision & Multimodal</h4><div class="count" data-count="16">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🎙️</div><h4>Speech & Voice</h4><div class="count" data-count="21">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🎵</div><h4>Music & Audio</h4><div class="count" data-count="14">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🧊</div><h4>3D Generation</h4><div class="count" data-count="21">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">💻</div><h4>AI Coding</h4><div class="count" data-count="16">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🔍</div><h4>RAG & Agents</h4><div class="count" data-count="19">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🎛️</div><h4>Image Control</h4><div class="count" data-count="17">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">⚙️</div><h4>Local Engines</h4><div class="count" data-count="18">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🧩</div><h4>Frameworks</h4><div class="count" data-count="6">0</div><div class="label">Models</div></div>
   </div>
 </section>
 
 <!-- ═══ STATS BAND ═══ -->
 <section class="stats-band">
   <div class="stats-grid">
-    <div class="stat-item reveal"><div class="num">350+</div><div class="label">Tests Passing</div></div>
-    <div class="stat-item reveal"><div class="num">58</div><div class="label">Security Patterns</div></div>
-    <div class="stat-item reveal"><div class="num">44</div><div class="label">Agent Tools</div></div>
-    <div class="stat-item reveal"><div class="num">217</div><div class="label">Agent Templates</div></div>
-    <div class="stat-item reveal"><div class="num">467</div><div class="label">tok/s (Groq)</div></div>
-    <div class="stat-item reveal"><div class="num">1M</div><div class="label">Context Window</div></div>
+    <div class="stat-item reveal"><div class="num" data-count="350" data-suffix="+">0</div><div class="label">Tests Passing</div></div>
+    <div class="stat-item reveal"><div class="num" data-count="58">0</div><div class="label">Security Patterns</div></div>
+    <div class="stat-item reveal"><div class="num" data-count="44">0</div><div class="label">Agent Tools</div></div>
+    <div class="stat-item reveal"><div class="num" data-count="217">0</div><div class="label">Agent Templates</div></div>
+    <div class="stat-item reveal"><div class="num" data-count="467">0</div><div class="label">tok/s (Groq)</div></div>
+    <div class="stat-item reveal"><div class="num" data-count="1" data-suffix="M">0</div><div class="label">Context Window</div></div>
   </div>
 </section>
 
@@ -636,41 +758,13 @@ a { color: inherit; text-decoration: none; }
   </div>
 
   <div class="arch-flow">
-    <div class="arch-layer reveal">
-      <div class="arch-layer-num">1</div>
-      <div class="arch-layer-content"><h4>Entity Layer — Define Your Data</h4><p>JSON schemas become PostgreSQL tables instantly. Auto fields: id, created_date, updated_date, created_by.</p></div>
-      <div class="arch-layer-tag">PostgreSQL</div>
-    </div>
-    <div class="arch-layer reveal">
-      <div class="arch-layer-num">2</div>
-      <div class="arch-layer-content"><h4>API Layer — Auto-Generated CRUD</h4><p>Every entity gets instant REST endpoints with pagination, sorting, filtering, and row-level security.</p></div>
-      <div class="arch-layer-tag">FastAPI</div>
-    </div>
-    <div class="arch-layer reveal">
-      <div class="arch-layer-num">3</div>
-      <div class="arch-layer-content"><h4>Builder Layer — AI-Powered No-Code</h4><p>Describe your app in natural language. The AI builder creates entities, pages, and functions automatically.</p></div>
-      <div class="arch-layer-tag">Local LLM</div>
-    </div>
-    <div class="arch-layer reveal">
-      <div class="arch-layer-num">4</div>
-      <div class="arch-layer-content"><h4>AI Layer — 281 Models, One Router</h4><p>Intent-based ModelRouter auto-selects the best engine: Groq for fast chat, Gemini for vision, SDXL for images.</p></div>
-      <div class="arch-layer-tag">ModelRouter V10</div>
-    </div>
-    <div class="arch-layer reveal">
-      <div class="arch-layer-num">5</div>
-      <div class="arch-layer-content"><h4>Media Layer — Full-Stack Production</h4><p>4K video, AI voiceovers, 3D logos, and cinematic content — all from a single prompt via ffmpeg + Blender + SDXL.</p></div>
-      <div class="arch-layer-tag">ffmpeg + SDXL</div>
-    </div>
-    <div class="arch-layer reveal">
-      <div class="arch-layer-num">6</div>
-      <div class="arch-layer-content"><h4>Automation Layer — Workflows & Triggers</h4><p>Schedule tasks, trigger on entity changes, orchestrate multi-step workflows. Visual builder with connector support.</p></div>
-      <div class="arch-layer-tag">CNCF SWF</div>
-    </div>
-    <div class="arch-layer reveal">
-      <div class="arch-layer-num">7</div>
-      <div class="arch-layer-content"><h4>Security Layer — Hardened by Default</h4><p>JWT auth, OTP verification, 58 security patterns, XSS/SSRF/injection protection, audit logging, credit-based billing.</p></div>
-      <div class="arch-layer-tag">350+ Tests</div>
-    </div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">1</div><div class="arch-layer-content"><h4>Entity Layer — Define Your Data</h4><p>JSON schemas become PostgreSQL tables instantly. Auto fields: id, created_date, updated_date, created_by.</p></div><div class="arch-layer-tag">PostgreSQL</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">2</div><div class="arch-layer-content"><h4>API Layer — Auto-Generated CRUD</h4><p>Every entity gets instant REST endpoints with pagination, sorting, filtering, and row-level security.</p></div><div class="arch-layer-tag">FastAPI</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">3</div><div class="arch-layer-content"><h4>Builder Layer — AI-Powered No-Code</h4><p>Describe your app in natural language. The AI builder creates entities, pages, and functions automatically.</p></div><div class="arch-layer-tag">Local LLM</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">4</div><div class="arch-layer-content"><h4>AI Layer — 281 Models, One Router</h4><p>Intent-based ModelRouter auto-selects the best engine: Groq for fast chat, Gemini for vision, SDXL for images.</p></div><div class="arch-layer-tag">ModelRouter V10</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">5</div><div class="arch-layer-content"><h4>Media Layer — Full-Stack Production</h4><p>4K video, AI voiceovers, 3D logos, and cinematic content — all from a single prompt via ffmpeg + Blender + SDXL.</p></div><div class="arch-layer-tag">ffmpeg + SDXL</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">6</div><div class="arch-layer-content"><h4>Automation Layer — Workflows & Triggers</h4><p>Schedule tasks, trigger on entity changes, orchestrate multi-step workflows. Visual builder with connector support.</p></div><div class="arch-layer-tag">CNCF SWF</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">7</div><div class="arch-layer-content"><h4>Security Layer — Hardened by Default</h4><p>JWT auth, OTP verification, 58 security patterns, XSS/SSRF/injection protection, audit logging, credit-based billing.</p></div><div class="arch-layer-tag">350+ Tests</div></div>
   </div>
 </section>
 
@@ -698,7 +792,6 @@ a { color: inherit; text-decoration: none; }
         <li>API documentation auto-generated for every entity</li>
       </ul>
     </div>
-
     <div class="content-block reveal">
       <h3>🤖 Agent Capabilities</h3>
       <p>Mr. James — the built-in AI agent — has 44 tools and can autonomously build, deploy, and manage.</p>
@@ -711,7 +804,6 @@ a { color: inherit; text-decoration: none; }
         <li>Tencent Cloud, Google Gemini, Groq, and Kimi integrations built-in</li>
       </ul>
     </div>
-
     <div class="content-block reveal">
       <h3>🔒 Security & Privacy</h3>
       <p>Built with security-first principles. Every endpoint is protected, every pattern is checked.</p>
@@ -724,7 +816,6 @@ a { color: inherit; text-decoration: none; }
         <li>Three privacy modes: LOCAL (fully offline), HYBRID, CLOUD</li>
       </ul>
     </div>
-
     <div class="content-block reveal">
       <h3>🌐 Ecosystem & Integrations</h3>
       <p>Connect EvolvixOS to your existing tools and services out of the box.</p>
@@ -752,10 +843,9 @@ a { color: inherit; text-decoration: none; }
   </div>
 
   <div class="pricing-grid">
-    <!-- Free -->
     <div class="pricing-card reveal">
       <div class="pricing-name">🌱 Starter</div>
-      <div class="pricing-price"><span class="currency">$</span><span class="amount">0</span><span class="period">/month</span></div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="0">0</span><span class="period">/month</span></div>
       <p class="pricing-desc">Perfect for exploring the platform and building your first AI apps.</p>
       <ul class="pricing-features">
         <li><span class="check">✓</span> 3 Entities / Apps</li>
@@ -770,12 +860,10 @@ a { color: inherit; text-decoration: none; }
       </ul>
       <a href="/platform/" class="pricing-cta secondary">Start Free</a>
     </div>
-
-    <!-- Pro -->
     <div class="pricing-card featured reveal">
       <div class="pricing-badge">★ Most Popular</div>
       <div class="pricing-name">🚀 Professional</div>
-      <div class="pricing-price"><span class="currency">$</span><span class="amount">29</span><span class="period">/month</span></div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="29">0</span><span class="period">/month</span></div>
       <p class="pricing-desc">For developers building production AI apps with cloud model access.</p>
       <ul class="pricing-features">
         <li><span class="check">✓</span> Unlimited Entities / Apps</li>
@@ -791,11 +879,9 @@ a { color: inherit; text-decoration: none; }
       </ul>
       <a href="/platform/" class="pricing-cta primary">Start Pro Trial →</a>
     </div>
-
-    <!-- Business -->
     <div class="pricing-card reveal">
       <div class="pricing-name">💼 Business</div>
-      <div class="pricing-price"><span class="currency">$</span><span class="amount">99</span><span class="period">/month</span></div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="99">0</span><span class="period">/month</span></div>
       <p class="pricing-desc">Full media production, voice commands, and higher limits for growing teams.</p>
       <ul class="pricing-features">
         <li><span class="check">✓</span> Everything in Professional</li>
@@ -811,11 +897,9 @@ a { color: inherit; text-decoration: none; }
       </ul>
       <a href="/platform/" class="pricing-cta secondary">Start Business Trial</a>
     </div>
-
-    <!-- Enterprise -->
     <div class="pricing-card reveal">
       <div class="pricing-name">🏆 Enterprise</div>
-      <div class="pricing-price"><span class="currency">$</span><span class="amount">299</span><span class="period">/month</span></div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="299">0</span><span class="period">/month</span></div>
       <p class="pricing-desc">Dedicated infrastructure, GPU access, and enterprise-grade support.</p>
       <ul class="pricing-features">
         <li><span class="check">✓</span> Everything in Business</li>
@@ -840,8 +924,8 @@ a { color: inherit; text-decoration: none; }
     <h2>Ready to Build Something <span class="grad">Extraordinary?</span></h2>
     <p>Join the open-source AI engineering revolution. Self-host EvolvixOS today — no credit card required.</p>
     <div class="hero-actions">
-      <a href="/platform/" class="btn-lg-primary">Launch Studio →</a>
-      <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn-lg-ghost">View on GitHub</a>
+      <a href="/platform/" class="btn-magnetic primary" data-magnetic>Launch Studio <span class="arrow">→</span></a>
+      <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn-magnetic ghost" data-magnetic>View on GitHub</a>
     </div>
   </div>
 </section>
@@ -891,28 +975,257 @@ a { color: inherit; text-decoration: none; }
   </div>
 </footer>
 
-<!-- ═══ SCRIPTS ═══ -->
 <script>
+// ═══════════════════════════════════════════════════════════════
+// MAXIMUM WOW — Animation Engine
+// ═══════════════════════════════════════════════════════════════
+
+// ─── Scroll Progress Bar ───
+const scrollProgress = document.getElementById('scrollProgress');
 window.addEventListener('scroll', () => {
+  const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+  scrollProgress.style.width = scrolled + '%';
   const nav = document.getElementById('nav');
   if (window.scrollY > 20) nav.classList.add('scrolled');
   else nav.classList.remove('scrolled');
 });
 
+// ─── Cursor Glow Follower ───
+const cursorGlow = document.getElementById('cursorGlow');
+let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+function animateGlow() {
+  glowX += (mouseX - glowX) * 0.1;
+  glowY += (mouseY - glowY) * 0.1;
+  cursorGlow.style.transform = `translate(${glowX}px, ${glowY}px) translate(-50%, -50%)`;
+  requestAnimationFrame(animateGlow);
+}
+animateGlow();
+
+// ─── Particle Network Background ───
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.vx = (Math.random() - 0.5) * 0.4;
+    this.vy = (Math.random() - 0.5) * 0.4;
+    this.size = Math.random() * 2 + 0.5;
+    this.opacity = Math.random() * 0.3 + 0.1;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(168, 85, 247, ${this.opacity})`;
+    ctx.fill();
+  }
+}
+
+const particleCount = Math.min(80, Math.floor(window.innerWidth / 12));
+for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+function drawConnections() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(168, 85, 247, ${(1 - dist / 120) * 0.08})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  drawConnections();
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ─── Hero Text Scramble Reveal ───
+class TextScramble {
+  constructor(el) {
+    this.el = el;
+    this.chars = '!<>-_\\/[]{}—=+*^?#________';
+    this.update = this.update.bind(this);
+  }
+  scramble(newText) {
+    const oldText = this.el.innerText;
+    const length = Math.max(oldText.length, newText.length);
+    const promise = new Promise(resolve => this.resolve = resolve);
+    this.queue = [];
+    for (let i = 0; i < length; i++) {
+      const from = oldText[i] || '';
+      const to = newText[i] || '';
+      const start = Math.floor(Math.random() * 30);
+      const end = start + Math.floor(Math.random() * 30);
+      this.queue.push({ from, to, start, end });
+    }
+    cancelAnimationFrame(this.frameRequest);
+    this.frame = 0;
+    this.update();
+    return promise;
+  }
+  update() {
+    let output = '';
+    let complete = 0;
+    for (let i = 0; i < this.queue.length; i++) {
+      let { from, to, start, end, char } = this.queue[i];
+      if (this.frame >= end) {
+        complete++;
+        output += to;
+      } else if (this.frame >= start) {
+        if (!char || Math.random() < 0.28) {
+          char = this.chars[Math.floor(Math.random() * this.chars.length)];
+          this.queue[i].char = char;
+        }
+        output += `<span style="opacity: 0.5; color: var(--primary-light)">${char}</span>`;
+      } else {
+        output += from;
+      }
+    }
+    this.el.innerHTML = output;
+    if (complete === this.queue.length) {
+      this.resolve();
+    } else {
+      this.frameRequest = requestAnimationFrame(this.update);
+      this.frame++;
+    }
+  }
+}
+
+// Trigger scramble on hero gradient text
+const heroGrad = document.getElementById('heroGrad');
+const fx = new TextScramble(heroGrad);
+const phrases = ['Without Limits', 'Without Limits', 'Without Limits'];
+let counter = 0;
+const scrambleNext = () => {
+  fx.scramble(phrases[counter]).then(() => {
+    setTimeout(scrambleNext, 8000);
+  });
+  counter = (counter + 1) % phrases.length;
+};
+setTimeout(scrambleNext, 800);
+
+// ─── Animated Counters ───
+function animateCounter(el) {
+  const target = parseInt(el.dataset.count);
+  const suffix = el.dataset.suffix || '';
+  const duration = 2000;
+  const start = performance.now();
+  function update(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    el.textContent = Math.floor(eased * target) + suffix;
+    if (progress < 1) requestAnimationFrame(update);
+    else el.textContent = target + suffix;
+  }
+  requestAnimationFrame(update);
+}
+
+// ─── Intersection Observer for reveals + counters ───
 const observer = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
     if (entry.isIntersecting) {
-      setTimeout(() => entry.target.classList.add('active'), i * 60);
+      setTimeout(() => {
+        entry.target.classList.add('active');
+        // Animate counters inside this element
+        entry.target.querySelectorAll('[data-count]').forEach(el => {
+          if (!el.dataset.animated) {
+            el.dataset.animated = 'true';
+            animateCounter(el);
+          }
+        });
+      }, i * 60);
       observer.unobserve(entry.target);
     }
   });
 }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
+// Also catch standalone data-count elements
+document.querySelectorAll('[data-count]').forEach(el => {
+  if (!el.closest('.reveal')) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !el.dataset.animated) {
+          el.dataset.animated = 'true';
+          animateCounter(el);
+          obs.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+    obs.observe(el);
+  }
+});
+
+// ─── 3D Card Tilt ───
+document.querySelectorAll('[data-tilt]').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotateX = ((y - cy) / cy) * -8;
+    const rotateY = ((x - cx) / cx) * 8;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+    card.style.setProperty('--mx', `${(x / rect.width) * 100}%`);
+    card.style.setProperty('--my', `${(y / rect.height) * 100}%`);
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+// ─── Magnetic Buttons ───
+document.querySelectorAll('[data-magnetic]').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+  });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = '';
+  });
+});
+
+// ─── Smooth Scroll ───
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     const target = document.querySelector(a.getAttribute('href'));
     if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+// ─── Parallax orbs on mouse ───
+document.addEventListener('mousemove', e => {
+  const cx = (e.clientX / window.innerWidth - 0.5) * 30;
+  const cy = (e.clientY / window.innerHeight - 0.5) * 30;
+  document.querySelectorAll('.orb').forEach((orb, i) => {
+    const factor = (i + 1) * 0.5;
+    orb.style.transform = `translate(${cx * factor}px, ${cy * factor}px)`;
   });
 });
 </script>
