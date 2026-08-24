@@ -1131,10 +1131,65 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
 .bg-noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.015;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
+
+/* ═══ Enhanced Animated Background ═══ */
+.bg-canvas { opacity: 0.8 !important; }
+.bg-aurora-band { opacity: 0.25 !important; filter: blur(50px) !important; }
+.bg-grid { opacity: 0.05 !important; }
+.plat-orb { opacity: 0.15 !important; filter: blur(80px) !important; }
+
+/* Mouse-following glow */
+.bg-mouse-glow {
+  position: fixed; width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 60%);
+  pointer-events: none; z-index: 0; transition: transform 0.15s ease-out;
+  left: -300px; top: -300px; mix-blend-mode: screen;
+}
+
+/* Shooting stars */
+.bg-shooting-star {
+  position: fixed; width: 2px; height: 2px; background: #fff; border-radius: 50%;
+  pointer-events: none; z-index: 0; opacity: 0;
+  box-shadow: 0 0 6px #fff, 0 0 12px rgba(217,70,239,0.5);
+}
+.bg-shooting-star::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 80px; height: 1px;
+  background: linear-gradient(90deg, rgba(217,70,239,0.6), transparent);
+  transform: translateX(-80px); border-radius: 50%;
+}
+@keyframes shootStar {
+  0% { opacity: 0; transform: translate(0, 0) rotate(45deg); }
+  10% { opacity: 1; }
+  100% { opacity: 0; transform: translate(300px, 300px) rotate(45deg); }
+}
+
+/* ═══ Enhanced Logo Animation ═══ */
+.evolvix-logo, .evolvix-logo-lg { filter: drop-shadow(0 0 8px rgba(217,70,239,0.4)) drop-shadow(0 0 16px rgba(168,85,247,0.2)); }
+.logo-glow-container { animation: logoBreathe 3s ease-in-out infinite !important; }
+@keyframes logoBreathe {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(217,70,239,0.4)) drop-shadow(0 0 12px rgba(168,85,247,0.2)); }
+  50% { filter: drop-shadow(0 0 16px rgba(217,70,239,0.6)) drop-shadow(0 0 24px rgba(168,85,247,0.4)); }
+}
+.nav-logo:hover .evolvix-logo { transform: scale(1.15) rotate(-8deg) !important; }
+
+/* Logo entrance animation */
+@keyframes logoEntrance {
+  0% { opacity: 0; transform: scale(0.3) rotate(-180deg); }
+  60% { opacity: 1; transform: scale(1.1) rotate(10deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+.logo-glow-container { animation: logoBreathe 3s ease-in-out infinite, logoEntrance 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+
+/* Large logo morphing ring */
+@keyframes morphRing {
+  0%, 100% { stroke-dasharray: 100 200; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 150 150; stroke-dashoffset: -50; }
+}
+
 </style>
   <link rel="stylesheet" href="/studio-friendly.css">
 </head>
-<body class="bg-[#0a0a0f] text-gray-100 h-screen overflow-hidden">
+<body class="bg-[#0a0a0f] text-gray-100 h-screen overflow-hidden"><div class="bg-mouse-glow"></div>
 <!-- Scroll Progress --><div class="scroll-progress-platform" id="scrollProgressPlat"></div>
 
 <!-- ═══ Animated Background ═══ -->
@@ -4873,6 +4928,48 @@ function smoothScrollTo(elementId, target) {
     requestAnimationFrame(animate);
   }
   animate();
+})();
+
+
+// ═══ Enhanced Background: Mouse Glow + Shooting Stars ═══
+(function() {
+  // Mouse follow glow
+  var glow = document.querySelector('.bg-mouse-glow');
+  if (!glow) {
+    glow = document.createElement('div');
+    glow.className = 'bg-mouse-glow';
+    document.body.appendChild(glow);
+  }
+  var mx = 0, my = 0, gx = 0, gy = 0;
+  document.addEventListener('mousemove', function(e) { mx = e.clientX; my = e.clientY; });
+  function updateGlow() {
+    gx += (mx - gx) * 0.08;
+    gy += (my - gy) * 0.08;
+    glow.style.transform = 'translate(' + gx + 'px, ' + gy + 'px)';
+    requestAnimationFrame(updateGlow);
+  }
+  updateGlow();
+
+  // Shooting stars
+  function createStar() {
+    var star = document.createElement('div');
+    star.className = 'bg-shooting-star';
+    star.style.left = Math.random() * window.innerWidth + 'px';
+    star.style.top = Math.random() * (window.innerHeight * 0.4) + 'px';
+    star.style.animation = 'shootStar ' + (1.5 + Math.random()) + 's ease-in forwards';
+    document.body.appendChild(star);
+    setTimeout(function() { star.remove(); }, 3000);
+  }
+  setInterval(createStar, 3500);
+  setTimeout(createStar, 1000);
+  setTimeout(createStar, 2000);
+
+  // Enhance particle canvas — make particles bigger and brighter
+  var origAnimate = window.requestAnimationFrame;
+  var canvas = document.getElementById('bgParticleCanvas');
+  if (canvas) {
+    canvas.style.opacity = '0.8';
+  }
 })();
 
 </script>
