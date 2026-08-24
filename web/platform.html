@@ -1104,6 +1104,17 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
 .flex-1.overflow-y-auto::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.2); border-radius: 3px; }
 .flex-1.overflow-y-auto::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,0.4); }
 
+
+/* ═══ EvolvixOS Modern Animated Logo ═══ */
+.evolvix-logo, .evolvix-logo-lg { display: inline-block; }
+.evolvix-logo { width: 36px; height: 36px; }
+.evolvix-logo-lg { width: 64px; height: 64px; }
+.evolvix-logo path, .evolvix-logo-lg path { transition: all 0.3s ease; }
+.logo-glow-container { animation: logoBreathe 4s ease-in-out infinite; }
+@keyframes logoBreathe { 0%,100% { filter: drop-shadow(0 0 4px rgba(217,70,239,0.3)); } 50% { filter: drop-shadow(0 0 12px rgba(217,70,239,0.5)); } }
+.nav-logo:hover .evolvix-logo { transform: scale(1.08) rotate(-5deg); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.nav-logo .evolvix-logo { transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+
 </style>
   <link rel="stylesheet" href="/studio-friendly.css">
 </head>
@@ -1123,7 +1134,45 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
     <div class="p-4 border-b border-gray-800/60">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 flex items-center justify-center font-bold text-sm logo-glow">E</div>
+        <div class="logo-glow-container"><svg viewBox="0 0 40 40" class="evolvix-logo" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="elix-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"><animate attributeName="stop-color" values="#a855f7;#ec4899;#d946ef;#a855f7" dur="4s" repeatCount="indefinite"/></stop>
+      <stop offset="50%" stop-color="#d946ef"><animate attributeName="stop-color" values="#d946ef;#a855f7;#ec4899;#d946ef" dur="4s" repeatCount="indefinite"/></stop>
+      <stop offset="100%" stop-color="#ec4899"><animate attributeName="stop-color" values="#ec4899;#d946ef;#a855f7;#ec4899" dur="4s" repeatCount="indefinite"/></stop>
+    </linearGradient>
+    <linearGradient id="elix-grad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d946ef" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0.3"/>
+    </linearGradient>
+    <filter id="elix-glow"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <!-- Outer hexagon ring -->
+  <path d="M20 3 L34 11 L34 29 L20 37 L6 29 L6 11 Z" stroke="url(#elix-grad)" stroke-width="1.5" fill="none" opacity="0.4">
+    <animateTransform attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="20s" repeatCount="indefinite"/>
+  </path>
+  <!-- Inner gem -->
+  <path d="M20 7 L30 13 L30 27 L20 33 L10 27 L10 13 Z" fill="url(#elix-grad)" filter="url(#elix-glow)">
+    <animate attributeName="opacity" values="0.85;1;0.85" dur="3s" repeatCount="indefinite"/>
+  </path>
+  <!-- Facet lines -->
+  <path d="M20 7 L20 33 M10 13 L30 27 M30 13 L10 27" stroke="url(#elix-grad2)" stroke-width="0.8" opacity="0.5">
+    <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.5s" repeatCount="indefinite"/>
+  </path>
+  <!-- Center E shape with geometric layers -->
+  <path d="M14 15 L26 15 L26 18 L17 18 L17 19 L24 19 L24 22 L17 22 L17 23 L26 23 L26 26 L14 26 Z" fill="#0a0a0f" opacity="0.85">
+    <animate attributeName="opacity" values="0.7;0.95;0.7" dur="3s" repeatCount="indefinite"/>
+  </path>
+  <!-- Sparkle accent -->
+  <circle cx="30" cy="11" r="1" fill="#fff" opacity="0">
+    <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    <animate attributeName="r" values="0.5;1.5;0.5" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+  </circle>
+  <circle cx="9" cy="28" r="0.8" fill="#fff" opacity="0">
+    <animate attributeName="opacity" values="0;0.8;0" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+    <animate attributeName="r" values="0.3;1;0.3" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+  </circle>
+</svg></div>
         <div>
           <span class="font-semibold text-sm">EvolvixOS</span>
           <p class="text-[10px] text-gray-500 -mt-0.5">Platform Builder</p>
@@ -1246,9 +1295,61 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
 
         <!-- Hero -->
         <div id="builder-hero" class="pt-16 pb-10 text-center">
-          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 via-fuchsia-500 to-pink-500 mx-auto mb-5 flex items-center justify-center shadow-xl shadow-purple-500/20" style="animation: float 3s ease-in-out infinite;">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>
-          </div>
+          <div class="logo-glow-container mx-auto mb-5" style="animation: float 3s ease-in-out infinite;"><svg viewBox="0 0 64 64" class="evolvix-logo-lg" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="elix-lg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"><animate attributeName="stop-color" values="#a855f7;#ec4899;#d946ef;#a855f7" dur="4s" repeatCount="indefinite"/></stop>
+      <stop offset="50%" stop-color="#d946ef"><animate attributeName="stop-color" values="#d946ef;#a855f7;#ec4899;#d946ef" dur="4s" repeatCount="indefinite"/></stop>
+      <stop offset="100%" stop-color="#ec4899"><animate attributeName="stop-color" values="#ec4899;#d946ef;#a855f7;#ec4899" dur="4s" repeatCount="indefinite"/></stop>
+    </linearGradient>
+    <linearGradient id="elix-lg-grad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d946ef" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0.3"/>
+    </linearGradient>
+    <filter id="elix-lg-glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <radialGradient id="elix-lg-pulse" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#d946ef" stop-opacity="0.3"><animate attributeName="stop-opacity" values="0.15;0.4;0.15" dur="3s" repeatCount="indefinite"/></stop>
+      <stop offset="100%" stop-color="#d946ef" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Pulse ring -->
+  <circle cx="32" cy="32" r="30" fill="url(#elix-lg-pulse)">
+    <animate attributeName="r" values="28;34;28" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Outer hexagon ring (rotating) -->
+  <path d="M32 5 L54 17.5 L54 46.5 L32 59 L10 46.5 L10 17.5 Z" stroke="url(#elix-lg-grad)" stroke-width="2" fill="none" opacity="0.35">
+    <animateTransform attributeName="transform" type="rotate" from="0 32 32" to="360 32 32" dur="20s" repeatCount="indefinite"/>
+  </path>
+  <!-- Counter-rotating inner ring -->
+  <path d="M32 10 L48 19 L48 45 L32 54 L16 45 L16 19 Z" stroke="url(#elix-lg-grad)" stroke-width="1" fill="none" opacity="0.2">
+    <animateTransform attributeName="transform" type="rotate" from="360 32 32" to="0 32 32" dur="15s" repeatCount="indefinite"/>
+  </path>
+  <!-- Inner gem -->
+  <path d="M32 12 L48 21 L48 43 L32 52 L16 43 L16 21 Z" fill="url(#elix-lg-grad)" filter="url(#elix-lg-glow)">
+    <animate attributeName="opacity" values="0.85;1;0.85" dur="3s" repeatCount="indefinite"/>
+  </path>
+  <!-- Facet lines -->
+  <path d="M32 12 L32 52 M16 21 L48 43 M48 21 L16 43" stroke="url(#elix-lg-grad2)" stroke-width="1.2" opacity="0.5">
+    <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.5s" repeatCount="indefinite"/>
+  </path>
+  <!-- Geometric E -->
+  <path d="M23 22 L41 22 L41 27 L27 27 L27 29.5 L38 29.5 L38 34.5 L27 34.5 L27 37 L41 37 L41 42 L23 42 Z" fill="#0a0a0f" opacity="0.9">
+    <animate attributeName="opacity" values="0.75;1;0.75" dur="3s" repeatCount="indefinite"/>
+  </path>
+  <!-- Sparkles -->
+  <circle cx="49" cy="17" r="1.5" fill="#fff" opacity="0">
+    <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    <animate attributeName="r" values="0.5;2;0.5" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+  </circle>
+  <circle cx="14" cy="46" r="1.2" fill="#fff" opacity="0">
+    <animate attributeName="opacity" values="0;0.8;0" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+    <animate attributeName="r" values="0.3;1.5;0.3" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+  </circle>
+  <circle cx="50" cy="48" r="1" fill="#fff" opacity="0">
+    <animate attributeName="opacity" values="0;0.6;0" dur="3s" repeatCount="indefinite" begin="2s"/>
+    <animate attributeName="r" values="0.3;1;0.3" dur="3s" repeatCount="indefinite" begin="2s"/>
+  </circle>
+</svg></div>
           <h2 class="text-3xl font-bold mb-2">Hi <span id="hero-username" class="gradient-text">there</span>.</h2>
           <p class="text-gray-500 text-base">What will you build next?</p>
         </div>
