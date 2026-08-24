@@ -1186,6 +1186,20 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
   50% { stroke-dasharray: 150 150; stroke-dashoffset: -50; }
 }
 
+
+/* ═══ DRAMATIC Background Override ═══ */
+.bg-canvas { opacity: 1 !important; z-index: 0 !important; }
+.bg-aurora-band { opacity: 0.35 !important; filter: blur(40px) !important; height: 400px !important; }
+.bg-aurora-1 { animation-duration: 15s !important; }
+.bg-aurora-2 { animation-duration: 18s !important; }
+.bg-aurora-3 { animation-duration: 22s !important; }
+.bg-grid { opacity: 0.06 !important; background-size: 40px 40px !important; }
+.plat-orb { opacity: 0.2 !important; filter: blur(60px) !important; }
+.bg-mouse-glow {
+  width: 800px !important; height: 800px !important;
+  background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, rgba(217,70,239,0.06) 30%, transparent 60%) !important;
+}
+
 </style>
   <link rel="stylesheet" href="/studio-friendly.css">
 </head>
@@ -4825,44 +4839,58 @@ function smoothScrollTo(elementId, target) {
 }
 
 
-// ═══ Animated Particle Network Background ═══
+
+// ═══ DRAMATIC Particle Network ═══
 (function() {
   var canvas = document.getElementById('bgParticleCanvas');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
   var particles = [];
   var mouse = { x: -1000, y: -1000 };
-  var maxParticles = window.innerWidth < 768 ? 30 : 60;
-  var connectionDist = window.innerWidth < 768 ? 100 : 150;
+  var W, H;
+  var maxParticles, connectionDist;
 
   function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    maxParticles = W < 768 ? 50 : 120;
+    connectionDist = W < 768 ? 120 : 200;
   }
   resize();
   window.addEventListener('resize', resize);
 
-  // Init particles
+  // Colors
+  var colors = [
+    [168, 85, 247],   // purple
+    [217, 70, 239],   // fuchsia
+    [236, 72, 153],   // pink
+    [139, 92, 246],   // violet
+    [124, 58, 237],   // indigo
+  ];
+
   for (var i = 0; i < maxParticles; i++) {
+    var c = colors[Math.floor(Math.random() * colors.length)];
     particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: Math.random() * 2 + 0.5,
-      hue: Math.random() > 0.5 ? 280 : 320, // purple or pink
-      opacity: Math.random() * 0.4 + 0.1
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 3 + 1,
+      cr: c[0], cg: c[1], cb: c[2],
+      opacity: Math.random() * 0.5 + 0.3,
+      pulse: Math.random() * Math.PI * 2
     });
   }
 
-  // Track mouse
   window.addEventListener('mousemove', function(e) {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
   });
 
+  var time = 0;
   function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    time += 0.01;
+    ctx.clearRect(0, 0, W, H);
 
     // Draw connections
     for (var i = 0; i < particles.length; i++) {
@@ -4871,9 +4899,12 @@ function smoothScrollTo(elementId, target) {
         var dy = particles[i].y - particles[j].y;
         var dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < connectionDist) {
-          var alpha = (1 - dist / connectionDist) * 0.15;
-          ctx.strokeStyle = 'hsla(' + (particles[i].hue + particles[j].hue) / 2 + ', 80%, 60%, ' + alpha + ')';
-          ctx.lineWidth = 0.5;
+          var alpha = (1 - dist / connectionDist) * 0.3;
+          var cr = (particles[i].cr + particles[j].cr) / 2;
+          var cg = (particles[i].cg + particles[j].cg) / 2;
+          var cb = (particles[i].cb + particles[j].cb) / 2;
+          ctx.strokeStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + alpha + ')';
+          ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
@@ -4884,51 +4915,72 @@ function smoothScrollTo(elementId, target) {
       var mdx = particles[i].x - mouse.x;
       var mdy = particles[i].y - mouse.y;
       var mdist = Math.sqrt(mdx * mdx + mdy * mdy);
-      if (mdist < connectionDist * 1.5) {
-        var malpha = (1 - mdist / (connectionDist * 1.5)) * 0.25;
-        ctx.strokeStyle = 'hsla(' + particles[i].hue + ', 80%, 65%, ' + malpha + ')';
-        ctx.lineWidth = 0.8;
+      if (mdist < connectionDist * 2) {
+        var malpha = (1 - mdist / (connectionDist * 2)) * 0.4;
+        ctx.strokeStyle = 'rgba(' + particles[i].cr + ',' + particles[i].cg + ',' + particles[i].cb + ',' + malpha + ')';
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(particles[i].x, particles[i].y);
         ctx.lineTo(mouse.x, mouse.y);
         ctx.stroke();
-        // Push particle away from mouse slightly
-        particles[i].vx += (mdx / mdist) * 0.02;
-        particles[i].vy += (mdy / mdist) * 0.02;
+        particles[i].vx += (mdx / mdist) * 0.03;
+        particles[i].vy += (mdy / mdist) * 0.03;
       }
     }
 
-    // Draw and move particles
+    // Draw particles with glow
     for (var k = 0; k < particles.length; k++) {
       var p = particles[k];
       p.x += p.vx;
       p.y += p.vy;
-
-      // Bounce off edges
-      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
-
-      // Friction
+      p.pulse += 0.03;
+      if (p.x < 0) { p.x = 0; p.vx *= -1; }
+      if (p.x > W) { p.x = W; p.vx *= -1; }
+      if (p.y < 0) { p.y = 0; p.vy *= -1; }
+      if (p.y > H) { p.y = H; p.vy *= -1; }
       p.vx *= 0.99;
       p.vy *= 0.99;
 
-      // Draw glow
-      ctx.fillStyle = 'hsla(' + p.hue + ', 80%, 60%, ' + p.opacity + ')';
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
+      var pulseFactor = 1 + Math.sin(p.pulse) * 0.3;
+      var r = p.r * pulseFactor;
 
       // Outer glow
-      ctx.fillStyle = 'hsla(' + p.hue + ', 80%, 60%, ' + (p.opacity * 0.3) + ')';
+      ctx.fillStyle = 'rgba(' + p.cr + ',' + p.cg + ',' + p.cb + ',' + (p.opacity * 0.15) + ')';
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r * 2.5, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, r * 4, 0, Math.PI * 2);
       ctx.fill();
+
+      // Mid glow
+      ctx.fillStyle = 'rgba(' + p.cr + ',' + p.cg + ',' + p.cb + ',' + (p.opacity * 0.3) + ')';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r * 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Core
+      ctx.fillStyle = 'rgba(' + p.cr + ',' + p.cg + ',' + p.cb + ',' + p.opacity + ')';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Draw flowing wave lines at bottom
+    ctx.strokeStyle = 'rgba(168, 85, 247, 0.08)';
+    ctx.lineWidth = 1;
+    for (var wave = 0; wave < 3; wave++) {
+      ctx.beginPath();
+      for (var x = 0; x < W; x += 5) {
+        var y = H * 0.7 + Math.sin(x * 0.01 + time + wave * 1.5) * 50 + wave * 30;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
     }
 
     requestAnimationFrame(animate);
   }
   animate();
 })();
+
 
 
 // ═══ Enhanced Background: Mouse Glow + Shooting Stars ═══
