@@ -1,0 +1,217 @@
+/* ═══ EvolvixOS Studio — Friendly Design Overrides ═══ */
+/* Injected into platform.html to make the studio warmer and more inviting */
+
+/* Softer borders with purple tint */
+#mobile-sidebar, .prompt-box, .entity-card, .suggestion-card,
+.records-table, #agents-sidebar-panel, #agents-chat-panel,
+.modal-content, .modal-overlay > div {
+  border-color: rgba(168, 85, 247, 0.12) !important;
+}
+
+/* Warmer card backgrounds with subtle gradient */
+.entity-card, .suggestion-card {
+  background: linear-gradient(180deg, #14141f 0%, #10101a 100%) !important;
+  border-radius: 16px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.entity-card:hover, .suggestion-card:hover {
+  border-color: rgba(168, 85, 247, 0.35) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(168, 85, 247, 0.06) !important;
+}
+
+/* Friendlier buttons — pill shape */
+.btn-primary, button[class*="bg-gradient"] {
+  border-radius: 100px !important;
+  font-weight: 700 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3) !important;
+}
+
+/* Softer prompt box */
+.prompt-box {
+  border-radius: 20px !important;
+  border-color: rgba(168, 85, 247, 0.15) !important;
+  background: linear-gradient(180deg, #0e0e16 0%, #0a0a0f 100%) !important;
+}
+
+.prompt-box:focus-within {
+  border-color: rgba(168, 85, 247, 0.4) !important;
+  box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.06), 0 12px 40px rgba(168, 85, 247, 0.1) !important;
+}
+
+/* Friendlier sidebar */
+#mobile-sidebar {
+  background: linear-gradient(180deg, #0e0e16 0%, #0a0a0f 100%) !important;
+  border-right-color: rgba(168, 85, 247, 0.1) !important;
+}
+
+/* Nav items with smoother transitions */
+.nav-item {
+  border-radius: 12px !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.nav-item:hover {
+  background: rgba(168, 85, 247, 0.06) !important;
+}
+
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.12), rgba(236, 72, 153, 0.04)) !important;
+  color: #c084fc !important;
+}
+
+/* Hero section — friendlier */
+#builder-hero h2 {
+  font-weight: 800 !important;
+  letter-spacing: -0.5px !important;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #a855f7, #ec4899, #818cf8) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Modal — softer, friendlier */
+.modal-content {
+  border-radius: 24px !important;
+  border: 1px solid rgba(168, 85, 247, 0.15) !important;
+  background: linear-gradient(180deg, #14141f 0%, #0e0e16 100%) !important;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Top bar — softer */
+.top-bar {
+  background: rgba(10, 10, 15, 0.8) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom-color: rgba(168, 85, 247, 0.1) !important;
+}
+
+/* Agent chat — friendlier bubbles */
+.chat-msg {
+  border-radius: 16px !important;
+}
+
+/* Scrollbar — softer */
+::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.2) !important;
+  border-radius: 10px !important;
+  border: 2px solid transparent !important;
+  background-clip: padding-box !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.4) !important;
+  background-clip: padding-box !important;
+}
+
+/* Toggle — friendlier */
+.toggle-checkbox:checked {
+  background: linear-gradient(135deg, #8b5cf6, #d946ef) !important;
+}
+
+/* Section headers */
+.page h2, .page h3 {
+  letter-spacing: -0.5px !important;
+}
+
+/* Function cards */
+#functions-list > div, .function-card {
+  border-radius: 16px !important;
+  border-color: rgba(168, 85, 247, 0.12) !important;
+  transition: all 0.3s !important;
+}
+
+#functions-list > div:hover, .function-card:hover {
+  border-color: rgba(168, 85, 247, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Workflow cards */
+#workflows-list > div, .workflow-card {
+  border-radius: 16px !important;
+  border-color: rgba(168, 85, 247, 0.12) !important;
+  transition: all 0.3s !important;
+}
+
+#workflows-list > div:hover, .workflow-card:hover {
+  border-color: rgba(168, 85, 247, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Storage upload area */
+.upload-area {
+  border-radius: 20px !important;
+  border-color: rgba(168, 85, 247, 0.15) !important;
+  transition: all 0.3s !important;
+}
+
+.upload-area:hover {
+  border-color: rgba(168, 85, 247, 0.35) !important;
+  background: rgba(168, 85, 247, 0.03) !important;
+}
+
+/* Analytics cards */
+.analytics-card, .stat-card {
+  border-radius: 16px !important;
+  border-color: rgba(168, 85, 247, 0.12) !important;
+  transition: all 0.3s !important;
+}
+
+.analytics-card:hover, .stat-card:hover {
+  border-color: rgba(168, 85, 247, 0.25) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Settings tabs — pill style */
+.settings-tab-btn {
+  border-radius: 100px !important;
+  transition: all 0.2s !important;
+}
+
+.settings-tab-btn.active {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.08)) !important;
+  color: #c084fc !important;
+}
+
+/* Field type buttons */
+.field-type {
+  border-radius: 10px !important;
+  transition: all 0.2s !important;
+}
+
+.field-type:hover {
+  border-color: rgba(168, 85, 247, 0.4) !important;
+  background: rgba(168, 85, 247, 0.04) !important;
+}
+
+/* Light mode adjustments */
+body.light-mode .entity-card,
+body.light-mode .suggestion-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f8f8fc 100%) !important;
+  border-color: rgba(168, 85, 247, 0.1) !important;
+}
+
+body.light-mode .modal-content {
+  background: linear-gradient(180deg, #ffffff 0%, #f8f8fc 100%) !important;
+  border-color: rgba(168, 85, 247, 0.1) !important;
+}
+
+body.light-mode #mobile-sidebar {
+  background: linear-gradient(180deg, #f8f8fc 0%, #f0f0f8 100%) !important;
+}
+
+body.light-mode .prompt-box {
+  background: linear-gradient(180deg, #ffffff 0%, #f8f8fc 100%) !important;
+}
+
+body.light-mode .top-bar {
+  background: rgba(248, 248, 252, 0.85) !important;
+}
