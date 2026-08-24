@@ -945,6 +945,12 @@ async def list_apps(request: Request, db=Depends(get_db)):
     user = get_user_from_token(request)
     uid = str(user.get("user_id")) if user else None
     apps = await AppsManager.list_apps(db, uid)
+    # Enrich with entity and page counts
+    for app in apps:
+        ent_result = await db.execute(text("SELECT COUNT(*) FROM platform_entities WHERE app_id = :aid"), {"aid": app["id"]})
+        app["entity_count"] = ent_result.fetchone()[0]
+        page_result = await db.execute(text("SELECT COUNT(*) FROM platform_pages WHERE app_id = :aid"), {"aid": app["id"]})
+        app["page_count"] = page_result.fetchone()[0]
     return apps
 
 @app.post("/api/apps")

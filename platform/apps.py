@@ -43,12 +43,9 @@ class AppsManager:
 
     @staticmethod
     async def list_apps(db: AsyncSession, user_id: str = None):
-        query = "SELECT * FROM platform_apps"
+        # All apps visible to all authenticated platform users (Base44-style)
+        query = "SELECT * FROM platform_apps ORDER BY created_date DESC"
         params = {}
-        if user_id:
-            query += ' WHERE created_by = :uid'
-            params["uid"] = user_id
-        query += " ORDER BY created_date DESC"
         result = await db.execute(text(query), params)
         rows = result.fetchall()
         return [AppsManager._row_to_dict(r) for r in rows]
