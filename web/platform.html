@@ -1402,6 +1402,123 @@ body.light-mode .cmd-item-icon {
 }
 
 /* === END 3D ICON UPGRADE === */
+
+/* === ENHANCED 3D DASHBOARD ICONS === */
+
+/* Service cards (API Gateway, ML Pipeline etc.) — 3D icon containers */
+.quick-start-card svg, .quick-start-card .icon {
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4)) drop-shadow(0 0 6px rgba(139,92,246,0.2));
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d; perspective: 600px;
+}
+.quick-start-card:hover svg, .quick-start-card:hover .icon {
+  transform: scale(1.25) rotate(-8deg) rotateX(20deg) rotateY(-15deg);
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5)) drop-shadow(0 0 12px rgba(139,92,246,0.4));
+}
+
+/* Increase sidebar icon size for better 3D visibility */
+.nav-item svg {
+  width: 18px; height: 18px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)) drop-shadow(0 0 3px rgba(139,92,246,0.15));
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+.nav-item:hover svg {
+  transform: scale(1.2) rotate(-5deg) rotateX(20deg) rotateY(-15deg);
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6)) drop-shadow(0 0 10px rgba(139,92,246,0.5));
+}
+
+/* Bottom nav icons — larger with 3D */
+.bottom-nav-item svg {
+  width: 24px; height: 24px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+.bottom-nav-item.active svg {
+  transform: scale(1.15) rotate(-3deg) rotateX(15deg) rotateY(-8deg);
+  filter: drop-shadow(0 3px 8px rgba(217,70,239,0.5)) drop-shadow(0 0 8px rgba(217,70,239,0.4));
+}
+
+/* Dashboard greeting logo — 3D float */
+.logo-glow-container .evolvix-logo {
+  filter: drop-shadow(0 6px 12px rgba(139,92,246,0.3)) drop-shadow(0 0 8px rgba(217,70,239,0.2));
+  animation: logo3DFloat 4s ease-in-out infinite;
+  transform-style: preserve-3d; perspective: 800px;
+}
+@keyframes logo3DFloat {
+  0%, 100% { transform: translateY(0) rotateX(0) rotateY(0); }
+  50% { transform: translateY(-4px) rotateX(5deg) rotateY(-3deg); }
+}
+
+/* Hero command bar — 3D depth */
+.command-bar, .prompt-bar {
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.4),
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 2px 8px rgba(139,92,246,0.1) inset !important;
+}
+
+/* Send/Build button — 3D pop */
+button[class*="rounded-full"][class*="gradient"],
+.send-btn, .build-btn {
+  box-shadow:
+    0 4px 12px rgba(217,70,239,0.3),
+    0 0 0 1px rgba(255,255,255,0.05) inset,
+    0 -2px 4px rgba(0,0,0,0.2) inset !important;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+button[class*="rounded-full"][class*="gradient"]:hover,
+.send-btn:hover, .build-btn:hover {
+  transform: scale(1.08) translateY(-2px) !important;
+  box-shadow:
+    0 8px 20px rgba(217,70,239,0.4),
+    0 0 0 1px rgba(255,255,255,0.08) inset,
+    0 -2px 4px rgba(0,0,0,0.2) inset !important;
+}
+
+/* Entity/function cards — 3D icon containers */
+.entity-card svg, .function-card svg, .workflow-card svg, .agent-card svg {
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4)) drop-shadow(0 0 4px rgba(139,92,246,0.15));
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+.entity-card:hover svg, .function-card:hover svg, .workflow-card:hover svg, .agent-card:hover svg {
+  transform: scale(1.2) rotate(-5deg) rotateX(15deg) rotateY(-10deg);
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5)) drop-shadow(0 0 8px rgba(139,92,246,0.3));
+}
+
+/* Connector cards — 3D icons */
+.connector-card svg, .connector-card .icon {
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4)) drop-shadow(0 0 4px rgba(139,92,246,0.15));
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+}
+.connector-card:hover svg, .connector-card:hover .icon {
+  transform: scale(1.2) rotate(-5deg) rotateX(15deg) rotateY(-10deg);
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5)) drop-shadow(0 0 8px rgba(139,92,246,0.3));
+}
+
+/* SDK cards — 3D icons */
+.sdk-card svg, .sdk-card .icon {
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4)) drop-shadow(0 0 4px rgba(139,92,246,0.15));
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.sdk-card:hover svg, .sdk-card:hover .icon {
+  transform: scale(1.2) rotate(-5deg) rotateX(15deg) rotateY(-10deg);
+}
+
+/* Page Builder component palette — 3D */
+.palette-item svg, .component-item svg {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.palette-item:hover svg, .component-item:hover svg {
+  transform: scale(1.3) rotate(-8deg) rotateX(20deg) rotateY(-15deg);
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.5)) drop-shadow(0 0 8px rgba(139,92,246,0.3));
+}
+
+/* === END ENHANCED 3D === */
 </style>
   <link rel="stylesheet" href="/studio-friendly.css">
 </head>
