@@ -28,7 +28,7 @@ class EntityManager:
         if not isinstance(props, dict):
             return False, "Properties must be a dict"
 
-        valid_types = {"string", "integer", "number", "boolean", "array", "object"}
+        valid_types = {"string", "integer", "number", "boolean", "array", "object", "file", "image"}
         for field_name, field_def in props.items():
             if not isinstance(field_def, dict):
                 return False, f"Field '{field_name}' must be a dict"
@@ -49,6 +49,8 @@ class EntityManager:
             "boolean": "BOOLEAN",
             "array": "JSONB",
             "object": "JSONB",
+            "file": "TEXT",
+            "image": "TEXT",
         }
         columns = []
         props = schema.get("properties", {})

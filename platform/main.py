@@ -880,6 +880,231 @@ Always respond with a JSON action object. If the user just wants to chat, respon
         return {"action": action_type, "error": str(e), "message": "Something went wrong on my end while doing that — mind trying again?"}
 
 
+# ─── Apps API (Feature 1, 2, 8) ───
+from apps import AppsManager
+from sdk_gen import SDKGenerator
+from pagegen import PageGenerator
+from oauth import OAuthManager
+from realtime import ws_manager as realtime_ws_manager
+from fastapi import WebSocket, WebSocketDisconnect
+
+@app.get("/api/apps")
+async def list_apps(request: Request, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    apps = await AppsManager.list_apps(db, uid)
+    return apps
+
+@app.post("/api/apps")
+async def create_app(app_data: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    name = app_data.get("name", "Untitled App")
+    description = app_data.get("description", "")
+    pages = app_data.get("pages", [])
+    # If auto-generate pages from entities
+    auto_gen = app_data.get("auto_generate", False)
+    if auto_gen:
+        entities = await EntityManager.list_entities(db)
+        pg = PageGenerator()
+        pages = [pg.generate_dashboard_page(entities)]
+        for e in entities:
+            pages.extend(pg.generate_pages_for_entity(e["name"], e.get("schema", {})))
+    result = await AppsManager.create_app(db, name, description, uid, pages)
+    return result
+
+@app.get("/api/apps/{app_id}")
+async def get_app(app_id: int, db=Depends(get_db)):
+    app = await AppsManager.get_app(db, app_id)
+    if not app:
+        raise HTTPException(404, "App not found")
+    pages = await AppsManager.get_pages(db, app_id)
+    app["pages"] = pages
+    return app
+
+@app.put("/api/apps/{app_id}")
+async def update_app(app_id: int, updates: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await AppsManager.update_app(db, app_id, updates, uid)
+
+@app.delete("/api/apps/{app_id}")
+async def delete_app(app_id: int, request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    app = await AppsManager.get_app(db, app_id)
+    if not app:
+        raise HTTPException(404, "App not found")
+    if uid and app.get("created_by") and str(app["created_by"]) != uid:
+        raise HTTPException(403, "Not authorized")
+    await AppsManager.delete_app(db, app_id, uid)
+    return {"deleted": True}
+
+@app.post("/api/apps/{app_id}/publish")
+async def publish_app(app_id: int, request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await AppsManager.publish_app(db, app_id, uid)
+
+@app.get("/api/apps/slug/{slug}")
+async def get_app_by_slug(slug: str, db=Depends(get_db)):
+    app = await AppsManager.get_app_by_slug(db, slug)
+    if not app:
+        raise HTTPException(404, "App not found")
+    if not app.get("is_public"):
+        raise HTTPException(403, "App is not published")
+    pages = await AppsManager.get_pages(db, app["id"])
+    app["pages"] = pages
+    return app
+
+# ─── Pages API ───
+
+@app.get("/api/apps/slug/{slug}/entities")
+async def get_public_entities(slug: str, db=Depends(get_db)):
+    """Public endpoint: get entities for a published app. No auth required."""
+    app = await AppsManager.get_app_by_slug(db, slug)
+    if not app:
+        raise HTTPException(404, "App not found")
+    if app.get("status") != "published":
+        raise HTTPException(403, "App is not published")
+    try:
+        entities = await EntityManager.list_entities(db)
+        # Filter to entities that belong to this app (by app_id if present, otherwise all)
+        app_id = app.get("id")
+        app_entities = [e for e in entities if e.get("app_id") == app_id or not e.get("app_id")]
+        return app_entities
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.get("/api/apps/slug/{slug}/records/{entity_name}")
+async def get_public_records(slug: str, entity_name: str, db=Depends(get_db), limit: int = 100, skip: int = 0):
+    """Public endpoint: get records for a published app entity. No auth required."""
+    app = await AppsManager.get_app_by_slug(db, slug)
+    if not app:
+        raise HTTPException(404, "App not found")
+    if app.get("status") != "published":
+        raise HTTPException(403, "App is not published")
+    try:
+        records = await EnhancedCRUD.list_records(db, entity_name, limit=limit, skip=skip)
+        return records
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.get("/api/apps/{app_id}/pages")
+async def get_pages(app_id: int, db=Depends(get_db)):
+    return await AppsManager.get_pages(db, app_id)
+
+@app.post("/api/apps/{app_id}/pages")
+async def create_page(app_id: int, page_data: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await AppsManager.create_page(db, app_id, page_data.get("name", "New Page"), page_data.get("layout", []), page_data.get("type", "custom"), page_data.get("is_home", False), uid)
+
+@app.put("/api/pages/{page_id}")
+async def update_page(page_id: int, updates: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await AppsManager.update_page(db, page_id, updates, uid)
+
+@app.delete("/api/pages/{page_id}")
+async def delete_page(page_id: int, db=Depends(get_db)):
+    await AppsManager.delete_page(db, page_id)
+    return {"deleted": True}
+
+@app.get("/api/components/palette")
+async def get_component_palette():
+    return PageGenerator.get_component_palette()
+
+# ─── SDK Generator (Feature 5) ───
+@app.get("/api/sdk")
+async def generate_sdk(request: Request, db=Depends(get_db), lang: str = "js"):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    entities = await EntityManager.list_entities(db)
+    gen = SDKGenerator()
+    if lang == "ts":
+        code = gen.generate_ts(entities)
+    else:
+        code = gen.generate_js(entities)
+    return {"code": code, "language": lang, "entity_count": len(entities)}
+
+# ─── OAuth Connectors (Feature 6) ───
+@app.get("/api/connectors/providers")
+async def list_oauth_providers():
+    return OAuthManager.list_providers()
+
+@app.get("/api/connectors")
+async def list_connectors(request: Request, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await OAuthManager.list_connectors(db, uid)
+
+@app.post("/api/connectors")
+async def create_connector(connector_data: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await OAuthManager.create_connector(
+        db, connector_data.get("provider"), connector_data.get("name"),
+        connector_data.get("client_id"), connector_data.get("client_secret"),
+        connector_data.get("scopes"), uid
+    )
+
+@app.get("/api/connectors/{connector_id}/auth-url")
+async def get_auth_url(connector_id: int, request: Request, db=Depends(get_db)):
+    redirect_uri = str(request.url_for("get_auth_url", connector_id=connector_id)).replace("auth-url", "callback")
+    return await OAuthManager.get_auth_url(db, connector_id, redirect_uri)
+
+@app.delete("/api/connectors/{connector_id}")
+async def delete_connector(connector_id: int, request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await OAuthManager.delete_connector(db, connector_id, uid)
+
+# ─── Version History (Feature 10) ───
+@app.get("/api/versions")
+async def get_versions(entity_type: str = None, entity_id: str = None, limit: int = 20, db=Depends(get_db)):
+    return await AppsManager.get_versions(db, entity_type, entity_id, limit)
+
+# ─── Activity Feed ───
+@app.get("/api/activity")
+async def get_activity(request: Request, limit: int = 20, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await AppsManager.get_activity(db, limit, uid)
+
+# ─── Real-time WebSocket (Feature 3) ───
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket, entity: str = None):
+    await realtime_ws_manager.connect(websocket, entity)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            # Echo for ping/pong
+            import json
+            msg = json.loads(data)
+            if msg.get("type") == "ping":
+                await websocket.send_text(json.dumps({"type": "pong"}))
+    except WebSocketDisconnect:
+        realtime_ws_manager.disconnect(websocket, entity)
+
+# ─── Enhanced Entity Endpoints with Versioning + Real-time ───
+# Override create to add version tracking + WS broadcast
+@app.post("/api/entities")
+async def create_entity_with_version(entity_data: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    name = entity_data.get("name")
+    schema = entity_data.get("schema", {})
+    result = await EntityManager.create_entity(db, name, schema, uid)
+    # Save version
+    await AppsManager._save_version(db, "entity", name, name, {"name": name, "schema": schema}, "Entity created", uid)
+    # Log activity
+    await AppsManager._log_activity(db, "create", "entity", name, f"Entity '{name}' created", uid)
+    # Broadcast via WebSocket
+    await realtime_ws_manager.broadcast(name, "entity.created", {"entity": name})
+    return result
+
+
 # ─── Startup ───
 @app.on_event("startup")
 async def startup():

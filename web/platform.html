@@ -956,6 +956,26 @@ body.light-mode .bg-black\/60{background:rgba(0,0,0,.3) !important}
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 12l4-4 4 4 5-5"/></svg>
         Analytics
       </a>
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="apps">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Apps
+      </a>
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="pagebuilder">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg>
+        Page Builder
+      </a>
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="connectors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+        Connectors
+      </a>
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="sdk">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
+        SDK
+      </a>
+      <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="versions">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        History
+      </a>
       <a class="nav-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-400 cursor-pointer" data-page="memory">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg>
         Memory
@@ -1473,6 +1493,105 @@ body.light-mode .bg-black\/60{background:rgba(0,0,0,.3) !important}
     </div>
   </div>
 </div>
+<div id="page-apps" class="page p-6 max-w-5xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold gradient-text mb-1">Apps</h2>
+      <p class="text-sm text-gray-500">Create, publish, and share your apps</p>
+    </div>
+    <button onclick="showCreateAppModal()" class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-sm font-medium hover:opacity-90 transition flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14"/></svg>
+      New App
+    </button>
+  </div>
+  <div id="apps-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="flex items-center justify-center py-16 text-gray-600 text-sm">Loading apps...</div>
+  </div>
+</div>
+
+<div id="page-pagebuilder" class="page p-6 max-w-6xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold gradient-text mb-1">Page Builder</h2>
+      <p class="text-sm text-gray-500">Design pages with drag-and-drop components</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <select id="pagebuilder-app-select" class="bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300" onchange="loadAppPages()">
+        <option value="">Select app...</option>
+      </select>
+      <button onclick="savePageLayout()" class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-sm font-medium hover:opacity-90 transition">Save</button>
+    </div>
+  </div>
+  <div class="grid grid-cols-12 gap-4" style="min-height:500px">
+    <!-- Component Palette -->
+    <div class="col-span-3 bg-[#0a0a0f] rounded-xl border border-gray-800 p-4">
+      <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Components</h3>
+      <div id="component-palette" class="space-y-2">
+        <div class="flex items-center justify-center py-8 text-gray-600 text-xs">Loading...</div>
+      </div>
+    </div>
+    <!-- Canvas -->
+    <div class="col-span-6 bg-[#0a0a0f] rounded-xl border border-gray-800 p-4 overflow-y-auto" style="min-height:500px">
+      <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Canvas</h3>
+      <div id="page-canvas" class="space-y-3 min-h-[400px] border border-dashed border-gray-800 rounded-lg p-4">
+        <div class="flex items-center justify-center py-16 text-gray-600 text-xs">Drag components here or select an app to edit its pages</div>
+      </div>
+    </div>
+    <!-- Properties Panel -->
+    <div class="col-span-3 bg-[#0a0a0f] rounded-xl border border-gray-800 p-4">
+      <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Properties</h3>
+      <div id="properties-panel" class="space-y-3">
+        <div class="flex items-center justify-center py-8 text-gray-600 text-xs">Select a component to edit</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-connectors" class="page p-6 max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold gradient-text mb-1">Connectors</h2>
+      <p class="text-sm text-gray-500">Connect external services via OAuth</p>
+    </div>
+    <button onclick="showCreateConnectorModal()" class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-sm font-medium hover:opacity-90 transition flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14"/></svg>
+      Add Connector
+    </button>
+  </div>
+  <div id="connectors-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="flex items-center justify-center py-16 text-gray-600 text-sm">Loading connectors...</div>
+  </div>
+</div>
+
+<div id="page-sdk" class="page p-6 max-w-4xl mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold gradient-text mb-1">SDK Generator</h2>
+      <p class="text-sm text-gray-500">Auto-generated SDK from your entity schemas</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <select id="sdk-lang" class="bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300" onchange="loadSDK()">
+        <option value="js">JavaScript</option>
+        <option value="ts">TypeScript</option>
+      </select>
+      <button onclick="copySDK()" class="px-3 py-2 rounded-lg bg-purple-600/20 border border-purple-500/30 text-purple-300 text-sm hover:bg-purple-600/30 transition">Copy</button>
+    </div>
+  </div>
+  <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-4">
+    <pre id="sdk-code" class="text-xs text-gray-300 font-mono overflow-x-auto max-h-[600px] overflow-y-auto"><div class="text-gray-600">Generating SDK...</div></pre>
+  </div>
+</div>
+
+<div id="page-versions" class="page p-6 max-w-4xl mx-auto">
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold gradient-text mb-1">Version History</h2>
+    <p class="text-sm text-gray-500">Track changes to entities, apps, and workflows</p>
+  </div>
+  <div id="versions-list" class="space-y-2">
+    <div class="flex items-center justify-center py-16 text-gray-600 text-sm">Loading version history...</div>
+  </div>
+</div>
+
 <div id="page-memory" class="page p-6 max-w-3xl mx-auto">
         <div class="flex items-center justify-between mb-8">
           <div>
@@ -1648,7 +1767,7 @@ function navigateTo(page) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
   if (navItem) navItem.classList.add('active');
-  const titles = {chat: 'AI Builder', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', agents: 'Agents', memory: 'Memory', records: 'Records', analytics: 'Analytics'};
+  const titles = {chat: 'AI Builder', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', agents: 'Agents', memory: 'Memory', records: 'Records', analytics: 'Analytics', apps: 'Apps', pagebuilder: 'Page Builder', connectors: 'Connectors', sdk: 'SDK Generator', versions: 'Version History'};
   document.getElementById('page-title').textContent = titles[page] || page;
   if (page === 'entities') loadEntities();
   if (page === 'functions') loadFunctions();
@@ -1656,6 +1775,11 @@ function navigateTo(page) {
   if (page === 'agents') loadAgents();
   if (page === 'memory') loadMemory();
   if (page === 'analytics') loadAnalytics();
+  if (page === 'apps') loadApps();
+  if (page === 'connectors') loadConnectors();
+  if (page === 'sdk') loadSDK();
+  if (page === 'versions') loadVersions();
+  if (page === 'pagebuilder') loadPageBuilder();
 }
 
 document.querySelectorAll('.nav-item').forEach(item => {
@@ -2873,6 +2997,382 @@ async function loadAnalytics() {
   }
 }
 
+
+// ════ Apps ════
+async function loadApps() {
+  try {
+    var apps = await api('/apps');
+    var grid = document.getElementById('apps-grid');
+    if (!apps || apps.length === 0) {
+      grid.innerHTML = '<div class="col-span-full text-center py-16"><div class="text-gray-600 text-sm mb-4">No apps yet. Create your first app!</div><button onclick="showCreateAppModal()" class="px-4 py-2 rounded-lg bg-purple-600/20 border border-purple-500/30 text-purple-300 text-sm hover:bg-purple-600/30 transition">Create App</button></div>';
+      return;
+    }
+    grid.innerHTML = apps.map(function(app) {
+      var statusColor = app.status === 'published' ? 'text-green-400 bg-green-500/10' : 'text-yellow-400 bg-yellow-500/10';
+      var statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-medium ' + statusColor + '">' + app.status + '</span>';
+      var shareUrl = app.is_public && app.share_token ? 'https://evolvixos.com/app/' + app.slug : '';
+      return '<div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-5 hover:border-purple-500/30 transition-all cursor-pointer" onclick="openApp(' + app.id + ')">' +
+        '<div class="flex items-start justify-between mb-3">' +
+          '<div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 flex items-center justify-center"><svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>' +
+          statusBadge +
+        '</div>' +
+        '<h3 class="font-semibold text-sm mb-1">' + app.name + '</h3>' +
+        '<p class="text-xs text-gray-500 mb-3 line-clamp-2">' + (app.description || 'No description') + '</p>' +
+        '<div class="flex items-center justify-between text-[10px] text-gray-600">' +
+          '<span>v' + (app.version || 1) + '</span>' +
+          (shareUrl ? '<a href="' + shareUrl + '" target="_blank" onclick="event.stopPropagation()" class="text-purple-400 hover:underline">View published app</a>' : '<span>Draft</span>') +
+        '</div>' +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    document.getElementById('apps-grid').innerHTML = '<div class="col-span-full text-center py-16 text-red-400 text-sm">Error loading apps</div>';
+  }
+}
+
+function showCreateAppModal() {
+  var modal = document.createElement('div');
+  modal.id = 'create-app-modal-overlay';
+  modal.className = 'modal-overlay';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center';
+  modal.innerHTML = '<div class="modal" style="background:#0c0c12;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px;width:90%;max-width:480px">' +
+    '<h3 class="text-lg font-semibold mb-4">Create New App</h3>' +
+    '<div class="space-y-3">' +
+      '<input id="new-app-name" placeholder="App name (e.g. My CRM)" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 outline-none focus:border-purple-500" />' +
+      '<textarea id="new-app-desc" placeholder="Description (optional)" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 outline-none focus:border-purple-500" rows="2"></textarea>' +
+      '<label class="flex items-center gap-2 text-sm text-gray-400"><input type="checkbox" id="new-app-autogen" checked /> Auto-generate pages from existing entities</label>' +
+    '</div>' +
+    '<div class="flex items-center justify-end gap-2 mt-5">' +
+      '<button onclick="this.closest(\'.modal-overlay\').remove()" class="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white transition">Cancel</button>' +
+      '<button onclick="createApp()" class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-sm font-medium hover:opacity-90 transition">Create</button>' +
+    '</div>' +
+  '</div>';
+  document.body.appendChild(modal);
+}
+
+async function createApp() {
+  var name = document.getElementById('new-app-name').value.trim();
+  if (!name) return toast('Please enter an app name', 'error');
+  var desc = document.getElementById('new-app-desc').value.trim();
+  var autoGen = document.getElementById('new-app-autogen').checked;
+  try {
+    var result = await api('/apps', 'POST', { name: name, description: desc, auto_generate: autoGen });
+    toast('App "' + name + '" created!', 'success');
+    document.getElementById('create-app-modal-overlay').remove();
+    loadApps();
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+}
+
+async function openApp(appId) {
+  try {
+    var app = await api('/apps/' + appId);
+    var modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center';
+    var pagesHtml = (app.pages || []).map(function(pg) {
+      return '<div class="flex items-center justify-between py-2 px-3 rounded-lg bg-white/5 mb-1"><span class="text-sm">' + pg.name + '</span><span class="text-[10px] text-gray-600">' + pg.page_type + '</span></div>';
+    }).join('');
+    modal.innerHTML = '<div style="background:#0c0c12;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px;width:90%;max-width:520px">' +
+      '<div class="flex items-start justify-between mb-4"><div><h3 class="text-lg font-semibold">' + app.name + '</h3><p class="text-xs text-gray-500">' + (app.description || '') + '</p></div>' +
+      '<span class="px-2 py-1 rounded text-[10px] ' + (app.status === 'published' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400') + '">' + app.status + '</span></div>' +
+      '<div class="mb-4"><h4 class="text-xs text-gray-400 uppercase mb-2">Pages</h4>' + (pagesHtml || '<p class="text-xs text-gray-600">No pages</p>') + '</div>' +
+      '<div class="flex items-center gap-2 mt-5">' +
+        (app.status !== 'published' ? '<button onclick="publishApp(' + appId + ')" class="px-3 py-2 rounded-lg bg-green-600/20 border border-green-500/30 text-green-400 text-xs hover:bg-green-600/30 transition">Publish</button>' : '<span class="text-xs text-green-400">Published at /app/' + app.slug + '</span>') +
+        '<button onclick="editAppInBuilder(' + appId + ')" class="px-3 py-2 rounded-lg bg-purple-600/20 border border-purple-500/30 text-purple-300 text-xs hover:bg-purple-600/30 transition">Edit in Builder</button>' +
+        '<button onclick="if(confirm(\'Delete this app?\'))deleteApp(' + appId + ')" class="px-3 py-2 rounded-lg bg-red-600/20 border border-red-500/30 text-red-400 text-xs hover:bg-red-600/30 transition ml-auto">Delete</button>' +
+      '</div>' +
+    '</div>';
+    document.body.appendChild(modal);
+  } catch(e) { toast('Error loading app', 'error'); }
+}
+
+async function publishApp(appId) {
+  try {
+    var resp = await api('/apps/' + appId + '/publish', 'POST');
+    toast('App published! Share at /app/' + result.slug, 'success');
+    document.getElementById('create-app-modal-overlay').remove();
+    loadApps();
+  } catch(e) { toast('Error publishing', 'error'); }
+}
+
+async function deleteApp(appId) {
+  try {
+    await api('/apps/' + appId, 'DELETE');
+    toast('App deleted', 'success');
+    document.getElementById('create-app-modal-overlay').remove();
+    loadApps();
+  } catch(e) { toast('Error deleting', 'error'); }
+}
+
+function editAppInBuilder(appId) {
+  document.querySelector('.modal-overlay').remove();
+  navigateTo('pagebuilder');
+  setTimeout(function() {
+    var select = document.getElementById('pagebuilder-app-select');
+    if (select) { select.value = appId; loadAppPages(); }
+  }, 300);
+}
+
+// ════ Page Builder ════
+var pbComponents = [];
+var pbSelectedComponent = null;
+var pbCurrentPageId = null;
+
+async function loadPageBuilder() {
+  // Load apps for dropdown
+  try {
+    var apps = await api('/apps');
+    var select = document.getElementById('pagebuilder-app-select');
+    select.innerHTML = '<option value="">Select app...</option>' + apps.map(function(a) {
+      return '<option value="' + a.id + '">' + a.name + '</option>';
+    }).join('');
+  } catch(e) {}
+  // Load component palette
+  try {
+    var comps = await api('/components/palette');
+    pbComponents = comps;
+    var palette = document.getElementById('component-palette');
+    palette.innerHTML = comps.map(function(c, i) {
+      return '<div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-purple-500/10 cursor-pointer transition" onclick="addComponentToCanvas(' + i + ')">' +
+        '<svg class="w-3 h-3 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/></svg>' +
+        '<span class="text-xs text-gray-300">' + c.name + '</span>' +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    document.getElementById('component-palette').innerHTML = '<div class="text-xs text-gray-600">Error loading components</div>';
+  }
+}
+
+async function loadAppPages() {
+  var appId = document.getElementById('pagebuilder-app-select').value;
+  if (!appId) return;
+  try {
+    var pages = await api('/apps/' + appId + '/pages');
+    if (pages.length === 0) {
+      document.getElementById('page-canvas').innerHTML = '<div class="flex items-center justify-center py-16 text-gray-600 text-xs">No pages. Create one with auto-generate.</div>';
+      return;
+    }
+    pbCurrentPageId = pages[0].id;
+    renderPageCanvas(pages[0].layout || []);
+  } catch(e) {
+    document.getElementById('page-canvas').innerHTML = '<div class="text-xs text-gray-600">Error loading pages</div>';
+  }
+}
+
+function addComponentToCanvas(idx) {
+  var comp = JSON.parse(JSON.stringify(pbComponents[idx]));
+  var canvas = document.getElementById('page-canvas');
+  var item = document.createElement('div');
+  item.className = 'flex items-center justify-between p-3 rounded-lg bg-white/5 border border-gray-800 cursor-pointer hover:border-purple-500/30 transition';
+  item.onclick = function() { selectComponent(item, comp); };
+  item.innerHTML = '<div class="flex items-center gap-2"><svg class="w-3 h-3 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/></svg><span class="text-xs text-gray-300">' + comp.name + '</span></div><button onclick="event.stopPropagation();this.parentElement.remove()" class="text-gray-600 hover:text-red-400 text-xs">✕</button>';
+  canvas.appendChild(item);
+  if (canvas.querySelector('.flex.items-center.justify-center')) {
+    canvas.querySelector('.flex.items-center.justify-center').remove();
+  }
+}
+
+function selectComponent(elem, comp) {
+  document.querySelectorAll('#page-canvas > div').forEach(function(d) { d.classList.remove('border-purple-500'); });
+  elem.classList.add('border-purple-500');
+  pbSelectedComponent = comp;
+  var panel = document.getElementById('properties-panel');
+  var props = comp.props || {};
+  panel.innerHTML = '<h4 class="text-xs text-gray-400 uppercase mb-2">' + comp.name + ' Properties</h4>' +
+    Object.keys(props).map(function(key) {
+      var val = typeof props[key] === 'object' ? JSON.stringify(props[key]) : props[key];
+      return '<div><label class="text-[10px] text-gray-500 uppercase">' + key + '</label><input value="' + val + '" class="w-full bg-[#0a0a0f] border border-gray-700 rounded px-2 py-1.5 text-xs text-gray-200 mt-1" onchange="updateComponentProp(\'' + key + '\', this.value)" /></div>';
+    }).join('');
+}
+
+function updateComponentProp(key, value) {
+  if (pbSelectedComponent && pbSelectedComponent.props) {
+    pbSelectedComponent.props[key] = value;
+  }
+}
+
+async function savePageLayout() {
+  if (!pbCurrentPageId) return toast('No page selected', 'error');
+  var layout = [];
+  document.querySelectorAll('#page-canvas > div:not(.flex.items-center.justify-center)').forEach(function(d) {
+    layout.push({ component: 'custom', props: { label: d.textContent.trim() } });
+  });
+  try {
+    await api('/pages/' + pbCurrentPageId, 'PUT', { layout: layout });
+    toast('Page saved!', 'success');
+  } catch(e) { toast('Error saving', 'error'); }
+}
+
+function renderPageCanvas(layout) {
+  var canvas = document.getElementById('page-canvas');
+  if (!layout || layout.length === 0) {
+    canvas.innerHTML = '<div class="flex items-center justify-center py-16 text-gray-600 text-xs">Drag components here</div>';
+    return;
+  }
+  canvas.innerHTML = layout.map(function(item) {
+    var name = (item.component || 'Component');
+    var label = (item.props && item.props.title) || (item.props && item.props.label) || name;
+    return '<div class="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-gray-800 cursor-pointer hover:border-purple-500/30 transition" onclick="selectComponent(this, ' + JSON.stringify(item).replace(/"/g, '&quot;') + ')">' +
+      '<div class="flex items-center gap-2"><span class="text-xs text-gray-300">' + label + '</span></div>' +
+      '<span class="text-[10px] text-gray-600">' + name + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+// ════ Connectors ════
+async function loadConnectors() {
+  try {
+    var providersResp = await api('/connectors/providers');
+    var connectorsResp = await api('/connectors');
+    var providers = providersResp;
+    var connectors = connectorsResp;
+    var grid = document.getElementById('connectors-grid');
+    var html = '';
+    // Show available providers
+    providers.forEach(function(p) {
+      var connected = connectors.find(function(c) { return c.provider === p.id; });
+      var statusBadge = connected ? '<span class="px-2 py-0.5 rounded text-[10px] bg-green-500/10 text-green-400">Connected</span>' : '<span class="px-2 py-0.5 rounded text-[10px] bg-gray-500/10 text-gray-400">Not connected</span>';
+      html += '<div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-5 hover:border-purple-500/30 transition-all">' +
+        '<div class="flex items-start justify-between mb-3">' +
+          '<div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 flex items-center justify-center"><span class="text-sm font-bold text-purple-400">' + p.name.charAt(0) + '</span></div>' +
+          statusBadge +
+        '</div>' +
+        '<h3 class="font-semibold text-sm mb-1">' + p.name + '</h3>' +
+        '<p class="text-xs text-gray-500 mb-3">Scopes: ' + p.default_scopes.join(', ') + '</p>' +
+        '<button onclick="showCreateConnectorModal(\'' + p.id + '\', \'' + p.name + '\')" class="px-3 py-1.5 rounded-lg bg-purple-600/20 border border-purple-500/30 text-purple-300 text-xs hover:bg-purple-600/30 transition">' + (connected ? 'Configure' : 'Connect') + '</button>' +
+      '</div>';
+    });
+    // Show existing connectors
+    connectors.forEach(function(c) {
+      if (!providers.find(function(p) { return p.id === c.provider; })) {
+        html += '<div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-5">' +
+          '<h3 class="font-semibold text-sm mb-1">' + c.name + '</h3>' +
+          '<p class="text-xs text-gray-500 mb-2">' + c.provider + ' - ' + c.status + '</p>' +
+          '<button onclick="deleteConnector(' + c.id + ')" class="text-xs text-red-400 hover:underline">Remove</button>' +
+        '</div>';
+      }
+    });
+    grid.innerHTML = html || '<div class="col-span-full text-center py-16 text-gray-600 text-sm">No connectors</div>';
+  } catch(e) {
+    document.getElementById('connectors-grid').innerHTML = '<div class="col-span-full text-center py-16 text-red-400 text-sm">Error loading connectors</div>';
+  }
+}
+
+function showCreateConnectorModal(providerId, providerName) {
+  var modal = document.createElement('div');
+  modal.id = 'create-app-modal-overlay';
+  modal.className = 'modal-overlay';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center';
+  modal.innerHTML = '<div style="background:#0c0c12;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px;width:90%;max-width:480px">' +
+    '<h3 class="text-lg font-semibold mb-1">Connect ' + providerName + '</h3>' +
+    '<p class="text-xs text-gray-500 mb-4">Enter your OAuth credentials</p>' +
+    '<div class="space-y-3">' +
+      '<input id="connector-name" placeholder="Connector name" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 outline-none focus:border-purple-500" value="' + providerName + ' Connector" />' +
+      '<input id="connector-client-id" placeholder="Client ID" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 outline-none focus:border-purple-500" />' +
+      '<input id="connector-client-secret" type="password" placeholder="Client Secret" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 outline-none focus:border-purple-500" />' +
+    '</div>' +
+    '<div class="flex items-center justify-end gap-2 mt-5">' +
+      '<button onclick="this.closest(\'.modal-overlay\').remove()" class="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white transition">Cancel</button>' +
+      '<button onclick="createConnector(\'' + providerId + '\')" class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-sm font-medium hover:opacity-90 transition">Connect</button>' +
+    '</div>' +
+  '</div>';
+  document.body.appendChild(modal);
+}
+
+async function createConnector(providerId) {
+  var name = document.getElementById('connector-name').value.trim();
+  var clientId = document.getElementById('connector-client-id').value.trim();
+  var clientSecret = document.getElementById('connector-client-secret').value.trim();
+  if (!name || !clientId || !clientSecret) return toast('Fill in all fields', 'error');
+  try {
+    await api('/connectors', 'POST', { provider: providerId, name: name, client_id: clientId, client_secret: clientSecret });
+    toast('Connector created!', 'success');
+    document.querySelector('.modal-overlay').remove();
+    loadConnectors();
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+}
+
+async function deleteConnector(id) {
+  if (!confirm('Remove this connector?')) return;
+  try {
+    await api('/connectors/' + id, 'DELETE');
+    toast('Connector removed', 'success');
+    loadConnectors();
+  } catch(e) { toast('Error removing', 'error'); }
+}
+
+// ════ SDK Generator ════
+async function loadSDK() {
+  var lang = document.getElementById('sdk-lang').value;
+  try {
+    var data = await api('/sdk?lang=' + lang);
+    var pre = document.getElementById('sdk-code');
+    pre.innerHTML = '<code>' + (data.code || 'No entities found').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code>';
+    pre.dataset.code = data.code || '';
+  } catch(e) {
+    document.getElementById('sdk-code').innerHTML = '<div class="text-red-400">Error generating SDK</div>';
+  }
+}
+
+function copySDK() {
+  var code = document.getElementById('sdk-code').dataset.code || '';
+  navigator.clipboard.writeText(code).then(function() {
+    toast('SDK copied to clipboard!', 'success');
+  });
+}
+
+// ════ Version History ════
+async function loadVersions() {
+  try {
+    var versions = await api('/versions');
+    var list = document.getElementById('versions-list');
+    if (!versions || versions.length === 0) {
+      list.innerHTML = '<div class="flex items-center justify-center py-16 text-gray-600 text-sm">No version history yet</div>';
+      return;
+    }
+    list.innerHTML = versions.map(function(v) {
+      var icon = v.entity_type === 'app' ? 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z' : v.entity_type === 'entity' ? 'M4 4h16v16H4z' : 'M12 8v4l3 3';
+      var color = v.entity_type === 'app' ? '#a78bfa' : v.entity_type === 'entity' ? '#e879f9' : '#f472b6';
+      return '<div class="flex items-center gap-3 p-3 rounded-lg bg-[#0a0a0f] border border-gray-800 hover:border-purple-500/30 transition">' +
+        '<div style="width:32px;height:32px;border-radius:8px;background:' + color + '15;display:flex;align-items:center;justify-content:center;flex-shrink:0">' +
+          '<svg width="14" height="14" fill="none" stroke="' + color + '" stroke-width="2" viewBox="0 0 24 24"><path d="' + icon + '"/></svg>' +
+        '</div>' +
+        '<div class="flex-1">' +
+          '<div class="flex items-center gap-2"><span class="text-sm font-medium">' + (v.entity_name || 'Unknown') + '</span><span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400">v' + v.version_number + '</span></div>' +
+          '<p class="text-xs text-gray-500">' + (v.change_description || '') + '</p>' +
+        '</div>' +
+        '<span class="text-[10px] text-gray-600">' + (v.created_date || '').slice(0, 19) + '</span>' +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    document.getElementById('versions-list').innerHTML = '<div class="flex items-center justify-center py-16 text-red-400 text-sm">Error loading versions</div>';
+  }
+}
+
+// ════ Real-time WebSocket ════
+var evolvixWS = null;
+function initWebSocket() {
+  try {
+    evolvixWS = new WebSocket('wss://evolvixos.com/platform/ws');
+    evolvixWS.onmessage = function(event) {
+      var msg = JSON.parse(event.data);
+      if (msg.type === 'entity.created' || msg.type === 'entity.updated' || msg.type === 'entity.deleted') {
+        // Refresh current page if showing records
+        if (document.getElementById('page-records') && document.getElementById('page-records').classList.contains('active')) {
+          loadRecords(currentEntity);
+        }
+        // Show a subtle notification
+        toast('Data updated: ' + msg.entity, 'info');
+      }
+    };
+    evolvixWS.onclose = function() {
+      setTimeout(initWebSocket, 5000); // Reconnect after 5s
+    };
+  } catch(e) { console.log('WS init failed', e); }
+}
+setTimeout(initWebSocket, 2000);
+
 // ═══ Command Palette ═══
 var cmdItems = [
   {label:'AI Builder',desc:'Open the AI chat builder',page:'chat',icon:'M12 2L2 7l10 5 10-5-10-5z'},
@@ -2883,6 +3383,11 @@ var cmdItems = [
   {label:'Agents',desc:'Chat with AI agents',page:'agents',icon:'M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0'},
   {label:'Memory',desc:'Platform memory and preferences',page:'memory',icon:'M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0'},
   {label:'Analytics',desc:'Usage metrics and activity',page:'analytics',icon:'M3 3v18h18M7 12l4-4 4 4 5-5'},
+  {label:'Apps',desc:'Create and publish apps',page:'apps',icon:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'},
+  {label:'Page Builder',desc:'Design pages visually',page:'pagebuilder',icon:'M3 3h7v7H3zM14 3h7v7h-7z'},
+  {label:'Connectors',desc:'OAuth integrations',page:'connectors',icon:'M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71'},
+  {label:'SDK',desc:'Generate code SDK',page:'sdk',icon:'M16 18l6-6-6-6M8 6l-6 6 6 6'},
+  {label:'Version History',desc:'Track changes',page:'versions',icon:'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'},
   {label:'Billing',desc:'Plans, credits, and billing',page:'billing',icon:'M3 10h18M3 10l2-6h14l2 6M3 10v10h18V10'},
   {label:'New Entity',desc:'Create a new data model',action:'newEntity',icon:'M12 5v14M5 12h14'},
   {label:'New Function',desc:'Deploy a new backend function',action:'newFunction',icon:'M12 5v14M5 12h14'},
