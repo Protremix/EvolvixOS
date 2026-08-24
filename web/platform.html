@@ -2486,17 +2486,17 @@ function quickBuild(prompt) {
 async function createFromTemplate(templateId) {
   // Ask for app name
   var defaultName = {crm: 'API Gateway', ecommerce: 'ML Pipeline', tasks: 'Data Pipeline', blog: 'Auth Service'}[templateId] || 'New Service';
-  var appName = prompt('App name:', defaultName);
-  if (!appName) return;
+  var serviceName = prompt('Service name:', defaultName);
+  if (!serviceName) return;
   
   // Show loading state
   toast('Creating app from template...', 'info');
   revealConversation();
-  addChatMessage('user', 'Create a ' + templateId + ' app called ' + appName);
+  addChatMessage('user', 'Create a ' + templateId + ' app called ' + serviceName);
   addTypingIndicator();
   
   try {
-    var res = await api('/templates/' + templateId + '/create', 'POST', {name: appName});
+    var res = await api('/templates/' + templateId + '/create', 'POST', {name: serviceName});
     removeTypingIndicator();
     
     var msg = '<div class="space-y-2">';
