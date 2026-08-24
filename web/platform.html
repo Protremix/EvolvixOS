@@ -2020,6 +2020,7 @@ async function loadEntities() {
 }
 
 function showCreateEntity() { document.getElementById('entity-modal').classList.remove('hidden'); addFieldRow(); }
+function setCurrentApp(appId) { window.currentAppId = appId; }
 function closeEntityModal() { document.getElementById('entity-modal').classList.add('hidden'); document.getElementById('entity-name').value = ''; document.getElementById('entity-fields').innerHTML = ''; }
 
 function addFieldRow() {
@@ -2027,13 +2028,40 @@ function addFieldRow() {
   div.className = 'flex gap-2';
   div.innerHTML = `
     <input type="text" placeholder="field name" class="flex-1 bg-[#0a0a0f] border border-gray-800 rounded px-2 py-1.5 text-xs field-name focus:outline-none focus:border-purple-500">
-    <select class="bg-[#0a0a0f] border border-gray-800 rounded px-2 py-1.5 text-xs field-type">
-      <option value="string">string</option><option value="integer">integer</option><option value="number">number</option><option value="boolean">boolean</option><option value="array">array</option><option value="object">object</option>
+    <select class="bg-[#0a0a0f] border border-gray-800 rounded px-2 py-1.5 text-xs field-type" onchange="onFieldTypeChange(this)">
+      <option value="string">string</option><option value="integer">integer</option><option value="number">number</option><option value="boolean">boolean</option><option value="array">array</option><option value="object">object</option><option value="relation">relation</option>
+    </select>
+    <select class="bg-[#0a0a0f] border border-gray-800 rounded px-2 py-1.5 text-xs field-relation hidden" onchange="onRelationTargetChange(this)">
+      <option value="">→ target...</option>
     </select>
     <label class="flex items-center gap-1 text-xs text-gray-400"><input type="checkbox" class="field-required"> req</label>
     <button onclick="this.parentElement.remove()" class="text-red-400/60 hover:text-red-400 text-xs px-1 transition-colors">×</button>
   `;
   document.getElementById('entity-fields').appendChild(div);
+}
+
+function onFieldTypeChange(sel) {
+  var relSel = sel.parentElement.querySelector('.field-relation');
+  if (relSel) {
+    if (sel.value === 'relation') {
+      relSel.classList.remove('hidden');
+      // Populate with existing entity names
+      var currentEntities = Object.keys(entitySchemas || {});
+      relSel.innerHTML = '<option value="">→ target...</option>';
+      currentEntities.forEach(function(name) {
+        var opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = '→ ' + name;
+        relSel.appendChild(opt);
+      });
+    } else {
+      relSel.classList.add('hidden');
+    }
+  }
+}
+
+function onRelationTargetChange(sel) {
+  // Just store the target, used during schema building
 }
 
 async function createEntity() {
@@ -2045,14 +2073,20 @@ async function createEntity() {
     const fieldType = row.querySelector('.field-type').value;
     const isReq = row.querySelector('.field-required').checked;
     if (fieldName) {
-      props[fieldName] = {type: fieldType};
+      if (fieldType === 'relation') {
+        var relTarget = row.querySelector('.field-relation') ? row.querySelector('.field-relation').value : '';
+        if (!relTarget) { toast('Select relation target for ' + fieldName, 'error'); return; }
+        props[fieldName] = {type: 'relation', relation: {target: relTarget, display: 'name'}};
+      } else {
+        props[fieldName] = {type: fieldType};
+      }
       if (isReq) required.push(fieldName);
     }
   });
   const schema = {type: 'object', properties: props};
   if (required.length) schema.required = required;
   try {
-    await api('/entities', 'POST', {name, schema});
+    await api('/entities', 'POST', {name, schema, app_id: window.currentAppId || null});
     closeEntityModal();
     loadEntities();
     toast(`Entity '${name}' created`, 'success');
