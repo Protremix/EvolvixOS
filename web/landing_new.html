@@ -1599,6 +1599,14 @@ a { color: inherit; text-decoration: none; }
   background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, rgba(217,70,239,0.06) 30%, transparent 60%) !important;
 }
 
+
+/* AI SVG icon sizing */
+.feature-icon svg { width: 28px; height: 28px; }
+.model-card .emoji svg { width: 32px; height: 32px; }
+.marquee-icon svg { width: 18px; height: 18px; }
+.tool-icon svg { width: 20px; height: 20px; }
+.tpk-icon svg { width: 28px; height: 28px; }
+
 </style>
 </head>
 <body><div class="bg-mouse-glow"></div>
@@ -1735,55 +1743,55 @@ a { color: inherit; text-decoration: none; }
 
   <div class="feature-grid" id="featureGrid">
     <div class="feature-card reveal" data-tilt>
-      <div class="feature-icon">🏗️</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="18" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="18" r="1" fill="currentColor"/><circle cx="18" cy="18" r="1" fill="currentColor"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></div>
       <h3>Engineering Workbench</h3>
       <p>Engineer full-stack systems with a drag-and-drop page builder, entity-based CRUD APIs, and auto-generated SDKs. Just describe what you want and watch it come to life.</p>
       <span class="tag" style="background: rgba(168, 85, 247, 0.08); color: var(--primary-light);">Self-Hosted</span>
     </div>
     <div class="feature-card reveal" data-tilt>
-      <div class="feature-icon">🧠</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="12" cy="19" r="2"/><path d="M12 7v3M12 14v3M7 12h3M14 12h3"/><path d="M9.5 6.5L7 10M14.5 6.5L17 10M9.5 17.5L7 14M14.5 17.5L17 14"/></svg></div>
       <h3>281+ AI Models</h3>
       <p>Access 281 AI models across 12 categories — LLMs, image generation, video, vision, 3D, audio, and more. Auto-routed to the best engine for each task via intent-based ModelRouter.</p>
       <span class="tag" style="background: rgba(129, 140, 248, 0.08); color: var(--accent);">12 Categories</span>
     </div>
     <div class="feature-card reveal" data-tilt>
-      <div class="feature-icon">🎬</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="12" rx="2"/><path d="M17 10l4-2v8l-4-2"/><circle cx="10" cy="12" r="2"/><path d="M10 10v-2M10 14v2M8 12H6M14 12h-2"/></svg></div>
       <h3>Full-Stack Media Production</h3>
       <p>Generate 4K video, AI voiceovers, professional logos, and cinematic content — all from a single prompt. Powered by SDXL, ffmpeg, Blender 3D, and neural TTS.</p>
       <span class="tag" style="background: rgba(236, 72, 153, 0.08); color: var(--secondary);">4K Ready</span>
     </div>
     <div class="feature-card reveal" data-tilt>
-      <div class="feature-icon">⚡</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/><path d="M10 6L8 9M16 10l-2 3"/></svg></div>
       <h3>Entity CRUD API</h3>
       <p>Define data models as JSON schemas and get instant PostgreSQL-backed CRUD APIs with pagination, filtering, sorting, row-level security, and auto-generated documentation.</p>
       <span class="tag" style="background: rgba(52, 211, 153, 0.08); color: var(--success);">Auto-Generated</span>
     </div>
     <div class="feature-card reveal" data-tilt>
-      <div class="feature-icon">🔄</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6l8-4z"/><circle cx="12" cy="11" r="3"/><path d="M12 8v6M9 11h6"/></svg></div>
       <h3>Workflow Automation</h3>
       <p>Schedule recurring tasks, trigger actions on entity changes, and orchestrate multi-step workflows with a visual builder. Connector-triggered automations for Slack, Calendar, and more.</p>
       <span class="tag" style="background: rgba(168, 85, 247, 0.08); color: var(--primary-light);">Visual Builder</span>
     </div>
     <div class="feature-card reveal" data-tilt>
-      <div class="feature-icon">🔐</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/><path d="M12 14v2"/><circle cx="12" cy="14" r="0.5" fill="currentColor"/></svg></div>
       <h3>Privacy-First Architecture</h3>
       <p>Three privacy modes — LOCAL, HYBRID, CLOUD. Run everything on your own servers with zero reliance on paid external APIs. Your data never leaves your infrastructure.</p>
       <span class="tag" style="background: rgba(129, 140, 248, 0.08); color: var(--accent);">Self-Hosted</span>
     </div>
     <div class="feature-card reveal" data-tilt>
-      <div class="feature-icon">🎙️</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0"/><path d="M12 18v3M9 21h6"/><path d="M4 11h1M19 11h1"/></svg></div>
       <h3>Voice-Command Interface</h3>
       <p>Alexa-style voice experience for all platform commands. Control media generation, server management, and system engineering through natural language voice commands.</p>
       <span class="tag" style="background: rgba(236, 72, 153, 0.08); color: var(--secondary);">Hands-Free</span>
     </div>
     <div class="feature-card reveal" data-tilt>
-      <div class="feature-icon">🔗</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h6M6 9v6M18 9v6M9 18h6"/><path d="M8 8l2 2M16 8l-2 2M8 16l2-2M16 16l-2-2"/></svg></div>
       <h3>REST API & SDK</h3>
       <p>Connect EvolvixOS to any external project via REST API. Auto-generate TypeScript and JavaScript SDKs from your entity schemas. Deploy backend functions as HTTP endpoints.</p>
       <span class="tag" style="background: rgba(52, 211, 153, 0.08); color: var(--success);">TypeScript + JS</span>
     </div>
     <div class="feature-card reveal" data-tilt>
-      <div class="feature-icon">📊</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-5"/><circle cx="7" cy="14" r="1.5" fill="currentColor"/><circle cx="10" cy="11" r="1.5" fill="currentColor"/><circle cx="13" cy="14" r="1.5" fill="currentColor"/><circle cx="18" cy="9" r="1.5" fill="currentColor"/></svg></div>
       <h3>Analytics Dashboard</h3>
       <p>Real-time analytics with Chart.js visualizations. Track entity counts, API usage, workflow executions, and user activity. Zero-knowledge dashboard for non-technical users.</p>
       <span class="tag" style="background: rgba(245, 158, 11, 0.08); color: var(--warm);">Real-Time</span>
@@ -1794,7 +1802,7 @@ a { color: inherit; text-decoration: none; }
 <!-- ═══ AI MODELS SHOWCASE ═══ -->
 <section class="models-section" id="models">
   <div class="section-center reveal">
-    <div class="section-tag">🧩 AI Model Catalog</div>
+    <div class="section-tag"><span style="display:inline-flex;align-items:center;gap:4px"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg> AI Model Catalog</span></div>
     <h2 class="section-title">281 Models. <span class="grad">12 Categories.</span> One Platform.</h2>
     <p class="section-subtitle">
       From text generation to 4K video, EvolvixOS auto-selects the best AI engine for every task.
@@ -1803,18 +1811,18 @@ a { color: inherit; text-decoration: none; }
   </div>
 
   <div class="models-grid">
-    <div class="model-card reveal"><div class="emoji">💬</div><h4>LLM & Text</h4><div class="count" data-count="42">0</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🖼️</div><h4>Image Generation</h4><div class="count" data-count="30">0</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🎥</div><h4>Video Generation</h4><div class="count" data-count="61">0</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">👁️</div><h4>Vision & Multimodal</h4><div class="count" data-count="16">0</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🎙️</div><h4>Speech & Voice</h4><div class="count" data-count="21">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h10M4 19h16"/><circle cx="18" cy="12" r="2"/><path d="M18 10v4"/></svg></div><h4>LLM & Text</h4><div class="count" data-count="42">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/><path d="M3 15l3-3 3 3"/></svg></div><h4>Image Generation</h4><div class="count" data-count="30">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="12" rx="2"/><path d="M17 10l4-2v8l-4-2"/><circle cx="10" cy="12" r="2"/><path d="M10 10v-2M10 14v2M8 12H6M14 12h-2"/></svg></div><h4>Video Generation</h4><div class="count" data-count="61">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="1" fill="currentColor"/><path d="M12 9v-2M12 15v2M9 12H7M17 12h-2"/></svg></div><h4>Vision & Multimodal</h4><div class="count" data-count="16">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0"/><path d="M12 18v3M9 21h6"/></svg></div><h4>Speech & Voice</h4><div class="count" data-count="21">0</div><div class="label">Models</div></div>
     <div class="model-card reveal"><div class="emoji">🎵</div><h4>Music & Audio</h4><div class="count" data-count="14">0</div><div class="label">Models</div></div>
     <div class="model-card reveal"><div class="emoji">🧊</div><h4>3D Generation</h4><div class="count" data-count="21">0</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">💻</div><h4>AI Coding</h4><div class="count" data-count="16">0</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🔍</div><h4>RAG & Agents</h4><div class="count" data-count="19">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-5 6 5 6M16 6l5 6-5 6M14 4l-4 16"/></svg></div><h4>AI Coding</h4><div class="count" data-count="16">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><circle cx="12" cy="12" r="2"/><path d="M8 6h8M6 8v8M18 8v8M8 18h8M7.5 7.5l3 3M16.5 7.5l-3 3M7.5 16.5l3-3M16.5 16.5l-3-3"/></svg></div><h4>RAG & Agents</h4><div class="count" data-count="19">0</div><div class="label">Models</div></div>
     <div class="model-card reveal"><div class="emoji">🎛️</div><h4>Image Control</h4><div class="count" data-count="17">0</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">⚙️</div><h4>Local Engines</h4><div class="count" data-count="18">0</div><div class="label">Models</div></div>
-    <div class="model-card reveal"><div class="emoji">🧩</div><h4>Frameworks</h4><div class="count" data-count="6">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/><path d="M2 8h2M2 12h2M2 16h2M20 8h2M20 12h2M20 16h2M8 2v2M12 2v2M16 2v2M8 20v2M12 20v2M16 20v2"/></svg></div><h4>Local Engines</h4><div class="count" data-count="18">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><h4>Frameworks</h4><div class="count" data-count="6">0</div><div class="label">Models</div></div>
   </div>
 </section>
 
@@ -1865,39 +1873,39 @@ a { color: inherit; text-decoration: none; }
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">✏️</span><span class="marquee-name">file_edit</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📝</span><span class="marquee-name">file_write</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📤</span><span class="marquee-name">file_upload</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">💻</span><span class="marquee-name">bash</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🐍</span><span class="marquee-name">python_exec</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">📦</span><span class="marquee-name">sandbox_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg></span><span class="marquee-name">bash</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-3 0-5 2-5 4v3h5V8h5c1 0 2-1 2-2 0-2-2-4-7-4z"/><path d="M12 22c3 0 5-2 5-4v-3h-5v1H7c-1 0-2 1-2 2 0 2 2 4 7 4z"/><circle cx="9.5" cy="5" r="0.5" fill="currentColor"/><circle cx="14.5" cy="19" r="0.5" fill="currentColor"/></svg></span><span class="marquee-name">python_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v8l-8 4-8-4V7l8-4z"/><path d="M12 11l8-4M12 11v8M12 11L4 7"/><circle cx="12" cy="11" r="1.5" fill="currentColor"/></svg></span><span class="marquee-name">sandbox_exec</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🔧</span><span class="marquee-name">pip_install</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🔍</span><span class="marquee-name">code_analyze</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">⚙️</span><span class="marquee-name">service_check</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🔄</span><span class="marquee-name">service_restart</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🐳</span><span class="marquee-name">docker_ps</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🚀</span><span class="marquee-name">docker_restart</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">📊</span><span class="marquee-name">system_info</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l4 4"/><path d="M11 8v6M8 11h6"/></svg></span><span class="marquee-name">code_analyze</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M4.5 19.5l2-2M17.5 6.5l2-2"/></svg></span><span class="marquee-name">service_check</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7L21 8"/><path d="M21 3v5h-5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></span><span class="marquee-name">service_restart</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="4" height="4" rx="0.5"/><rect x="8" y="10" width="4" height="4" rx="0.5"/><rect x="13" y="10" width="4" height="4" rx="0.5"/><rect x="8" y="5" width="4" height="4" rx="0.5"/><path d="M2 14c2 3 6 4 10 4s8-2 10-6c-1 0-2 0-3 1"/></svg></span><span class="marquee-name">docker_ps</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10l-2 4H9l-2-4c0-4 2-8 5-10z"/><circle cx="12" cy="9" r="1.5"/><path d="M9 16l-2 4M15 16l2 4M12 19v3"/></svg></span></span><span class="marquee-name">docker_restart</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-5"/><circle cx="7" cy="14" r="1.5" fill="currentColor"/><circle cx="13" cy="14" r="1.5" fill="currentColor"/><circle cx="18" cy="9" r="1.5" fill="currentColor"/></svg></span><span class="marquee-name">system_info</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🩺</span><span class="marquee-name">process_startup_check</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🌐</span><span class="marquee-name">web_search</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🔗</span><span class="marquee-name">web_fetch</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/><circle cx="12" cy="8" r="1" fill="currentColor"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg></span><span class="marquee-name">web_search</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="18" cy="18" r="1" fill="currentColor"/></svg></span><span class="marquee-name">web_fetch</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">📡</span><span class="marquee-name">http_request</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🧠</span><span class="marquee-name">smart_api_call</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3a3 3 0 00-3 3v2a3 3 0 00-1 5 3 3 0 001 5v2a3 3 0 003 3 3 3 0 003-3V3a3 3 0 00-3 0z"/><path d="M15 3a3 3 0 013 3v2a3 3 0 011 5 3 3 0 01-1 5v2a3 3 0 01-3 3 3 3 0 01-3-3V3a3 3 0 013 0z"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><path d="M9 9v6M15 9v6"/></svg></span><span class="marquee-name">smart_api_call</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🛤️</span><span class="marquee-name">api_auto_route</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🤖</span><span class="marquee-name">call_free_llm</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="14" r="1.5" fill="currentColor"/><circle cx="15" cy="14" r="1.5" fill="currentColor"/><path d="M12 4v4M9 18h6M12 2v2"/></svg></span><span class="marquee-name">call_free_llm</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">👁️</span><span class="marquee-name">gemini_vision</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🗣️</span><span class="marquee-name">gemini_tts</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🎭</span><span class="marquee-name">set_persona</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0116 0"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="14" cy="8" r="1" fill="currentColor"/><path d="M10 10l4 0"/></svg></span><span class="marquee-name">set_persona</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🔎</span><span class="marquee-name">search_subagents</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">🧩</span><span class="marquee-name">team_memory_search</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/><path d="M8 2v4M12 2v4M16 2v4M8 18v4M12 18v4M16 18v4M2 8h4M2 12h4M2 16h4M18 8h4M18 12h4M18 16h4"/></svg></span><span class="marquee-name">team_memory_search</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">💾</span><span class="marquee-name">team_memory_save</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">☁️</span><span class="marquee-name">tencent_cloud</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🌿</span><span class="marquee-name">git</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">⚡</span><span class="marquee-name">skill_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5L12 2z"/><circle cx="12" cy="11" r="1.5" fill="currentColor"/></svg></span><span class="marquee-name">skill_exec</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🎨</span><span class="marquee-name">ui_generate</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎬</span><span class="marquee-name">video_generate</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="12" rx="2"/><path d="M17 10l4-2v8l-4-2"/><circle cx="10" cy="12" r="2"/><path d="M10 10v-2M10 14v2M8 12H6M14 12h-2"/></svg></span><span class="marquee-name">video_generate</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🖼️</span><span class="marquee-name">image_generate</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎤</span><span class="marquee-name">voice_command</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎵</span><span class="marquee-name">audio_synthesize</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🔤</span><span class="marquee-name">logo_generate</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">💎</span><span class="marquee-name">3d_render</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 9l8 13 8-13-8-7z"/><path d="M4 9h16M8 4l4 5 4-5M12 9v13"/></svg></span></span><span class="marquee-name">3d_render</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">₿</span><span class="marquee-name">crypto_analyze</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">⛓️</span><span class="marquee-name">defi_scan</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">👛</span><span class="marquee-name">wallet_track</span></div>
@@ -1912,39 +1920,39 @@ a { color: inherit; text-decoration: none; }
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">✏️</span><span class="marquee-name">file_edit</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📝</span><span class="marquee-name">file_write</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📤</span><span class="marquee-name">file_upload</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">💻</span><span class="marquee-name">bash</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🐍</span><span class="marquee-name">python_exec</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">📦</span><span class="marquee-name">sandbox_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg></span><span class="marquee-name">bash</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c-3 0-5 2-5 4v3h5V8h5c1 0 2-1 2-2 0-2-2-4-7-4z"/><path d="M12 22c3 0 5-2 5-4v-3h-5v1H7c-1 0-2 1-2 2 0 2 2 4 7 4z"/><circle cx="9.5" cy="5" r="0.5" fill="currentColor"/><circle cx="14.5" cy="19" r="0.5" fill="currentColor"/></svg></span><span class="marquee-name">python_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v8l-8 4-8-4V7l8-4z"/><path d="M12 11l8-4M12 11v8M12 11L4 7"/><circle cx="12" cy="11" r="1.5" fill="currentColor"/></svg></span><span class="marquee-name">sandbox_exec</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🔧</span><span class="marquee-name">pip_install</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🔍</span><span class="marquee-name">code_analyze</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">⚙️</span><span class="marquee-name">service_check</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🔄</span><span class="marquee-name">service_restart</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🐳</span><span class="marquee-name">docker_ps</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🚀</span><span class="marquee-name">docker_restart</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">📊</span><span class="marquee-name">system_info</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M16 16l4 4"/><path d="M11 8v6M8 11h6"/></svg></span><span class="marquee-name">code_analyze</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M4.5 19.5l2-2M17.5 6.5l2-2"/></svg></span><span class="marquee-name">service_check</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7L21 8"/><path d="M21 3v5h-5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></span><span class="marquee-name">service_restart</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="4" height="4" rx="0.5"/><rect x="8" y="10" width="4" height="4" rx="0.5"/><rect x="13" y="10" width="4" height="4" rx="0.5"/><rect x="8" y="5" width="4" height="4" rx="0.5"/><path d="M2 14c2 3 6 4 10 4s8-2 10-6c-1 0-2 0-3 1"/></svg></span><span class="marquee-name">docker_ps</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10l-2 4H9l-2-4c0-4 2-8 5-10z"/><circle cx="12" cy="9" r="1.5"/><path d="M9 16l-2 4M15 16l2 4M12 19v3"/></svg></span></span><span class="marquee-name">docker_restart</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-5"/><circle cx="7" cy="14" r="1.5" fill="currentColor"/><circle cx="13" cy="14" r="1.5" fill="currentColor"/><circle cx="18" cy="9" r="1.5" fill="currentColor"/></svg></span><span class="marquee-name">system_info</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🩺</span><span class="marquee-name">process_startup_check</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🌐</span><span class="marquee-name">web_search</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🔗</span><span class="marquee-name">web_fetch</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/><circle cx="12" cy="8" r="1" fill="currentColor"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg></span><span class="marquee-name">web_search</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="18" cy="18" r="1" fill="currentColor"/></svg></span><span class="marquee-name">web_fetch</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">📡</span><span class="marquee-name">http_request</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🧠</span><span class="marquee-name">smart_api_call</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3a3 3 0 00-3 3v2a3 3 0 00-1 5 3 3 0 001 5v2a3 3 0 003 3 3 3 0 003-3V3a3 3 0 00-3 0z"/><path d="M15 3a3 3 0 013 3v2a3 3 0 011 5 3 3 0 01-1 5v2a3 3 0 01-3 3 3 3 0 01-3-3V3a3 3 0 013 0z"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><path d="M9 9v6M15 9v6"/></svg></span><span class="marquee-name">smart_api_call</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🛤️</span><span class="marquee-name">api_auto_route</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🤖</span><span class="marquee-name">call_free_llm</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="14" r="1.5" fill="currentColor"/><circle cx="15" cy="14" r="1.5" fill="currentColor"/><path d="M12 4v4M9 18h6M12 2v2"/></svg></span><span class="marquee-name">call_free_llm</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">👁️</span><span class="marquee-name">gemini_vision</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🗣️</span><span class="marquee-name">gemini_tts</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🎭</span><span class="marquee-name">set_persona</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20a8 8 0 0116 0"/><circle cx="10" cy="8" r="1" fill="currentColor"/><circle cx="14" cy="8" r="1" fill="currentColor"/><path d="M10 10l4 0"/></svg></span><span class="marquee-name">set_persona</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🔎</span><span class="marquee-name">search_subagents</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">🧩</span><span class="marquee-name">team_memory_search</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/><path d="M8 2v4M12 2v4M16 2v4M8 18v4M12 18v4M16 18v4M2 8h4M2 12h4M2 16h4M18 8h4M18 12h4M18 16h4"/></svg></span><span class="marquee-name">team_memory_search</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">💾</span><span class="marquee-name">team_memory_save</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">☁️</span><span class="marquee-name">tencent_cloud</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🌿</span><span class="marquee-name">git</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">⚡</span><span class="marquee-name">skill_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.5 6.5L21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5L12 2z"/><circle cx="12" cy="11" r="1.5" fill="currentColor"/></svg></span><span class="marquee-name">skill_exec</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🎨</span><span class="marquee-name">ui_generate</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎬</span><span class="marquee-name">video_generate</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="12" rx="2"/><path d="M17 10l4-2v8l-4-2"/><circle cx="10" cy="12" r="2"/><path d="M10 10v-2M10 14v2M8 12H6M14 12h-2"/></svg></span><span class="marquee-name">video_generate</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🖼️</span><span class="marquee-name">image_generate</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎤</span><span class="marquee-name">voice_command</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎵</span><span class="marquee-name">audio_synthesize</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🔤</span><span class="marquee-name">logo_generate</span></div>
-<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">💎</span><span class="marquee-name">3d_render</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 9l8 13 8-13-8-7z"/><path d="M4 9h16M8 4l4 5 4-5M12 9v13"/></svg></span></span><span class="marquee-name">3d_render</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">₿</span><span class="marquee-name">crypto_analyze</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">⛓️</span><span class="marquee-name">defi_scan</span></div>
 <div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">👛</span><span class="marquee-name">wallet_track</span></div>
@@ -1971,7 +1979,7 @@ a { color: inherit; text-decoration: none; }
 <div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:92%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">⚙️</span><span class="tool-chip-name">service_check</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
 <div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:88%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">🔄</span><span class="tool-chip-name">service_restart</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
 <div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:85%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">🐳</span><span class="tool-chip-name">docker_ps</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
-<div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:82%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">🚀</span><span class="tool-chip-name">docker_restart</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:82%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10l-2 4H9l-2-4c0-4 2-8 5-10z"/><circle cx="12" cy="9" r="1.5"/><path d="M9 16l-2 4M15 16l2 4M12 19v3"/></svg></span></span><span class="tool-chip-name">docker_restart</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
 <div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:78%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">📊</span><span class="tool-chip-name">system_info</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
 <div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:75%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">🩺</span><span class="tool-chip-name">process_startup_check</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
 <div class="tool-chip" data-tilt data-cat="WEB & API" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:96%"><span class="tool-chip-badge">WEB & API</span><span class="tool-chip-icon">🌐</span><span class="tool-chip-name">web_search</span><span class="tool-chip-cat">Web & API</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
@@ -1995,7 +2003,7 @@ a { color: inherit; text-decoration: none; }
 <div class="tool-chip" data-tilt data-cat="MEDIA" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:92%"><span class="tool-chip-badge">MEDIA</span><span class="tool-chip-icon">🎤</span><span class="tool-chip-name">voice_command</span><span class="tool-chip-cat">Media</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
 <div class="tool-chip" data-tilt data-cat="MEDIA" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:88%"><span class="tool-chip-badge">MEDIA</span><span class="tool-chip-icon">🎵</span><span class="tool-chip-name">audio_synthesize</span><span class="tool-chip-cat">Media</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
 <div class="tool-chip" data-tilt data-cat="MEDIA" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:85%"><span class="tool-chip-badge">MEDIA</span><span class="tool-chip-icon">🔤</span><span class="tool-chip-name">logo_generate</span><span class="tool-chip-cat">Media</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
-<div class="tool-chip" data-tilt data-cat="MEDIA" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:80%"><span class="tool-chip-badge">MEDIA</span><span class="tool-chip-icon">💎</span><span class="tool-chip-name">3d_render</span><span class="tool-chip-cat">Media</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="MEDIA" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:80%"><span class="tool-chip-badge">MEDIA</span><span class="tool-chip-icon"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 9l8 13 8-13-8-7z"/><path d="M4 9h16M8 4l4 5 4-5M12 9v13"/></svg></span></span><span class="tool-chip-name">3d_render</span><span class="tool-chip-cat">Media</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
 <div class="tool-chip" data-tilt data-cat="BLOCKCHAIN" style="--tool-bg:rgba(245,158,11,0.1);--tool-fg:#f59e0b;--power:92%"><span class="tool-chip-badge">BLOCKCHAIN</span><span class="tool-chip-icon">₿</span><span class="tool-chip-name">crypto_analyze</span><span class="tool-chip-cat">Blockchain</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
 <div class="tool-chip" data-tilt data-cat="BLOCKCHAIN" style="--tool-bg:rgba(245,158,11,0.1);--tool-fg:#f59e0b;--power:88%"><span class="tool-chip-badge">BLOCKCHAIN</span><span class="tool-chip-icon">⛓️</span><span class="tool-chip-name">defi_scan</span><span class="tool-chip-cat">Blockchain</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
 <div class="tool-chip" data-tilt data-cat="BLOCKCHAIN" style="--tool-bg:rgba(245,158,11,0.1);--tool-fg:#f59e0b;--power:85%"><span class="tool-chip-badge">BLOCKCHAIN</span><span class="tool-chip-icon">👛</span><span class="tool-chip-name">wallet_track</span><span class="tool-chip-cat">Blockchain</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
@@ -2112,7 +2120,7 @@ a { color: inherit; text-decoration: none; }
 <!-- ═══ PRICING ═══ -->
 <section class="pricing-section" id="pricing">
   <div class="section-center reveal">
-    <div class="section-tag">💎 Subscription Plans</div>
+    <div class="section-tag"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 9l8 13 8-13-8-7z"/><path d="M4 9h16M8 4l4 5 4-5M12 9v13"/></svg></span> Subscription Plans</div>
     <h2 class="section-title">Simple, Transparent <span class="grad">Pricing</span></h2>
     <p class="section-subtitle">
       Start free, scale as you grow. Every plan includes the full platform —
@@ -2162,7 +2170,7 @@ a { color: inherit; text-decoration: none; }
     <div class="pricing-card featured reveal" data-tilt>
       <div class="pricing-badge">★ Most Popular</div>
       <div class="pricing-feature-count">8 features</div>
-      <div class="pricing-name">🚀 Professional</div>
+      <div class="pricing-name"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10l-2 4H9l-2-4c0-4 2-8 5-10z"/><circle cx="12" cy="9" r="1.5"/><path d="M9 16l-2 4M15 16l2 4M12 19v3"/></svg></span> Professional</div>
       <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="29" data-monthly="29" data-annual="23">0</span><span class="period">/month</span></div>
       <p class="pricing-desc">For developers engineering production AI systems with cloud model access.</p>
       <ul class="pricing-features">
@@ -2263,7 +2271,7 @@ a { color: inherit; text-decoration: none; }
 
   <div class="token-packs-grid">
     <div class="token-pack-card reveal" data-color="emerald" data-tilt>
-      <div class="pack-icon">🔋</div>
+      <div class="pack-icon"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="16" height="10" rx="2"/><path d="M21 10v4"/><rect x="5" y="9" width="4" height="6" rx="0.5" fill="currentColor"/><circle cx="12" cy="12" r="0.5" fill="currentColor"/></svg></span></div>
       <div class="pack-name">Starter Pack</div>
       <div class="pack-credits" data-count="2000" data-suffix="">0</div>
       <div class="pack-credits-label">Credits</div>
@@ -2293,7 +2301,7 @@ a { color: inherit; text-decoration: none; }
       <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
     </div>
     <div class="token-pack-card reveal" data-color="pink" data-tilt>
-      <div class="pack-icon">🚀</div>
+      <div class="pack-icon"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c3 2 5 6 5 10l-2 4H9l-2-4c0-4 2-8 5-10z"/><circle cx="12" cy="9" r="1.5"/><path d="M9 16l-2 4M15 16l2 4M12 19v3"/></svg></span></div>
       <div class="pack-name">Pro Pack</div>
       <div class="pack-credits" data-count="50000" data-suffix="">0</div>
       <div class="pack-credits-label">Credits</div>
@@ -2309,7 +2317,7 @@ a { color: inherit; text-decoration: none; }
       <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
     </div>
     <div class="token-pack-card reveal" data-color="blue" data-tilt>
-      <div class="pack-icon">💎</div>
+      <div class="pack-icon"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L4 9l8 13 8-13-8-7z"/><path d="M4 9h16M8 4l4 5 4-5M12 9v13"/></svg></span></div>
       <div class="pack-name">Mega Pack</div>
       <div class="pack-credits" data-count="200000" data-suffix="">0</div>
       <div class="pack-credits-label">Credits</div>
@@ -2326,7 +2334,7 @@ a { color: inherit; text-decoration: none; }
       <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
     </div>
     <div class="token-pack-card reveal" data-color="amber" data-tilt>
-      <div class="pack-icon">🐋</div>
+      <div class="pack-icon"><span style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c0-4 3-7 8-7s8 3 8 6c0 2-1 4-3 5l-2 3h-4l-1-2c-3-1-6-3-6-5z"/><circle cx="9" cy="11" r="1" fill="currentColor"/><path d="M18 10c1-1 2-1 3 0"/></svg></span></div>
       <div class="pack-name">Whale Pack</div>
       <div class="pack-credits" data-count="1000000" data-suffix="">0</div>
       <div class="pack-credits-label">Credits</div>
