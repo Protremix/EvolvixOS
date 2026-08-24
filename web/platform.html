@@ -2492,7 +2492,7 @@ async function createFromTemplate(templateId) {
   // Show loading state
   toast('Creating app from template...', 'info');
   revealConversation();
-  addChatMessage('user', 'Create a ' + templateId + ' app called ' + serviceName);
+  addChatMessage('user', 'Create a ' + templateId + ' service called ' + serviceName);
   addTypingIndicator();
   
   try {
@@ -3782,11 +3782,11 @@ function showCreateAppModal() {
   modal.className = 'modal-overlay';
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center';
   modal.innerHTML = '<div class="modal" style="background:#0c0c12;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px;width:90%;max-width:480px">' +
-    '<h3 class="text-lg font-semibold mb-4">Create New App</h3>' +
+    '<h3 class="text-lg font-semibold mb-4">Create New Service</h3>' +
     '<div class="space-y-3">' +
-      '<input id="new-app-name" placeholder="App name (e.g. My CRM)" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 outline-none focus:border-purple-500" />' +
-      '<textarea id="new-app-desc" placeholder="Description (optional)" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 outline-none focus:border-purple-500" rows="2"></textarea>' +
-      '<label class="flex items-center gap-2 text-sm text-gray-400"><input type="checkbox" id="new-app-autogen" checked /> Auto-generate pages from existing entities</label>' +
+      '<input id="new-service-name" placeholder="Service name (e.g. API Gateway)" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 outline-none focus:border-purple-500" />' +
+      '<textarea id="new-service-desc" placeholder="Description (optional)" class="w-full bg-[#0a0a0f] border border-gray-700 rounded-lg px-3 py-2.5 text-sm text-gray-200 outline-none focus:border-purple-500" rows="2"></textarea>' +
+      '<label class="flex items-center gap-2 text-sm text-gray-400"><input type="checkbox" id="new-service-autogen" checked /> Auto-generate pages from existing entities</label>' +
     '</div>' +
     '<div class="flex items-center justify-end gap-2 mt-5">' +
       '<button onclick="this.closest(\'.modal-overlay\').remove()" class="px-4 py-2 rounded-lg text-sm text-gray-400 hover:text-white transition">Cancel</button>' +
@@ -3797,7 +3797,7 @@ function showCreateAppModal() {
 }
 
 async function createApp() {
-  var name = document.getElementById('new-app-name').value.trim();
+  var name = document.getElementById('new-service-name').value.trim();
   if (!name) return toast('Please enter an app name', 'error');
   var desc = document.getElementById('new-app-desc').value.trim();
   var autoGen = document.getElementById('new-app-autogen').checked;
