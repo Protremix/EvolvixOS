@@ -1902,7 +1902,7 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6" id="analytics-stats">
           <div class="bg-[#0a0a0f] rounded-xl border border-gray-800 p-4 hover:border-purple-500/30 transition-all">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Apps</span>
+              <span class="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Services</span>
               <div class="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center">
                 <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
               </div>
@@ -2012,7 +2012,7 @@ aside.sidebar { animation: slideInLeft 0.4s ease; }
       <div id="page-apps" class="page p-6 max-w-5xl mx-auto">
   <div class="flex items-center justify-between mb-6">
     <div>
-      <h2 class="text-2xl font-bold gradient-text mb-1">Apps</h2>
+      <h2 class="text-2xl font-bold gradient-text mb-1">Services</h2>
       <p class="text-sm text-gray-500">Create, publish, and share your apps</p>
     </div>
     <button onclick="showCreateAppModal()" class="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white text-sm font-medium hover:opacity-90 transition flex items-center gap-2">
@@ -2372,7 +2372,7 @@ function navigateTo(page) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
   if (navItem) navItem.classList.add('active');
-  const titles = {chat: 'Workbench', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', agents: 'Agents', memory: 'Memory', records: 'Records', analytics: 'Analytics', apps: 'Apps', pagebuilder: 'Page Builder', connectors: 'Connectors', sdk: 'SDK Generator', versions: 'Version History', billing: 'Billing & Credits'};
+  const titles = {chat: 'Workbench', entities: 'Entities', functions: 'Functions', workflows: 'Workflows', storage: 'Storage', agents: 'Agents', memory: 'Memory', records: 'Records', analytics: 'Analytics', apps: 'Services', pagebuilder: 'Page Builder', connectors: 'Connectors', sdk: 'SDK Generator', versions: 'Version History', billing: 'Billing & Credits'};
   document.getElementById('page-title').textContent = titles[page] || page;
   if (page === 'entities') loadEntities();
   if (page === 'functions') loadFunctions();
@@ -4344,7 +4344,7 @@ var cmdItems = [
   {label:'Agents',desc:'Chat with AI agents',page:'agents',icon:'M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0'},
   {label:'Memory',desc:'Platform memory and preferences',page:'memory',icon:'M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0'},
   {label:'Analytics',desc:'Usage metrics and activity',page:'analytics',icon:'M3 3v18h18M7 12l4-4 4 4 5-5'},
-  {label:'Apps',desc:'Create and publish apps',page:'apps',icon:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'},
+  {label:'Services',desc:'Deploy and manage services',page:'apps',icon:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z'},
   {label:'Page Builder',desc:'Design pages visually',page:'pagebuilder',icon:'M3 3h7v7H3zM14 3h7v7h-7z'},
   {label:'Connectors',desc:'OAuth integrations',page:'connectors',icon:'M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71'},
   {label:'SDK',desc:'Generate code SDK',page:'sdk',icon:'M16 18l6-6-6-6M8 6l-6 6 6 6'},
