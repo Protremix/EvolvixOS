@@ -709,7 +709,7 @@ html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent
 /* Touch-friendly: larger tap targets on mobile */
 @media (max-width: 767px) {
   .nav-item { padding-top: 12px; padding-bottom: 12px; }
-  button[class*="w-8 h-8"], button[class*="w-9 h-9"] { width: 40px !important; height: 40px !important; }
+  button[class*="w-5 h-5"], button[class*="w-9 h-9"] { width: 40px !important; height: 40px !important; }
   select { min-height: 36px; }
   .field-type { padding: 10px !important; }
   /* Safe area for notched phones */
@@ -1521,7 +1521,7 @@ button[class*="rounded-full"][class*="gradient"]:hover,
 /* === END ENHANCED 3D === */
 
 /* AI nav icon sizing */
-.nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+.nav-item svg { width: 14px; height: 14px; flex-shrink: 0; }
 
 </style>
   <link rel="stylesheet" href="/studio-friendly.css">
@@ -1779,7 +1779,7 @@ button[class*="rounded-full"][class*="gradient"]:hover,
             class="w-full bg-transparent resize-none text-sm px-1 py-1 focus:outline-none placeholder-gray-600"></textarea>
           <div class="prompt-controls flex items-center justify-between px-1 pt-2">
             <div class="flex items-center gap-2">
-              <button title="Attach (coming soon)" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-800 hover:text-gray-300 transition-all">
+              <button title="Attach (coming soon)" class="w-5 h-5 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-800 hover:text-gray-300 transition-all">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
               </button>
               <div class="w-px h-4 bg-gray-800"></div>
@@ -1810,7 +1810,7 @@ button[class*="rounded-full"][class*="gradient"]:hover,
               </select>
             </div>
             <div class="flex items-center gap-2">
-              <button id="builder-mic" onclick="toggleVoiceInput()" title="Voice input" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-800 hover:text-gray-300 transition-all">
+              <button id="builder-mic" onclick="toggleVoiceInput()" title="Voice input" class="w-5 h-5 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-800 hover:text-gray-300 transition-all">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4"/></svg>
               </button>
               <button onclick="sendChat()" class="w-9 h-9 flex items-center justify-center rounded-xl btn-primary">
@@ -2096,7 +2096,7 @@ button[class*="rounded-full"][class*="gradient"]:hover,
                 <h2 class="text-lg font-bold">Agents</h2>
                 <p class="text-gray-500 text-xs mt-0.5">Chat to build & manage anything.</p>
               </div>
-              <button onclick="showCreateAgent()" class="btn-primary w-8 h-8 rounded-lg text-lg font-medium flex items-center justify-center shrink-0" title="New Agent">+</button>
+              <button onclick="showCreateAgent()" class="btn-primary w-5 h-5 rounded-lg text-lg font-medium flex items-center justify-center shrink-0" title="New Agent">+</button>
             </div>
             <div id="agents-list" class="flex-1 overflow-y-auto p-2 space-y-1"></div>
           </div>
@@ -2117,7 +2117,7 @@ button[class*="rounded-full"][class*="gradient"]:hover,
                 <button onclick="closeAgentChat()" class="md:hidden text-gray-500 hover:text-white shrink-0" title="Back">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
                 </button>
-                <div id="agent-chat-avatar" class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0 text-xs font-bold">A</div>
+                <div id="agent-chat-avatar" class="w-5 h-5 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shrink-0 text-xs font-bold">A</div>
                 <div class="flex-1 min-w-0">
                   <h3 id="agent-chat-title" class="text-sm font-semibold truncate">Agent</h3>
                   <div id="agent-chat-model" class="text-[11px] text-gray-500 truncate">auto</div>
@@ -2962,14 +2962,14 @@ async function loadEntities() {
     (data.entities || []).forEach(e => entitySchemas[e.name] = e.schema);
     const grid = document.getElementById('entities-grid');
     if (!data.entities || data.entities.length === 0) {
-      grid.innerHTML = `<div class="col-span-full text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><p class="text-gray-500 text-sm">No entities yet. Use Workbench to create one.</p></div>`;
+      grid.innerHTML = `<div class="col-span-full text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><p class="text-gray-500 text-sm">No entities yet. Use Workbench to create one.</p></div>`;
       return;
     }
     grid.innerHTML = data.entities.map(e => {
       const fields = Object.keys(e.schema?.properties || {});
       return `<div class="entity-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-5 cursor-pointer" onclick="viewRecords('${e.name}')">
         <div class="flex items-center gap-2.5 mb-3">
-          <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+          <div class="w-5 h-5 rounded-lg bg-purple-500/10 flex items-center justify-center">
             <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
           </div>
           <h3 class="font-semibold">${e.name}</h3>
@@ -3068,7 +3068,7 @@ async function viewRecords(name) {
     const data = await api(`/entities/${name}/records`);
     const table = document.getElementById('records-table');
     if (!data.records || data.records.length === 0) {
-      table.innerHTML = `<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><p class="text-gray-500 text-sm">No records yet. Click "+ New Record" to create one.</p></div>`;
+      table.innerHTML = `<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><p class="text-gray-500 text-sm">No records yet. Click "+ New Record" to create one.</p></div>`;
       return;
     }
     const cols = Object.keys(data.records[0]);
@@ -3144,14 +3144,14 @@ async function loadFunctions() {
     const data = await api('/functions');
     const list = document.getElementById('functions-list');
     if (!data.functions || data.functions.length === 0) {
-      list.innerHTML = `<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></div><p class="text-gray-500 text-sm">No functions deployed yet.</p></div>`;
+      list.innerHTML = `<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></div><p class="text-gray-500 text-sm">No functions deployed yet.</p></div>`;
       return;
     }
     list.innerHTML = data.functions.map(f => `
       <div class="entity-card bg-[#0c0c12] border border-gray-800/60 rounded-xl p-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+            <div class="w-5 h-5 rounded-lg bg-purple-500/10 flex items-center justify-center">
               <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
             </div>
             <div>
@@ -3764,7 +3764,7 @@ async function loadMemory() {
     if (!list) return;
     const records = data.records || [];
     if (records.length === 0) {
-      list.innerHTML = '<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg></div><p class="text-gray-500 text-sm">No memories yet. The Workbench will learn your preferences over time.</p></div>';
+      list.innerHTML = '<div class="text-center py-16"><div class="w-16 h-16 rounded-2xl bg-gray-800/30 mx-auto mb-4 flex items-center justify-center"><svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2a4 4 0 100 8 4 4 0 000-8zM4 20a8 8 0 0116 0"/></svg></div><p class="text-gray-500 text-sm">No memories yet. The Workbench will learn your preferences over time.</p></div>';
       return;
     }
     const catColors = {preference: 'text-purple-400 bg-purple-500/10', fact: 'text-blue-400 bg-blue-500/10', decision: 'text-green-400 bg-green-500/10', instruction: 'text-orange-400 bg-orange-500/10', project_context: 'text-pink-400 bg-pink-500/10'};
