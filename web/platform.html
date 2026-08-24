@@ -2485,7 +2485,7 @@ function quickBuild(prompt) {
 
 async function createFromTemplate(templateId) {
   // Ask for app name
-  var defaultName = {crm: 'My CRM', ecommerce: 'My Store', tasks: 'My Tasks', blog: 'My Auth Service'}[templateId] || 'New App';
+  var defaultName = {crm: 'API Gateway', ecommerce: 'ML Pipeline', tasks: 'Data Pipeline', blog: 'Auth Service'}[templateId] || 'New Service';
   var appName = prompt('App name:', defaultName);
   if (!appName) return;
   
