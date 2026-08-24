@@ -757,6 +757,172 @@ a { color: inherit; text-decoration: none; }
 .pricing-price .amount { transition: transform 0.3s, opacity 0.2s; }
 .pricing-price.changing .amount { opacity: 0; transform: scale(0.8); }
 
+/* ─── How Credits Work ─── */
+.credits-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
+
+/* Two-column layout: tiers + free-vs-paid */
+.credits-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px; margin-top: 56px; }
+@media (max-width: 900px) { .credits-layout { grid-template-columns: 1fr; } }
+
+/* Tier table */
+.credits-tier-table {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 36px; overflow: hidden; position: relative;
+}
+.credits-tier-table h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+
+.tier-row {
+  display: flex; align-items: center; gap: 16px; padding: 16px 0;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.06);
+  transition: transform 0.3s, background 0.3s;
+  border-radius: 12px; padding-left: 12px; padding-right: 12px;
+}
+.tier-row:hover { transform: translateX(8px); background: rgba(168, 85, 247, 0.04); }
+.tier-row:last-child { border-bottom: none; }
+
+.tier-badge {
+  width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tier-row:hover .tier-badge { transform: scale(1.1) rotate(-5deg); }
+
+.tier-badge.free { background: rgba(52, 211, 153, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
+.tier-badge.fast { background: rgba(129, 140, 248, 0.12); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.2); }
+.tier-badge.standard { background: rgba(168, 85, 247, 0.12); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.2); }
+.tier-badge.advanced { background: rgba(236, 72, 153, 0.12); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.2); }
+.tier-badge.premium { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+
+.tier-info { flex: 1; }
+.tier-info .tier-name { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+.tier-info .tier-models { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+.tier-cost {
+  font-size: 22px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0; text-align: right;
+}
+.tier-cost .per { font-size: 13px; color: var(--text-dim); font-weight: 500; display: block; }
+
+/* Free vs Paid comparison */
+.credits-comparison {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 36px; position: relative; overflow: hidden;
+}
+.credits-comparison h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+
+.comparison-block { margin-bottom: 28px; }
+.comparison-block:last-child { margin-bottom: 0; }
+.comparison-block-title {
+  font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.comparison-block-title.free { color: #34d399; }
+.comparison-block-title.paid { color: #f59e0b; }
+
+.comparison-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  border-radius: 12px; font-size: 14px; color: var(--text);
+  transition: transform 0.2s, background 0.2s;
+}
+.comparison-item:hover { transform: translateX(6px); background: rgba(255,255,255,0.03); }
+.comparison-item .icon {
+  width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800;
+}
+.comparison-item .icon.free { background: rgba(52, 211, 153, 0.12); color: #34d399; }
+.comparison-item .icon.paid { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+/* Examples section */
+.credits-examples {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 48px;
+}
+.example-card {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.04) 0%, rgba(236, 72, 153, 0.02) 100%);
+  border: 1px solid var(--border); border-radius: 20px; padding: 28px 24px;
+  text-align: center; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative; overflow: hidden;
+}
+.example-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--gradient-1); transform: scaleX(0); transform-origin: center;
+  transition: transform 0.4s;
+}
+.example-card:hover { transform: translateY(-8px); border-color: var(--border-hover); box-shadow: 0 16px 40px rgba(0,0,0,0.2); }
+.example-card:hover::before { transform: scaleX(1); }
+.example-card .ex-amount {
+  font-size: 36px; font-weight: 900; font-family: 'JetBrains Mono', monospace;
+  background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.example-card .ex-amount-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+.example-card .ex-list { list-style: none; text-align: left; }
+.example-card .ex-list li {
+  display: flex; align-items: center; gap: 10px; padding: 8px 0;
+  font-size: 14px; color: var(--text); line-height: 1.5;
+}
+.example-card .ex-list li .qty {
+  font-weight: 800; color: var(--primary-light); font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0; min-width: 36px;
+}
+
+/* Calculator widget */
+.credits-calculator {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 40px; margin-top: 48px; position: relative; overflow: hidden;
+}
+.credits-calculator::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--gradient-1);
+}
+.credits-calculator h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.credits-calculator p { font-size: 15px; color: var(--text-muted); margin-bottom: 28px; }
+
+.calc-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.calc-row label { font-size: 15px; font-weight: 600; flex-shrink: 0; width: 180px; }
+.calc-row select {
+  flex: 1; padding: 12px 16px; border-radius: 12px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  color: var(--text); font-size: 15px; font-family: inherit;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.calc-row select:focus { outline: none; border-color: var(--primary); }
+.calc-row input[type="range"] {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 6px; border-radius: 3px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  cursor: pointer;
+}
+.calc-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--gradient-1); cursor: pointer;
+  box-shadow: 0 2px 10px var(--primary-glow);
+  transition: transform 0.2s;
+}
+.calc-row input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.calc-row .calc-value {
+  font-size: 18px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+  color: var(--primary-light); min-width: 80px; text-align: right;
+}
+
+.calc-result {
+  margin-top: 28px; padding: 24px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.06) 0%, rgba(236, 72, 153, 0.04) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.15);
+  text-align: center;
+}
+.calc-result .label { font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.calc-result .value {
+  font-size: 48px; font-weight: 900; font-family: 'JetBrains Mono', monospace;
+  background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: transform 0.3s;
+}
+.calc-result .subtext { font-size: 14px; color: var(--text-muted); margin-top: 8px; }
+
 /* ─── Content/Info Section ─── */
 .content-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
 .content-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 48px; }
@@ -1305,6 +1471,7 @@ a { color: inherit; text-decoration: none; }
     <a href="#architecture">Architecture</a>
     <a href="#pricing">Pricing</a>
     <a href="#token-packs">Token Packs</a>
+    <a href="#how-credits-work">How It Works</a>
     <a href="/platform/">Studio</a>
     <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
   </div>
@@ -1973,6 +2140,184 @@ a { color: inherit; text-decoration: none; }
   </div>
 </section>
 
+<!-- ═══ HOW CREDITS WORK ═══ -->
+<section class="credits-section" id="how-credits-work">
+  <div class="section-center reveal">
+    <div class="section-tag">🪙 How Credits Work</div>
+    <h2 class="section-title">Every Action Has a <span class="grad">Simple Price</span></h2>
+    <p class="section-subtitle">
+      Credits are the currency of EvolvixOS. Each AI call costs a small number of credits based on the model's power.
+      Your subscription includes monthly credits. Token packs add more — they never expire.
+    </p>
+  </div>
+
+  <div class="credits-layout">
+    <!-- Tier Table -->
+    <div class="credits-tier-table reveal">
+      <h3>📊 Credit Cost Per AI Call</h3>
+
+      <div class="tier-row">
+        <div class="tier-badge free">1</div>
+        <div class="tier-info">
+          <div class="tier-name">Free Models</div>
+          <div class="tier-models">GLM 5.2 Free, Nemotron 3 Super, GPT-OSS 20B, DeepSeek V4 Flash</div>
+        </div>
+        <div class="tier-cost">1<span class="per">credit / call</span></div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-badge fast">2</div>
+        <div class="tier-info">
+          <div class="tier-name">Fast Models</div>
+          <div class="tier-models">GPT-OSS 120B, GPT-OSS 20B, DeepSeek V4, Nemotron 3 Super, Gemma 4 31B</div>
+        </div>
+        <div class="tier-cost">2<span class="per">credits / call</span></div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-badge standard">3</div>
+        <div class="tier-info">
+          <div class="tier-name">Standard Models</div>
+          <div class="tier-models">Default tier — most local models and backend function calls</div>
+        </div>
+        <div class="tier-cost">3<span class="per">credits / call</span></div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-badge advanced">5</div>
+        <div class="tier-info">
+          <div class="tier-name">Advanced Models</div>
+          <div class="tier-models">GLM 5, Kimi K2, Qwen 2.5, Step 3.7</div>
+        </div>
+        <div class="tier-cost">5<span class="per">credits / call</span></div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-badge advanced">10</div>
+        <div class="tier-info">
+          <div class="tier-name">High-Tier Models</div>
+          <div class="tier-models">GLM 5.2, GLM 5.3, Claude Sonnet 5, Gemini 3.1 Pro, Kimi K2.7, Nemotron 3 Ultra, Qwen 3.8</div>
+        </div>
+        <div class="tier-cost">10<span class="per">credits / call</span></div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-badge premium">20</div>
+        <div class="tier-info">
+          <div class="tier-name">Premium Models</div>
+          <div class="tier-models">Gemini 3.1 Pro Preview, Claude Opus, Gemini 3.7 Flash</div>
+        </div>
+        <div class="tier-cost">20<span class="per">credits / call</span></div>
+      </div>
+    </div>
+
+    <!-- Free vs Paid -->
+    <div class="credits-comparison reveal">
+      <h3>⚡ What Costs Credits?</h3>
+
+      <div class="comparison-block">
+        <div class="comparison-block-title free">✓ Always Free — 0 Credits</div>
+        <div class="comparison-item"><span class="icon free">✓</span> Create & manage entities (CRUD)</div>
+        <div class="comparison-item"><span class="icon free">✓</span> Page Builder (drag & drop)</div>
+        <div class="comparison-item"><span class="icon free">✓</span> SDK auto-generation (TS/JS)</div>
+        <div class="comparison-item"><span class="icon free">✓</span> Workflow creation & scheduling</div>
+        <div class="comparison-item"><span class="icon free">✓</span> File uploads & storage</div>
+        <div class="comparison-item"><span class="icon free">✓</span> User authentication & management</div>
+        <div class="comparison-item"><span class="icon free">✓</span> Analytics dashboard</div>
+      </div>
+
+      <div class="comparison-block">
+        <div class="comparison-block-title paid">⚡ Costs Credits Per Call</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> AI chat (any model call)</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> Backend function execution</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> AI agent task execution</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> Image generation (SDXL)</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> Voice synthesis (TTS)</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> Vision analysis (Gemini Vision)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Examples -->
+  <div class="section-center reveal" style="margin-top: 64px;">
+    <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">📦 What Can You Do With Your Credits?</h3>
+    <p style="font-size: 16px; color: var(--text-muted);">Real examples of how far your credits go.</p>
+  </div>
+
+  <div class="credits-examples">
+    <div class="example-card reveal">
+      <div class="ex-amount">100</div>
+      <div class="ex-amount-label">Credits (Free Plan)</div>
+      <ul class="ex-list">
+        <li><span class="qty">100</span> Free model AI calls</li>
+        <li><span class="qty">50</span> Fast model calls</li>
+        <li><span class="qty">20</span> High-tier model calls</li>
+        <li><span class="qty">5</span> Premium model calls</li>
+      </ul>
+    </div>
+    <div class="example-card reveal">
+      <div class="ex-amount">2,000</div>
+      <div class="ex-amount-label">Credits (Starter Plan)</div>
+      <ul class="ex-list">
+        <li><span class="qty">2,000</span> Free model calls</li>
+        <li><span class="qty">1,000</span> Fast model calls</li>
+        <li><span class="qty">200</span> High-tier model calls</li>
+        <li><span class="qty">100</span> Premium model calls</li>
+      </ul>
+    </div>
+    <div class="example-card reveal">
+      <div class="ex-amount">10,000</div>
+      <div class="ex-amount-label">Credits (Pro Plan or Boost Pack)</div>
+      <ul class="ex-list">
+        <li><span class="qty">10,000</span> Free model calls</li>
+        <li><span class="qty">5,000</span> Fast model calls</li>
+        <li><span class="qty">1,000</span> High-tier model calls</li>
+        <li><span class="qty">500</span> Premium model calls</li>
+      </ul>
+    </div>
+    <div class="example-card reveal">
+      <div class="ex-amount">1M</div>
+      <div class="ex-amount-label">Credits (Whale Pack)</div>
+      <ul class="ex-list">
+        <li><span class="qty">1M</span> Free model calls</li>
+        <li><span class="qty">500K</span> Fast model calls</li>
+        <li><span class="qty">100K</span> High-tier model calls</li>
+        <li><span class="qty">50K</span> Premium model calls</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Interactive Calculator -->
+  <div class="credits-calculator reveal">
+    <h3>🧮 Credit Calculator</h3>
+    <p>Pick a model tier and drag the slider to see how many calls you get with each plan or pack.</p>
+
+    <div class="calc-row">
+      <label>Model Tier:</label>
+      <select id="calcTier">
+        <option value="1">Free Models (1 credit/call)</option>
+        <option value="2">Fast Models (2 credits/call)</option>
+        <option value="3" selected>Standard Models (3 credits/call)</option>
+        <option value="5">Advanced Models (5 credits/call)</option>
+        <option value="10">High-Tier Models (10 credits/call)</option>
+        <option value="20">Premium Models (20 credits/call)</option>
+      </select>
+    </div>
+
+    <div class="calc-row">
+      <label>Your Credits:</label>
+      <input type="range" id="calcSlider" min="100" max="500000" value="10000" step="100">
+      <span class="calc-value" id="calcCredits">10,000</span>
+    </div>
+
+    <div class="calc-result">
+      <div class="label">You Can Make</div>
+      <div class="value" id="calcResult">3,333</div>
+      <div class="subtext" id="calcSubtext">AI calls with Standard Models</div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══ CTA ═══ -->
 <section class="cta-section">
   <div class="cta-box reveal">
@@ -2002,6 +2347,7 @@ a { color: inherit; text-decoration: none; }
     <a href="#architecture">Architecture</a>
         <a href="#pricing">Pricing</a>
     <a href="#token-packs">Token Packs</a>
+    <a href="#how-credits-work">How It Works</a>
       </div>
       <div class="footer-col">
         <h4>Resources</h4>
@@ -2406,6 +2752,35 @@ const navObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' });
 Object.values(navSections).forEach(s => navObserver.observe(s.el));
 
+
+// ─── Credit Calculator ───
+(function() {
+  const tierSelect = document.getElementById('calcTier');
+  const slider = document.getElementById('calcSlider');
+  const creditsLabel = document.getElementById('calcCredits');
+  const resultEl = document.getElementById('calcResult');
+  const subtextEl = document.getElementById('calcSubtext');
+
+  const tierNames = {
+    1: 'Free Models', 2: 'Fast Models', 3: 'Standard Models',
+    5: 'Advanced Models', 10: 'High-Tier Models', 20: 'Premium Models'
+  };
+
+  function updateCalc() {
+    const cost = parseInt(tierSelect.value);
+    const credits = parseInt(slider.value);
+    const calls = Math.floor(credits / cost);
+    creditsLabel.textContent = credits.toLocaleString();
+    resultEl.textContent = calls.toLocaleString();
+    subtextEl.textContent = 'AI calls with ' + tierNames[cost];
+    // Animate result
+    resultEl.style.transform = 'scale(1.1)';
+    setTimeout(() => resultEl.style.transform = 'scale(1)', 200);
+  }
+
+  tierSelect.addEventListener('change', updateCalc);
+  slider.addEventListener('input', updateCalc);
+})();
 
 // ─── 3D tilt for token pack cards ───
 document.querySelectorAll('.token-pack-card[data-tilt]').forEach(card => {
