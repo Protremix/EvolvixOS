@@ -465,14 +465,39 @@ function setActiveBottomNav(el) {
   if (el) el.classList.add('active');
 }
 // Sync bottom nav when navigating from sidebar
-var origShowPage = window.showPage;
-if (origShowPage) {
-  window.showPage = function(page) {
-    origShowPage(page);
-    var bnItem = document.querySelector('.bottom-nav-item[data-page="' + page + '"]');
-    if (bnItem) setActiveBottomNav(bnItem); haptic(10);
-  };
-}
+// Page switching: hide all pages, show the selected one
+window.showPage = function(page) {
+  var pages = document.querySelectorAll('.page');
+  pages.forEach(function(p) { p.classList.remove('active'); });
+  var target = document.getElementById('page-' + page);
+  if (target) { target.classList.add('active'); }
+  
+  // Update sidebar active state
+  var navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(function(n) { 
+    n.classList.remove('active'); 
+    n.classList.remove('text-white');
+    n.classList.add('text-gray-400');
+  });
+  var activeNav = document.querySelector('.nav-item[data-page="' + page + '"]');
+  if (activeNav) { 
+    activeNav.classList.add('active'); 
+    activeNav.classList.remove('text-gray-400');
+    activeNav.classList.add('text-white');
+  }
+  
+  // Update bottom nav active state
+  var bnItems = document.querySelectorAll('.bottom-nav-item');
+  bnItems.forEach(function(b) { b.classList.remove('active'); });
+  var bnItem = document.querySelector('.bottom-nav-item[data-page="' + page + '"]');
+  if (bnItem) { bnItem.classList.add('active'); }
+  
+  // Close sidebar on mobile
+  if (window.innerWidth < 768) {
+    var sidebar = document.querySelector('aside');
+    if (sidebar) sidebar.classList.remove('open');
+  }
+};
 
 // ═══ Mobile swipe gestures for sidebar ═══
 (function() {
