@@ -4,7 +4,7 @@
   "source": "https://github.com/open-free-llm-api/awesome-freellm-apis",
   "website": "https://freellm.net",
   "total_providers": 31,
-  "total_free_models": 450,
+  "total_free_models": 449,
   "providers": [
     {
       "name": "NVIDIA NIM",
@@ -466,7 +466,7 @@
     },
     {
       "name": "OpenRouter",
-      "free_models": 28,
+      "free_models": 27,
       "credit_model": "Free tier + $10 topup \u2192 1K RPD",
       "max_context": "1M",
       "modalities": [
@@ -486,5 +486,5 @@
       "models": []
     }
   ],
-  "last_updated": "2026-08-24T11:04:25.815365+00:00"
+  "last_updated": "2026-08-25T09:14:59.216673+00:00"
 }

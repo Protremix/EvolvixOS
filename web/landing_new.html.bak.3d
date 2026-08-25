@@ -1,0 +1,3171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EvolvixOS — The AI Engineering Platform</title>
+<meta name="description" content="EvolvixOS is the open-source AI engineering platform that lets you engineer, deploy, and scale AI-powered systems with 281+ models, cinematic media production, and zero-knowledge dashboards.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   EvolvixOS Landing — MAXIMUM WOW Edition
+   Particles, 3D tilt, animated counters, magnetic buttons,
+   scroll progress, glow trails, text reveals, gradient shifts
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --bg: #0a0a0f;
+  --bg-soft: #0e0e16;
+  --bg-card: #14141f;
+  --bg-elevated: #1a1a28;
+  --border: rgba(168, 85, 247, 0.12);
+  --border-hover: rgba(168, 85, 247, 0.3);
+  --text: #f5f5fa;
+  --text-muted: #9999aa;
+  --text-dim: #666677;
+  --primary: #a855f7;
+  --primary-light: #c084fc;
+  --primary-glow: rgba(168, 85, 247, 0.35);
+  --secondary: #ec4899;
+  --secondary-glow: rgba(236, 72, 153, 0.25);
+  --accent: #818cf8;
+  --accent-glow: rgba(129, 140, 248, 0.25);
+  --warm: #f59e0b;
+  --success: #34d399;
+  --gradient-1: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #818cf8 100%);
+  --gradient-2: linear-gradient(135deg, #818cf8 0%, #a855f7 100%);
+  --gradient-anim: linear-gradient(90deg, #a855f7, #ec4899, #818cf8, #a855f7);
+  background-size: 200% 100%;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-soft); }
+::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.2); border-radius: 10px; border: 2px solid var(--bg-soft); }
+::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.4); }
+
+/* ─── Scroll Progress Bar ─── */
+/* Hero entrance animations */
+.hero-badge {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroFadeIn 0.8s ease-out 0.2s forwards, badgeGlow 3s ease-in-out 1s infinite;
+}
+@keyframes heroFadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes badgeGlow {
+  0%, 100% { box-shadow: 0 0 0 rgba(34, 197, 94, 0); }
+  50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.15); }
+}
+#heroTitle {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: heroFadeIn 0.8s ease-out 0.4s forwards;
+}
+.hero > p {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroFadeIn 0.8s ease-out 0.6s forwards;
+}
+.hero-actions {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroFadeIn 0.8s ease-out 0.8s forwards;
+}
+.hero-stats {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: heroFadeIn 0.8s ease-out 1.0s forwards;
+}
+
+/* Back to top button */
+.back-to-top {
+  position: fixed;
+  bottom: 30px; right: 30px;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #fff;
+  cursor: pointer;
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(20px) scale(0.8);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.3);
+  border: none;
+  pointer-events: none;
+}
+.back-to-top.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+.back-to-top:hover {
+  transform: translateY(-4px) scale(1.1);
+  box-shadow: 0 8px 30px rgba(168, 85, 247, 0.5);
+}
+
+/* Nav active section indicator */
+.nav a.active-section {
+  color: #fff !important;
+  position: relative;
+}
+.nav a.active-section::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  border-radius: 100px;
+}
+
+/* Feature card icon bounce on reveal */
+.feature-card.reveal.active .feature-icon {
+  animation: iconBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes iconBounce {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Model card counter glow */
+.model-card.reveal.active .count::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 100px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent);
+  animation: counterGlow 2s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes counterGlow {
+  from { opacity: 1; transform: scale(0.8); }
+  to { opacity: 0; transform: scale(2); }
+}
+
+.scroll-progress {
+  position: fixed; top: 0; left: 0; height: 4px; width: 0%;
+  background: var(--gradient-1);
+  z-index: 9999;
+  transition: width 0.1s ease;
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+/* ─── Cursor Glow ─── */
+.cursor-glow {
+  position: fixed; width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 60%);
+  pointer-events: none; z-index: 1;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease-out;
+  mix-blend-mode: screen;
+}
+
+/* ─── Particle Canvas ─── */
+#particles {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0; pointer-events: none; opacity: 0.6;
+}
+
+/* ─── Nav ─── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  padding: 18px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(10, 10, 15, 0.7);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+.nav.scrolled { padding: 12px 48px; background: rgba(10, 10, 15, 0.92); }
+.nav-logo {
+  display: flex; align-items: center; gap: 14px;
+  font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+}
+.nav-logo-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--gradient-1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 900; color: #fff;
+  box-shadow: 0 4px 20px var(--primary-glow);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-logo:hover .nav-logo-icon { transform: scale(1.1) rotate(-8deg); }
+.nav-links { display: flex; gap: 36px; align-items: center; }
+.nav-links a {
+  color: var(--text-muted); font-size: 15px; font-weight: 500;
+  transition: color 0.2s; position: relative;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 2px;
+  background: var(--gradient-1); border-radius: 2px;
+  transform: scaleX(0); transition: transform 0.3s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a:hover::after { transform: scaleX(1); }
+.nav-cta { display: flex; gap: 12px; align-items: center; }
+.nav-cta .btn-ghost {
+  padding: 10px 22px; border-radius: 100px; font-size: 14px; font-weight: 600;
+  color: var(--text-muted); border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+.nav-cta .btn-ghost:hover { color: var(--text); border-color: var(--primary); background: rgba(168, 85, 247, 0.05); }
+.nav-cta .btn-primary {
+  padding: 10px 24px; border-radius: 100px; font-size: 14px; font-weight: 700;
+  background: var(--gradient-1); color: #fff;
+  box-shadow: 0 4px 20px var(--primary-glow);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+}
+.nav-cta .btn-primary:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 30px var(--primary-glow); }
+
+/* ─── Hero ─── */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 140px 40px 80px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    linear-gradient(rgba(168, 85, 247, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(168, 85, 247, 0.025) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 70% 60% at center, black 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at center, black 20%, transparent 80%);
+}
+.hero::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(168, 85, 247, 0.12) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 40% at 80% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+              radial-gradient(ellipse 50% 40% at 20% 70%, rgba(129, 140, 248, 0.08) 0%, transparent 50%);
+  z-index: 0;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 8px 20px; border-radius: 100px;
+  background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.2);
+  font-size: 14px; font-weight: 600; color: var(--primary-light);
+  margin-bottom: 36px; position: relative; z-index: 2;
+  backdrop-filter: blur(10px);
+  animation: badgeFloat 4s ease-in-out infinite;
+}
+@keyframes badgeFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.hero-badge .dot {
+  width: 10px; height: 10px; border-radius: 50%; background: var(--success);
+  box-shadow: 0 0 12px var(--success);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+
+/* Hero headline with scramble reveal */
+.hero h1 {
+  font-size: clamp(42px, 7vw, 88px); font-weight: 900; letter-spacing: -3px;
+  line-height: 1.02; margin-bottom: 28px; position: relative; z-index: 2;
+  background: linear-gradient(180deg, #fff 0%, #d0d0e0 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero h1 .grad {
+  background: var(--gradient-anim);
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease infinite;
+}
+@keyframes gradientShift { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+
+.hero p {
+  font-size: clamp(17px, 2.2vw, 22px); color: var(--text-muted);
+  max-width: 720px; margin-bottom: 48px; position: relative; z-index: 2;
+  line-height: 1.6;
+  animation: fadeInUp 1s ease 0.3s both;
+}
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+.hero-actions {
+  display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; position: relative; z-index: 2;
+  animation: fadeInUp 1s ease 0.5s both;
+}
+
+/* Magnetic button */
+.btn-magnetic {
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
+  padding: 16px 36px; border-radius: 100px; font-size: 17px; font-weight: 700;
+  border: none; cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
+}
+.btn-magnetic.primary {
+  background: var(--gradient-1); color: #fff;
+  box-shadow: 0 10px 40px var(--primary-glow);
+}
+.btn-magnetic.primary:hover { box-shadow: 0 16px 50px var(--primary-glow), 0 0 60px rgba(168, 85, 247, 0.15); }
+.btn-magnetic.primary::before {
+  content: ''; position: absolute; inset: 0; border-radius: 100px;
+  background: var(--gradient-1);
+  opacity: 0; transition: opacity 0.3s;
+  z-index: -1;
+}
+.btn-magnetic.primary::after {
+  content: ''; position: absolute; inset: -3px; border-radius: 100px;
+  background: var(--gradient-1); opacity: 0;
+  filter: blur(20px); transition: opacity 0.3s;
+  z-index: -2;
+}
+.btn-magnetic.primary:hover::after { opacity: 0.5; }
+.btn-magnetic.ghost {
+  background: rgba(255,255,255,0.04); color: var(--text);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+.btn-magnetic.ghost:hover { background: rgba(255,255,255,0.08); border-color: var(--primary); }
+.btn-magnetic .arrow { transition: transform 0.3s; }
+.btn-magnetic:hover .arrow { transform: translateX(6px); }
+
+.hero-stats {
+  display: flex; gap: 56px; margin-top: 72px; flex-wrap: wrap; justify-content: center;
+  position: relative; z-index: 2;
+  animation: fadeInUp 1s ease 0.7s both;
+}
+.hero-stat { text-align: center; }
+.hero-stat-num {
+  font-size: 44px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+  background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: transform 0.3s;
+}
+.hero-stat:hover .hero-stat-num { transform: scale(1.1); }
+.hero-stat-label { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 6px; font-weight: 600; }
+
+/* ─── Floating orbs ─── */
+.orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.35; z-index: 0; animation: float 25s ease-in-out infinite; }
+.orb-1 { width: 500px; height: 500px; background: var(--primary); top: -150px; left: -150px; }
+.orb-2 { width: 400px; height: 400px; background: var(--secondary); bottom: -100px; right: -80px; animation-delay: -7s; }
+.orb-3 { width: 350px; height: 350px; background: var(--accent); top: 40%; left: 55%; animation-delay: -14s; }
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(40px, -40px) scale(1.05); }
+  66% { transform: translate(-30px, 30px) scale(0.95); }
+}
+
+/* ─── Sections ─── */
+.section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
+.section-center { text-align: center; }
+.section-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 18px; border-radius: 100px;
+  background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.15);
+  font-size: 13px; font-weight: 700; color: var(--primary-light); text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: clamp(30px, 4.5vw, 52px); font-weight: 800; letter-spacing: -1.5px;
+  margin-bottom: 20px; line-height: 1.1;
+}
+.section-title .grad { background: var(--gradient-anim); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: gradientShift 4s ease infinite; }
+.section-subtitle { font-size: 18px; color: var(--text-muted); max-width: 640px; margin: 0 auto 64px; line-height: 1.7; }
+
+/* ─── Feature Grid with 3D Tilt ─── */
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; }
+.feature-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 36px; transition: transform 0.2s ease-out, border-color 0.4s, box-shadow 0.4s; position: relative; overflow: hidden;
+  transform-style: preserve-3d; will-change: transform;
+}
+.feature-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--gradient-1); border-radius: 24px 24px 0 0;
+  transform: scaleX(0); transition: transform 0.4s;
+  transform-origin: left;
+}
+.feature-card::after {
+  content: ''; position: absolute; inset: 0; border-radius: 24px;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+  opacity: 0; transition: opacity 0.3s;
+  pointer-events: none;
+}
+.feature-card:hover { border-color: var(--border-hover); box-shadow: 0 20px 50px rgba(0,0,0,0.3), 0 0 40px rgba(168, 85, 247, 0.08); }
+.feature-card:hover::before { transform: scaleX(1); }
+.feature-card:hover::after { opacity: 1; }
+.feature-icon {
+  width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+  font-size: 28px; margin-bottom: 24px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateZ(40px);
+}
+.feature-card:hover .feature-icon { transform: translateZ(40px) scale(1.12) rotate(-5deg); }
+.feature-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.5px; transform: translateZ(30px); }
+.feature-card p { font-size: 15px; color: var(--text-muted); line-height: 1.7; transform: translateZ(20px); }
+.feature-card .tag {
+  display: inline-block; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600;
+  margin-top: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+  transform: translateZ(15px);
+}
+
+/* ─── AI Models Showcase ─── */
+.models-section { background: linear-gradient(180deg, var(--bg) 0%, #0c0c14 50%, var(--bg) 100%); padding: 120px 0; position: relative; z-index: 2; }
+.models-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 1280px; margin: 0 auto; padding: 0 40px; }
+.model-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 28px 24px; text-align: center; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative; overflow: hidden;
+}
+.model-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.06) 0%, transparent 50%);
+  opacity: 0; transition: opacity 0.3s;
+}
+.model-card:hover { border-color: var(--primary); transform: translateY(-8px) scale(1.03); box-shadow: 0 16px 50px rgba(0,0,0,0.3), 0 0 30px rgba(168, 85, 247, 0.1); }
+.model-card:hover::before { opacity: 1; }
+.model-card .emoji { font-size: 36px; margin-bottom: 14px; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); display: inline-block; }
+.model-card:hover .emoji { transform: scale(1.25) rotate(-8deg); }
+.model-card h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; position: relative; }
+.model-card .count { font-size: 36px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--primary-light); position: relative; }
+.model-card .label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; position: relative; }
+
+/* ─── Architecture with animated flow ─── */
+.arch-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
+.arch-flow { display: flex; flex-direction: column; gap: 16px; margin-top: 48px; }
+.arch-layer {
+  display: flex; align-items: center; gap: 20px; padding: 24px 32px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative; overflow: hidden;
+}
+.arch-layer::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.08), transparent);
+  transition: width 0.4s ease;
+}
+.arch-layer:hover::before { width: 100%; }
+.arch-layer:hover { border-color: var(--border-hover); transform: translateX(12px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+.arch-layer-num {
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+  background: var(--gradient-2); display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 800; color: #fff;
+  box-shadow: 0 4px 15px var(--primary-glow);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative; z-index: 1;
+}
+.arch-layer:hover .arch-layer-num { transform: scale(1.15) rotate(-5deg); }
+.arch-layer-content h4 { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; position: relative; z-index: 1; }
+.arch-layer-content p { font-size: 14px; color: var(--text-muted); margin-top: 2px; position: relative; z-index: 1; }
+.arch-layer-tag {
+  margin-left: auto; padding: 6px 14px; border-radius: 100px; font-size: 12px; font-weight: 600;
+  background: rgba(168, 85, 247, 0.08); color: var(--primary-light);
+  text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+  position: relative; z-index: 1;
+}
+
+/* ─── Token Packs ─── */
+.token-packs-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
+.token-packs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 56px; }
+.token-pack-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 36px 28px; text-align: center; position: relative; overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.4s, border-color 0.4s;
+  cursor: pointer;
+}
+.token-pack-card:hover { transform: translateY(-10px); box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+
+/* Color-specific glow effects */
+.token-pack-card[data-color="emerald"]:hover { border-color: rgba(52, 211, 153, 0.4); box-shadow: 0 20px 50px rgba(52, 211, 153, 0.12); }
+.token-pack-card[data-color="purple"]:hover { border-color: rgba(168, 85, 247, 0.4); box-shadow: 0 20px 50px rgba(168, 85, 247, 0.12); }
+.token-pack-card[data-color="pink"]:hover { border-color: rgba(236, 72, 153, 0.4); box-shadow: 0 20px 50px rgba(236, 72, 153, 0.12); }
+.token-pack-card[data-color="blue"]:hover { border-color: rgba(129, 140, 248, 0.4); box-shadow: 0 20px 50px rgba(129, 140, 248, 0.12); }
+.token-pack-card[data-color="amber"]:hover { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 20px 50px rgba(245, 158, 11, 0.12); }
+
+/* Mouse-follow glow */
+.token-pack-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(168, 85, 247, 0.06) 0%, transparent 40%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.token-pack-card:hover::after { opacity: 1; }
+
+.token-pack-card .pack-icon {
+  width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center; font-size: 28px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.token-pack-card:hover .pack-icon { transform: scale(1.15) rotate(-6deg); }
+
+.token-pack-card .pack-name { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.token-pack-card .pack-credits {
+  font-size: 40px; font-weight: 900; font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -1.5px; margin-bottom: 4px;
+  background: linear-gradient(135deg, #fff, #c084fc);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.token-pack-card .pack-credits-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+.token-pack-card .pack-price { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+.token-pack-card .pack-price .currency { font-size: 18px; color: var(--text-muted); font-weight: 600; }
+.token-pack-card .pack-save {
+  display: inline-block; padding: 4px 12px; border-radius: 100px;
+  font-size: 12px; font-weight: 700;
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(34, 197, 94, 0.15));
+  color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3);
+  margin-bottom: 20px;
+}
+.token-pack-card .pack-features { list-style: none; text-align: left; margin-bottom: 24px; }
+.token-pack-card .pack-features li {
+  display: flex; align-items: flex-start; gap: 8px; padding: 6px 0;
+  font-size: 13px; color: var(--text-muted); line-height: 1.5;
+}
+.token-pack-card .pack-features li::before { content: '✓'; color: var(--success); font-weight: 800; flex-shrink: 0; font-size: 12px; }
+
+.token-pack-card .pack-cta {
+  display: block; text-align: center; padding: 12px 20px; border-radius: 100px;
+  font-size: 14px; font-weight: 700; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text);
+}
+.token-pack-card:hover .pack-cta { border-color: var(--primary); background: rgba(168, 85, 247, 0.08); transform: scale(1.05); }
+
+/* Popular badge for token packs */
+.token-pack-card .popular-badge {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  padding: 4px 16px; border-radius: 100px; font-size: 11px; font-weight: 700;
+  background: linear-gradient(135deg, #a855f7, #ec4899); color: #fff;
+  text-transform: uppercase; letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+  animation: badgeBounce 2s ease-in-out infinite; z-index: 3;
+  white-space: nowrap;
+}
+
+/* Animated coin float */
+@keyframes coinFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(5deg); }
+}
+.token-pack-card .pack-icon { animation: coinFloat 3s ease-in-out infinite; }
+.token-pack-card:nth-child(2) .pack-icon { animation-delay: 0.5s; }
+.token-pack-card:nth-child(3) .pack-icon { animation-delay: 1s; }
+.token-pack-card:nth-child(4) .pack-icon { animation-delay: 1.5s; }
+.token-pack-card:nth-child(5) .pack-icon { animation-delay: 2s; }
+
+/* 3D tilt for token packs */
+.token-pack-tilt { perspective: 1000px; }
+
+/* ─── Pricing ─── */
+.pricing-section { padding: 140px 40px 100px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
+
+/* Billing toggle */
+.billing-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 32px 0 0;
+}
+.billing-toggle-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: color 0.3s;
+}
+.billing-toggle-label.active { color: var(--text); }
+.billing-toggle-switch {
+  position: relative;
+  width: 56px; height: 30px;
+  border-radius: 100px;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.billing-toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.4);
+}
+.billing-toggle-switch.annual::after { transform: translateX(26px); }
+.billing-save-badge {
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(34, 197, 94, 0.15));
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  animation: saveBadgePulse 2s ease-in-out infinite;
+}
+@keyframes saveBadgePulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 56px; }
+.pricing-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 32px;
+  padding: 44px 36px; position: relative;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.4s ease, border-color 0.4s ease;
+  overflow: hidden;
+}
+.pricing-card:hover { box-shadow: 0 30px 70px rgba(0,0,0,0.4); }
+
+/* Mouse-follow glow on cards */
+.pricing-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), rgba(168, 85, 247, 0.06) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.pricing-card:hover::after { opacity: 1; }
+
+/* Animated gradient border on featured card */
+.pricing-card.featured {
+  border-color: transparent;
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.08) 0%, var(--bg-card) 30%);
+  box-shadow: 0 0 50px rgba(168, 85, 247, 0.15);
+  animation: featuredPulse 4s ease-in-out infinite;
+  position: relative;
+}
+.pricing-card.featured::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 32px;
+  padding: 1px;
+  background: linear-gradient(135deg, #a855f7, #ec4899, #8b5cf6, #a855f7);
+  background-size: 300% 300%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: gradientBorder 4s linear infinite;
+  pointer-events: none;
+}
+@keyframes gradientBorder {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+@keyframes featuredPulse {
+  0%, 100% { box-shadow: 0 0 50px rgba(168, 85, 247, 0.12); }
+  50% { box-shadow: 0 0 80px rgba(168, 85, 247, 0.22); }
+}
+.pricing-badge {
+  position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+  padding: 6px 20px; border-radius: 100px; font-size: 12px; font-weight: 700;
+  background: linear-gradient(135deg, #a855f7, #ec4899); color: #fff;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+  animation: badgeBounce 2s ease-in-out infinite;
+  z-index: 3;
+  white-space: nowrap;
+}
+@keyframes badgeBounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-4px); } }
+
+/* Feature count badge */
+.pricing-feature-count {
+  position: absolute;
+  top: 16px; right: 16px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.pricing-name { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.pricing-price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 6px; position: relative; }
+.pricing-price .amount { font-size: 56px; font-weight: 900; letter-spacing: -2.5px; background: linear-gradient(135deg, #fff, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transition: transform 0.3s; }
+.pricing-card:hover .pricing-price .amount { transform: scale(1.05); }
+.pricing-price .currency { font-size: 22px; font-weight: 600; color: var(--text-muted); }
+.pricing-price .period { font-size: 18px; color: var(--text-muted); font-weight: 500; }
+.pricing-desc { font-size: 15px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.6; }
+.pricing-features { list-style: none; margin-bottom: 36px; }
+.pricing-features li {
+  display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
+  font-size: 15px; color: var(--text); border-bottom: 1px solid rgba(168, 85, 247, 0.06);
+  transition: transform 0.2s, color 0.2s;
+}
+.pricing-features li:hover { transform: translateX(6px); color: #fff; }
+.pricing-features li:last-child { border-bottom: none; }
+.pricing-features li .check {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 7px;
+  background: rgba(52, 211, 153, 0.12); display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: var(--success); font-weight: 800;
+  transition: transform 0.2s;
+}
+.pricing-features li:hover .check { transform: scale(1.15); }
+.pricing-features li .x {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 7px;
+  background: rgba(239, 68, 68, 0.08); display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #ef4444; font-weight: 800;
+}
+.pricing-features li .label-muted { color: var(--text-dim); }
+.pricing-cta {
+  display: block; text-align: center; padding: 16px; border-radius: 100px;
+  font-size: 16px; font-weight: 700; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative; overflow: hidden;
+}
+.pricing-cta.primary { background: linear-gradient(135deg, #a855f7, #ec4899); color: #fff; box-shadow: 0 6px 25px rgba(168, 85, 247, 0.3); }
+.pricing-cta.primary::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+.pricing-cta.primary:hover::before { left: 100%; }
+.pricing-cta.primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 35px rgba(168, 85, 247, 0.4); }
+.pricing-cta.secondary { background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text); }
+.pricing-cta.secondary:hover { border-color: var(--primary); background: rgba(168, 85, 247, 0.08); transform: translateY(-2px); }
+
+/* Price transition animation */
+.pricing-price .amount { transition: transform 0.3s, opacity 0.2s; }
+.pricing-price.changing .amount { opacity: 0; transform: scale(0.8); }
+
+/* ─── How Credits Work ─── */
+.credits-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
+
+/* Two-column layout: tiers + free-vs-paid */
+.credits-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px; margin-top: 56px; }
+@media (max-width: 900px) { .credits-layout { grid-template-columns: 1fr; } }
+
+/* Tier table */
+.credits-tier-table {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 36px; overflow: hidden; position: relative;
+}
+.credits-tier-table h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+
+.tier-row {
+  display: flex; align-items: center; gap: 16px; padding: 16px 0;
+  border-bottom: 1px solid rgba(168, 85, 247, 0.06);
+  transition: transform 0.3s, background 0.3s;
+  border-radius: 12px; padding-left: 12px; padding-right: 12px;
+}
+.tier-row:hover { transform: translateX(8px); background: rgba(168, 85, 247, 0.04); }
+.tier-row:last-child { border-bottom: none; }
+
+.tier-badge {
+  width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tier-row:hover .tier-badge { transform: scale(1.1) rotate(-5deg); }
+
+.tier-badge.free { background: rgba(52, 211, 153, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.2); }
+.tier-badge.fast { background: rgba(129, 140, 248, 0.12); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.2); }
+.tier-badge.standard { background: rgba(168, 85, 247, 0.12); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.2); }
+.tier-badge.advanced { background: rgba(236, 72, 153, 0.12); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.2); }
+.tier-badge.premium { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+
+.tier-info { flex: 1; }
+.tier-info .tier-name { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+.tier-info .tier-models { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+.tier-cost {
+  font-size: 22px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0; text-align: right;
+}
+.tier-cost .per { font-size: 13px; color: var(--text-dim); font-weight: 500; display: block; }
+
+/* Free vs Paid comparison */
+.credits-comparison {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 36px; position: relative; overflow: hidden;
+}
+.credits-comparison h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 10px; }
+
+.comparison-block { margin-bottom: 28px; }
+.comparison-block:last-child { margin-bottom: 0; }
+.comparison-block-title {
+  font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+.comparison-block-title.free { color: #34d399; }
+.comparison-block-title.paid { color: #f59e0b; }
+
+.comparison-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  border-radius: 12px; font-size: 14px; color: var(--text);
+  transition: transform 0.2s, background 0.2s;
+}
+.comparison-item:hover { transform: translateX(6px); background: rgba(255,255,255,0.03); }
+.comparison-item .icon {
+  width: 24px; height: 24px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800;
+}
+.comparison-item .icon.free { background: rgba(52, 211, 153, 0.12); color: #34d399; }
+.comparison-item .icon.paid { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+
+/* Examples section */
+.credits-examples {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 48px;
+}
+.example-card {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.04) 0%, rgba(236, 72, 153, 0.02) 100%);
+  border: 1px solid var(--border); border-radius: 20px; padding: 28px 24px;
+  text-align: center; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative; overflow: hidden;
+}
+.example-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--gradient-1); transform: scaleX(0); transform-origin: center;
+  transition: transform 0.4s;
+}
+.example-card:hover { transform: translateY(-8px); border-color: var(--border-hover); box-shadow: 0 16px 40px rgba(0,0,0,0.2); }
+.example-card:hover::before { transform: scaleX(1); }
+.example-card .ex-amount {
+  font-size: 36px; font-weight: 900; font-family: 'JetBrains Mono', monospace;
+  background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.example-card .ex-amount-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+.example-card .ex-list { list-style: none; text-align: left; }
+.example-card .ex-list li {
+  display: flex; align-items: center; gap: 10px; padding: 8px 0;
+  font-size: 14px; color: var(--text); line-height: 1.5;
+}
+.example-card .ex-list li .qty {
+  font-weight: 800; color: var(--primary-light); font-family: 'JetBrains Mono', monospace;
+  flex-shrink: 0; min-width: 36px;
+}
+
+/* Calculator widget */
+.credits-calculator {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 40px; margin-top: 48px; position: relative; overflow: hidden;
+}
+.credits-calculator::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--gradient-1);
+}
+.credits-calculator h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+.credits-calculator p { font-size: 15px; color: var(--text-muted); margin-bottom: 28px; }
+
+.calc-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.calc-row label { font-size: 15px; font-weight: 600; flex-shrink: 0; width: 180px; }
+.calc-row select {
+  flex: 1; padding: 12px 16px; border-radius: 12px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  color: var(--text); font-size: 15px; font-family: inherit;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.calc-row select:focus { outline: none; border-color: var(--primary); }
+.calc-row input[type="range"] {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 6px; border-radius: 3px;
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  cursor: pointer;
+}
+.calc-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--gradient-1); cursor: pointer;
+  box-shadow: 0 2px 10px var(--primary-glow);
+  transition: transform 0.2s;
+}
+.calc-row input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.calc-row .calc-value {
+  font-size: 18px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+  color: var(--primary-light); min-width: 80px; text-align: right;
+}
+
+.calc-result {
+  margin-top: 28px; padding: 24px; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.06) 0%, rgba(236, 72, 153, 0.04) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.15);
+  text-align: center;
+}
+.calc-result .label { font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.calc-result .value {
+  font-size: 48px; font-weight: 900; font-family: 'JetBrains Mono', monospace;
+  background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: transform 0.3s;
+}
+.calc-result .subtext { font-size: 14px; color: var(--text-muted); margin-top: 8px; }
+
+/* ─── Content/Info Section ─── */
+.content-section { padding: 120px 40px; max-width: 1280px; margin: 0 auto; position: relative; z-index: 2; }
+.content-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 48px; }
+.content-block {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+  padding: 40px; transition: all 0.4s; position: relative; overflow: hidden;
+}
+.content-block::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: var(--gradient-1); transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.content-block:hover { border-color: var(--border-hover); transform: translateY(-6px); box-shadow: 0 16px 50px rgba(0,0,0,0.3); }
+.content-block:hover::after { transform: scaleX(1); }
+.content-block h3 { font-size: 24px; font-weight: 700; margin-bottom: 14px; letter-spacing: -0.5px; }
+.content-block p { font-size: 16px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.7; }
+.content-block ul { list-style: none; }
+.content-block ul li {
+  display: flex; align-items: flex-start; gap: 12px; padding: 10px 0;
+  font-size: 15px; color: var(--text); line-height: 1.5;
+  transition: transform 0.2s, color 0.2s;
+}
+.content-block ul li:hover { transform: translateX(8px); color: var(--primary-light); }
+.content-block ul li::before {
+  content: '▸'; color: var(--primary-light); font-weight: 700; flex-shrink: 0; font-size: 18px;
+}
+
+/* ─── Stats Band ─── */
+.stats-band {
+  background: linear-gradient(135deg, #12121a 0%, #1a1a2e 50%, #12121a 100%);
+  padding: 72px 40px; margin: 48px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  position: relative; z-index: 2; overflow: hidden;
+}
+.stats-band::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse 60% 80% at center, rgba(168, 85, 247, 0.04) 0%, transparent 60%);
+}
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 32px; max-width: 1280px; margin: 0 auto; text-align: center; position: relative; }
+.stat-item { transition: transform 0.3s; }
+.stat-item:hover { transform: translateY(-6px); }
+.stat-item .num {
+  font-size: 48px; font-weight: 800; font-family: 'JetBrains Mono', monospace;
+  background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.stat-item:hover .num { transform: scale(1.12); }
+.stat-item .label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 8px; font-weight: 600; }
+
+/* ─── CTA ─── */
+.cta-section { padding: 120px 40px; text-align: center; max-width: 900px; margin: 0 auto; position: relative; z-index: 2; }
+.cta-box {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(236, 72, 153, 0.04) 50%, rgba(129, 140, 248, 0.06) 100%);
+  border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 32px;
+  padding: 72px 48px; position: relative; overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+.cta-box::before {
+  content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.04) 0%, transparent 50%);
+  animation: rotate 30s linear infinite;
+}
+.cta-box::after {
+  content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
+  border-radius: 32px;
+  background: var(--gradient-1); opacity: 0; filter: blur(30px);
+  transition: opacity 0.5s; z-index: -1;
+}
+.cta-box:hover::after { opacity: 0.15; }
+@keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.cta-box h2 { font-size: clamp(30px, 4.5vw, 46px); font-weight: 800; margin-bottom: 20px; position: relative; letter-spacing: -1.5px; }
+.cta-box h2 .grad { background: var(--gradient-anim); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: gradientShift 4s ease infinite; }
+.cta-box p { font-size: 18px; color: var(--text-muted); margin-bottom: 36px; position: relative; }
+.cta-box .hero-actions { position: relative; }
+
+/* ─── Footer ─── */
+.footer { border-top: 1px solid var(--border); padding: 72px 40px 36px; background: #08080d; position: relative; z-index: 2; }
+.footer-content { max-width: 1280px; margin: 0 auto; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+.footer-brand h3 { font-size: 22px; font-weight: 800; margin-bottom: 14px; letter-spacing: -0.5px; }
+.footer-brand p { font-size: 15px; color: var(--text-muted); max-width: 320px; line-height: 1.7; }
+.footer-col h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); margin-bottom: 18px; }
+.footer-col a { display: block; font-size: 15px; color: var(--text); padding: 6px 0; transition: color 0.2s, transform 0.2s; }
+.footer-col a:hover { color: var(--primary-light); transform: translateX(6px); }
+.footer-bottom {
+  padding-top: 32px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--text-dim);
+}
+.footer-social { display: flex; gap: 12px; }
+.footer-social a {
+  width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.footer-social a:hover { border-color: var(--primary); background: rgba(168, 85, 247, 0.08); transform: translateY(-4px) scale(1.1); }
+
+/* ─── Reveal Animation ─── */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+.reveal.active { opacity: 1; transform: translateY(0); }
+
+/* ─── Shimmer effect on scroll ─── */
+.shimmer-text {
+  background: var(--gradient-anim);
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease infinite;
+}
+
+/* ─── Tilt wrapper ─── */
+.tilt-wrapper { perspective: 1000px; }
+
+/* ─── Mobile ─── */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav { padding: 14px 20px; }
+  .nav.scrolled { padding: 10px 20px; }
+  .section, .pricing-section, .content-section, .arch-section { padding: 80px 20px; }
+  .hero { padding: 120px 20px 60px; }
+  .hero-stats { gap: 28px; }
+  .hero-stat-num { font-size: 32px; }
+  .content-blocks { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+  .cta-box { padding: 48px 28px; }
+  .pricing-card { padding: 32px 24px; }
+  .pricing-price .amount { font-size: 44px; }
+  .cursor-glow { display: none; }
+  #particles { opacity: 0.3; }
+}
+
+/* ─── Tools Arsenal Section ─── */
+.tools-section {
+  padding: 140px 40px 100px;
+  max-width: 1280px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* Radar pulse from section center */
+.tools-radar {
+  position: absolute;
+  top: 25%; left: 50%;
+  width: 200px; height: 200px;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  pointer-events: none;
+}
+.tools-radar::before,
+.tools-radar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(168, 85, 247, 0.15);
+  animation: radarPulse 4s ease-out infinite;
+}
+.tools-radar::after {
+  animation-delay: 2s;
+}
+@keyframes radarPulse {
+  0% { transform: scale(0.3); opacity: 1; border-width: 2px; }
+  100% { transform: scale(4); opacity: 0; border-width: 0.5px; }
+}
+
+.tools-bg-glow {
+  position: absolute;
+  top: 20%; left: 50%;
+  width: 700px; height: 500px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
+  filter: blur(80px);
+  z-index: -1;
+  animation: toolsGlow 8s ease-in-out infinite;
+}
+@keyframes toolsGlow {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.6; }
+  50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+}
+
+/* Animated counter for "44" */
+.tools-counter {
+  display: inline-flex;
+  align-items: baseline;
+  position: relative;
+}
+.tools-counter-num {
+  background: linear-gradient(135deg, #a78bfa 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+/* Category filter pills */
+.tools-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 32px 0 8px;
+}
+.tool-filter {
+  padding: 8px 18px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+.tool-filter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(236,72,153,0.2));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tool-filter:hover {
+  color: var(--text);
+  border-color: rgba(168,85,247,0.3);
+  transform: translateY(-2px);
+}
+.tool-filter.active {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(135deg, rgba(168,85,247,0.3), rgba(236,72,153,0.3));
+  box-shadow: 0 4px 15px rgba(168,85,247,0.2);
+}
+.tool-filter .filter-count {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-left: 4px;
+}
+
+/* Marquee */
+.marquee-wrapper {
+  overflow: hidden;
+  width: 100%;
+  margin: 24px 0;
+  mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+.marquee-wrapper-reverse {
+  margin-top: -8px;
+}
+.marquee {
+  display: flex;
+  gap: 14px;
+  width: max-content;
+  animation: marqueeScroll 45s linear infinite;
+}
+.marquee-right {
+  animation: marqueeScrollRight 38s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marqueeScrollRight {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  border-radius: 100px;
+  background: var(--tool-bg, rgba(168, 85, 247, 0.08));
+  border: 1px solid rgba(168, 85, 247, 0.15);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+/* Holographic shimmer sweep on marquee items */
+.marquee-item::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  animation: shimmerSweep 3s ease-in-out infinite;
+}
+@keyframes shimmerSweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+.marquee-item:hover {
+  transform: translateY(-4px) scale(1.08);
+  border-color: var(--tool-fg, var(--primary));
+  box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 30px var(--tool-bg);
+  background: var(--tool-bg);
+}
+.marquee-item:hover::after {
+  display: none;
+}
+.marquee-icon {
+  font-size: 20px;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: inline-block;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+@keyframes iconFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+.marquee-item:hover .marquee-icon {
+  transform: scale(1.3) rotate(-8deg);
+  animation: none;
+}
+.marquee-name {
+  color: var(--tool-fg, var(--primary-light));
+  letter-spacing: -0.3px;
+}
+
+/* Tools Grid */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 32px;
+}
+.tool-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  border-radius: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.4s ease,
+              border-color 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  /* Stagger reveal */
+  opacity: 0;
+  transform: translateY(30px) scale(0.95);
+}
+.tool-chip.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+/* Animated gradient top border */
+.tool-chip::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--tool-fg, var(--primary)), transparent);
+  background-size: 200% 100%;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.5s ease;
+}
+.tool-chip:hover::before {
+  transform: scaleX(1);
+  animation: borderFlow 2s linear infinite;
+}
+@keyframes borderFlow {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+/* Holographic radial glow */
+.tool-chip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 0%), var(--tool-bg, transparent) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.tool-chip:hover {
+  border-color: var(--tool-fg, var(--primary));
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 30px var(--tool-bg);
+}
+.tool-chip:hover::after { opacity: 1; }
+.tool-chip-icon {
+  font-size: 32px;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: inline-block;
+  animation: iconFloatCard 4s ease-in-out infinite;
+}
+@keyframes iconFloatCard {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  33% { transform: translateY(-3px) rotate(-2deg); }
+  66% { transform: translateY(2px) rotate(2deg); }
+}
+.tool-chip:hover .tool-chip-icon {
+  transform: scale(1.25) rotate(-8deg);
+  animation: none;
+}
+.tool-chip-name {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tool-fg, var(--primary-light));
+  letter-spacing: -0.3px;
+}
+.tool-chip-cat {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+/* Power level bar */
+.tool-chip-power {
+  height: 3px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.05);
+  overflow: hidden;
+  margin-top: 4px;
+}
+.tool-chip-power-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--tool-fg, var(--primary)), transparent);
+  width: 0;
+  transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tool-chip.revealed .tool-chip-power-fill {
+  width: var(--power, 80%);
+}
+/* Category badge on card */
+.tool-chip-badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 100px;
+  background: var(--tool-bg, rgba(168,85,247,0.1));
+  color: var(--tool-fg, var(--primary-light));
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tool-chip:hover .tool-chip-badge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Filtered out animation */
+.tool-chip.filtered-out {
+  opacity: 0.15;
+  transform: scale(0.9);
+  filter: grayscale(1);
+  pointer-events: none;
+}
+
+.tools-cta {
+  text-align: center;
+  margin-top: 48px;
+}
+
+/* Stats bar */
+.tools-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 24px 0 0;
+  flex-wrap: wrap;
+}
+.tools-stat {
+  text-align: center;
+}
+.tools-stat-num {
+  font-size: 24px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  background: linear-gradient(135deg, #a78bfa, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.tools-stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .tools-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .tool-chip { padding: 16px; }
+  .tool-chip-icon { font-size: 26px; }
+  .marquee-item { padding: 10px 18px; font-size: 13px; }
+  .tools-section { padding: 80px 20px; }
+  .tools-stats { gap: 20px; }
+  .tools-stat-num { font-size: 18px; }
+}
+
+
+
+/* ═══ EvolvixOS Modern Animated Logo ═══ */
+.evolvix-logo, .evolvix-logo-lg { display: inline-block; }
+.evolvix-logo { width: 36px; height: 36px; }
+.evolvix-logo-lg { width: 64px; height: 64px; }
+.evolvix-logo path, .evolvix-logo-lg path { transition: all 0.3s ease; }
+.logo-glow-container { animation: logoBreathe 4s ease-in-out infinite; }
+@keyframes logoBreathe { 0%,100% { filter: drop-shadow(0 0 4px rgba(217,70,239,0.3)); } 50% { filter: drop-shadow(0 0 12px rgba(217,70,239,0.5)); } }
+.nav-logo:hover .evolvix-logo { transform: scale(1.08) rotate(-5deg); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.nav-logo .evolvix-logo { transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+
+
+/* ═══ Animated Background System ═══ */
+.bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.5; }
+.bg-aurora { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; }
+.bg-aurora-band { position: absolute; width: 200%; height: 300px; opacity: 0.15; border-radius: 50%; filter: blur(60px); }
+.bg-aurora-1 { background: linear-gradient(90deg, transparent, #a855f7, #d946ef, transparent); top: -10%; left: -50%; animation: auroraDrift 20s ease-in-out infinite; }
+.bg-aurora-2 { background: linear-gradient(90deg, transparent, #ec4899, #6366f1, transparent); top: 30%; left: -60%; animation: auroraDrift 25s ease-in-out infinite reverse; animation-delay: -8s; }
+.bg-aurora-3 { background: linear-gradient(90deg, transparent, #6366f1, #a855f7, transparent); bottom: -10%; left: -50%; animation: auroraDrift 30s ease-in-out infinite; animation-delay: -15s; }
+@keyframes auroraDrift { 0% { transform: translateX(0) translateY(0) rotate(0deg); } 33% { transform: translateX(30%) translateY(20px) rotate(5deg); } 66% { transform: translateX(-10%) translateY(-15px) rotate(-3deg); } 100% { transform: translateX(0) translateY(0) rotate(0deg); } }
+.bg-grid { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.03;
+  background-image: linear-gradient(rgba(139,92,246,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.3) 1px, transparent 1px);
+  background-size: 50px 50px; animation: gridMove 40s linear infinite; }
+@keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 50px 50px; } }
+.bg-noise { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.015;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+
+/* ═══ Enhanced Animated Background ═══ */
+.bg-canvas { opacity: 0.8 !important; }
+.bg-aurora-band { opacity: 0.25 !important; filter: blur(50px) !important; }
+.bg-grid { opacity: 0.05 !important; }
+.plat-orb { opacity: 0.15 !important; filter: blur(80px) !important; }
+
+/* Mouse-following glow */
+.bg-mouse-glow { z-index: -1;
+  position: fixed; width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 60%);
+  pointer-events: none; z-index: 0; transition: transform 0.15s ease-out;
+  left: -300px; top: -300px; mix-blend-mode: screen;
+}
+
+/* Shooting stars */
+.bg-shooting-star {
+  position: fixed; width: 2px; height: 2px; background: #fff; border-radius: 50%;
+  pointer-events: none; z-index: 0; opacity: 0;
+  box-shadow: 0 0 6px #fff, 0 0 12px rgba(217,70,239,0.5);
+}
+.bg-shooting-star::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 80px; height: 1px;
+  background: linear-gradient(90deg, rgba(217,70,239,0.6), transparent);
+  transform: translateX(-80px); border-radius: 50%;
+}
+@keyframes shootStar {
+  0% { opacity: 0; transform: translate(0, 0) rotate(45deg); }
+  10% { opacity: 1; }
+  100% { opacity: 0; transform: translate(300px, 300px) rotate(45deg); }
+}
+
+/* ═══ Enhanced Logo Animation ═══ */
+.evolvix-logo, .evolvix-logo-lg { filter: drop-shadow(0 0 8px rgba(217,70,239,0.4)) drop-shadow(0 0 16px rgba(168,85,247,0.2)); }
+.logo-glow-container { animation: logoBreathe 3s ease-in-out infinite !important; }
+@keyframes logoBreathe {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(217,70,239,0.4)) drop-shadow(0 0 12px rgba(168,85,247,0.2)); }
+  50% { filter: drop-shadow(0 0 16px rgba(217,70,239,0.6)) drop-shadow(0 0 24px rgba(168,85,247,0.4)); }
+}
+.nav-logo:hover .evolvix-logo { transform: scale(1.15) rotate(-8deg) !important; }
+
+/* Logo entrance animation */
+@keyframes logoEntrance {
+  0% { opacity: 0; transform: scale(0.3) rotate(-180deg); }
+  60% { opacity: 1; transform: scale(1.1) rotate(10deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+.logo-glow-container { animation: logoBreathe 3s ease-in-out infinite, logoEntrance 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+
+/* Large logo morphing ring */
+@keyframes morphRing {
+  0%, 100% { stroke-dasharray: 100 200; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 150 150; stroke-dashoffset: -50; }
+}
+
+
+/* ═══ DRAMATIC Background Override ═══ */
+.bg-canvas { opacity: 0.7 !important; z-index: -1 !important; }
+.bg-aurora-band { opacity: 0.35 !important; filter: blur(40px) !important; height: 400px !important; }
+.bg-aurora-1 { animation-duration: 15s !important; }
+.bg-aurora-2 { animation-duration: 18s !important; }
+.bg-aurora-3 { animation-duration: 22s !important; }
+.bg-grid { opacity: 0.06 !important; background-size: 40px 40px !important; }
+.plat-orb { opacity: 0.2 !important; filter: blur(60px) !important; }
+.bg-mouse-glow { z-index: -1;
+  width: 800px !important; height: 800px !important;
+  background: radial-gradient(circle, rgba(168,85,247,0.12) 0%, rgba(217,70,239,0.06) 30%, transparent 60%) !important;
+}
+
+</style>
+</head>
+<body><div class="bg-mouse-glow"></div>
+
+<!-- ═══ Animated Background ═══ -->
+<canvas class="bg-canvas" id="bgParticleCanvas"></canvas>
+<div class="bg-aurora">
+  <div class="bg-aurora-band bg-aurora-1"></div>
+  <div class="bg-aurora-band bg-aurora-2"></div>
+  <div class="bg-aurora-band bg-aurora-3"></div>
+</div>
+<div class="bg-grid"></div>
+<div class="bg-noise"></div>
+
+
+<!-- Scroll progress bar -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- Cursor glow follower -->
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- Back to top button -->
+<button class="back-to-top" id="backToTop" aria-label="Back to top">&#8593;</button>
+
+<!-- Particle network canvas -->
+<canvas id="particles"></canvas>
+
+<!-- ═══ NAV ═══ -->
+<nav class="nav" id="nav">
+  <a href="#" class="nav-logo">
+    <div class="logo-glow-container"><svg viewBox="0 0 40 40" class="evolvix-logo" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="elix-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"><animate attributeName="stop-color" values="#a855f7;#ec4899;#d946ef;#a855f7" dur="4s" repeatCount="indefinite"/></stop>
+      <stop offset="50%" stop-color="#d946ef"><animate attributeName="stop-color" values="#d946ef;#a855f7;#ec4899;#d946ef" dur="4s" repeatCount="indefinite"/></stop>
+      <stop offset="100%" stop-color="#ec4899"><animate attributeName="stop-color" values="#ec4899;#d946ef;#a855f7;#ec4899" dur="4s" repeatCount="indefinite"/></stop>
+    </linearGradient>
+    <linearGradient id="elix-grad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#d946ef" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#a855f7" stop-opacity="0.3"/>
+    </linearGradient>
+    <filter id="elix-glow"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <!-- Outer hexagon ring -->
+  <path d="M20 3 L34 11 L34 29 L20 37 L6 29 L6 11 Z" stroke="url(#elix-grad)" stroke-width="1.5" fill="none" opacity="0.4">
+    <animateTransform attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="20s" repeatCount="indefinite"/>
+  </path>
+  <!-- Inner gem -->
+  <path d="M20 7 L30 13 L30 27 L20 33 L10 27 L10 13 Z" fill="url(#elix-grad)" filter="url(#elix-glow)">
+    <animate attributeName="opacity" values="0.85;1;0.85" dur="3s" repeatCount="indefinite"/>
+  </path>
+  <!-- Facet lines -->
+  <path d="M20 7 L20 33 M10 13 L30 27 M30 13 L10 27" stroke="url(#elix-grad2)" stroke-width="0.8" opacity="0.5">
+    <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.5s" repeatCount="indefinite"/>
+  </path>
+  <!-- Center E shape with geometric layers -->
+  <path d="M14 15 L26 15 L26 18 L17 18 L17 19 L24 19 L24 22 L17 22 L17 23 L26 23 L26 26 L14 26 Z" fill="#0a0a0f" opacity="0.85">
+    <animate attributeName="opacity" values="0.7;0.95;0.7" dur="3s" repeatCount="indefinite"/>
+  </path>
+  <!-- Sparkle accent -->
+  <circle cx="30" cy="11" r="1" fill="#fff" opacity="0">
+    <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+    <animate attributeName="r" values="0.5;1.5;0.5" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+  </circle>
+  <circle cx="9" cy="28" r="0.8" fill="#fff" opacity="0">
+    <animate attributeName="opacity" values="0;0.8;0" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+    <animate attributeName="r" values="0.3;1;0.3" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
+  </circle>
+</svg></div>
+    EvolvixOS
+  </a>
+  <div class="nav-links">
+    <a href="#features">Platform</a>
+    <a href="#models">AI Models</a>
+    <a href="#tools">Tools</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#token-packs">Token Packs</a>
+    <a href="#how-credits-work">How It Works</a>
+    <a href="/platform/">Studio</a>
+    <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
+  </div>
+  <div class="nav-cta">
+    <a href="/platform/" class="btn-ghost">Sign In</a>
+    <a href="#pricing" class="btn-primary">Get Started</a>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Open Source • Self-Hosted • 281+ AI Models
+  </div>
+  <h1 id="heroTitle">
+    Engineer AI Systems<br>
+    <span class="grad" id="heroGrad">Without Limits</span>
+  </h1>
+  <p>
+    The open-source AI engineering platform that combines a full-stack engineering workbench,
+    281+ AI models, cinematic media production, and zero-knowledge dashboards —
+    all running on your own infrastructure. No vendor lock-in, no limits.
+  </p>
+  <div class="hero-actions">
+    <a href="/platform/" class="btn-magnetic primary" data-magnetic>
+      Launch Studio <span class="arrow">→</span>
+    </a>
+    <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn-magnetic ghost" data-magnetic>
+      ⭐ Star on GitHub
+    </a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num" data-count="281" data-suffix="+">0</div><div class="hero-stat-label">AI Models</div></div>
+    <div class="hero-stat"><div class="hero-stat-num" data-count="12">0</div><div class="hero-stat-label">Categories</div></div>
+    <div class="hero-stat"><div class="hero-stat-num" data-count="44">0</div><div class="hero-stat-label">Built-in Tools</div></div>
+    <div class="hero-stat"><div class="hero-stat-num" data-count="100" data-suffix="%">0</div><div class="hero-stat-label">Open Source</div></div>
+  </div>
+</section>
+
+<!-- ═══ FEATURES ═══ -->
+<section class="section" id="features">
+  <div class="section-center reveal">
+    <div class="section-tag">✨ Platform Capabilities</div>
+    <h2 class="section-title">Everything You Need to <span class="grad">Build, Ship & Scale</span></h2>
+    <p class="section-subtitle">
+      From system engineering to 4K media production, EvolvixOS gives you the full AI engineering toolkit
+      in a single, self-hosted platform. Describe what you want — we build it.
+    </p>
+  </div>
+
+  <div class="feature-grid" id="featureGrid">
+    <div class="feature-card reveal" data-tilt>
+      <div class="feature-icon">🏗️</div>
+      <h3>Engineering Workbench</h3>
+      <p>Engineer full-stack systems with a drag-and-drop page builder, entity-based CRUD APIs, and auto-generated SDKs. Just describe what you want and watch it come to life.</p>
+      <span class="tag" style="background: rgba(168, 85, 247, 0.08); color: var(--primary-light);">Self-Hosted</span>
+    </div>
+    <div class="feature-card reveal" data-tilt>
+      <div class="feature-icon">🧠</div>
+      <h3>281+ AI Models</h3>
+      <p>Access 281 AI models across 12 categories — LLMs, image generation, video, vision, 3D, audio, and more. Auto-routed to the best engine for each task via intent-based ModelRouter.</p>
+      <span class="tag" style="background: rgba(129, 140, 248, 0.08); color: var(--accent);">12 Categories</span>
+    </div>
+    <div class="feature-card reveal" data-tilt>
+      <div class="feature-icon">🎬</div>
+      <h3>Full-Stack Media Production</h3>
+      <p>Generate 4K video, AI voiceovers, professional logos, and cinematic content — all from a single prompt. Powered by SDXL, ffmpeg, Blender 3D, and neural TTS.</p>
+      <span class="tag" style="background: rgba(236, 72, 153, 0.08); color: var(--secondary);">4K Ready</span>
+    </div>
+    <div class="feature-card reveal" data-tilt>
+      <div class="feature-icon">⚡</div>
+      <h3>Entity CRUD API</h3>
+      <p>Define data models as JSON schemas and get instant PostgreSQL-backed CRUD APIs with pagination, filtering, sorting, row-level security, and auto-generated documentation.</p>
+      <span class="tag" style="background: rgba(52, 211, 153, 0.08); color: var(--success);">Auto-Generated</span>
+    </div>
+    <div class="feature-card reveal" data-tilt>
+      <div class="feature-icon">🔄</div>
+      <h3>Workflow Automation</h3>
+      <p>Schedule recurring tasks, trigger actions on entity changes, and orchestrate multi-step workflows with a visual builder. Connector-triggered automations for Slack, Calendar, and more.</p>
+      <span class="tag" style="background: rgba(168, 85, 247, 0.08); color: var(--primary-light);">Visual Builder</span>
+    </div>
+    <div class="feature-card reveal" data-tilt>
+      <div class="feature-icon">🔐</div>
+      <h3>Privacy-First Architecture</h3>
+      <p>Three privacy modes — LOCAL, HYBRID, CLOUD. Run everything on your own servers with zero reliance on paid external APIs. Your data never leaves your infrastructure.</p>
+      <span class="tag" style="background: rgba(129, 140, 248, 0.08); color: var(--accent);">Self-Hosted</span>
+    </div>
+    <div class="feature-card reveal" data-tilt>
+      <div class="feature-icon">🎙️</div>
+      <h3>Voice-Command Interface</h3>
+      <p>Alexa-style voice experience for all platform commands. Control media generation, server management, and system engineering through natural language voice commands.</p>
+      <span class="tag" style="background: rgba(236, 72, 153, 0.08); color: var(--secondary);">Hands-Free</span>
+    </div>
+    <div class="feature-card reveal" data-tilt>
+      <div class="feature-icon">🔗</div>
+      <h3>REST API & SDK</h3>
+      <p>Connect EvolvixOS to any external project via REST API. Auto-generate TypeScript and JavaScript SDKs from your entity schemas. Deploy backend functions as HTTP endpoints.</p>
+      <span class="tag" style="background: rgba(52, 211, 153, 0.08); color: var(--success);">TypeScript + JS</span>
+    </div>
+    <div class="feature-card reveal" data-tilt>
+      <div class="feature-icon">📊</div>
+      <h3>Analytics Dashboard</h3>
+      <p>Real-time analytics with Chart.js visualizations. Track entity counts, API usage, workflow executions, and user activity. Zero-knowledge dashboard for non-technical users.</p>
+      <span class="tag" style="background: rgba(245, 158, 11, 0.08); color: var(--warm);">Real-Time</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AI MODELS SHOWCASE ═══ -->
+<section class="models-section" id="models">
+  <div class="section-center reveal">
+    <div class="section-tag">🧩 AI Model Catalog</div>
+    <h2 class="section-title">281 Models. <span class="grad">12 Categories.</span> One Platform.</h2>
+    <p class="section-subtitle">
+      From text generation to 4K video, EvolvixOS auto-selects the best AI engine for every task.
+      No more juggling multiple APIs — it's all here, ready to go.
+    </p>
+  </div>
+
+  <div class="models-grid">
+    <div class="model-card reveal"><div class="emoji">💬</div><h4>LLM & Text</h4><div class="count" data-count="42">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🖼️</div><h4>Image Generation</h4><div class="count" data-count="30">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🎥</div><h4>Video Generation</h4><div class="count" data-count="61">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">👁️</div><h4>Vision & Multimodal</h4><div class="count" data-count="16">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🎙️</div><h4>Speech & Voice</h4><div class="count" data-count="21">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🎵</div><h4>Music & Audio</h4><div class="count" data-count="14">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🧊</div><h4>3D Generation</h4><div class="count" data-count="21">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">💻</div><h4>AI Coding</h4><div class="count" data-count="16">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🔍</div><h4>RAG & Agents</h4><div class="count" data-count="19">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🎛️</div><h4>Image Control</h4><div class="count" data-count="17">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">⚙️</div><h4>Local Engines</h4><div class="count" data-count="18">0</div><div class="label">Models</div></div>
+    <div class="model-card reveal"><div class="emoji">🧩</div><h4>Frameworks</h4><div class="count" data-count="6">0</div><div class="label">Models</div></div>
+  </div>
+</section>
+
+<!-- ═══ TOOLS ARSENAL ═══ -->
+<section class="tools-section" id="tools">
+  <div class="tools-radar"></div>
+  <div class="tools-bg-glow"></div>
+  <div class="section-center reveal">
+    <div class="section-tag">🛠️ Agent Toolkit</div>
+    <h2 class="section-title"><span class="tools-counter"><span class="tools-counter-num" data-count="44">0</span><span>+</span></span> Built-in <span class="grad">Tools</span></h2>
+    <p class="section-subtitle">
+      Mr. James — the built-in AI agent — has an arsenal of 44+ tools at its disposal.
+      From file operations and code execution to cloud management and media production,
+      it can autonomously build, deploy, and manage your entire stack.
+    </p>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="tools-stats reveal">
+    <div class="tools-stat"><div class="tools-stat-num" data-count="46">0</div><div class="tools-stat-label">Total Tools</div></div>
+    <div class="tools-stat"><div class="tools-stat-num" data-count="12">0</div><div class="tools-stat-label">Categories</div></div>
+    <div class="tools-stat"><div class="tools-stat-num" data-count="6">0</div><div class="tools-stat-label">AI Models</div></div>
+    <div class="tools-stat"><div class="tools-stat-num" data-count="3">0</div><div class="tools-stat-label">Comms Channels</div></div>
+  </div>
+
+  <!-- Category Filters -->
+  <div class="tools-filters reveal" id="toolFilters">
+    <div class="tool-filter active" data-cat="all">All <span class="filter-count">46</span></div>
+    <div class="tool-filter" data-cat="FILE OPS">File Ops</div>
+    <div class="tool-filter" data-cat="EXECUTION">Execution</div>
+    <div class="tool-filter" data-cat="SYSTEM">System</div>
+    <div class="tool-filter" data-cat="WEB & API">Web & API</div>
+    <div class="tool-filter" data-cat="AI MODELS">AI Models</div>
+    <div class="tool-filter" data-cat="MEMORY">Memory</div>
+    <div class="tool-filter" data-cat="CLOUD">Cloud</div>
+    <div class="tool-filter" data-cat="DEVOPS">DevOps</div>
+    <div class="tool-filter" data-cat="MEDIA">Media</div>
+    <div class="tool-filter" data-cat="BLOCKCHAIN">Blockchain</div>
+    <div class="tool-filter" data-cat="COMMS">Comms</div>
+    <div class="tool-filter" data-cat="ANALYTICS">Analytics</div>
+  </div>
+
+  <!-- Marquee Row 1 (left to right) -->
+  <div class="marquee-wrapper">
+    <div class="marquee marquee-left">
+      <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📁</span><span class="marquee-name">file_read</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📁</span><span class="marquee-name">file_list</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">✏️</span><span class="marquee-name">file_edit</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📝</span><span class="marquee-name">file_write</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📤</span><span class="marquee-name">file_upload</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">💻</span><span class="marquee-name">bash</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🐍</span><span class="marquee-name">python_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">📦</span><span class="marquee-name">sandbox_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🔧</span><span class="marquee-name">pip_install</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🔍</span><span class="marquee-name">code_analyze</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">⚙️</span><span class="marquee-name">service_check</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🔄</span><span class="marquee-name">service_restart</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🐳</span><span class="marquee-name">docker_ps</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🚀</span><span class="marquee-name">docker_restart</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">📊</span><span class="marquee-name">system_info</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🩺</span><span class="marquee-name">process_startup_check</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🌐</span><span class="marquee-name">web_search</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🔗</span><span class="marquee-name">web_fetch</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">📡</span><span class="marquee-name">http_request</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🧠</span><span class="marquee-name">smart_api_call</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🛤️</span><span class="marquee-name">api_auto_route</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🤖</span><span class="marquee-name">call_free_llm</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">👁️</span><span class="marquee-name">gemini_vision</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🗣️</span><span class="marquee-name">gemini_tts</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🎭</span><span class="marquee-name">set_persona</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🔎</span><span class="marquee-name">search_subagents</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">🧩</span><span class="marquee-name">team_memory_search</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">💾</span><span class="marquee-name">team_memory_save</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">☁️</span><span class="marquee-name">tencent_cloud</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🌿</span><span class="marquee-name">git</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">⚡</span><span class="marquee-name">skill_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🎨</span><span class="marquee-name">ui_generate</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎬</span><span class="marquee-name">video_generate</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🖼️</span><span class="marquee-name">image_generate</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎤</span><span class="marquee-name">voice_command</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎵</span><span class="marquee-name">audio_synthesize</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🔤</span><span class="marquee-name">logo_generate</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">💎</span><span class="marquee-name">3d_render</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">₿</span><span class="marquee-name">crypto_analyze</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">⛓️</span><span class="marquee-name">defi_scan</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">👛</span><span class="marquee-name">wallet_track</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">💬</span><span class="marquee-name">telegram_send</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">📱</span><span class="marquee-name">whatsapp_send</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">📧</span><span class="marquee-name">email_send</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📈</span><span class="marquee-name">analytics_query</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📉</span><span class="marquee-name">entity_aggregate</span></div>
+      <!-- Duplicate for seamless loop -->
+      <div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📁</span><span class="marquee-name">file_read</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📁</span><span class="marquee-name">file_list</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">✏️</span><span class="marquee-name">file_edit</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📝</span><span class="marquee-name">file_write</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📤</span><span class="marquee-name">file_upload</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">💻</span><span class="marquee-name">bash</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🐍</span><span class="marquee-name">python_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">📦</span><span class="marquee-name">sandbox_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🔧</span><span class="marquee-name">pip_install</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🔍</span><span class="marquee-name">code_analyze</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">⚙️</span><span class="marquee-name">service_check</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🔄</span><span class="marquee-name">service_restart</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🐳</span><span class="marquee-name">docker_ps</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🚀</span><span class="marquee-name">docker_restart</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">📊</span><span class="marquee-name">system_info</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">🩺</span><span class="marquee-name">process_startup_check</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🌐</span><span class="marquee-name">web_search</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🔗</span><span class="marquee-name">web_fetch</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">📡</span><span class="marquee-name">http_request</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🧠</span><span class="marquee-name">smart_api_call</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🛤️</span><span class="marquee-name">api_auto_route</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🤖</span><span class="marquee-name">call_free_llm</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">👁️</span><span class="marquee-name">gemini_vision</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🗣️</span><span class="marquee-name">gemini_tts</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🎭</span><span class="marquee-name">set_persona</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">🔎</span><span class="marquee-name">search_subagents</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">🧩</span><span class="marquee-name">team_memory_search</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">💾</span><span class="marquee-name">team_memory_save</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">☁️</span><span class="marquee-name">tencent_cloud</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🌿</span><span class="marquee-name">git</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">⚡</span><span class="marquee-name">skill_exec</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(52, 211, 153, 0.1);--tool-fg:#34d399"><span class="marquee-icon">🎨</span><span class="marquee-name">ui_generate</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎬</span><span class="marquee-name">video_generate</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🖼️</span><span class="marquee-name">image_generate</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎤</span><span class="marquee-name">voice_command</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🎵</span><span class="marquee-name">audio_synthesize</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">🔤</span><span class="marquee-name">logo_generate</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(236, 72, 153, 0.1);--tool-fg:#ec4899"><span class="marquee-icon">💎</span><span class="marquee-name">3d_render</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">₿</span><span class="marquee-name">crypto_analyze</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">⛓️</span><span class="marquee-name">defi_scan</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(245, 158, 11, 0.1);--tool-fg:#f59e0b"><span class="marquee-icon">👛</span><span class="marquee-name">wallet_track</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">💬</span><span class="marquee-name">telegram_send</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">📱</span><span class="marquee-name">whatsapp_send</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(129, 140, 248, 0.1);--tool-fg:#818cf8"><span class="marquee-icon">📧</span><span class="marquee-name">email_send</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📈</span><span class="marquee-name">analytics_query</span></div>
+<div class="marquee-item" style="--tool-bg:rgba(168, 85, 247, 0.1);--tool-fg:#c084fc"><span class="marquee-icon">📉</span><span class="marquee-name">entity_aggregate</span></div>
+    </div>
+  </div>
+
+  <!-- Interactive Grid -->
+  <div class="tools-grid" id="toolsGrid">
+    <div class="tool-chip" data-tilt data-cat="FILE OPS" style="--tool-bg:rgba(168,85,247,0.1);--tool-fg:#c084fc;--power:95%"><span class="tool-chip-badge">FILE OPS</span><span class="tool-chip-icon">📁</span><span class="tool-chip-name">file_read</span><span class="tool-chip-cat">File Ops</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="FILE OPS" style="--tool-bg:rgba(168,85,247,0.1);--tool-fg:#c084fc;--power:90%"><span class="tool-chip-badge">FILE OPS</span><span class="tool-chip-icon">📁</span><span class="tool-chip-name">file_list</span><span class="tool-chip-cat">File Ops</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="FILE OPS" style="--tool-bg:rgba(168,85,247,0.1);--tool-fg:#c084fc;--power:88%"><span class="tool-chip-badge">FILE OPS</span><span class="tool-chip-icon">✏️</span><span class="tool-chip-name">file_edit</span><span class="tool-chip-cat">File Ops</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="FILE OPS" style="--tool-bg:rgba(168,85,247,0.1);--tool-fg:#c084fc;--power:85%"><span class="tool-chip-badge">FILE OPS</span><span class="tool-chip-icon">📝</span><span class="tool-chip-name">file_write</span><span class="tool-chip-cat">File Ops</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="FILE OPS" style="--tool-bg:rgba(168,85,247,0.1);--tool-fg:#c084fc;--power:82%"><span class="tool-chip-badge">FILE OPS</span><span class="tool-chip-icon">📤</span><span class="tool-chip-name">file_upload</span><span class="tool-chip-cat">File Ops</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="EXECUTION" style="--tool-bg:rgba(52,211,153,0.1);--tool-fg:#34d399;--power:98%"><span class="tool-chip-badge">EXECUTION</span><span class="tool-chip-icon">💻</span><span class="tool-chip-name">bash</span><span class="tool-chip-cat">Execution</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="EXECUTION" style="--tool-bg:rgba(52,211,153,0.1);--tool-fg:#34d399;--power:95%"><span class="tool-chip-badge">EXECUTION</span><span class="tool-chip-icon">🐍</span><span class="tool-chip-name">python_exec</span><span class="tool-chip-cat">Execution</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="EXECUTION" style="--tool-bg:rgba(52,211,153,0.1);--tool-fg:#34d399;--power:90%"><span class="tool-chip-badge">EXECUTION</span><span class="tool-chip-icon">📦</span><span class="tool-chip-name">sandbox_exec</span><span class="tool-chip-cat">Execution</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="EXECUTION" style="--tool-bg:rgba(52,211,153,0.1);--tool-fg:#34d399;--power:85%"><span class="tool-chip-badge">EXECUTION</span><span class="tool-chip-icon">🔧</span><span class="tool-chip-name">pip_install</span><span class="tool-chip-cat">Execution</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="EXECUTION" style="--tool-bg:rgba(52,211,153,0.1);--tool-fg:#34d399;--power:80%"><span class="tool-chip-badge">EXECUTION</span><span class="tool-chip-icon">🔍</span><span class="tool-chip-name">code_analyze</span><span class="tool-chip-cat">Execution</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:92%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">⚙️</span><span class="tool-chip-name">service_check</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:88%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">🔄</span><span class="tool-chip-name">service_restart</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:85%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">🐳</span><span class="tool-chip-name">docker_ps</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:82%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">🚀</span><span class="tool-chip-name">docker_restart</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:78%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">📊</span><span class="tool-chip-name">system_info</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="SYSTEM" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:75%"><span class="tool-chip-badge">SYSTEM</span><span class="tool-chip-icon">🩺</span><span class="tool-chip-name">process_startup_check</span><span class="tool-chip-cat">System</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="WEB & API" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:96%"><span class="tool-chip-badge">WEB & API</span><span class="tool-chip-icon">🌐</span><span class="tool-chip-name">web_search</span><span class="tool-chip-cat">Web & API</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="WEB & API" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:92%"><span class="tool-chip-badge">WEB & API</span><span class="tool-chip-icon">🔗</span><span class="tool-chip-name">web_fetch</span><span class="tool-chip-cat">Web & API</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="WEB & API" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:88%"><span class="tool-chip-badge">WEB & API</span><span class="tool-chip-icon">📡</span><span class="tool-chip-name">http_request</span><span class="tool-chip-cat">Web & API</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="WEB & API" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:85%"><span class="tool-chip-badge">WEB & API</span><span class="tool-chip-icon">🧠</span><span class="tool-chip-name">smart_api_call</span><span class="tool-chip-cat">Web & API</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="WEB & API" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:80%"><span class="tool-chip-badge">WEB & API</span><span class="tool-chip-icon">🛤️</span><span class="tool-chip-name">api_auto_route</span><span class="tool-chip-cat">Web & API</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="WEB & API" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:75%"><span class="tool-chip-badge">WEB & API</span><span class="tool-chip-icon">🤖</span><span class="tool-chip-name">call_free_llm</span><span class="tool-chip-cat">Web & API</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="AI MODELS" style="--tool-bg:rgba(168,85,247,0.1);--tool-fg:#c084fc;--power:98%"><span class="tool-chip-badge">AI MODELS</span><span class="tool-chip-icon">👁️</span><span class="tool-chip-name">gemini_vision</span><span class="tool-chip-cat">AI Models</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="AI MODELS" style="--tool-bg:rgba(168,85,247,0.1);--tool-fg:#c084fc;--power:95%"><span class="tool-chip-badge">AI MODELS</span><span class="tool-chip-icon">🗣️</span><span class="tool-chip-name">gemini_tts</span><span class="tool-chip-cat">AI Models</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="AI MODELS" style="--tool-bg:rgba(168,85,247,0.1);--tool-fg:#c084fc;--power:85%"><span class="tool-chip-badge">AI MODELS</span><span class="tool-chip-icon">🎭</span><span class="tool-chip-name">set_persona</span><span class="tool-chip-cat">AI Models</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="AI MODELS" style="--tool-bg:rgba(168,85,247,0.1);--tool-fg:#c084fc;--power:80%"><span class="tool-chip-badge">AI MODELS</span><span class="tool-chip-icon">🔎</span><span class="tool-chip-name">search_subagents</span><span class="tool-chip-cat">AI Models</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="MEMORY" style="--tool-bg:rgba(245,158,11,0.1);--tool-fg:#f59e0b;--power:90%"><span class="tool-chip-badge">MEMORY</span><span class="tool-chip-icon">🧩</span><span class="tool-chip-name">team_memory_search</span><span class="tool-chip-cat">Memory</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="MEMORY" style="--tool-bg:rgba(245,158,11,0.1);--tool-fg:#f59e0b;--power:88%"><span class="tool-chip-badge">MEMORY</span><span class="tool-chip-icon">💾</span><span class="tool-chip-name">team_memory_save</span><span class="tool-chip-cat">Memory</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="CLOUD" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:92%"><span class="tool-chip-badge">CLOUD</span><span class="tool-chip-icon">☁️</span><span class="tool-chip-name">tencent_cloud</span><span class="tool-chip-cat">Cloud</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="DEVOPS" style="--tool-bg:rgba(52,211,153,0.1);--tool-fg:#34d399;--power:95%"><span class="tool-chip-badge">DEVOPS</span><span class="tool-chip-icon">🌿</span><span class="tool-chip-name">git</span><span class="tool-chip-cat">DevOps</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="DEVOPS" style="--tool-bg:rgba(52,211,153,0.1);--tool-fg:#34d399;--power:90%"><span class="tool-chip-badge">DEVOPS</span><span class="tool-chip-icon">⚡</span><span class="tool-chip-name">skill_exec</span><span class="tool-chip-cat">DevOps</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="DEVOPS" style="--tool-bg:rgba(52,211,153,0.1);--tool-fg:#34d399;--power:85%"><span class="tool-chip-badge">DEVOPS</span><span class="tool-chip-icon">🎨</span><span class="tool-chip-name">ui_generate</span><span class="tool-chip-cat">DevOps</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="MEDIA" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:98%"><span class="tool-chip-badge">MEDIA</span><span class="tool-chip-icon">🎬</span><span class="tool-chip-name">video_generate</span><span class="tool-chip-cat">Media</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="MEDIA" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:95%"><span class="tool-chip-badge">MEDIA</span><span class="tool-chip-icon">🖼️</span><span class="tool-chip-name">image_generate</span><span class="tool-chip-cat">Media</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="MEDIA" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:92%"><span class="tool-chip-badge">MEDIA</span><span class="tool-chip-icon">🎤</span><span class="tool-chip-name">voice_command</span><span class="tool-chip-cat">Media</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="MEDIA" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:88%"><span class="tool-chip-badge">MEDIA</span><span class="tool-chip-icon">🎵</span><span class="tool-chip-name">audio_synthesize</span><span class="tool-chip-cat">Media</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="MEDIA" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:85%"><span class="tool-chip-badge">MEDIA</span><span class="tool-chip-icon">🔤</span><span class="tool-chip-name">logo_generate</span><span class="tool-chip-cat">Media</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="MEDIA" style="--tool-bg:rgba(236,72,153,0.1);--tool-fg:#ec4899;--power:80%"><span class="tool-chip-badge">MEDIA</span><span class="tool-chip-icon">💎</span><span class="tool-chip-name">3d_render</span><span class="tool-chip-cat">Media</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="BLOCKCHAIN" style="--tool-bg:rgba(245,158,11,0.1);--tool-fg:#f59e0b;--power:92%"><span class="tool-chip-badge">BLOCKCHAIN</span><span class="tool-chip-icon">₿</span><span class="tool-chip-name">crypto_analyze</span><span class="tool-chip-cat">Blockchain</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="BLOCKCHAIN" style="--tool-bg:rgba(245,158,11,0.1);--tool-fg:#f59e0b;--power:88%"><span class="tool-chip-badge">BLOCKCHAIN</span><span class="tool-chip-icon">⛓️</span><span class="tool-chip-name">defi_scan</span><span class="tool-chip-cat">Blockchain</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="BLOCKCHAIN" style="--tool-bg:rgba(245,158,11,0.1);--tool-fg:#f59e0b;--power:85%"><span class="tool-chip-badge">BLOCKCHAIN</span><span class="tool-chip-icon">👛</span><span class="tool-chip-name">wallet_track</span><span class="tool-chip-cat">Blockchain</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="COMMS" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:95%"><span class="tool-chip-badge">COMMS</span><span class="tool-chip-icon">💬</span><span class="tool-chip-name">telegram_send</span><span class="tool-chip-cat">Comms</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="COMMS" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:92%"><span class="tool-chip-badge">COMMS</span><span class="tool-chip-icon">📱</span><span class="tool-chip-name">whatsapp_send</span><span class="tool-chip-cat">Comms</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="COMMS" style="--tool-bg:rgba(129,140,248,0.1);--tool-fg:#818cf8;--power:88%"><span class="tool-chip-badge">COMMS</span><span class="tool-chip-icon">📧</span><span class="tool-chip-name">email_send</span><span class="tool-chip-cat">Comms</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="ANALYTICS" style="--tool-bg:rgba(168,85,247,0.1);--tool-fg:#c084fc;--power:90%"><span class="tool-chip-badge">ANALYTICS</span><span class="tool-chip-icon">📈</span><span class="tool-chip-name">analytics_query</span><span class="tool-chip-cat">Analytics</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+<div class="tool-chip" data-tilt data-cat="ANALYTICS" style="--tool-bg:rgba(168,85,247,0.1);--tool-fg:#c084fc;--power:85%"><span class="tool-chip-badge">ANALYTICS</span><span class="tool-chip-icon">📉</span><span class="tool-chip-name">entity_aggregate</span><span class="tool-chip-cat">Analytics</span><div class="tool-chip-power"><div class="tool-chip-power-fill"></div></div></div>
+  </div>
+
+  <div class="tools-cta">
+    <a href="/platform/" class="btn-magnetic primary" data-magnetic>Try All Tools in Studio <span class="arrow">→</span></a>
+  </div>
+</section>
+
+
+<!-- ═══ STATS BAND ═══ -->
+<section class="stats-band">
+  <div class="stats-grid">
+    <div class="stat-item reveal"><div class="num" data-count="350" data-suffix="+">0</div><div class="label">Tests Passing</div></div>
+    <div class="stat-item reveal"><div class="num" data-count="58">0</div><div class="label">Security Patterns</div></div>
+    <div class="stat-item reveal"><div class="num" data-count="44">0</div><div class="label">Agent Tools</div></div>
+    <div class="stat-item reveal"><div class="num" data-count="217">0</div><div class="label">Agent Templates</div></div>
+    <div class="stat-item reveal"><div class="num" data-count="467">0</div><div class="label">tok/s (Groq)</div></div>
+    <div class="stat-item reveal"><div class="num" data-count="1" data-suffix="M">0</div><div class="label">Context Window</div></div>
+  </div>
+</section>
+
+<!-- ═══ ARCHITECTURE ═══ -->
+<section class="arch-section" id="architecture">
+  <div class="section-center reveal">
+    <div class="section-tag">🏗️ How It Works</div>
+    <h2 class="section-title">A Platform Built in <span class="grad">Layers</span></h2>
+    <p class="section-subtitle">
+      EvolvixOS is built on a proven layered architecture — entity-based data, auto-generated APIs,
+      and an AI-driven engineering layer, all on your own infrastructure.
+    </p>
+  </div>
+
+  <div class="arch-flow">
+    <div class="arch-layer reveal"><div class="arch-layer-num">1</div><div class="arch-layer-content"><h4>Entity Layer — Define Your Data</h4><p>JSON schemas become PostgreSQL tables instantly. Auto fields: id, created_date, updated_date, created_by.</p></div><div class="arch-layer-tag">PostgreSQL</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">2</div><div class="arch-layer-content"><h4>API Layer — Auto-Generated CRUD</h4><p>Every entity gets instant REST endpoints with pagination, sorting, filtering, and row-level security.</p></div><div class="arch-layer-tag">FastAPI</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">3</div><div class="arch-layer-content"><h4>Workbench Layer — AI-Powered Engineering</h4><p>Describe your system in natural language. The Workbench creates schemas, pages, and functions automatically.</p></div><div class="arch-layer-tag">Local LLM</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">4</div><div class="arch-layer-content"><h4>AI Layer — 281 Models, One Router</h4><p>Intent-based ModelRouter auto-selects the best engine: Groq for fast chat, Gemini for vision, SDXL for images.</p></div><div class="arch-layer-tag">ModelRouter V10</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">5</div><div class="arch-layer-content"><h4>Media Layer — Full-Stack Production</h4><p>4K video, AI voiceovers, 3D logos, and cinematic content — all from a single prompt via ffmpeg + Blender + SDXL.</p></div><div class="arch-layer-tag">ffmpeg + SDXL</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">6</div><div class="arch-layer-content"><h4>Automation Layer — Workflows & Triggers</h4><p>Schedule tasks, trigger on entity changes, orchestrate multi-step workflows. Visual builder with connector support.</p></div><div class="arch-layer-tag">CNCF SWF</div></div>
+    <div class="arch-layer reveal"><div class="arch-layer-num">7</div><div class="arch-layer-content"><h4>Security Layer — Hardened by Default</h4><p>JWT auth, OTP verification, 58 security patterns, XSS/SSRF/injection protection, audit logging, credit-based billing.</p></div><div class="arch-layer-tag">350+ Tests</div></div>
+  </div>
+</section>
+
+<!-- ═══ CONTENT / INFO ═══ -->
+<section class="content-section">
+  <div class="section-center reveal">
+    <div class="section-tag">📦 What's Inside</div>
+    <h2 class="section-title">Built for <span class="grad">Real Engineering</span></h2>
+    <p class="section-subtitle">
+      EvolvixOS isn't a wrapper around someone else's API. It's a complete, self-contained platform
+      you can run, modify, and own. Every line of code is yours.
+    </p>
+  </div>
+
+  <div class="content-blocks">
+    <div class="content-block reveal">
+      <h3>🛠️ Developer Experience</h3>
+      <p>Everything you need to engineer and ship AI-powered systems without fighting infrastructure.</p>
+      <ul>
+        <li>Auto-generated TypeScript & JavaScript SDKs from entity schemas</li>
+        <li>Deploy Python code as HTTP backend functions in one command</li>
+        <li>Visual page builder with drag-and-drop components and live preview</li>
+        <li>Public service viewer — share your services with anyone via URL</li>
+        <li>One-click engineering templates for common patterns (API Gateway, ML Pipeline, Auth Service)</li>
+        <li>API documentation auto-generated for every entity</li>
+      </ul>
+    </div>
+    <div class="content-block reveal">
+      <h3>🤖 Agent Capabilities</h3>
+      <p>Mr. James — the built-in AI agent — has 44 tools and can autonomously build, deploy, and manage.</p>
+      <ul>
+        <li>217 subagent templates across 16 categories (engineering, marketing, security)</li>
+        <li>16 MBTI personality profiles for customized interaction styles</li>
+        <li>Voice command processing (Alexa-level, smarter)</li>
+        <li>Self-improvement capabilities with self-correction</li>
+        <li>GitHub Discovery Engine — automatically learns new tools</li>
+        <li>Tencent Cloud, Google Gemini, Groq, and Kimi integrations built-in</li>
+      </ul>
+    </div>
+    <div class="content-block reveal">
+      <h3>🔒 Security & Privacy</h3>
+      <p>Built with security-first principles. Every endpoint is protected, every pattern is checked.</p>
+      <ul>
+        <li>JWT authentication with OTP verification (Brevo email delivery)</li>
+        <li>58 dangerous pattern detection (command injection, SSRF, XSS)</li>
+        <li>25 Python-specific dangerous import blocks</li>
+        <li>SSRF protection with GCP/Azure/AWS metadata endpoint blocking</li>
+        <li>152 fuzzing tests covering chained and complex attack vectors</li>
+        <li>Three privacy modes: LOCAL (fully offline), HYBRID, CLOUD</li>
+      </ul>
+    </div>
+    <div class="content-block reveal">
+      <h3>🌐 Ecosystem & Integrations</h3>
+      <p>Connect EvolvixOS to your existing tools and services out of the box.</p>
+      <ul>
+        <li>WhatsApp & Telegram bot integrations for partner-style interaction</li>
+        <li>Tencent Cloud SDK (CVM, CDB, VPC, SSL, DNS, CDN, Hunyuan AI)</li>
+        <li>TIMSDK for real-time messaging (1,000 MAU free tier)</li>
+        <li>TencentDB Agent Memory Hub for persistent team memory</li>
+        <li>CubeSandbox MicroVM isolation for untrusted code execution</li>
+        <li>Octop AI assistant integration with 217 subagent templates</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PRICING ═══ -->
+<section class="pricing-section" id="pricing">
+  <div class="section-center reveal">
+    <div class="section-tag">💎 Subscription Plans</div>
+    <h2 class="section-title">Simple, Transparent <span class="grad">Pricing</span></h2>
+    <p class="section-subtitle">
+      Start free, scale as you grow. Every plan includes the full platform —
+      the difference is compute power and model access. No hidden fees, no surprises.
+    </p>
+  </div>
+
+  <!-- Billing Toggle -->
+  <div class="billing-toggle reveal">
+    <span class="billing-toggle-label active" id="monthlyLabel">Monthly</span>
+    <div class="billing-toggle-switch" id="billingSwitch" role="switch" aria-label="Toggle annual billing"></div>
+    <span class="billing-toggle-label" id="annualLabel">Annual</span>
+    <span class="billing-save-badge">Save 20%</span>
+  </div>
+
+  <div class="pricing-grid">
+    <div class="pricing-card reveal" data-tilt>
+      <div class="pricing-feature-count">5 features</div>
+      <div class="pricing-name">🆓 Free</div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="0" data-monthly="0" data-annual="0">0</span><span class="period">/month</span></div>
+      <p class="pricing-desc">Perfect for exploring the platform and engineering your first AI systems.</p>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> 1 AI Agent</li>
+        <li><span class="check">✓</span> 3 Entities</li>
+        <li><span class="check">✓</span> 1 Backend Function</li>
+        <li><span class="check">✓</span> Free AI Models (GLM, Nemotron, GPT-OSS)</li>
+        <li><span class="check">✓</span> Community Support</li>
+      </ul>
+      <a href="/platform/" class="pricing-cta secondary" data-magnetic>Start Free</a>
+    </div>
+    <div class="pricing-card reveal" data-tilt>
+      <div class="pricing-feature-count">7 features</div>
+      <div class="pricing-name">🌱 Starter</div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="9" data-monthly="9" data-annual="7">0</span><span class="period">/month</span></div>
+      <p class="pricing-desc">For hobbyists and indie devs building their first AI projects.</p>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> 5 AI Agents</li>
+        <li><span class="check">✓</span> 10 Entities</li>
+        <li><span class="check">✓</span> 5 Backend Functions</li>
+        <li><span class="check">✓</span> 3 Workflows</li>
+        <li><span class="check">✓</span> Standard AI Models (GLM 5, GPT-OSS, DeepSeek, Kimi)</li>
+        <li><span class="check">✓</span> Email Support</li>
+        <li><span class="check">✓</span> No rate limits</li>
+      </ul>
+      <a href="/platform/" class="pricing-cta secondary" data-magnetic>Start Starter</a>
+    </div>
+    <div class="pricing-card featured reveal" data-tilt>
+      <div class="pricing-badge">★ Most Popular</div>
+      <div class="pricing-feature-count">8 features</div>
+      <div class="pricing-name">🚀 Professional</div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="29" data-monthly="29" data-annual="23">0</span><span class="period">/month</span></div>
+      <p class="pricing-desc">For developers engineering production AI systems with cloud model access.</p>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> 20 AI Agents</li>
+        <li><span class="check">✓</span> 50 Entities</li>
+        <li><span class="check">✓</span> 20 Backend Functions</li>
+        <li><span class="check">✓</span> Unlimited Workflows</li>
+        <li><span class="check">✓</span> All AI Models (Claude Sonnet 5, Gemini 3.1 Pro)</li>
+        <li><span class="check">✓</span> Priority Support</li>
+        <li><span class="check">✓</span> Scheduled Tasks</li>
+        <li><span class="check">✓</span> Custom Agent Training</li>
+      </ul>
+      <a href="/platform/" class="pricing-cta primary" data-magnetic>Start Pro Trial →</a>
+    </div>
+    <div class="pricing-card reveal" data-tilt>
+      <div class="pricing-feature-count">9 features</div>
+      <div class="pricing-name">💼 Business</div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="49" data-monthly="49" data-annual="39">0</span><span class="period">/month</span></div>
+      <p class="pricing-desc">For growing teams needing more power and collaboration.</p>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> 50 AI Agents</li>
+        <li><span class="check">✓</span> 200 Entities</li>
+        <li><span class="check">✓</span> 50 Backend Functions</li>
+        <li><span class="check">✓</span> Unlimited Workflows</li>
+        <li><span class="check">✓</span> All AI Models + Gemini 3.6 Flash</li>
+        <li><span class="check">✓</span> Scheduled Tasks</li>
+        <li><span class="check">✓</span> Analytics Dashboard</li>
+        <li><span class="check">✓</span> Team Collaboration (3 seats)</li>
+        <li><span class="check">✓</span> Email Support</li>
+      </ul>
+      <a href="/platform/" class="pricing-cta secondary" data-magnetic>Start Business</a>
+    </div>
+    <div class="pricing-card reveal" data-tilt>
+      <div class="pricing-feature-count">8 features</div>
+      <div class="pricing-name">🏢 Team</div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="99" data-monthly="99" data-annual="79">0</span><span class="period">/month</span></div>
+      <p class="pricing-desc">Unlimited everything for growing teams with advanced needs.</p>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> Unlimited AI Agents</li>
+        <li><span class="check">✓</span> Unlimited Entities</li>
+        <li><span class="check">✓</span> Unlimited Functions</li>
+        <li><span class="check">✓</span> Unlimited Workflows</li>
+        <li><span class="check">✓</span> All AI Models + Early Access</li>
+        <li><span class="check">✓</span> Team Collaboration (5 seats)</li>
+        <li><span class="check">✓</span> Custom Model Hosting</li>
+        <li><span class="check">✓</span> SLA 99.9%</li>
+      </ul>
+      <a href="/platform/" class="pricing-cta secondary" data-magnetic>Start Team</a>
+    </div>
+    <div class="pricing-card reveal" data-tilt>
+      <div class="pricing-feature-count">10 features</div>
+      <div class="pricing-name">🏛️ Enterprise</div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="199" data-monthly="199" data-annual="158">0</span><span class="period">/month</span></div>
+      <p class="pricing-desc">Dedicated infrastructure, GPU access, and enterprise-grade support.</p>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> Everything Unlimited</li>
+        <li><span class="check">✓</span> Dedicated GPU Server (Wan2.1)</li>
+        <li><span class="check">✓</span> MicroVM Sandboxing (CubeSandbox)</li>
+        <li><span class="check">✓</span> Tencent Cloud Integration</li>
+        <li><span class="check">✓</span> Custom AI Model Fine-tuning</li>
+        <li><span class="check">✓</span> Dedicated Support + SLA</li>
+        <li><span class="check">✓</span> On-Premise Deployment</li>
+        <li><span class="check">✓</span> Custom Branding</li>
+        <li><span class="check">✓</span> Source Code Access</li>
+      </ul>
+      <a href="mailto:admin@evolvixos.com" class="pricing-cta secondary" data-magnetic>Contact Sales</a>
+    </div>
+    <div class="pricing-card reveal" data-tilt>
+      <div class="pricing-feature-count">8 features</div>
+      <div class="pricing-name">👑 Enterprise+</div>
+      <div class="pricing-price"><span class="currency">$</span><span class="amount" data-count="299" data-monthly="299" data-annual="239">0</span><span class="period">/month</span></div>
+      <p class="pricing-desc">Maximum power. Dedicated server, white-label, and a dedicated AI engineer.</p>
+      <ul class="pricing-features">
+        <li><span class="check">✓</span> Everything in Enterprise</li>
+        <li><span class="check">✓</span> Dedicated Server Infrastructure</li>
+        <li><span class="check">✓</span> White-label Platform</li>
+        <li><span class="check">✓</span> Custom Integrations</li>
+        <li><span class="check">✓</span> Dedicated AI Engineer</li>
+        <li><span class="check">✓</span> 24/7 Phone Support</li>
+        <li><span class="check">✓</span> Quarterly Strategy Review</li>
+        <li><span class="check">✓</span> Custom SLA Terms</li>
+      </ul>
+      <a href="mailto:admin@evolvixos.com" class="pricing-cta secondary" data-magnetic>Contact Sales</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TOKEN PACKS ═══ -->
+<section class="token-packs-section" id="token-packs">
+  <div class="section-center reveal">
+    <div class="section-tag">🪙 Token Packs</div>
+    <h2 class="section-title">Need More Credits? <span class="grad">Buy a Token Pack</span></h2>
+    <p class="section-subtitle">
+      One-time credit purchases that never expire. Top up your account anytime —
+      no subscription needed. Credits work with all AI models on the platform.
+    </p>
+  </div>
+
+  <div class="token-packs-grid">
+    <div class="token-pack-card reveal" data-color="emerald" data-tilt>
+      <div class="pack-icon">🔋</div>
+      <div class="pack-name">Starter Pack</div>
+      <div class="pack-credits" data-count="2000" data-suffix="">0</div>
+      <div class="pack-credits-label">Credits</div>
+      <div class="pack-price"><span class="currency">$</span>5</div>
+      <div style="height: 24px;"></div>
+      <ul class="pack-features">
+        <li>All Standard Models</li>
+        <li>No Expiry</li>
+        <li>Instant Delivery</li>
+      </ul>
+      <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
+    </div>
+    <div class="token-pack-card reveal" data-color="purple" data-tilt>
+      <div class="popular-badge">★ Best Value</div>
+      <div class="pack-icon">⚡</div>
+      <div class="pack-name">Boost Pack</div>
+      <div class="pack-credits" data-count="10000" data-suffix="">0</div>
+      <div class="pack-credits-label">Credits</div>
+      <div class="pack-price"><span class="currency">$</span>20</div>
+      <div style="height: 24px;"></div>
+      <ul class="pack-features">
+        <li>All Standard + Pro Models</li>
+        <li>No Expiry</li>
+        <li>Instant Delivery</li>
+        <li>Priority Queue</li>
+      </ul>
+      <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
+    </div>
+    <div class="token-pack-card reveal" data-color="pink" data-tilt>
+      <div class="pack-icon">🚀</div>
+      <div class="pack-name">Pro Pack</div>
+      <div class="pack-credits" data-count="50000" data-suffix="">0</div>
+      <div class="pack-credits-label">Credits</div>
+      <div class="pack-price"><span class="currency">$</span>80</div>
+      <div class="pack-save">Save 20%</div>
+      <ul class="pack-features">
+        <li>All Models Including Premium</li>
+        <li>No Expiry</li>
+        <li>Instant Delivery</li>
+        <li>Priority Queue</li>
+        <li>Extended Rate Limits</li>
+      </ul>
+      <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
+    </div>
+    <div class="token-pack-card reveal" data-color="blue" data-tilt>
+      <div class="pack-icon">💎</div>
+      <div class="pack-name">Mega Pack</div>
+      <div class="pack-credits" data-count="200000" data-suffix="">0</div>
+      <div class="pack-credits-label">Credits</div>
+      <div class="pack-price"><span class="currency">$</span>250</div>
+      <div class="pack-save">Save 37%</div>
+      <ul class="pack-features">
+        <li>All Models + Early Access</li>
+        <li>No Expiry</li>
+        <li>Instant Delivery</li>
+        <li>Dedicated Queue</li>
+        <li>Extended Rate Limits</li>
+        <li>Team Sharing (5 seats)</li>
+      </ul>
+      <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
+    </div>
+    <div class="token-pack-card reveal" data-color="amber" data-tilt>
+      <div class="pack-icon">🐋</div>
+      <div class="pack-name">Whale Pack</div>
+      <div class="pack-credits" data-count="1000000" data-suffix="">0</div>
+      <div class="pack-credits-label">Credits</div>
+      <div class="pack-price"><span class="currency">$</span>1,000</div>
+      <div class="pack-save">Save 50%</div>
+      <ul class="pack-features">
+        <li>All Models + Early Access + Beta</li>
+        <li>No Expiry</li>
+        <li>Instant Delivery</li>
+        <li>Dedicated Server Queue</li>
+        <li>Unlimited Rate Limits</li>
+        <li>Team Sharing (20 seats)</li>
+        <li>Custom Model Access</li>
+      </ul>
+      <a href="/platform/" class="pack-cta" data-magnetic>Buy Now</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW CREDITS WORK ═══ -->
+<section class="credits-section" id="how-credits-work">
+  <div class="section-center reveal">
+    <div class="section-tag">🪙 How Credits Work</div>
+    <h2 class="section-title">Every Action Has a <span class="grad">Simple Price</span></h2>
+    <p class="section-subtitle">
+      Credits are the currency of EvolvixOS. Each AI call costs a small number of credits based on the model's power.
+      Your subscription includes monthly credits. Token packs add more — they never expire.
+    </p>
+  </div>
+
+  <div class="credits-layout">
+    <!-- Tier Table -->
+    <div class="credits-tier-table reveal">
+      <h3>📊 Credit Cost Per AI Call</h3>
+
+      <div class="tier-row">
+        <div class="tier-badge free">1</div>
+        <div class="tier-info">
+          <div class="tier-name">Free Models</div>
+          <div class="tier-models">GLM 5.2 Free, Nemotron 3 Super, GPT-OSS 20B, DeepSeek V4 Flash</div>
+        </div>
+        <div class="tier-cost">1<span class="per">credit / call</span></div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-badge fast">2</div>
+        <div class="tier-info">
+          <div class="tier-name">Fast Models</div>
+          <div class="tier-models">GPT-OSS 120B, GPT-OSS 20B, DeepSeek V4, Nemotron 3 Super, Gemma 4 31B</div>
+        </div>
+        <div class="tier-cost">2<span class="per">credits / call</span></div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-badge standard">3</div>
+        <div class="tier-info">
+          <div class="tier-name">Standard Models</div>
+          <div class="tier-models">Default tier — most local models and backend function calls</div>
+        </div>
+        <div class="tier-cost">3<span class="per">credits / call</span></div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-badge advanced">5</div>
+        <div class="tier-info">
+          <div class="tier-name">Advanced Models</div>
+          <div class="tier-models">GLM 5, Kimi K2, Qwen 2.5, Step 3.7</div>
+        </div>
+        <div class="tier-cost">5<span class="per">credits / call</span></div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-badge advanced">10</div>
+        <div class="tier-info">
+          <div class="tier-name">High-Tier Models</div>
+          <div class="tier-models">GLM 5.2, GLM 5.3, Claude Sonnet 5, Gemini 3.1 Pro, Kimi K2.7, Nemotron 3 Ultra, Qwen 3.8</div>
+        </div>
+        <div class="tier-cost">10<span class="per">credits / call</span></div>
+      </div>
+
+      <div class="tier-row">
+        <div class="tier-badge premium">20</div>
+        <div class="tier-info">
+          <div class="tier-name">Premium Models</div>
+          <div class="tier-models">Gemini 3.1 Pro Preview, Claude Opus, Gemini 3.7 Flash</div>
+        </div>
+        <div class="tier-cost">20<span class="per">credits / call</span></div>
+      </div>
+    </div>
+
+    <!-- Free vs Paid -->
+    <div class="credits-comparison reveal">
+      <h3>⚡ What Costs Credits?</h3>
+
+      <div class="comparison-block">
+        <div class="comparison-block-title free">✓ Always Free — 0 Credits</div>
+        <div class="comparison-item"><span class="icon free">✓</span> Create & manage entities (CRUD)</div>
+        <div class="comparison-item"><span class="icon free">✓</span> Page Builder (drag & drop)</div>
+        <div class="comparison-item"><span class="icon free">✓</span> SDK auto-generation (TS/JS)</div>
+        <div class="comparison-item"><span class="icon free">✓</span> Workflow creation & scheduling</div>
+        <div class="comparison-item"><span class="icon free">✓</span> File uploads & storage</div>
+        <div class="comparison-item"><span class="icon free">✓</span> User authentication & management</div>
+        <div class="comparison-item"><span class="icon free">✓</span> Analytics dashboard</div>
+      </div>
+
+      <div class="comparison-block">
+        <div class="comparison-block-title paid">⚡ Costs Credits Per Call</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> AI chat (any model call)</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> Backend function execution</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> AI agent task execution</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> Image generation (SDXL)</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> Voice synthesis (TTS)</div>
+        <div class="comparison-item"><span class="icon paid">⚡</span> Vision analysis (Gemini Vision)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Examples -->
+  <div class="section-center reveal" style="margin-top: 64px;">
+    <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">📦 What Can You Do With Your Credits?</h3>
+    <p style="font-size: 16px; color: var(--text-muted);">Real examples of how far your credits go.</p>
+  </div>
+
+  <div class="credits-examples">
+    <div class="example-card reveal">
+      <div class="ex-amount">100</div>
+      <div class="ex-amount-label">Credits (Free Plan)</div>
+      <ul class="ex-list">
+        <li><span class="qty">100</span> Free model AI calls</li>
+        <li><span class="qty">50</span> Fast model calls</li>
+        <li><span class="qty">20</span> High-tier model calls</li>
+        <li><span class="qty">5</span> Premium model calls</li>
+      </ul>
+    </div>
+    <div class="example-card reveal">
+      <div class="ex-amount">2,000</div>
+      <div class="ex-amount-label">Credits (Starter Plan)</div>
+      <ul class="ex-list">
+        <li><span class="qty">2,000</span> Free model calls</li>
+        <li><span class="qty">1,000</span> Fast model calls</li>
+        <li><span class="qty">200</span> High-tier model calls</li>
+        <li><span class="qty">100</span> Premium model calls</li>
+      </ul>
+    </div>
+    <div class="example-card reveal">
+      <div class="ex-amount">10,000</div>
+      <div class="ex-amount-label">Credits (Pro Plan or Boost Pack)</div>
+      <ul class="ex-list">
+        <li><span class="qty">10,000</span> Free model calls</li>
+        <li><span class="qty">5,000</span> Fast model calls</li>
+        <li><span class="qty">1,000</span> High-tier model calls</li>
+        <li><span class="qty">500</span> Premium model calls</li>
+      </ul>
+    </div>
+    <div class="example-card reveal">
+      <div class="ex-amount">1M</div>
+      <div class="ex-amount-label">Credits (Whale Pack)</div>
+      <ul class="ex-list">
+        <li><span class="qty">1M</span> Free model calls</li>
+        <li><span class="qty">500K</span> Fast model calls</li>
+        <li><span class="qty">100K</span> High-tier model calls</li>
+        <li><span class="qty">50K</span> Premium model calls</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Interactive Calculator -->
+  <div class="credits-calculator reveal">
+    <h3>🧮 Credit Calculator</h3>
+    <p>Pick a model tier and drag the slider to see how many calls you get with each plan or pack.</p>
+
+    <div class="calc-row">
+      <label>Model Tier:</label>
+      <select id="calcTier">
+        <option value="1">Free Models (1 credit/call)</option>
+        <option value="2">Fast Models (2 credits/call)</option>
+        <option value="3" selected>Standard Models (3 credits/call)</option>
+        <option value="5">Advanced Models (5 credits/call)</option>
+        <option value="10">High-Tier Models (10 credits/call)</option>
+        <option value="20">Premium Models (20 credits/call)</option>
+      </select>
+    </div>
+
+    <div class="calc-row">
+      <label>Your Credits:</label>
+      <input type="range" id="calcSlider" min="100" max="500000" value="10000" step="100">
+      <span class="calc-value" id="calcCredits">10,000</span>
+    </div>
+
+    <div class="calc-result">
+      <div class="label">You Can Make</div>
+      <div class="value" id="calcResult">3,333</div>
+      <div class="subtext" id="calcSubtext">AI calls with Standard Models</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="cta-section">
+  <div class="cta-box reveal">
+    <h2>Ready to Engineer Something <span class="grad">Extraordinary?</span></h2>
+    <p>Join the open-source AI engineering revolution. Self-host EvolvixOS today — no credit card required.</p>
+    <div class="hero-actions">
+      <a href="/platform/" class="btn-magnetic primary" data-magnetic>Launch Studio <span class="arrow">→</span></a>
+      <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn-magnetic ghost" data-magnetic>View on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>EvolvixOS</h3>
+        <p>The open-source AI engineering platform. Engineer, deploy, and scale AI-powered systems on your own infrastructure. 281+ models, zero limits.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a href="/platform/">Studio</a>
+        <a href="#features">Features</a>
+        <a href="#models">AI Models</a>
+        <a href="#tools">Tools</a>
+    <a href="#architecture">Architecture</a>
+        <a href="#pricing">Pricing</a>
+    <a href="#token-packs">Token Packs</a>
+    <a href="#how-credits-work">How It Works</a>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
+        <a href="/platform/">Documentation</a>
+        <a href="/platform/">API Reference</a>
+        <a href="/platform/">SDK Guide</a>
+        <a href="mailto:admin@evolvixos.com">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="https://github.com/Protremix/EvolvixOS" target="_blank">Open Source</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 EvolvixOS. Open-source under MIT License.</div>
+      <div class="footer-social">
+        <a href="https://github.com/Protremix/EvolvixOS" target="_blank">⌨</a>
+        <a href="#">𝕏</a>
+        <a href="#">in</a>
+        <a href="#">✉</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// MAXIMUM WOW — Animation Engine
+// ═══════════════════════════════════════════════════════════════
+
+// ─── Scroll Progress Bar ───
+const scrollProgress = document.getElementById('scrollProgress');
+window.addEventListener('scroll', () => {
+  const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+  scrollProgress.style.width = scrolled + '%';
+  const nav = document.getElementById('nav');
+  if (window.scrollY > 20) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+});
+
+// ─── Cursor Glow Follower ───
+const cursorGlow = document.getElementById('cursorGlow');
+let mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+function animateGlow() {
+  glowX += (mouseX - glowX) * 0.1;
+  glowY += (mouseY - glowY) * 0.1;
+  cursorGlow.style.transform = `translate(${glowX}px, ${glowY}px) translate(-50%, -50%)`;
+  requestAnimationFrame(animateGlow);
+}
+animateGlow();
+
+// ─── Particle Network Background ───
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.vx = (Math.random() - 0.5) * 0.4;
+    this.vy = (Math.random() - 0.5) * 0.4;
+    this.size = Math.random() * 2 + 0.5;
+    this.opacity = Math.random() * 0.3 + 0.1;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(168, 85, 247, ${this.opacity})`;
+    ctx.fill();
+  }
+}
+
+const particleCount = Math.min(80, Math.floor(window.innerWidth / 12));
+for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+function drawConnections() {
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.strokeStyle = `rgba(168, 85, 247, ${(1 - dist / 120) * 0.08})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => { p.update(); p.draw(); });
+  drawConnections();
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// ─── Hero Text Scramble Reveal ───
+class TextScramble {
+  constructor(el) {
+    this.el = el;
+    this.chars = '!<>-_\\/[]{}—=+*^?#________';
+    this.update = this.update.bind(this);
+  }
+  scramble(newText) {
+    const oldText = this.el.innerText;
+    const length = Math.max(oldText.length, newText.length);
+    const promise = new Promise(resolve => this.resolve = resolve);
+    this.queue = [];
+    for (let i = 0; i < length; i++) {
+      const from = oldText[i] || '';
+      const to = newText[i] || '';
+      const start = Math.floor(Math.random() * 30);
+      const end = start + Math.floor(Math.random() * 30);
+      this.queue.push({ from, to, start, end });
+    }
+    cancelAnimationFrame(this.frameRequest);
+    this.frame = 0;
+    this.update();
+    return promise;
+  }
+  update() {
+    let output = '';
+    let complete = 0;
+    for (let i = 0; i < this.queue.length; i++) {
+      let { from, to, start, end, char } = this.queue[i];
+      if (this.frame >= end) {
+        complete++;
+        output += to;
+      } else if (this.frame >= start) {
+        if (!char || Math.random() < 0.28) {
+          char = this.chars[Math.floor(Math.random() * this.chars.length)];
+          this.queue[i].char = char;
+        }
+        output += `<span style="opacity: 0.5; color: var(--primary-light)">${char}</span>`;
+      } else {
+        output += from;
+      }
+    }
+    this.el.innerHTML = output;
+    if (complete === this.queue.length) {
+      this.resolve();
+    } else {
+      this.frameRequest = requestAnimationFrame(this.update);
+      this.frame++;
+    }
+  }
+}
+
+// Trigger scramble on hero gradient text
+const heroGrad = document.getElementById('heroGrad');
+const fx = new TextScramble(heroGrad);
+const phrases = ['Without Limits', 'Without Boundaries', 'Without Compromise', 'Without Limits'];
+let counter = 0;
+const scrambleNext = () => {
+  fx.scramble(phrases[counter]).then(() => {
+    setTimeout(scrambleNext, 8000);
+  });
+  counter = (counter + 1) % phrases.length;
+};
+setTimeout(scrambleNext, 800);
+
+// ─── Animated Counters ───
+function animateCounter(el) {
+  const target = parseInt(el.dataset.count);
+  const suffix = el.dataset.suffix || '';
+  const duration = 2000;
+  const start = performance.now();
+  function update(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    el.textContent = Math.floor(eased * target) + suffix;
+    if (progress < 1) requestAnimationFrame(update);
+    else el.textContent = target + suffix;
+  }
+  requestAnimationFrame(update);
+}
+
+// ─── Intersection Observer for reveals + counters ───
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => {
+        entry.target.classList.add('active');
+        // Animate counters inside this element
+        entry.target.querySelectorAll('[data-count]').forEach(el => {
+          if (!el.dataset.animated) {
+            el.dataset.animated = 'true';
+            animateCounter(el);
+          }
+        });
+      }, i * 60);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Also catch standalone data-count elements
+document.querySelectorAll('[data-count]').forEach(el => {
+  if (!el.closest('.reveal')) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !el.dataset.animated) {
+          el.dataset.animated = 'true';
+          animateCounter(el);
+          obs.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+    obs.observe(el);
+  }
+});
+
+// ─── 3D Card Tilt ───
+document.querySelectorAll('[data-tilt]').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotateX = ((y - cy) / cy) * -8;
+    const rotateY = ((x - cx) / cx) * 8;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+    card.style.setProperty('--mx', `${(x / rect.width) * 100}%`);
+    card.style.setProperty('--my', `${(y / rect.height) * 100}%`);
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+// ─── Magnetic Buttons ───
+document.querySelectorAll('[data-magnetic]').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+  });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = '';
+  });
+});
+
+// ─── Smooth Scroll ───
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+
+// ─── Tool chip staggered reveal ───
+const toolObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const chips = entry.target.querySelectorAll('.tool-chip');
+      chips.forEach((chip, i) => {
+        setTimeout(() => chip.classList.add('revealed'), i * 50);
+      });
+      toolObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+const toolsGrid = document.getElementById('toolsGrid');
+if (toolsGrid) toolObserver.observe(toolsGrid);
+
+// ─── Category filter pills ───
+document.querySelectorAll('.tool-filter').forEach(filter => {
+  filter.addEventListener('click', () => {
+    document.querySelectorAll('.tool-filter').forEach(f => f.classList.remove('active'));
+    filter.classList.add('active');
+    const cat = filter.dataset.cat;
+    document.querySelectorAll('.tool-chip').forEach(chip => {
+      if (cat === 'all' || chip.dataset.cat === cat) {
+        chip.classList.remove('filtered-out');
+      } else {
+        chip.classList.add('filtered-out');
+      }
+    });
+  });
+});
+
+// ─── Enhanced 3D tilt for tool chips ───
+document.querySelectorAll('.tool-chip[data-tilt]').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotateX = ((y - cy) / cy) * -10;
+    const rotateY = ((x - cx) / cx) * 10;
+    card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px) scale(1.02)`;
+    card.style.setProperty('--mx', `${(x / rect.width) * 100}%`);
+    card.style.setProperty('--my', `${(y / rect.height) * 100}%`);
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+
+// ─── Billing toggle (monthly / annual) ───
+const billingSwitch = document.getElementById('billingSwitch');
+const monthlyLabel = document.getElementById('monthlyLabel');
+const annualLabel = document.getElementById('annualLabel');
+let isAnnual = false;
+if (billingSwitch) {
+  billingSwitch.addEventListener('click', () => {
+    isAnnual = !isAnnual;
+    billingSwitch.classList.toggle('annual', isAnnual);
+    monthlyLabel.classList.toggle('active', !isAnnual);
+    annualLabel.classList.toggle('active', isAnnual);
+    document.querySelectorAll('.pricing-price .amount').forEach(el => {
+      const monthly = el.dataset.monthly;
+      const annual = el.dataset.annual;
+      const target = isAnnual ? annual : monthly;
+      el.parentElement.classList.add('changing');
+      setTimeout(() => {
+        el.textContent = target;
+        el.parentElement.classList.remove('changing');
+      }, 200);
+    });
+  });
+}
+
+// ─── 3D tilt for pricing cards ───
+document.querySelectorAll('.pricing-card[data-tilt]').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotateX = ((y - cy) / cy) * -6;
+    const rotateY = ((x - cx) / cx) * 6;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+    card.style.setProperty('--mx', `${(x / rect.width) * 100}%`);
+    card.style.setProperty('--my', `${(y / rect.height) * 100}%`);
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+
+// ─── Back to top button ───
+const backToTop = document.getElementById('backToTop');
+if (backToTop) {
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 600) {
+      backToTop.classList.add('visible');
+    } else {
+      backToTop.classList.remove('visible');
+    }
+  });
+  backToTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+// ─── Nav active section indicator ───
+const navLinks2 = document.querySelectorAll('.nav a[href^="#"]');
+const navSections = {};
+navLinks2.forEach(link => {
+  const id = link.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) navSections[id] = { el, link };
+});
+const navObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinks2.forEach(l => l.classList.remove('active-section'));
+      if (navSections[id]) navSections[id].link.classList.add('active-section');
+    }
+  });
+}, { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' });
+Object.values(navSections).forEach(s => navObserver.observe(s.el));
+
+
+// ─── Credit Calculator ───
+(function() {
+  const tierSelect = document.getElementById('calcTier');
+  const slider = document.getElementById('calcSlider');
+  const creditsLabel = document.getElementById('calcCredits');
+  const resultEl = document.getElementById('calcResult');
+  const subtextEl = document.getElementById('calcSubtext');
+
+  const tierNames = {
+    1: 'Free Models', 2: 'Fast Models', 3: 'Standard Models',
+    5: 'Advanced Models', 10: 'High-Tier Models', 20: 'Premium Models'
+  };
+
+  function updateCalc() {
+    const cost = parseInt(tierSelect.value);
+    const credits = parseInt(slider.value);
+    const calls = Math.floor(credits / cost);
+    creditsLabel.textContent = credits.toLocaleString();
+    resultEl.textContent = calls.toLocaleString();
+    subtextEl.textContent = 'AI calls with ' + tierNames[cost];
+    // Animate result
+    resultEl.style.transform = 'scale(1.1)';
+    setTimeout(() => resultEl.style.transform = 'scale(1)', 200);
+  }
+
+  tierSelect.addEventListener('change', updateCalc);
+  slider.addEventListener('input', updateCalc);
+})();
+
+// ─── 3D tilt for token pack cards ───
+document.querySelectorAll('.token-pack-card[data-tilt]').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotateX = ((y - cy) / cy) * -8;
+    const rotateY = ((x - cx) / cx) * 8;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+    card.style.setProperty('--mx', `${(x / rect.width) * 100}%`);
+    card.style.setProperty('--my', `${(y / rect.height) * 100}%`);
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+// ─── Token pack credits counter ───
+document.querySelectorAll('.token-pack-card .pack-credits[data-count]').forEach(el => {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !el.dataset.animated) {
+        el.dataset.animated = 'true';
+        const target = parseInt(el.dataset.count);
+        const suffix = el.dataset.suffix || '';
+        const duration = 2000;
+        const start = performance.now();
+        function update(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = Math.floor(eased * target).toLocaleString() + suffix;
+          if (progress < 1) requestAnimationFrame(update);
+          else el.textContent = target.toLocaleString() + suffix;
+        }
+        requestAnimationFrame(update);
+        obs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.3 });
+  obs.observe(el);
+});
+
+// ─── Parallax orbs on mouse ───
+document.addEventListener('mousemove', e => {
+  const cx = (e.clientX / window.innerWidth - 0.5) * 30;
+  const cy = (e.clientY / window.innerHeight - 0.5) * 30;
+  document.querySelectorAll('.orb').forEach((orb, i) => {
+    const factor = (i + 1) * 0.5;
+    orb.style.transform = `translate(${cx * factor}px, ${cy * factor}px)`;
+  });
+});
+</script>
+<script>
+
+// ═══ DRAMATIC Particle Network ═══
+(function() {
+  var canvas = document.getElementById('bgParticleCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var particles = [];
+  var mouse = { x: -1000, y: -1000 };
+  var W, H;
+  var maxParticles, connectionDist;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    maxParticles = W < 768 ? 35 : 80;
+    connectionDist = W < 768 ? 120 : 200;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Colors
+  var colors = [
+    [168, 85, 247],   // purple
+    [217, 70, 239],   // fuchsia
+    [236, 72, 153],   // pink
+    [139, 92, 246],   // violet
+    [124, 58, 237],   // indigo
+  ];
+
+  for (var i = 0; i < maxParticles; i++) {
+    var c = colors[Math.floor(Math.random() * colors.length)];
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 3 + 1,
+      cr: c[0], cg: c[1], cb: c[2],
+      opacity: Math.random() * 0.5 + 0.3,
+      pulse: Math.random() * Math.PI * 2
+    });
+  }
+
+  window.addEventListener('mousemove', function(e) {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  var time = 0;
+  function animate() {
+    time += 0.01;
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw connections
+    for (var i = 0; i < particles.length; i++) {
+      for (var j = i + 1; j < particles.length; j++) {
+        var dx = particles[i].x - particles[j].x;
+        var dy = particles[i].y - particles[j].y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < connectionDist) {
+          var alpha = (1 - dist / connectionDist) * 0.3;
+          var cr = (particles[i].cr + particles[j].cr) / 2;
+          var cg = (particles[i].cg + particles[j].cg) / 2;
+          var cb = (particles[i].cb + particles[j].cb) / 2;
+          ctx.strokeStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + alpha + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+      // Mouse connection
+      var mdx = particles[i].x - mouse.x;
+      var mdy = particles[i].y - mouse.y;
+      var mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+      if (mdist < connectionDist * 2) {
+        var malpha = (1 - mdist / (connectionDist * 2)) * 0.4;
+        ctx.strokeStyle = 'rgba(' + particles[i].cr + ',' + particles[i].cg + ',' + particles[i].cb + ',' + malpha + ')';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.stroke();
+        particles[i].vx += (mdx / mdist) * 0.03;
+        particles[i].vy += (mdy / mdist) * 0.03;
+      }
+    }
+
+    // Draw particles with glow
+    for (var k = 0; k < particles.length; k++) {
+      var p = particles[k];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.pulse += 0.03;
+      if (p.x < 0) { p.x = 0; p.vx *= -1; }
+      if (p.x > W) { p.x = W; p.vx *= -1; }
+      if (p.y < 0) { p.y = 0; p.vy *= -1; }
+      if (p.y > H) { p.y = H; p.vy *= -1; }
+      p.vx *= 0.99;
+      p.vy *= 0.99;
+
+      var pulseFactor = 1 + Math.sin(p.pulse) * 0.3;
+      var r = p.r * pulseFactor;
+
+      // Outer glow
+      ctx.fillStyle = 'rgba(' + p.cr + ',' + p.cg + ',' + p.cb + ',' + (p.opacity * 0.15) + ')';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r * 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Mid glow
+      ctx.fillStyle = 'rgba(' + p.cr + ',' + p.cg + ',' + p.cb + ',' + (p.opacity * 0.3) + ')';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r * 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Core
+      ctx.fillStyle = 'rgba(' + p.cr + ',' + p.cg + ',' + p.cb + ',' + p.opacity + ')';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Draw flowing wave lines at bottom
+    ctx.strokeStyle = 'rgba(168, 85, 247, 0.08)';
+    ctx.lineWidth = 1;
+    for (var wave = 0; wave < 3; wave++) {
+      ctx.beginPath();
+      for (var x = 0; x < W; x += 5) {
+        var y = H * 0.7 + Math.sin(x * 0.01 + time + wave * 1.5) * 50 + wave * 30;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+</script>
+<script>
+// ═══ Enhanced Background: Mouse Glow + Shooting Stars ═══
+(function() {
+  // Mouse follow glow
+  var glow = document.querySelector('.bg-mouse-glow');
+  if (!glow) {
+    glow = document.createElement('div');
+    glow.className = 'bg-mouse-glow';
+    document.body.appendChild(glow);
+  }
+  var mx = 0, my = 0, gx = 0, gy = 0;
+  document.addEventListener('mousemove', function(e) { mx = e.clientX; my = e.clientY; });
+  function updateGlow() {
+    gx += (mx - gx) * 0.08;
+    gy += (my - gy) * 0.08;
+    glow.style.transform = 'translate(' + gx + 'px, ' + gy + 'px)';
+    requestAnimationFrame(updateGlow);
+  }
+  updateGlow();
+
+  // Shooting stars
+  function createStar() {
+    var star = document.createElement('div');
+    star.className = 'bg-shooting-star';
+    star.style.left = Math.random() * window.innerWidth + 'px';
+    star.style.top = Math.random() * (window.innerHeight * 0.4) + 'px';
+    star.style.animation = 'shootStar ' + (1.5 + Math.random()) + 's ease-in forwards';
+    document.body.appendChild(star);
+    setTimeout(function() { star.remove(); }, 3000);
+  }
+  setInterval(createStar, 3500);
+  setTimeout(createStar, 1000);
+  setTimeout(createStar, 2000);
+
+  // Enhance particle canvas — make particles bigger and brighter
+  var origAnimate = window.requestAnimationFrame;
+  var canvas = document.getElementById('bgParticleCanvas');
+  if (canvas) {
+    canvas.style.opacity = '0.8';
+  }
+})();
+</script>
+</body>
+</html>
