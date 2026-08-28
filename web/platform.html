@@ -1759,6 +1759,80 @@ body.light-mode {
   #mobile-sidebar { width: 280px; }
 }
 
+
+/* Page transition animations */
+.page-transition {
+    animation: pageFadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* Card stagger animation */
+.stagger-in {
+    animation: staggerIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+@keyframes staggerIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+/* Shimmer loading effect */
+.shimmer {
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+/* Glow pulse for active nav item */
+@keyframes navGlowPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+    50% { box-shadow: 0 0 12px 2px rgba(168, 85, 247, 0.3); }
+}
+.nav-item.active {
+    animation: navGlowPulse 3s ease-in-out infinite;
+}
+/* Toast slide-in improvement */
+@keyframes toastSlideIn {
+    from { opacity: 0; transform: translateX(100%) translateY(0); }
+    to { opacity: 1; transform: translateX(0) translateY(0); }
+}
+.toast {
+    animation: toastSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+/* Input focus ring animation */
+@keyframes focusRingExpand {
+    from { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); }
+    to { box-shadow: 0 0 0 4px rgba(168, 85, 247, 0); }
+}
+input:focus, textarea:focus, select:focus {
+    animation: focusRingExpand 0.6s ease-out;
+}
+/* Loading spinner pulse */
+@keyframes loadingPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+.loading-dot {
+    animation: loadingPulse 1s ease-in-out infinite;
+}
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+/* Scrollbar hover effect */
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(168, 85, 247, 0.6);
+}
+/* Button press effect */
+button:active {
+    transform: scale(0.97);
+}
+/* Smooth color transitions for all interactive elements */
+a, button, .nav-item, .card, .pricing-tier, input, select, textarea {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 </style>
   <link rel="stylesheet" href="/studio-friendly.css">
 </head>
@@ -2620,7 +2694,7 @@ body.light-mode {
     </div>
     <div class="mt-4 pt-4 border-t border-gray-800/50">
       <div class="text-xs text-gray-500 mb-2"><span style="color:#34d399;font-weight:bold;">✓</span> Always free (0 credits): Entity CRUD, Page Builder, SDK generation, Workflows, File uploads, Auth</div>
-      <div class="text-xs text-gray-500"><span style="color:#a855f7;font-weight:bold;">⚡</span> Costs credits: AI chat, Backend function calls, Agent tasks, Image generation, Voice synthesis</div>
+      <div class="text-xs text-gray-500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="display:inline;vertical-align:-2px;margin-right:4px"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" fill="url(#lightning-grad)"/></svg><defs><linearGradient id="lightning-grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#ec4899"/></linearGradient></defs> Costs credits: AI chat, Backend function calls, Agent tasks, Image generation, Voice synthesis</div>
     </div>
   </div>
 
@@ -5478,6 +5552,16 @@ function handleChatPrompt() {
 function createEntity() { showPage('pagebuilder'); }
 function createFunction() { showPage('sdk'); }
 function showWorkflowBuilder() { showPage('workflows'); }
+
+
+// Add stagger animation to cards when chat page loads
+document.addEventListener('DOMContentLoaded', function() {
+    var cards = document.querySelectorAll('#page-chat .card, #page-chat [class*="stat"]');
+    cards.forEach(function(card, i) {
+        card.classList.add('stagger-in');
+        card.style.animationDelay = (i * 0.08) + 's';
+    });
+});
 
 </script>
 </body>
