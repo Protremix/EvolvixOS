@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EvolvixOS — The AI Engineering Platform</title>
 <meta name="description" content="EvolvixOS is the open-source AI engineering platform that lets you engineer, deploy, and scale AI-powered systems with 281+ models, full-stack media production, and zero-knowledge dashboards.">
-<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/assets/evolvixos-logo-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -465,45 +465,7 @@ a { color: inherit; text-decoration: none; }
 <!-- ═══ NAV ═══ -->
 <nav class="nav" id="nav">
   <a href="#" class="nav-logo">
-    <div class="logo-glow-container"><svg viewBox="0 0 40 40" class="evolvix-logo" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="elix-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#a855f7"><animate attributeName="stop-color" values="#a855f7;#ec4899;#d946ef;#a855f7" dur="4s" repeatCount="indefinite"/></stop>
-      <stop offset="50%" stop-color="#d946ef"><animate attributeName="stop-color" values="#d946ef;#a855f7;#ec4899;#d946ef" dur="4s" repeatCount="indefinite"/></stop>
-      <stop offset="100%" stop-color="#ec4899"><animate attributeName="stop-color" values="#ec4899;#d946ef;#a855f7;#ec4899" dur="4s" repeatCount="indefinite"/></stop>
-    </linearGradient>
-    <linearGradient id="elix-grad2" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#d946ef" stop-opacity="0.6"/>
-      <stop offset="100%" stop-color="#a855f7" stop-opacity="0.3"/>
-    </linearGradient>
-    <filter id="elix-glow"><feGaussianBlur stdDeviation="1.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  </defs>
-  <!-- Outer hexagon ring -->
-  <path d="M20 3 L34 11 L34 29 L20 37 L6 29 L6 11 Z" stroke="url(#elix-grad)" stroke-width="1.5" fill="none" opacity="0.4">
-    <animateTransform attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="20s" repeatCount="indefinite"/>
-  </path>
-  <!-- Inner gem -->
-  <path d="M20 7 L30 13 L30 27 L20 33 L10 27 L10 13 Z" fill="url(#elix-grad)" filter="url(#elix-glow)">
-    <animate attributeName="opacity" values="0.85;1;0.85" dur="3s" repeatCount="indefinite"/>
-  </path>
-  <!-- Facet lines -->
-  <path d="M20 7 L20 33 M10 13 L30 27 M30 13 L10 27" stroke="url(#elix-grad2)" stroke-width="0.8" opacity="0.5">
-    <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2.5s" repeatCount="indefinite"/>
-  </path>
-  <!-- Center E shape with geometric layers -->
-  <path d="M14 15 L26 15 L26 18 L17 18 L17 19 L24 19 L24 22 L17 22 L17 23 L26 23 L26 26 L14 26 Z" fill="#0a0a0f" opacity="0.85">
-    <animate attributeName="opacity" values="0.7;0.95;0.7" dur="3s" repeatCount="indefinite"/>
-  </path>
-  <!-- Sparkle accent -->
-  <circle cx="30" cy="11" r="1" fill="#fff" opacity="0">
-    <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite" begin="0.5s"/>
-    <animate attributeName="r" values="0.5;1.5;0.5" dur="2s" repeatCount="indefinite" begin="0.5s"/>
-  </circle>
-  <circle cx="9" cy="28" r="0.8" fill="#fff" opacity="0">
-    <animate attributeName="opacity" values="0;0.8;0" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
-    <animate attributeName="r" values="0.3;1;0.3" dur="2.5s" repeatCount="indefinite" begin="1.2s"/>
-  </circle>
-</svg></div>
+    <div class="logo-glow-container"><img src="/assets/evolvixos-logo-64.png" alt="EvolvixOS" style="width:36px;height:36px;object-fit:contain;display:block;"></div>
     EvolvixOS
   </a>
   <div class="nav-links">
@@ -511,11 +473,11 @@ a { color: inherit; text-decoration: none; }
     <a href="#models">AI Models</a>
     <a href="#architecture">Architecture</a>
     <a href="#pricing">Pricing</a>
-    <a href="/platform/">Studio</a>
+    <a href="/dashboard/overview">Studio</a>
     <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
   </div>
   <div class="nav-cta">
-    <a href="/platform/" class="btn-ghost">Sign In</a>
+    <a href="/dashboard/overview" class="btn-ghost">Sign In</a>
     <a href="#pricing" class="btn-primary">Get Started</a>
   </div>
 </nav>
@@ -540,7 +502,7 @@ a { color: inherit; text-decoration: none; }
     all running on your own infrastructure.
   </p>
   <div class="hero-actions">
-    <a href="/platform/" class="btn-lg-primary">
+    <a href="/dashboard/overview" class="btn-lg-primary">
       Launch Studio →
     </a>
     <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn-lg-ghost">
@@ -935,7 +897,7 @@ a { color: inherit; text-decoration: none; }
         <li><span class="x">✕</span> <span class="label-muted">Media Production (4K Video)</span></li>
         <li><span class="x">✕</span> <span class="label-muted">Workflow Automation</span></li>
       </ul>
-      <a href="/platform/" class="pricing-cta secondary">Start Free</a>
+      <a href="/dashboard/overview" class="pricing-cta secondary">Start Free</a>
     </div>
     
     <!-- Pro -->
@@ -960,7 +922,7 @@ a { color: inherit; text-decoration: none; }
         <li><span class="x">✕</span> <span class="label-muted">4K Video Production</span></li>
         <li><span class="x">✕</span> <span class="label-muted">Voice Command Interface</span></li>
       </ul>
-      <a href="/platform/" class="pricing-cta primary">Start Pro Trial →</a>
+      <a href="/dashboard/overview" class="pricing-cta primary">Start Pro Trial →</a>
     </div>
     
     <!-- Business -->
@@ -984,7 +946,7 @@ a { color: inherit; text-decoration: none; }
         <li><span class="check">✓</span> WhatsApp + Telegram Bots</li>
         <li><span class="x">✕</span> <span class="label-muted">Dedicated GPU Server</span></li>
       </ul>
-      <a href="/platform/" class="pricing-cta secondary">Start Business Trial</a>
+      <a href="/dashboard/overview" class="pricing-cta secondary">Start Business Trial</a>
     </div>
     
     <!-- Enterprise -->
@@ -1019,7 +981,7 @@ a { color: inherit; text-decoration: none; }
     <h2>Ready to Engineer Something <span class="grad">Extraordinary?</span></h2>
     <p>Join the open-source AI engineering revolution. Self-host EvolvixOS today — no credit card required.</p>
     <div class="hero-actions">
-      <a href="/platform/" class="btn-lg-primary">Launch Studio →</a>
+      <a href="/dashboard/overview" class="btn-lg-primary">Launch Studio →</a>
       <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn-lg-ghost">View on GitHub</a>
     </div>
   </div>
@@ -1035,7 +997,7 @@ a { color: inherit; text-decoration: none; }
       </div>
       <div class="footer-col">
         <h4>Platform</h4>
-        <a href="/platform/">Studio</a>
+        <a href="/dashboard/overview">Studio</a>
         <a href="#features">Features</a>
         <a href="#models">AI Models</a>
         <a href="#architecture">Architecture</a>
@@ -1044,9 +1006,9 @@ a { color: inherit; text-decoration: none; }
       <div class="footer-col">
         <h4>Resources</h4>
         <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
-        <a href="/platform/">Documentation</a>
-        <a href="/platform/">API Reference</a>
-        <a href="/platform/">SDK Guide</a>
+        <a href="/dashboard/overview">Documentation</a>
+        <a href="/dashboard/overview">API Reference</a>
+        <a href="/dashboard/overview">SDK Guide</a>
         <a href="mailto:admin@evolvixos.com">Contact</a>
       </div>
       <div class="footer-col">

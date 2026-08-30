@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EvolvixOS — The Open-Source AI Engineering Platform</title>
 <meta name="description" content="Self-hosted AI engineering platform. Unified model routing, entity CRUD, backend functions, workflows. Yours, on your own metal.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M24 4 L42 14 V34 L24 44 L6 34 V14 Z' fill='none' stroke='%23007aff' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M16 30 L24 18 L32 30' fill='none' stroke='%23007aff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/assets/evolvixos-logo-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -988,7 +988,7 @@ footer {
 
 
 
-/* ─── Token Packs ─────────────────────────────────────────── */
+/* ─── Usage Add-ons ─────────────────────────────────────────── */
 .packs-section { background: var(--bg); padding: 80px 40px; }
 .packs-grid {
   max-width: 1200px; margin: 40px auto 0;
@@ -1020,12 +1020,12 @@ footer {
 }
 .pack-icon { width: 32px; height: 32px; margin: 0 auto 8px; }
 .pack-name { font-size: 14px; font-weight: 700; color: #1d1d1f; margin-bottom: 4px; }
-.pack-credits {
+.pack-usage {
   font-size: 28px; font-weight: 800; font-family: 'SF Mono', 'Fira Code', monospace;
   background: linear-gradient(90deg, #1d1d1f, #007aff);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
-.pack-credits-label { font-size: 10px; color: #86868b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.pack-usage-label { font-size: 10px; color: #86868b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
 .pack-price { font-size: 22px; font-weight: 700; color: #1d1d1f; margin-bottom: 4px; }
 .pack-save {
   display: inline-block; padding: 2px 8px; border-radius: 100px;
@@ -1071,20 +1071,17 @@ footer {
 <nav class="nav" id="nav">
   <div class="nav-inner">
     <a href="#" class="nav-logo">
-      <svg viewBox="0 0 48 48" fill="none">
-        <path d="M24 4 L42 14 V34 L24 44 L6 34 V14 Z" stroke="#007aff" stroke-width="2.5" stroke-linejoin="round"/>
-        <path d="M16 30 L24 18 L32 30" stroke="#007aff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+      <img src="/assets/evolvixos-logo-64.png" alt="EvolvixOS" style="width:22px;height:22px;object-fit:contain;vertical-align:middle;">
       EvolvixOS
     </a>
     <div class="nav-links">
       <a href="#features">Platform</a>
       <a href="#models">Models</a>
       <a href="#architecture">Architecture</a>
-      <a href="#pricing">Pricing</a>
+      <a href="/pricing">Pricing</a>
       <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
     </div>
-    <a href="/platform/" class="nav-cta">Launch Studio →</a>
+    <a href="/dashboard/overview" class="nav-cta">Launch Studio →</a>
   </div>
 </nav>
 
@@ -1105,14 +1102,14 @@ footer {
         <span class="hero-morph-text" id="morphText">An OS for AI engineering</span>
         <span class="hero-morph-cursor"></span>
       </div>
-      <p class="hero-sub">281 models. Five agents. Every tool local. Build, orchestrate, and ship — without leaving your infrastructure.</p>
+      <p class="hero-sub">Unified routing, entity CRUD, backend functions, workflows. Build, orchestrate, and ship — without leaving your infrastructure.</p>
       <div class="hero-stats">
-        <div class="hero-stat"><div class="hero-stat-num">281+</div><div class="hero-stat-label">AI MODELS</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">281+</div><div class="hero-stat-label">MODEL ROUTES</div></div>
         <div class="hero-stat"><div class="hero-stat-num">44+</div><div class="hero-stat-label">INTEGRATED TOOLS</div></div>
         <div class="hero-stat"><div class="hero-stat-num">350+</div><div class="hero-stat-label">SECURITY CHECKS</div></div>
       </div>
       <div class="hero-cta">
-        <a href="/platform/" class="btn btn-primary">Launch Studio</a>
+        <a href="/dashboard/overview" class="btn btn-primary">Launch Studio</a>
         <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn btn-link">View Source</a>
       </div>
     </div>
@@ -1207,7 +1204,7 @@ footer {
     <div class="model-card">
       <div class="model-name">Kimi Moonshot</div>
       <div class="model-desc">v1-32k</div>
-      <div class="model-stat"><span>Context</span><span>32K tokens</span></div>
+      <div class="model-stat"><span>Context</span><span>32K context</span></div>
     </div>
     <div class="model-card">
       <div class="model-name">Ollama</div>
@@ -1270,38 +1267,38 @@ footer {
       <div class="price-amount">€9<span class="per">/mo</span></div>
       <div class="price-desc">For trying things out</div>
       <ul class="price-features">
-        <li>2,000 credits / month</li>
-        <li>All 281+ models</li>
+        <li>2,000 API calls / month</li>
+        <li>Full routing access</li>
         <li>Local model routing</li>
         <li>Community support</li>
       </ul>
-      <a href="/platform/" class="price-btn">Start Starter</a>
+      <a href="/dashboard/overview" class="price-btn">Start Starter</a>
     </div>
     <div class="price-card featured">
       <div class="price-name">PRO</div>
       <div class="price-amount">€29<span class="per">/mo</span></div>
       <div class="price-desc">For serious builders</div>
       <ul class="price-features">
-        <li>10,000 credits / month</li>
+        <li>10,000 API calls / month</li>
         <li>All models + cloud routing</li>
         <li>Backend functions</li>
         <li>Workflow automation</li>
         <li>Priority support</li>
       </ul>
-      <a href="/platform/" class="price-btn">Start Pro</a>
+      <a href="/dashboard/overview" class="price-btn">Start Pro</a>
     </div>
     <div class="price-card">
       <div class="price-name">BUSINESS</div>
       <div class="price-amount">€49<span class="per">/mo</span></div>
       <div class="price-desc">For growing teams</div>
       <ul class="price-features">
-        <li>30,000 credits / month</li>
+        <li>30,000 API calls / month</li>
         <li>Everything in Pro</li>
         <li>Team collaboration</li>
         <li>SSO & audit logs</li>
         <li>Dedicated support</li>
       </ul>
-      <a href="/platform/" class="price-btn">Start Business</a>
+      <a href="/dashboard/overview" class="price-btn">Start Business</a>
     </div>
   </div>
 </section>
@@ -1309,17 +1306,17 @@ footer {
 <!-- More Plans -->
 <section class="packs-section" style="padding: 40px 0;">
   <div style="text-align: center; color: var(--muted); font-size: 14px;">
-    Also available: <strong>Team</strong> (€99/mo, 50K credits) · <strong>Enterprise</strong> (€199/mo, 200K credits) · <strong>Enterprise+</strong> (€299/mo, 500K credits) · <strong>20% off</strong> annual billing
+    Also available: <strong>Team</strong> (€99/mo, 50K calls) · <strong>Enterprise</strong> (€199/mo, 200K calls) · <strong>Enterprise+</strong> (€299/mo, 500K calls) · <strong>20% off</strong> annual billing
   </div>
 </section>
 
-<!-- Token Packs -->
-<section class="packs-section" id="token-packs">
-  <div class="section-label">CREDIT PACKS</div>
-  <h2 class="section-title">Buy credits, top up anytime</h2>
+<!-- Usage Add-ons -->
+<section class="packs-section" id="usage-addons">
+  <div class="section-label">USAGE ADD-ONS</div>
+  <h2 class="section-title">Buy usage add-ons, top up anytime</h2>
   <p class="section-sub">One-time purchases. Never expire. Instant delivery.</p>
-  <div class="packs-grid" id="landing-token-packs">
-    <div style="grid-column: 1/-1; text-align: center; color: #86868b; padding: 40px 0;">Loading token packs...</div>
+  <div class="packs-grid" id="landing-usage-addons">
+    <div style="grid-column: 1/-1; text-align: center; color: #86868b; padding: 40px 0;">Loading usage add-ons...</div>
   </div>
 </section>
 
@@ -1328,7 +1325,7 @@ footer {
   <h2 class="cta-title">Ready to engineer<br>something extraordinary?</h2>
   <p class="cta-sub">Open source. Self-hosted. No vendor lock-in. Just you, your metal, and 281+ AI models.</p>
   <div class="hero-cta">
-    <a href="/platform/" class="btn btn-primary">Launch Studio</a>
+    <a href="/dashboard/overview" class="btn btn-primary">Launch Studio</a>
     <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn btn-link">Star on GitHub</a>
   </div>
 </section>
@@ -1338,10 +1335,7 @@ footer {
   <div class="footer-inner">
     <div class="footer-brand">
       <div class="logo">
-        <svg viewBox="0 0 48 48" fill="none">
-          <path d="M24 4 L42 14 V34 L24 44 L6 34 V14 Z" stroke="#007aff" stroke-width="2.5" stroke-linejoin="round"/>
-          <path d="M16 30 L24 18 L32 30" stroke="#007aff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <img src="/assets/evolvixos-logo-64.png" alt="EvolvixOS" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;">
         EvolvixOS
       </div>
       <p>The open-source AI engineering platform. Built for engineers who want to own their stack.</p>
@@ -1349,10 +1343,10 @@ footer {
     <div class="footer-cols">
       <div class="footer-col">
         <h4>PRODUCT</h4>
-        <a href="/platform/">Studio</a>
+        <a href="/dashboard/overview">Studio</a>
         <a href="#features">Features</a>
-        <a href="#models">AI Models</a>
-        <a href="#pricing">Pricing</a>
+        <a href="#models">Routing</a>
+        <a href="/pricing">Pricing</a>
       </div>
       <div class="footer-col">
         <h4>RESOURCES</h4>
@@ -1364,7 +1358,7 @@ footer {
       </div>
       <div class="footer-col">
         <h4>COMPANY</h4>
-        <a href="mailto:support@evolvixos.com">Contact</a>
+        <a href="/contact">Contact</a>
         <a href="/refund-policy">Refund Policy</a>
         <a href="https://github.com/Protremix/EvolvixOS" target="_blank">Open Source</a>
       </div>
@@ -1705,7 +1699,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 (function() {
   var morphs = [
     "An OS for AI engineering",
-    "281 models, one router",
+    "Unified routing, one platform",
     "Your infrastructure, automated",
     "Self-hosted. Self-correcting.",
     "From prompt to production",
@@ -1757,8 +1751,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     { type: 'output', text: '  GET  /auth/me       \u2192 200' },
     { type: 'success', text: '\u2713 Generated 142 lines \u00b7 0 errors' },
     { type: 'spacer' },
-    { type: 'cmd', text: 'evx generate video --style cinematic' },
-    { type: 'info', text: 'Routing \u2192 pipeline: SDXL \u2192 ffmpeg' },
+        { type: 'cmd', text: 'evx entity create --name User' },
+        { type: 'info', text: 'Creating schema and CRUD endpoints...' },
     { type: 'output', text: 'Rendering scene 1/8...' },
     { type: 'output', text: 'Synthesizing voice (en-US-GuyNeural)...' },
     { type: 'success', text: '\u2713 25s video @ 4K \u00b7 8.2 MB' },
@@ -1816,14 +1810,14 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 </script>
 <script>
-// Load token packs on landing page
+// Load usage add-ons on landing page
 (function() {
-  fetch('https://evolvixos.com/platform/api/billing/token-packs')
+  fetch('https://evolvixos.com/platform/api/billing/usage-addons')
     .then(function(r) { return r.json(); })
     .then(function(data) {
       var packs = data.packs || [];
       if (!packs.length) {
-        document.getElementById('landing-token-packs').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#86868b;padding:40px 0;">Token packs coming soon.</div>';
+        document.getElementById('landing-usage-addons').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#86868b;padding:40px 0;">Usage add-ons coming soon.</div>';
         return;
       }
       var icons = { emerald: "#34c759", purple: "#007aff", pink: "#5856d6", blue: "#3b82f6", amber: "#f59e0b" };
@@ -1837,17 +1831,17 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         html += '<div class="pack-card' + featured + '">' + badge +
           '<svg class="pack-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="' + color + '" opacity="0.15"/><path d="M12 7v10M9 10l3-3 3 3M9 14l3 3 3-3" stroke="' + color + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
           '<div class="pack-name">' + pack.name + '</div>' +
-          '<div class="pack-credits">' + pack.credits.toLocaleString() + '</div>' +
-          '<div class="pack-credits-label">Credits</div>' +
+          '<div class="pack-usage">' + pack.credits.toLocaleString() + '</div>' +
+          '<div class="pack-usage-label">API Calls</div>' +
           '<div class="pack-price">$' + pack.price + '</div>' + save +
           '<ul class="pack-features">' + features + '</ul>' +
-          '<a href="/platform/" class="pack-cta">Buy Now</a>' +
+          '<a href="/dashboard/overview" class="pack-cta">Buy Now</a>' +
           '</div>';
       });
-      document.getElementById('landing-token-packs').innerHTML = html;
+      document.getElementById('landing-usage-addons').innerHTML = html;
     })
     .catch(function(e) {
-      document.getElementById('landing-token-packs').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#86868b;padding:40px 0;">Failed to load token packs.</div>';
+      document.getElementById('landing-usage-addons').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#86868b;padding:40px 0;">Failed to load usage add-ons.</div>';
     });
 })();
 </script>

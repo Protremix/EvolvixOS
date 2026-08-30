@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — EvolvixOS</title>
+<meta name="description" content="Get in touch with the EvolvixOS team.">
+<link rel="icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/assets/evolvixos-logo-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f5f7;
+  --card: #ffffff;
+  --text: #1d1d1f;
+  --muted: #6e6e73;
+  --border: #d2d2d7;
+  --accent: #007aff;
+  --accent-hover: #0056b3;
+  --radius: 12px;
+  --container: 740px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+nav { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; max-width: 1200px; margin: 0 auto; }
+.nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 18px; text-decoration: none; color: var(--text); }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; }
+.nav-links a:hover { color: var(--text); }
+main { max-width: var(--container); margin: 0 auto; padding: 80px 24px; }
+h1 { font-size: 48px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 16px; }
+.lede { font-size: 20px; color: var(--muted); margin-bottom: 48px; }
+.contact-grid { display: grid; gap: 24px; grid-template-columns: 1fr 1fr; }
+.contact-card { background: var(--card); border-radius: var(--radius); padding: 32px; border: 1px solid var(--border); }
+.contact-card h2 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.contact-card p { color: var(--muted); font-size: 15px; margin-bottom: 12px; }
+.contact-card a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.contact-card a:hover { text-decoration: underline; }
+.entity-info { background: var(--card); border-radius: var(--radius); padding: 32px; border: 1px solid var(--border); margin-top: 24px; }
+.entity-info h2 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
+.entity-info p { color: var(--muted); font-size: 14px; line-height: 1.8; }
+.entity-info strong { color: var(--text); }
+footer { text-align: center; padding: 40px 24px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 60px; }
+@media (max-width: 640px) { .contact-grid { grid-template-columns: 1fr; } h1 { font-size: 36px; } }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">
+    <img src="/assets/evolvixos-logo-64.png" alt="EvolvixOS" style="width:22px;height:22px;object-fit:contain;vertical-align:middle;">
+    EvolvixOS
+  </a>
+  <div class="nav-links">
+    <a href="/pricing">Pricing</a>
+    <a href="/terms">Terms</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/dashboard/overview">Studio</a>
+  </div>
+</nav>
+<main>
+  <h1>Contact us</h1>
+  <p class="lede">Questions, feedback, or need help? We are here for you.</p>
+  
+  <div class="contact-grid">
+    <div class="contact-card">
+      <h2>General Support</h2>
+      <p>For account questions, billing, or technical issues.</p>
+      <a href="mailto:support@evolvixos.com">support@evolvixos.com</a>
+    </div>
+    <div class="contact-card">
+      <h2>Privacy & Data</h2>
+      <p>For data requests, privacy questions, or GDPR matters.</p>
+      <a href="mailto:privacy@evolvixos.com">privacy@evolvixos.com</a>
+    </div>
+    <div class="contact-card">
+      <h2>Phone</h2>
+      <p>Monday to Friday, 9:00 to 18:00 CET.</p>
+      <a href="tel:+34711011010">+34 711 011 010</a>
+    </div>
+    <div class="contact-card">
+      <h2>Community</h2>
+      <p>Open source, issues, and contributions.</p>
+      <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub Repository</a>
+    </div>
+  </div>
+
+  <div class="entity-info">
+    <h2>Registered Entity</h2>
+    <p>
+      <strong>GOLAN EUROPE SL</strong><br>
+      Avenida Blai Bonet 8, Bloque 3, Apartamento 301<br>
+      Santa Ponça, 07180 Calvià (Illes Balears), España<br>
+      Tax ID: B16546020<br>
+      Email: <a href="mailto:support@evolvixos.com" style="color: var(--accent);">support@evolvixos.com</a><br>
+      Phone: +34 711 011 010
+    </p>
+  </div>
+</main>
+<footer>
+  &copy; 2026 GOLAN EUROPE SL. All rights reserved.
+</footer>
+</body>
+</html>
