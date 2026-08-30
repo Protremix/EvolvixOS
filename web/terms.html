@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service &middot; EvolvixOS</title>
+<meta name="description" content="The agreement between you and EvolvixOS covering the hosted platform, subscriptions, credits, and acceptable use.">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff; --bg-soft:#f5f5f7; --bg-card:#FFF; --bg-warm:#e8e8ed;
+  --text:#1d1d1f; --text-secondary:#86868b; --text-muted:#86868b;
+  --accent:#007aff; --accent-hover:#0051a8; --accent-light:#d6e4ff;
+  --border:#E5E2DA; --border-light:#EFECE4; --purple:#7C6F9E;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --serif:'Newsreader',Georgia,serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);
+  line-height:1.7;-webkit-font-smoothing:antialiased;font-size:16px}
+a{color:var(--accent);text-decoration:none;transition:color .18s ease}
+a:hover{color:var(--accent-hover);text-decoration:underline}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);
+  outline-offset:3px;border-radius:3px}
+
+/* header */
+.nav{position:sticky;top:0;z-index:50;background:rgba(250,249,246,.86);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--border-light)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:14px 28px;display:flex;
+  align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--text)}
+.brand:hover{text-decoration:none;color:var(--text)}
+.brand svg{width:30px;height:30px;display:block}
+.brand-name{font-family:var(--serif);font-size:1.22rem;font-weight:600;
+  letter-spacing:-.01em}
+.brand-name .os{background:linear-gradient(100deg,var(--accent),var(--purple));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:24px;font-size:.9rem}
+.nav-links a{color:var(--text-secondary)}
+.nav-links a:hover{color:var(--accent);text-decoration:none}
+
+/* layout */
+.wrap{max-width:1100px;margin:0 auto;padding:56px 28px 96px;
+  display:grid;grid-template-columns:224px 1fr;gap:56px;align-items:start}
+.toc{position:sticky;top:92px;font-size:.86rem}
+.toc h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--text-muted);margin-bottom:14px;font-weight:600}
+.toc ol{list-style:none;counter-reset:t}
+.toc li{counter-increment:t;margin-bottom:2px}
+.toc a{display:block;padding:5px 10px;border-radius:6px;color:var(--text-secondary);
+  border-left:2px solid transparent;line-height:1.45}
+.toc a:hover{background:var(--bg-warm);color:var(--accent);
+  border-left-color:var(--accent);text-decoration:none}
+.toc a::before{content:counter(t) ".";color:var(--text-muted);
+  margin-right:7px;font-variant-numeric:tabular-nums}
+
+.doc{min-width:0}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.11em;font-weight:600;
+  color:var(--accent);background:var(--accent-light);padding:6px 13px;
+  border-radius:100px;margin-bottom:20px}
+h1{font-family:var(--serif);font-size:clamp(2.1rem,5vw,3.1rem);font-weight:600;
+  letter-spacing:-.025em;line-height:1.1;margin-bottom:16px}
+h1 em{font-style:italic;background:linear-gradient(100deg,var(--accent),var(--purple));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lede{font-size:1.09rem;color:var(--text-secondary);max-width:62ch;margin-bottom:22px}
+.meta{font-size:.84rem;color:var(--text-muted);padding-bottom:26px;
+  border-bottom:1px solid var(--border);margin-bottom:14px}
+
+h2{font-family:var(--serif);font-size:1.52rem;font-weight:600;letter-spacing:-.015em;
+  margin:44px 0 14px;padding-top:14px;scroll-margin-top:96px}
+h2 .num{color:var(--accent);font-size:1.05rem;margin-right:11px;
+  font-family:var(--sans);font-weight:600;font-variant-numeric:tabular-nums}
+h3{font-size:1.02rem;font-weight:600;margin:26px 0 9px;color:var(--text)}
+p{margin-bottom:14px;color:var(--text-secondary);max-width:70ch}
+ul,ol{margin:0 0 15px 22px;color:var(--text-secondary);max-width:68ch}
+li{margin-bottom:7px}
+strong{color:var(--text);font-weight:600}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;
+  background:var(--bg-warm);padding:2px 6px;border-radius:4px;color:var(--text)}
+
+.callout{background:var(--bg-card);border:1px solid var(--border);
+  border-left:3px solid var(--accent);border-radius:10px;padding:18px 22px;
+  margin:22px 0;max-width:70ch}
+.callout p:last-child{margin-bottom:0}
+.callout.warm{background:var(--accent-light);border-color:var(--accent-light);
+  border-left-color:var(--accent)}
+.callout h3{margin-top:0}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.92rem;
+  background:var(--bg-card);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden}
+th,td{text-align:left;padding:11px 15px;border-bottom:1px solid var(--border-light);
+  vertical-align:top}
+th{background:var(--bg-soft);font-weight:600;font-size:.8rem;
+  text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary)}
+tbody tr:last-child td{border-bottom:none}
+td{color:var(--text-secondary)}
+
+.fill{background:#FFF8E6;border:1px dashed #D9A441;color:#8A6410;
+  padding:1px 7px;border-radius:4px;font-size:.87em;font-weight:600;
+  font-family:ui-monospace,monospace}
+
+/* footer */
+footer{border-top:1px solid var(--border);background:var(--bg-soft);
+  padding:38px 28px;text-align:center;font-size:.86rem;color:var(--text-muted)}
+.foot-links{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;
+  margin-bottom:14px}
+.foot-links a{color:var(--text-secondary)}
+
+@media(max-width:880px){
+  .wrap{grid-template-columns:1fr;gap:28px;padding:36px 22px 72px}
+  .toc{position:static;background:var(--bg-card);border:1px solid var(--border);
+    border-radius:10px;padding:18px 20px;order:-1}
+  .nav-links{display:none}
+}
+@media print{.nav,.toc,footer{display:none}.wrap{display:block;max-width:none}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="brand"><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="EvolvixOS"><defs><linearGradient id="gL" x1="0.05" y1="0" x2="0.95" y2="1"><stop offset="0" stop-color="#007aff"/><stop offset="0.42" stop-color="#0051a8"/><stop offset="1" stop-color="#5856d6"/></linearGradient></defs><path d="M26.77,5.20 Q24.00,3.60 21.23,5.20 L9.10,12.20 Q6.33,13.80 6.33,17.00 L6.33,31.00 Q6.33,34.20 9.10,35.80 L21.23,42.80 Q24.00,44.40 26.77,42.80 L38.90,35.80 Q41.67,34.20 41.67,31.00 L41.67,17.00 Q41.67,13.80 38.90,12.20 Z M13.20,28.40 L24.00,16.80 L34.80,28.40 L34.80,33.40 L24.00,21.80 L13.20,33.40 Z" fill="url(#gL)" fill-rule="evenodd"/></svg><span class="brand-name">Evolvix<span class="os">OS</span></span></a>
+    <div class="nav-links">
+      <a href="/#pricing">Pricing</a>
+      <a href="/terms">Terms</a>
+      <a href="/refund-policy">Refunds</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/platform/">Studio</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <aside class="toc">
+    <h4>On this page</h4>
+    <ol>
+        <li><a href="#s1">Who we are and what these terms cover</a></li>
+        <li><a href="#s2">Definitions</a></li>
+        <li><a href="#s3">Eligibility and your account</a></li>
+        <li><a href="#s4">Plans, billing, and our merchant of record</a></li>
+        <li><a href="#s5">How Credits work</a></li>
+        <li><a href="#s6">Acceptable use</a></li>
+        <li><a href="#s7">Third-party AI models, and your responsibility for Output</a></li>
+        <li><a href="#s8">Intellectual property</a></li>
+        <li><a href="#s9">Availability, support, and changes</a></li>
+        <li><a href="#s10">Your data and privacy</a></li>
+        <li><a href="#s11">Suspension and termination</a></li>
+        <li><a href="#s12">Disclaimers</a></li>
+        <li><a href="#s13">Limitation of liability</a></li>
+        <li><a href="#s14">Indemnity (business users)</a></li>
+        <li><a href="#s15">Changes to these Terms</a></li>
+        <li><a href="#s16">Governing law and disputes</a></li>
+        <li><a href="#s17">Other terms</a></li>
+        <li><a href="#s18">Contact</a></li>
+    </ol>
+  </aside>
+
+  <main class="doc">
+    <span class="eyebrow">Legal</span>
+    <h1>Terms of Service</h1>
+    <p class="lede">The agreement between you and EvolvixOS covering the hosted platform, subscriptions, credits, and acceptable use.</p>
+    <p class="meta">Effective 29 August 2026 &middot; Last updated 29 August 2026</p>
+
+      <h2 id="s1"><span class="num">01</span>Who we are and what these terms cover</h2>
+
+      <p>EvolvixOS ("EvolvixOS", "we", "us") is an AI engineering platform operated by
+      <span class="fill">{{LEGAL_ENTITY}}</span>, registered at <span class="fill">{{REG_ADDRESS}}</span>, tax identification number <span class="fill">{{TAX_ID}}</span>, Spain.</p>
+      <p>These Terms of Service ("Terms") form a binding agreement between you and us and
+      govern your use of the hosted EvolvixOS service at evolvixos.com, including the
+      Studio dashboard, the REST API, and any associated services (together, the
+      "Service"). By creating an account or using the Service you accept these Terms.
+      If you do not accept them, do not use the Service.</p>
+      <div class="callout">
+        <h3>The hosted Service and the open-source project are different things</h3>
+        <p>The EvolvixOS source code is published under the MIT License and you may
+        self-host it under that licence alone &mdash; these Terms do not restrict that.
+        These Terms apply only to the <strong>hosted Service we operate</strong>, which
+        includes managed infrastructure, model routing, and paid credits.</p>
+      </div>
+
+      <h2 id="s2"><span class="num">02</span>Definitions</h2>
+
+      <ul>
+        <li><strong>Account</strong> &mdash; your registered access to the Service.</li>
+        <li><strong>Credits</strong> &mdash; the unit used to meter consumption of compute
+        and AI model usage on the Service.</li>
+        <li><strong>Plan</strong> &mdash; a subscription tier that includes a recurring
+        monthly Credit allowance.</li>
+        <li><strong>Credit Pack</strong> &mdash; a one-time purchase of additional Credits.</li>
+        <li><strong>Input</strong> &mdash; prompts, files, code, and other content you
+        submit to the Service.</li>
+        <li><strong>Output</strong> &mdash; content the Service generates in response to
+        your Input.</li>
+        <li><strong>Paddle</strong> &mdash; Paddle.com Market Ltd and its affiliates, our
+        reseller and merchant of record (see section 4).</li>
+      </ul>
+
+      <h2 id="s3"><span class="num">03</span>Eligibility and your account</h2>
+
+      <p>You must be at least 18 years old and legally able to enter a contract. If you
+      use the Service for an organisation, you confirm you are authorised to bind it, and
+      "you" means that organisation.</p>
+      <p>You agree to provide accurate registration details and keep them current. You are
+      responsible for all activity under your Account and for keeping your credentials and
+      API keys confidential. Tell us promptly at <a href="mailto:info@evolvixos.com">info@evolvixos.com</a>
+      if you believe your Account has been compromised.</p>
+      <p>One person or organisation may not operate multiple free Accounts to circumvent
+      Credit allowances or rate limits.</p>
+
+      <h2 id="s4"><span class="num">04</span>Plans, billing, and our merchant of record</h2>
+
+      <div class="callout warm">
+        <p><strong>Payments are processed by Paddle, not by us.</strong> Paddle is the
+        merchant of record and the reseller of the Service. Your purchase contract for
+        payment is with Paddle, Paddle's own terms additionally apply to the transaction,
+        and Paddle appears on your bank or card statement. Paddle calculates, collects and
+        remits any applicable VAT, GST and sales tax.</p>
+      </div>
+      <p>Prices are shown in euro (EUR) and, where Paddle supports it, may be presented in
+      your local currency. Applicable taxes are added at checkout by Paddle according to
+      your billing location.</p>
+      <h3>Renewal</h3>
+      <p>Subscriptions renew automatically at the end of each billing period &mdash;
+      monthly or annually, as selected &mdash; at the then-current price, until cancelled.
+      We will give at least 30 days' notice before any price change affecting your
+      renewal, and you may cancel before it takes effect.</p>
+      <h3>Cancellation</h3>
+      <p>You may cancel at any time from your Account or by contacting
+      <a href="mailto:info@evolvixos.com">info@evolvixos.com</a>. Cancellation stops future renewals; your
+      Plan remains active until the end of the period already paid for. Cancelling is not
+      the same as requesting a refund &mdash; see our
+      <a href="/refund-policy">Refund Policy</a>.</p>
+      <h3>Failed payment</h3>
+      <p>If a renewal payment fails, we may suspend paid features until payment succeeds.
+      We will attempt to notify you before any suspension.</p>
+
+      <h2 id="s5"><span class="num">05</span>How Credits work</h2>
+
+      <p>Credits meter your consumption of compute and AI models. Different models and
+      operations consume Credits at different rates; current rates are shown in the
+      Studio.</p>
+      <table>
+        <thead><tr><th>Credit type</th><th>Source</th><th>Expiry</th></tr></thead>
+        <tbody>
+          <tr><td>Plan allowance</td><td>Included monthly with a paid or free Plan</td>
+              <td>Resets at the start of each billing period; unused allowance does
+              <strong>not</strong> carry over</td></tr>
+          <tr><td>Purchased Credits</td><td>Bought as a one-time Credit Pack</td>
+              <td>Do not expire while your Account remains active</td></tr>
+        </tbody>
+      </table>
+      <p>Credits have no cash value, are not a stored-value or payment instrument, and
+      cannot be transferred between Accounts, sold, or exchanged for money except as
+      required by law or as stated in our <a href="/refund-policy">Refund Policy</a>.</p>
+      <p>If your Credit balance is exhausted, metered features stop working until your
+      allowance resets or you purchase more. We may apply fair-use rate limits to protect
+      platform stability, and will tell you if your usage pattern requires this.</p>
+
+      <h2 id="s6"><span class="num">06</span>Acceptable use</h2>
+
+      <p>You must not use the Service to:</p>
+      <ul>
+        <li>break any applicable law, or infringe anyone's intellectual property,
+        privacy, or other rights;</li>
+        <li>generate or distribute malware, phishing content, or material designed to
+        gain unauthorised access to systems;</li>
+        <li>create sexual content involving minors, non-consensual sexual content, or
+        content that incites violence or hatred;</li>
+        <li>produce deepfakes, realistic synthetic likenesses of real people, or face-swap
+        material intended to deceive;</li>
+        <li>attempt to circumvent Credit metering, rate limits, security controls, or
+        access controls, or probe or load-test the Service without our written consent;</li>
+        <li>resell, sublicense, or provide the hosted Service to third parties as your own
+        offering, or use it to train a competing model or service;</li>
+        <li>scrape or bulk-extract the Service other than through the documented API and
+        within its limits;</li>
+        <li>submit personal data of others without a lawful basis, or submit special
+        category data unless you have made your own assessment that doing so is lawful.</li>
+      </ul>
+      <p>Automated abuse detection may flag activity for review. We may investigate
+      suspected breaches and take the steps described in section 11.</p>
+
+      <h2 id="s7"><span class="num">07</span>Third-party AI models, and your responsibility for Output</h2>
+
+      <p>The Service routes requests to AI models. Depending on the model you select and
+      your privacy mode, this may include models we run on our own infrastructure and
+      models operated by third-party providers. When you select a third-party model, your
+      Input is transmitted to that provider and handled under their terms. Our
+      <a href="/privacy">Privacy Policy</a> lists current providers.</p>
+      <div class="callout">
+        <p><strong>AI Output can be wrong.</strong> Outputs are generated
+        probabilistically and may be inaccurate, outdated, biased, insecure, or
+        unintentionally similar to existing material. You are responsible for reviewing
+        and testing Output before relying on it. Do not use Output as a substitute for
+        professional legal, medical, financial, or safety-critical advice, and review any
+        generated code for security before deploying it.</p>
+      </div>
+      <p>We make no claim of ownership over Output produced for you. Because identical or
+      similar Output may be generated for other users, we cannot guarantee Output is
+      unique or that it is free of third-party rights.</p>
+
+      <h2 id="s8"><span class="num">08</span>Intellectual property</h2>
+
+      <h3>Your content</h3>
+      <p>You keep all rights in your Input. You grant us a worldwide, non-exclusive,
+      royalty-free licence to host, copy, transmit, and process your Input and Output
+      strictly as needed to operate, secure, and support the Service. This licence ends
+      when you delete the content or close your Account, except for backups pending
+      deletion and anything we must keep by law.</p>
+      <p><strong>We do not use your Input or Output to train our own models</strong>
+      without your separate, explicit opt-in.</p>
+      <h3>Our content</h3>
+      <p>The hosted Service, its interfaces, and our trade marks and branding remain ours
+      or our licensors'. Source code released under the MIT License is governed by that
+      licence. Nothing here grants you rights in our branding.</p>
+      <h3>Feedback</h3>
+      <p>If you send us suggestions, we may use them freely without obligation to you.</p>
+
+      <h2 id="s9"><span class="num">09</span>Availability, support, and changes</h2>
+
+      <p>We aim for high availability but do not guarantee the Service will be
+      uninterrupted or error-free. Maintenance, updates, third-party provider outages, and
+      circumstances beyond our reasonable control can all cause downtime. We publish
+      operational status on the Service.</p>
+      <p>Support is provided by email at <a href="mailto:info@evolvixos.com">info@evolvixos.com</a>. No
+      specific response time is guaranteed unless separately agreed in writing.</p>
+      <p>We may add, change, or remove features. If we discontinue a feature you actively
+      rely on, or make a change that materially reduces core functionality, we will give
+      reasonable advance notice where practicable and, for material reductions affecting a
+      paid Plan, you may cancel and request a pro-rata refund of the unused paid period.</p>
+
+      <h2 id="s10"><span class="num">10</span>Your data and privacy</h2>
+
+      <p>Our handling of personal data is described in the
+      <a href="/privacy">Privacy Policy</a>, which forms part of these Terms. If you use
+      the Service to process personal data of third parties as a controller, you are
+      responsible for having a lawful basis and for meeting your own obligations; contact
+      <a href="mailto:info@evolvixos.com">info@evolvixos.com</a> if you require a data
+      processing agreement.</p>
+      <p>You are responsible for keeping your own backups of anything you cannot afford to
+      lose. We maintain backups for operational resilience, not as a guaranteed archive
+      service for you.</p>
+
+      <h2 id="s11"><span class="num">11</span>Suspension and termination</h2>
+
+      <p>You may stop using the Service and close your Account at any time.</p>
+      <p>We may suspend or limit your Account if we reasonably believe it is necessary to
+      protect the Service, other users, or a third party &mdash; for example on suspected
+      breach of section 6, security risk, non-payment, or a legal requirement. Where
+      practicable we will notify you first and give you an opportunity to fix the problem;
+      where we cannot, we will notify you as soon as we reasonably can and explain why.</p>
+      <p>We may terminate for material breach that is not remedied within 14 days of
+      notice, or immediately for serious breaches such as illegal use or a security
+      attack. We may also terminate a free Account that has been inactive for over 12
+      months after notifying you.</p>
+      <p>On termination your right to use the Service ends and we may delete your data
+      after a reasonable retention window (see the Privacy Policy). If we terminate
+      without your breach, we will refund the unused portion of any prepaid period.
+      Unused Credits are handled under the <a href="/refund-policy">Refund Policy</a>.</p>
+
+      <h2 id="s12"><span class="num">12</span>Disclaimers</h2>
+
+      <p>Except as expressly stated in these Terms and as required by law, the Service is
+      provided "as is" and "as available", and we exclude all implied warranties,
+      including fitness for a particular purpose, merchantability, non-infringement, and
+      that Output will be accurate or complete.</p>
+      <p>We do not warrant that the Service will meet your requirements, that defects will
+      be corrected, or that the Service or any third-party model is free of harmful
+      components.</p>
+      <p>Nothing in these Terms excludes or limits your statutory rights as a consumer.</p>
+
+      <h2 id="s13"><span class="num">13</span>Limitation of liability</h2>
+
+      <p>Nothing in this section limits liability that cannot be limited by law, including
+      liability for death or personal injury caused by negligence, or for fraud or
+      fraudulent misrepresentation.</p>
+      <p>Subject to that, we are not liable for indirect or consequential loss, loss of
+      profits, revenue, business, goodwill, anticipated savings, or loss or corruption of
+      data, however arising.</p>
+      <p>Subject to the above, our total aggregate liability arising out of or in
+      connection with the Service and these Terms is limited to the greater of (a) the
+      total amounts you paid for the Service in the 12 months immediately before the event
+      giving rise to the claim, and (b) EUR 100.</p>
+      <p>These limits apply to the fullest extent permitted by law and do not affect the
+      statutory rights of consumers.</p>
+
+      <h2 id="s14"><span class="num">14</span>Indemnity (business users)</h2>
+
+      <p>If you use the Service other than as a consumer, you agree to indemnify us
+      against claims, losses, and reasonable costs arising from your breach of these
+      Terms, your unlawful use of the Service, your Input, or your use of Output &mdash;
+      except to the extent caused by our own breach or negligence.</p>
+
+      <h2 id="s15"><span class="num">15</span>Changes to these Terms</h2>
+
+      <p>We may update these Terms. For material changes affecting your rights or
+      obligations we will give at least 30 days' notice by email or in-product notice
+      before they take effect. Continuing to use the Service after that date means you
+      accept the updated Terms; if you do not accept them, you may cancel before the
+      effective date and request a pro-rata refund of any unused prepaid period.</p>
+      <p>Non-material changes, such as clarifications or corrections, take effect when
+      published. The effective date at the top of this page always reflects the current
+      version.</p>
+
+      <h2 id="s16"><span class="num">16</span>Governing law and disputes</h2>
+
+      <p>These Terms are governed by the laws of Spain, excluding its conflict-of-laws
+      rules. The courts of Spain have jurisdiction.</p>
+      <p>If you are a consumer resident in the European Union, you keep the protection of
+      the mandatory consumer law of your country of residence, and you may bring
+      proceedings in the courts of your own country.</p>
+      <p>Before starting formal proceedings, please contact
+      <a href="mailto:info@evolvixos.com">info@evolvixos.com</a> so we can try to resolve the matter
+      directly. EU consumers may also use the European Commission's online dispute
+      resolution platform.</p>
+
+      <h2 id="s17"><span class="num">17</span>Other terms</h2>
+
+      <p><strong>Entire agreement.</strong> These Terms, the Refund Policy, and the
+      Privacy Policy are the whole agreement between us about the Service.</p>
+      <p><strong>Severability.</strong> If any provision is unenforceable, the rest stays
+      in force.</p>
+      <p><strong>No waiver.</strong> Not enforcing a right immediately does not waive it.</p>
+      <p><strong>Assignment.</strong> You may not assign these Terms without our consent.
+      We may assign them to an affiliate or in connection with a merger or sale of assets,
+      provided your rights are not reduced.</p>
+      <p><strong>Force majeure.</strong> Neither party is liable for delay or failure
+      caused by events beyond its reasonable control.</p>
+
+      <h2 id="s18"><span class="num">18</span>Contact</h2>
+
+      <p>General and billing support: <a href="mailto:info@evolvixos.com">info@evolvixos.com</a><br>
+      Privacy and data protection: <a href="mailto:info@evolvixos.com">info@evolvixos.com</a></p>
+      <p><span class="fill">{{LEGAL_ENTITY}}</span><br><span class="fill">{{REG_ADDRESS}}</span><br>Tax ID <span class="fill">{{TAX_ID}}</span> &middot; Spain</p>
+
+  </main>
+</div>
+
+<footer>
+  <div class="foot-links">
+    <a href="/">Home</a>
+    <a href="/terms">Terms of Service</a>
+    <a href="/refund-policy">Refund Policy</a>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="https://github.com/Protremix/EvolvixOS">GitHub</a>
+  </div>
+  <p>&copy; 2026 EvolvixOS &middot; Software open-source under the MIT License</p>
+</footer>
+</body>
+</html>

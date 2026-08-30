@@ -103,6 +103,8 @@ def check_resource_limit(user_id, resource_type):
     return {"ok": True, "current": count, "limit": limit}
 
 
+import hmac
+import hashlib
 import stripe
 
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY", "sk_test_placeholder")
@@ -121,6 +123,165 @@ STRIPE_PRICES = {
     "credits_15000": None,
     "credits_50000": None,
 }
+
+# ── Paddle Billing configuration ──────────────────────────────────────────────
+PADDLE_API_KEY = os.environ.get("PADDLE_API_KEY", "")
+PADDLE_WEBHOOK_SECRET = os.environ.get("PADDLE_WEBHOOK_SECRET", "")
+PADDLE_API_BASE = os.environ.get("PADDLE_API_BASE", "https://sandbox-api.paddle.com")
+# Paddle's documented variance tolerance is 5s. Keep NTP synced or raise this.
+PADDLE_WEBHOOK_TOLERANCE = int(os.environ.get("PADDLE_WEBHOOK_TOLERANCE", "5"))
+
+def verify_paddle_signature(raw_body, signature_header, secret=None, tolerance=None):
+    """Verify a Paddle Billing webhook.
+
+    Header format: ts=<unix>;h1=<hex hmac-sha256>
+    Signed payload: b"<ts>:" + raw_body   (raw bytes — never re-serialized JSON)
+    Returns (ok: bool, reason: str).
+    """
+    secret = PADDLE_WEBHOOK_SECRET if secret is None else secret
+    tolerance = PADDLE_WEBHOOK_TOLERANCE if tolerance is None else tolerance
+    if not secret:
+        return False, "no_secret_configured"
+    if not signature_header or raw_body is None:
+        return False, "missing_signature_or_body"
+
+    parts = {}
+    for item in signature_header.split(";"):
+        if "=" in item:
+            k, v = item.split("=", 1)
+            parts[k.strip()] = v.strip()
+    ts_str, h1 = parts.get("ts"), parts.get("h1")
+    if not ts_str or not h1:
+        return False, "malformed_header"
+
+    try:
+        ts = int(ts_str)
+    except (TypeError, ValueError):
+        return False, "bad_timestamp"
+    if abs(time.time() - ts) > tolerance:
+        return False, "timestamp_out_of_tolerance"
+
+    expected = hmac.new(secret.encode("utf-8"),
+                        ts_str.encode("utf-8") + b":" + raw_body,
+                        hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(expected, h1):
+        return False, "signature_mismatch"
+    return True, "ok"
+
+def paddle_event_to_fulfilment(event):
+    """Map a verified Paddle event onto apply_payment_event kwargs, or None to ignore.
+
+    Paddle carries checkout metadata in custom_data (Stripe's metadata equivalent).
+    Expected custom_data: {user_id, type: subscription|credits, plan, cycle, credits}
+    """
+    event_type = event.get("event_type") or ""
+    data = event.get("data", {}) or {}
+    custom = data.get("custom_data") or {}
+    try:
+        user_id = int(custom.get("user_id") or 0)
+    except (TypeError, ValueError):
+        user_id = 0
+
+    if event_type == "transaction.completed":
+        kind = custom.get("type")
+        if kind not in ("subscription", "credits"):
+            return None
+        return {"kind": kind, "user_id": user_id, "charge_id": data.get("id"),
+                "plan": custom.get("plan", "Free"), "cycle": custom.get("cycle", "monthly"),
+                "credits": custom.get("credits", 0), "provider": "paddle"}
+    if event_type in ("subscription.canceled", "subscription.past_due"):
+        return {"kind": "cancel", "user_id": user_id, "provider": "paddle"}
+    return None
+
+# ── Provider-neutral payment fulfilment ───────────────────────────────────────
+# Any payment provider normalizes its webhook into these calls via an adapter.
+# calls. Nothing below is provider-specific — adapters do the translating.
+
+PAYMENT_PROVIDER = os.environ.get("PAYMENT_PROVIDER", "stripe").lower()
+
+def _now():
+    return time.strftime("%Y-%m-%d %H:%M:%S")
+
+def mark_payment_paid(charge_id):
+    """Flag a payment row as paid by its provider charge/session id."""
+    if not charge_id:
+        return
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("UPDATE payments SET status = 'paid' WHERE provider_charge_id = ?", (charge_id,))
+        conn.commit()
+
+def fulfill_subscription(user_id, plan_name, cycle="monthly"):
+    """Activate or upgrade a user's subscription and reset their credit balance."""
+    if not user_id:
+        return False
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("SELECT id, credits_monthly FROM plans WHERE name = ?", (plan_name,))
+        plan = c.fetchone()
+        if not plan:
+            return False
+        plan_id, credits = plan
+        now = _now()
+        days = 365 if cycle == "yearly" else 30
+        period_end = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time() + days * 86400))
+        c.execute("SELECT id FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
+        existing = c.fetchone()
+        if existing:
+            c.execute("UPDATE subscriptions SET plan_id = ?, billing_cycle = ?, credits_remaining = ?, "
+                      "current_period_start = ?, current_period_end = ?, updated_date = ? WHERE id = ?",
+                      (plan_id, cycle, credits, now, period_end, now, existing[0]))
+        else:
+            c.execute("INSERT INTO subscriptions (user_id, plan_id, status, billing_cycle, credits_remaining, "
+                      "credits_used, current_period_start, current_period_end, created_date, updated_date) "
+                      "VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?)",
+                      (user_id, plan_id, "active", cycle, credits, now, period_end, now, now))
+        conn.commit()
+    return True
+
+def fulfill_credits(user_id, credits_amount, provider=None):
+    """Add purchased credits to a user's active subscription."""
+    credits_amount = int(credits_amount or 0)
+    if not (user_id and credits_amount):
+        return False
+    provider = provider or PAYMENT_PROVIDER
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("SELECT id, credits_remaining FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
+        row = c.fetchone()
+        if not row:
+            return False
+        c.execute("UPDATE subscriptions SET credits_remaining = ? WHERE id = ?", (row[1] + credits_amount, row[0]))
+        c.execute("INSERT INTO credit_transactions (user_id, amount, type, description, timestamp) VALUES (?, ?, ?, ?, ?)",
+                  (user_id, credits_amount, "credit",
+                   "Purchased " + str(credits_amount) + " credits via " + str(provider).title(), _now()))
+        conn.commit()
+    return True
+
+def downgrade_to_free(user_id):
+    """Drop a user back to the Free plan (subscription cancelled/expired)."""
+    if not user_id:
+        return False
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        free = c.execute("SELECT id FROM plans WHERE name = 'Free'").fetchone()
+        if not free:
+            return False
+        c.execute("UPDATE subscriptions SET plan_id = ?, credits_remaining = 100, updated_date = ? "
+                  "WHERE user_id = ? AND status = ?", (free[0], _now(), user_id, "active"))
+        conn.commit()
+    return True
+
+def apply_payment_event(kind, user_id, charge_id=None, plan=None, cycle="monthly",
+                        credits=0, provider=None):
+    """Single entry point every provider adapter calls after verifying a webhook."""
+    mark_payment_paid(charge_id)
+    if kind == "subscription":
+        return fulfill_subscription(user_id, plan or "Free", cycle)
+    if kind == "credits":
+        return fulfill_credits(user_id, credits, provider)
+    if kind == "cancel":
+        return downgrade_to_free(user_id)
+    return False
 
 RATE_LIMIT = defaultdict(list)  # ip -> [timestamps]
 MAX_REQUESTS = 10  # per 60 seconds per IP
@@ -504,56 +665,55 @@ class AuthHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"error": "Invalid signature"})
                 return
 
+            # Normalize the Stripe event, then hand off to the neutral layer.
             event_type = event["type"]
             data = event["data"]["object"]
-            metadata = data.get("metadata", {})
-            user_id = int(metadata.get("user_id", 0)) if metadata.get("user_id") else int(data.get("client_reference_id", 0))
+            metadata = data.get("metadata", {}) or {}
+            try:
+                user_id = int(metadata.get("user_id") or data.get("client_reference_id") or 0)
+            except (TypeError, ValueError):
+                user_id = 0
 
             if event_type == "checkout.session.completed":
-                with sqlite3.connect(DB_PATH) as conn:
-                    c = conn.cursor()
-                    # Mark payment as paid
-                    c.execute("UPDATE payments SET status = 'paid' WHERE provider_charge_id = ?", (data.get("id"),))
-                    # If subscription, activate plan
-                    if metadata.get("type") == "subscription":
-                        plan_name = metadata.get("plan", "Free")
-                        cycle = metadata.get("cycle", "monthly")
-                        c.execute("SELECT id, credits_monthly FROM plans WHERE name = ?", (plan_name,))
-                        plan = c.fetchone()
-                        if plan and user_id:
-                            plan_id, credits = plan
-                            now = time.strftime("%Y-%m-%d %H:%M:%S")
-                            days = 365 if cycle == "yearly" else 30
-                            period_end = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time() + days * 86400))
-                            c.execute("SELECT id FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
-                            existing = c.fetchone()
-                            if existing:
-                                c.execute("UPDATE subscriptions SET plan_id = ?, billing_cycle = ?, credits_remaining = ?, current_period_start = ?, current_period_end = ?, updated_date = ? WHERE id = ?",
-                                    (plan_id, cycle, credits, now, period_end, now, existing[0]))
-                            else:
-                                c.execute("INSERT INTO subscriptions (user_id, plan_id, status, billing_cycle, credits_remaining, credits_used, current_period_start, current_period_end, created_date, updated_date) VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?)",
-                                    (user_id, plan_id, "active", cycle, credits, now, period_end, now, now))
-                    # If credit purchase, add credits
-                    elif metadata.get("type") == "credits":
-                        credits_amount = int(metadata.get("credits", 0))
-                        if credits_amount and user_id:
-                            c.execute("SELECT id, credits_remaining FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
-                            row = c.fetchone()
-                            if row:
-                                c.execute("UPDATE subscriptions SET credits_remaining = ? WHERE id = ?", (row[1] + credits_amount, row[0]))
-                                c.execute("INSERT INTO credit_transactions (user_id, amount, type, description, timestamp) VALUES (?, ?, ?, ?, ?)",
-                                    (user_id, credits_amount, "credit", "Purchased " + str(credits_amount) + " credits via Stripe", time.strftime("%Y-%m-%d %H:%M:%S")))
-                    conn.commit()
+                kind = metadata.get("type")
+                apply_payment_event(
+                    kind if kind in ("subscription", "credits") else "none",
+                    user_id,
+                    charge_id=data.get("id"),
+                    plan=metadata.get("plan", "Free"),
+                    cycle=metadata.get("cycle", "monthly"),
+                    credits=metadata.get("credits", 0),
+                    provider="stripe",
+                )
             elif event_type == "customer.subscription.deleted":
-                # Downgrade to Free
-                if user_id:
-                    with sqlite3.connect(DB_PATH) as conn:
-                        c = conn.cursor()
-                        free_id = c.execute("SELECT id FROM plans WHERE name = 'Free'").fetchone()[0]
-                        c.execute("UPDATE subscriptions SET plan_id = ?, credits_remaining = 100, updated_date = ? WHERE user_id = ? AND status = ?",
-                            (free_id, time.strftime("%Y-%m-%d %H:%M:%S"), user_id, "active"))
-                        conn.commit()
+                apply_payment_event("cancel", user_id, provider="stripe")
 
+            self._send_json(200, {"received": True})
+            return
+
+        # Paddle Billing webhook — raw body required for HMAC verification
+        if self.path == "/auth/paddle-webhook":
+            raw_body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
+            ok, reason = verify_paddle_signature(raw_body, self.headers.get("Paddle-Signature", ""))
+            if not ok:
+                print("[paddle] rejected webhook: " + reason)
+                self._send_json(400, {"error": "Invalid signature", "reason": reason})
+                return
+            try:
+                event = json.loads(raw_body.decode("utf-8"))
+            except (ValueError, UnicodeDecodeError):
+                self._send_json(400, {"error": "Invalid payload"})
+                return
+
+            mapped = paddle_event_to_fulfilment(event)
+            if mapped:
+                try:
+                    apply_payment_event(**mapped)
+                except Exception as exc:
+                    # 500 so Paddle retries rather than dropping a paid order
+                    print("[paddle] fulfilment failed: " + repr(exc))
+                    self._send_json(500, {"error": "Fulfilment failed"})
+                    return
             self._send_json(200, {"received": True})
             return
 

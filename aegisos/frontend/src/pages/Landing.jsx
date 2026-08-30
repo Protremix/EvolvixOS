@@ -70,6 +70,188 @@ const AnimatedStat = ({ value, label, icon: Icon, delay, visible }) => {
   );
 };
 
+
+// Animated particle network background
+const AnimatedBackground = () => {
+  const canvasRef = useRef(null);
+  
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let animId;
+    let particles = [];
+    let mouse = { x: -1000, y: -1000 };
+    
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    
+    const PARTICLE_COUNT = Math.min(80, Math.floor(window.innerWidth / 18));
+    const MAX_DIST = 140;
+    const COLORS = ["#00f5d4", "#14b8a6", "#0d9488", "#06b6d4", "#0891b2"];
+    
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: Math.random() * 1.5 + 0.5,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        pulse: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.01 + Math.random() * 0.02,
+      });
+    }
+    
+    const handleMouse = (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    };
+    const handleMouseLeave = () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    };
+    
+    window.addEventListener("resize", resize);
+    window.addEventListener("mousemove", handleMouse);
+    window.addEventListener("mouseleave", handleMouseLeave);
+    
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Animated gradient orbs (blurred blobs)
+      const time = Date.now() * 0.0003;
+      ctx.save();
+      for (let i = 0; i < 3; i++) {
+        const orbX = canvas.width * (0.3 + 0.4 * Math.sin(time + i * 2.1));
+        const orbY = canvas.height * (0.3 + 0.4 * Math.cos(time + i * 2.1));
+        const orbR = 200 + 80 * Math.sin(time * 2 + i);
+        const grad = ctx.createRadialGradient(orbX, orbY, 0, orbX, orbY, orbR);
+        const colors = [
+          ["rgba(0,245,212,0.08)", "rgba(0,245,212,0)"],
+          ["rgba(20,184,166,0.06)", "rgba(20,184,166,0)"],
+          ["rgba(6,182,212,0.05)", "rgba(6,182,212,0)"],
+        ];
+        grad.addColorStop(0, colors[i][0]);
+        grad.addColorStop(1, colors[i][1]);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      ctx.restore();
+      
+      // Grid lines
+      ctx.strokeStyle = "rgba(0,245,212,0.03)";
+      ctx.lineWidth = 1;
+      const gridSize = 60;
+      const offset = (time * 30) % gridSize;
+      for (let x = -offset; x < canvas.width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = -offset; y < canvas.height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+      
+      // Particles
+      particles.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.pulse += p.pulseSpeed;
+        
+        // Mouse attraction
+        const mdx = mouse.x - p.x;
+        const mdy = mouse.y - p.y;
+        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (mdist < 200) {
+          p.vx += (mdx / mdist) * 0.02;
+          p.vy += (mdy / mdist) * 0.02;
+        }
+        
+        // Bounce off edges
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        
+        // Friction
+        p.vx *= 0.99;
+        p.vy *= 0.99;
+        
+        // Draw particle with pulse
+        const pulseFactor = 0.5 + 0.5 * Math.sin(p.pulse);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * (1 + pulseFactor * 0.5), 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = 0.3 + pulseFactor * 0.4;
+        ctx.fill();
+        
+        // Glow
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+        const glowGrad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+        glowGrad.addColorStop(0, p.color + "20");
+        glowGrad.addColorStop(1, p.color + "00");
+        ctx.fillStyle = glowGrad;
+        ctx.globalAlpha = pulseFactor * 0.5;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        
+        // Connect to nearby particles
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MAX_DIST) {
+            const alpha = (1 - dist / MAX_DIST) * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(0,245,212,${alpha})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+        
+        // Connect to mouse
+        if (mdist < 200) {
+          const alpha = (1 - mdist / 200) * 0.2;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mouse.x, mouse.y);
+          ctx.strokeStyle = `rgba(0,245,212,${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      });
+      
+      animId = requestAnimationFrame(draw);
+    };
+    draw();
+    
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", handleMouse);
+      window.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, []);
+  
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: 0 }}
+    />
+  );
+};
+
 const Landing = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -185,6 +367,7 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-gray-100 antialiased overflow-x-hidden">
+      <AnimatedBackground />
       <style>{`
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

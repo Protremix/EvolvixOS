@@ -3,23 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a0f">
+<meta name="theme-color" content="#ffffff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>EvolvixOS — Sign In</title>
 <style>
 :root {
-    --bg: #0a0a0c; --card: #141418; --border: rgba(255,255,255,0.08);
-    --text: #f0f0f5; --muted: #8e8e93; --primary: #8b5cf6;
-    --primary-glow: rgba(139,92,246,0.15); --accent: #d946ef;
-    --success: #4ade80; --danger: #f87171;
+    --bg: #ffffff; --card: #f5f5f7; --border: rgba(0,0,0,0.08);
+    --text: #1d1d1f; --muted: #86868b; --primary: #007AFF;
+    --primary-glow: rgba(0,122,255,0.12); --accent: #5856D6;
+    --success: #34c759; --danger: #ff3b30;
     --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; display: flex; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; min-height: 100dvh; display: flex; }
 
 /* Left panel — form */
 .left-panel {
     flex: 1; max-width: 520px;
+    min-height: 100vh; min-height: 100dvh;
     display: flex; flex-direction: column;
     justify-content: center; align-items: center;
     padding: 40px; position: relative;
@@ -44,7 +45,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); min-
 
 .social-btn {
     width: 100%; padding: 12px 16px;
-    background: rgba(255,255,255,0.03);
+    background: rgba(0,0,0,0.03);
     border: 1px solid var(--border);
     border-radius: 12px;
     color: var(--text); font-size: 14px; font-weight: 500;
@@ -53,7 +54,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); min-
     cursor: pointer; transition: all 0.2s;
     margin-bottom: 10px;
 }
-.social-btn:hover { background: rgba(255,255,255,0.06); border-color: rgba(139,92,246,0.3); }
+.social-btn:hover { background: rgba(0,0,0,0.06); border-color: rgba(0,122,255,0.3); }
 .social-btn svg { width: 18px; height: 18px; }
 
 .divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
@@ -64,7 +65,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); min-
 .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 6px; }
 .form-group input {
     width: 100%; padding: 12px 14px;
-    background: rgba(255,255,255,0.03);
+    background: rgba(0,0,0,0.03);
     border: 1px solid var(--border);
     border-radius: 10px; color: var(--text); font-size: 14px;
     font-family: var(--font); transition: all 0.2s;
@@ -89,14 +90,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); min-
 
 .btn-secondary {
     width: 100%; padding: 12px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.05);
     border: 1px solid var(--border);
     border-radius: 12px; color: var(--text);
     font-size: 14px; font-weight: 500;
     cursor: pointer; font-family: var(--font);
     margin-top: 10px; transition: all 0.2s;
 }
-.btn-secondary:hover { background: rgba(255,255,255,0.08); }
+.btn-secondary:hover { background: rgba(0,0,0,0.08); }
 
 .form-footer { text-align: center; margin-top: 24px; font-size: 13px; color: var(--muted); }
 .form-footer a { color: var(--primary); text-decoration: none; }
@@ -110,12 +111,12 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); min-
 .right-panel {
     flex: 1; display: flex; flex-direction: column;
     justify-content: center; align-items: center;
-    background: linear-gradient(135deg, #0d0d12 0%, #141418 100%);
+    background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
     position: relative; overflow: hidden; padding: 60px;
 }
 .right-panel::before {
     content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 30% 50%, rgba(139,92,246,0.08), transparent 50%);
+    background: radial-gradient(circle at 30% 50%, rgba(0,122,255,0.08), transparent 50%);
 }
 .right-content { position: relative; z-index: 1; max-width: 480px; }
 .right-tagline { font-size: 36px; font-weight: 700; line-height: 1.3; margin-bottom: 16px; }
@@ -125,19 +126,20 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); min-
 /* Floating cards */
 .float-card {
     position: absolute;
-    background: rgba(20,20,24,0.8);
-    border: 1px solid rgba(139,92,246,0.15);
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(0,0,0,0.06);
     border-radius: 16px; padding: 20px;
     backdrop-filter: blur(10px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.08);
 }
 .float-card-1 { top: 15%; right: 10%; }
 .float-card-2 { bottom: 15%; left: 8%; }
 .float-card-stat { font-size: 32px; font-weight: 700; }
 .float-card-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
 
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
     body { flex-direction: column; }
-    .left-panel { max-width: 100%; }
+    .left-panel { max-width: 100%; min-height: 100vh; min-height: 100dvh; }
     .right-panel { display: none; }
 }
 
@@ -157,7 +159,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); min-
 .otp-digit {
     width: 48px; height: 56px; text-align: center;
     font-size: 22px; font-weight: 700;
-    background: rgba(255,255,255,0.03);
+    background: rgba(0,0,0,0.03);
     border: 1px solid var(--border);
     border-radius: 10px; color: var(--text);
     font-family: var(--font);
@@ -167,7 +169,11 @@ body { background: var(--bg); color: var(--text); font-family: var(--font); min-
 /* ═══ MOBILE ENHANCEMENTS ═══ */
 @media (max-width: 480px) {
   .form-wrapper { max-width: 100% !important; padding: 0 16px; }
-  .left-panel { padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) !important; }
+  .left-panel {
+    min-height: 100vh; min-height: 100dvh;
+    padding-top: calc(24px + env(safe-area-inset-top)) !important;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom)) !important;
+  }
   /* OTP digits: shrink to fit small screens */
   .otp-digit { width: 40px !important; height: 48px !important; font-size: 18px !important; }
   .otp-box { gap: 6px !important; }
@@ -322,7 +328,7 @@ async function doLogin() {
         const data = await apiCall('/login', { email, password });
         if (data.ok && data.token) {
             localStorage.setItem('evolvixos_token', data.token);
-            localStorage.setItem('evolvixos_user', JSON.stringify(data.user));
+            localStorage.setItem('evolvixos_user', JSON.stringify(Object.assign({}, data.user, {token: data.token})));
             showAlert('Success! Redirecting...', 'success');
             setTimeout(() => window.location.href = '/platform/', 800);
         } else {
@@ -378,7 +384,7 @@ async function doVerify() {
                 }).then(d => {
                     if (d.ok && d.token) {
                         localStorage.setItem('evolvixos_token', d.token);
-                        localStorage.setItem('evolvixos_user', JSON.stringify(d.user));
+                        localStorage.setItem('evolvixos_user', JSON.stringify(Object.assign({}, d.user, {token: d.token})));
                     }
                     window.location.href = '/platform/';
                 });

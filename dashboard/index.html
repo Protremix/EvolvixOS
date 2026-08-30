@@ -7,9 +7,9 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
 <style>
 :root{
---bg:#060608;--bg2:#0c0c12;--card:#12121a;--card2:#1a1a26;--border:#2a2a3e;
---text:#e8e8f0;--muted:#6a6a85;--accent:#6c5ce7;--accent2:#a29bfe;--accent3:#fd79a8;
---green:#00b894;--orange:#fdcb6e;--blue:#0984e3;--cyan:#00cec9;
+--bg:#ffffff;--bg2:#f5f5f7;--card:#f5f5f7;--card2:#e8e8ed;--border:rgba(0,0,0,0.08);
+--text:#1d1d1f;--muted:#86868b;--accent:#007aff;--accent2:#5856d6;--accent3:#5856d6;
+--green:#34c759;--orange:#febc2e;--blue:#007aff;--cyan:#5ac8fa;
 --radius:14px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -22,13 +22,13 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 @keyframes shimmer{0%{background-position:-1000px 0}100%{background-position:1000px 0}}
 @keyframes typing{0%{opacity:.2}20%{opacity:1}100%{opacity:.2}}
-@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(108,92,231,.2)}50%{box-shadow:0 0 40px rgba(108,92,231,.4)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(0,122,255,.2)}50%{box-shadow:0 0 40px rgba(0,122,255,.4)}}
 @keyframes bar-grow{from{width:0}to{width:100%}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
 /* Animated background */
 .bg-grid{position:fixed;inset:0;z-index:0;opacity:.03;
-background-image:linear-gradient(rgba(108,92,231,1) 1px,transparent 1px),linear-gradient(90deg,rgba(108,92,231,1) 1px,transparent 1px);
+background-image:linear-gradient(rgba(0,122,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(0,122,255,1) 1px,transparent 1px);
 background-size:40px 40px;animation:gradient 20s linear infinite}
 .bg-blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.15;z-index:0;pointer-events:none}
 .bg-blob-1{top:-10%;left:-5%;width:500px;height:500px;background:var(--accent);animation:float 12s ease-in-out infinite}
@@ -46,9 +46,9 @@ background-size:40px 40px;animation:gradient 20s linear infinite}
 .sidebar-section{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:8px 12px 4px;animation:slideIn .8s ease}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;color:var(--muted);font-size:14px;transition:all .2s;animation:slideIn .6s ease;animation-fill-mode:both}
 .nav-item:hover{background:var(--card);color:var(--text)}
-.nav-item.active{background:linear-gradient(135deg,rgba(108,92,231,.15),rgba(253,121,168,.1));color:var(--accent2)}
+.nav-item.active{background:linear-gradient(135deg,rgba(0,122,255,.15),rgba(88,86,214,.1));color:var(--accent2)}
 .nav-item .icon{font-size:18px;width:24px;text-align:center}
-.nav-item .badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+.nav-item .badge{margin-left:auto;background:var(--accent);color:#1d1d1f;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
 
 /* Status */
 .status-pill{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border-radius:10px;font-size:12px;animation:fadeIn 1s ease}
@@ -66,8 +66,8 @@ background-size:40px 40px;animation:gradient 20s linear infinite}
 .header .models-count{font-size:13px;color:var(--muted);margin-top:4px}
 .header-actions{display:flex;gap:10px}
 .btn{padding:10px 20px;border-radius:10px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:8px}
-.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff;animation:glow 3s ease-in-out infinite}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,92,231,.4)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent3));color:#1d1d1f;animation:glow 3s ease-in-out infinite}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,122,255,.4)}
 .btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border)}
 .btn-ghost:hover{border-color:var(--accent)}
 
@@ -82,7 +82,7 @@ background-size:40px 40px;animation:gradient 20s linear infinite}
 .template-card:nth-child(5){animation-delay:.3s}.template-card:nth-child(6){animation-delay:.35s}
 .template-card:nth-child(7){animation-delay:.4s}.template-card:nth-child(8){animation-delay:.45s}
 .template-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--accent),var(--accent3));opacity:0;transition:opacity .3s;z-index:0}
-.template-card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 12px 40px rgba(108,92,231,.15)}
+.template-card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 12px 40px rgba(0,122,255,.15)}
 .template-card:hover::before{opacity:.05}
 .template-card>*{position:relative;z-index:1}
 .template-icon{font-size:32px;margin-bottom:12px;display:block;animation:float 4s ease-in-out infinite}
@@ -96,7 +96,7 @@ background-size:40px 40px;animation:gradient 20s linear infinite}
 .builder-header .dot{width:10px;height:10px;border-radius:50%}
 .builder-header .dot:nth-child(1){background:#ff5f56}.builder-header .dot:nth-child(2){background:#ffbd2e}.builder-header .dot:nth-child(3){background:#27c93f}
 .builder-header .title{font-size:13px;color:var(--muted);margin-left:8px}
-.builder-header .engine-badge{margin-left:auto;font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(108,92,231,.15);color:var(--accent2);font-weight:600}
+.builder-header .engine-badge{margin-left:auto;font-size:11px;padding:4px 10px;border-radius:20px;background:rgba(0,122,255,.15);color:var(--accent2);font-weight:600}
 
 .messages{padding:20px;max-height:500px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
 .messages::-webkit-scrollbar{width:6px}
@@ -132,9 +132,9 @@ background-size:40px 40px;animation:gradient 20s linear infinite}
 /* Input bar */
 .input-bar{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:12px;align-items:flex-end}
 .input-bar textarea{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-size:14px;font-family:inherit;resize:none;max-height:120px;transition:all .2s;min-height:44px}
-.input-bar textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,92,231,.1)}
-.input-bar .send-btn{width:44px;height:44px;border-radius:12px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
-.input-bar .send-btn:hover{transform:scale(1.05);box-shadow:0 4px 20px rgba(108,92,231,.4)}
+.input-bar textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,122,255,.1)}
+.input-bar .send-btn{width:44px;height:44px;border-radius:12px;border:none;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#1d1d1f;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.input-bar .send-btn:hover{transform:scale(1.05);box-shadow:0 4px 20px rgba(0,122,255,.4)}
 .input-bar .send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .input-bar .send-btn.loading{background:var(--card2);animation:pulse 1s infinite}
 .input-bar .upload-btn{width:44px;height:44px;border-radius:12px;border:1px solid var(--border);cursor:pointer;background:var(--card2);color:var(--muted);font-size:18px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
@@ -152,7 +152,7 @@ background-size:40px 40px;animation:gradient 20s linear infinite}
 .quick-btn:nth-child(3){animation-delay:.2s}.quick-btn:nth-child(4){animation-delay:.25s}
 .quick-btn:nth-child(5){animation-delay:.3s}.quick-btn:nth-child(6){animation-delay:.35s}
 .quick-btn:hover{border-color:var(--accent);color:var(--text);background:var(--card2)}
-.quick-btn.active{background:rgba(108,92,231,.15);border-color:var(--accent);color:var(--accent2)}
+.quick-btn.active{background:rgba(0,122,255,.15);border-color:var(--accent);color:var(--accent2)}
 
 /* Stats */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
@@ -170,7 +170,7 @@ background-size:40px 40px;animation:gradient 20s linear infinite}
 .cat-filter{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .cat-btn{font-size:12px;padding:6px 14px;border-radius:20px;background:var(--card2);border:1px solid var(--border);cursor:pointer;color:var(--muted);transition:all .2s}
 .cat-btn:hover{color:var(--text)}
-.cat-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cat-btn.active{background:var(--accent);color:#1d1d1f;border-color:var(--accent)}
 
 /* Responsive */
 @media(max-width:768px){
@@ -247,8 +247,8 @@ background-size:40px 40px;animation:gradient 20s linear infinite}
 <div class="header-actions">
 <button class="btn btn-ghost" onclick="showTemplates()">📋 Templates</button>
 <button class="btn btn-primary" onclick="focusInput()">⚡ Start Building</button>
-<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;">
-<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#d946ef);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;" id="user-avatar">U</div>
+<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:rgba(0,0,0,0.04);border:1px solid rgba(0,0,0,0.08);border-radius:10px;">
+<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#007aff,#5856d6);display:flex;align-items:center;justify-content:center;font-size:13px;color:#1d1d1f;" id="user-avatar">U</div>
 <span style="font-size:13px;color:var(--muted);" id="user-name">User</span>
 </div>
 <button class="btn btn-ghost" onclick="logout()" style="font-size:13px;padding:6px 12px;">🚪 Logout</button>

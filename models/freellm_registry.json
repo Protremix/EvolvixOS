@@ -4,7 +4,7 @@
   "source": "https://github.com/open-free-llm-api/awesome-freellm-apis",
   "website": "https://freellm.net",
   "total_providers": 31,
-  "total_free_models": 449,
+  "total_free_models": 451,
   "providers": [
     {
       "name": "NVIDIA NIM",
@@ -28,7 +28,7 @@
     },
     {
       "name": "ModelScope",
-      "free_models": 58,
+      "free_models": 59,
       "credit_card": "Registration",
       "max_context": "1M",
       "modalities": [
@@ -230,21 +230,6 @@
       "models": []
     },
     {
-      "name": "Cerebras",
-      "free_models": 8,
-      "credit_card": "No",
-      "max_context": "131K",
-      "modalities": [
-        "image",
-        "reasoning",
-        "text"
-      ],
-      "key_url": "https://cloud.cerebras.ai/",
-      "tier": "permanent_free",
-      "base_url": "https://api.cerebras.ai/v1",
-      "models": []
-    },
-    {
       "name": "Aion Labs",
       "free_models": 7,
       "credit_card": "Registration",
@@ -269,6 +254,20 @@
       "key_url": "https://huggingface.co/settings/tokens",
       "tier": "permanent_free",
       "base_url": "https://router.huggingface.co/v1",
+      "models": []
+    },
+    {
+      "name": "Cerebras",
+      "free_models": 6,
+      "credit_card": "No",
+      "max_context": "131K",
+      "modalities": [
+        "reasoning",
+        "text"
+      ],
+      "key_url": "https://cloud.cerebras.ai/",
+      "tier": "permanent_free",
+      "base_url": "https://api.cerebras.ai/v1",
       "models": []
     },
     {
@@ -334,6 +333,19 @@
       "models": []
     },
     {
+      "name": "Cline",
+      "free_models": 4,
+      "credit_card": "Registration",
+      "max_context": "0",
+      "modalities": [
+        "text"
+      ],
+      "key_url": "",
+      "tier": "permanent_free",
+      "base_url": "",
+      "models": []
+    },
+    {
       "name": "SiliconFlow",
       "free_models": 3,
       "credit_card": "Registration",
@@ -357,19 +369,6 @@
       "key_url": "https://console.x.ai",
       "tier": "permanent_free",
       "base_url": "https://api.x.ai/v1",
-      "models": []
-    },
-    {
-      "name": "Cline",
-      "free_models": 3,
-      "credit_card": "Registration",
-      "max_context": "0",
-      "modalities": [
-        "text"
-      ],
-      "key_url": "",
-      "tier": "permanent_free",
-      "base_url": "",
       "models": []
     },
     {
@@ -466,7 +465,7 @@
     },
     {
       "name": "OpenRouter",
-      "free_models": 27,
+      "free_models": 29,
       "credit_model": "Free tier + $10 topup \u2192 1K RPD",
       "max_context": "1M",
       "modalities": [
@@ -486,5 +485,5 @@
       "models": []
     }
   ],
-  "last_updated": "2026-08-25T09:14:59.216673+00:00"
+  "last_updated": "2026-08-30T10:07:40.669947+00:00"
 }

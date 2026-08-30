@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>API Directory — EvolvixOS</title>
 <style>
-:root{--bg:#0a0a0f;--card:#13131a;--border:#2a2a3a;--text:#fff;--muted:#8a8a9a;--accent:#6c5ce7;--accent2:#a855f7;--accent3:#f472b6;--green:#22c55e}
+:root{--bg:#ffffff;--card:#f5f5f7;--border:rgba(0,0,0,0.08);--text:#fff;--muted:#86868b;--accent:#007aff;--accent2:#5856d6;--accent3:#5856d6;--green:#34c759}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
-.header{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);background:rgba(10,10,15,.85);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.header{position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);background:rgba(255,255,255,0.85);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
 .header .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
 .header .logo .icon{font-size:24px}
 .header .logo .name{font-size:18px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
@@ -27,13 +27,13 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding:0 24px 24px}
 .api-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;transition:.2s;cursor:pointer;position:relative;overflow:hidden}
 .api-card:hover{border-color:var(--accent);transform:translateY(-2px)}
-.api-card .cat-badge{display:inline-block;padding:3px 10px;border-radius:8px;background:rgba(108,92,231,.15);color:var(--accent2);font-size:11px;font-weight:600;margin-bottom:10px}
+.api-card .cat-badge{display:inline-block;padding:3px 10px;border-radius:8px;background:rgba(0,122,255,.15);color:var(--accent2);font-size:11px;font-weight:600;margin-bottom:10px}
 .api-card .name{font-size:15px;font-weight:700;margin-bottom:6px;word-break:break-word}
 .api-card .desc{font-size:13px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .api-card .link{margin-top:10px;font-size:12px;color:var(--accent3);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
 .api-card .link:hover{text-decoration:underline}
 .load-more{display:block;margin:0 auto 24px;padding:12px 32px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;transition:.2s}
-.load-more:hover{border-color:var(--accent);background:rgba(108,92,231,.1)}
+.load-more:hover{border-color:var(--accent);background:rgba(0,122,255,.1)}
 .empty{text-align:center;padding:40px;color:var(--muted)}
 </style>
 </head>

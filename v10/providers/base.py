@@ -129,6 +129,7 @@ class LLMRegistry:
             ("v10.providers.gemini", "GeminiProvider"),
             ("v10.providers.kimi", "KimiProvider"),
             ("v10.providers.glm", "GLMProvider"),
+            ("v10.providers.nvidia", "NvidiaProvider"),
         ]:
             try:
                 mod = __import__(mod_name, fromlist=[cls_name])
@@ -228,8 +229,23 @@ class LLMRegistry:
                             reason=f"HYBRID: vision task → {name} (vision-capable)",
                             available_providers=available)
 
+            # ── Agent/reasoning tasks → NVIDIA Nemotron if available ──
+            if task_type in ("reasoning", "agent", "code") and "nvidia" in cloud_available:
+                provider_name = "nvidia"
+                p = self._providers[provider_name]
+                return RoutingDecision(
+                    task_type=task_type, complexity=complexity,
+                    privacy_mode="HYBRID", provider=provider_name,
+                    model=self._get_model_for_task(p, task_type),
+                    reason=f"HYBRID: {task_type} task → NVIDIA Nemotron (agent-optimized)",
+                    available_providers=available)
+
             if complexity == "complex" and cloud_available:
-                provider_name = cloud_available[0]
+                # Prefer NVIDIA for complex tasks if available
+                if "nvidia" in cloud_available:
+                    provider_name = "nvidia"
+                else:
+                    provider_name = cloud_available[0]
                 p = self._providers[provider_name]
                 return RoutingDecision(
                     task_type=task_type, complexity=complexity,

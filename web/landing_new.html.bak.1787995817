@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EvolvixOS — Engineer AI Systems Without Limits</title>
+<meta name="description" content="The open-source AI engineering platform. 281+ models, full-stack media production, zero-knowledge dashboards — all on your infrastructure.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2048%2048%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20role%3D%22img%22%20aria-label%3D%22EvolvixOS%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22evxF%22%20x1%3D%220.05%22%20y1%3D%220%22%20x2%3D%220.95%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23EE8A52%22%2F%3E%3Cstop%20offset%3D%220.42%22%20stop-color%3D%22%23D9663A%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%237B3FA0%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M26.77%2C5.20%20Q24.00%2C3.60%2021.23%2C5.20%20L9.10%2C12.20%20Q6.33%2C13.80%206.33%2C17.00%20L6.33%2C31.00%20Q6.33%2C34.20%209.10%2C35.80%20L21.23%2C42.80%20Q24.00%2C44.40%2026.77%2C42.80%20L38.90%2C35.80%20Q41.67%2C34.20%2041.67%2C31.00%20L41.67%2C17.00%20Q41.67%2C13.80%2038.90%2C12.20%20Z%20M13.20%2C28.40%20L24.00%2C16.80%20L34.80%2C28.40%20L34.80%2C33.40%20L24.00%2C21.80%20L13.20%2C33.40%20Z%22%20fill%3D%22url%28%23evxF%29%22%20fill-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+/* ============================================
+   EVOLVIXOS — CLAUDE-INSPIRED + 3D
+   Warm cream, serif headings, Three.js depth
+   ============================================ */
+
+:root {
+  --bg: #FAF9F6;
+  --bg-card: #FFFFFF;
+  --bg-soft: #F5F4EE;
+  --bg-warm: #F0EDE5;
+  --text: #1A1915;
+  --text-secondary: #6B6862;
+  --text-muted: #9C9890;
+  --accent: #C96442;
+  --accent-hover: #B5563A;
+  --accent-light: #F4E6DE;
+  --accent-soft: #E8D5CC;
+  --border: #E5E2DA;
+  --border-light: #EFECE4;
+  --purple: #7C6F9E;
+  --purple-light: #EDE8F4;
+  --shadow-sm: 0 1px 2px rgba(26,25,21,0.04);
+  --shadow-md: 0 4px 12px rgba(26,25,21,0.06);
+  --shadow-lg: 0 12px 32px rgba(26,25,21,0.08);
+  --shadow-3d: 0 20px 60px rgba(201,100,66,0.12);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --serif: 'Newsreader', Georgia, serif;
+  --sans: 'Inter', -apple-system, sans-serif;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--accent-light); color: var(--text); }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* === 3D HERO CANVAS === */
+#hero-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+/* Cream scrim keeps the headline crisp over the 3D layer */
+.hero-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 62% 58% at 50% 50%,
+    rgba(250,249,246,0.97) 0%,
+    rgba(250,249,246,0.93) 38%,
+    rgba(250,249,246,0.72) 58%,
+    rgba(250,249,246,0.28) 76%,
+    rgba(250,249,246,0) 90%);
+}
+.hero-wrap {
+  position: relative;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+
+/* === NAV === */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(250, 249, 246, 0.72);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom: 1px solid transparent;
+  transition: var(--transition);
+}
+.nav.scrolled {
+  border-bottom-color: var(--border);
+  box-shadow: var(--shadow-sm);
+  background: rgba(250, 249, 246, 0.9);
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  padding: 16px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; color: var(--text);
+  perspective: 400px;
+}
+.nav-logo-icon {
+  width: 38px; height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif);
+  font-weight: 700; font-size: 21px;
+  color: white;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(201,100,66,0.25);
+}
+.nav-logo:hover .nav-logo-icon {
+  transform: rotateY(180deg) rotateX(10deg);
+}
+.nav-logo-text {
+  font-family: var(--serif);
+  font-size: 22px; font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.nav-links {
+  display: flex; align-items: center; gap: 28px;
+  list-style: none;
+}
+.nav-links a {
+  text-decoration: none; color: var(--text-secondary);
+  font-size: 14px; font-weight: 500;
+  transition: var(--transition);
+  position: relative;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px; left: 0;
+  width: 0; height: 1.5px;
+  background: var(--accent);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a:hover::after { width: 100%; }
+.nav-cta { display: flex; align-items: center; gap: 12px; }
+
+/* === BUTTONS (3D magnetic) === */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 500;
+  text-decoration: none;
+  cursor: pointer; border: none;
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), box-shadow 0.25s, background 0.25s;
+  font-family: var(--sans);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 2px 8px rgba(201,100,66,0.2);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 8px 24px rgba(201,100,66,0.32);
+  transform: translateY(-2px) scale(1.02);
+}
+.btn-primary:active { transform: translateY(0) scale(0.98); }
+.btn-ghost {
+  background: rgba(255,255,255,0.6);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+.btn-ghost:hover {
+  background: var(--bg-card);
+  color: var(--text);
+  border-color: var(--accent-soft);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.btn-lg { padding: 15px 30px; font-size: 15px; }
+
+/* === HERO === */
+.hero {
+  position: relative;
+  z-index: 2;
+  padding: 120px 32px 80px;
+  text-align: center;
+  max-width: 900px; margin: 0 auto;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px;
+  background: rgba(244,230,222,0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--accent-soft);
+  border-radius: 100px;
+  font-size: 13px; font-weight: 500;
+  color: var(--accent);
+  margin-bottom: 28px;
+  animation: floatIn 1s cubic-bezier(0.16,1,0.3,1) both;
+}
+.hero-tag-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.3); }
+}
+@keyframes floatIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(42px, 6.5vw, 68px);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  color: var(--text);
+  margin-bottom: 24px;
+}
+.hero h1 .line {
+  display: block;
+  animation: floatIn 1s cubic-bezier(0.16,1,0.3,1) both;
+}
+.hero h1 .line:nth-child(1) { animation-delay: 0.1s; }
+.hero h1 .line:nth-child(2) { animation-delay: 0.22s; }
+.hero h1 em {
+  font-style: italic;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  font-size: 19px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 640px;
+  margin: 0 auto 40px;
+  animation: floatIn 1s cubic-bezier(0.16,1,0.3,1) 0.34s both;
+}
+.hero-cta {
+  display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+  animation: floatIn 1s cubic-bezier(0.16,1,0.3,1) 0.46s both;
+}
+.scroll-hint {
+  position: absolute;
+  bottom: 32px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text-muted);
+  animation: floatIn 1s 1s both;
+  z-index: 2;
+}
+.scroll-hint svg { animation: bob 2s ease-in-out infinite; }
+@keyframes bob {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+/* === SECTION SHARED === */
+.section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 90px 32px;
+  position: relative;
+}
+.section-full {
+  max-width: none;
+  padding-left: 0; padding-right: 0;
+}
+.section-full > * {
+  max-width: 1200px; margin-left: auto; margin-right: auto;
+  padding-left: 32px; padding-right: 32px;
+}
+.section-header { text-align: center; margin-bottom: 56px; }
+.section-label {
+  font-size: 13px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(30px, 4.2vw, 44px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin-bottom: 16px;
+}
+.section-desc {
+  font-size: 17px;
+  color: var(--text-secondary);
+  max-width: 600px; margin: 0 auto;
+}
+
+/* === 3D TILT CARD BASE === */
+.tilt {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1), box-shadow 0.4s, border-color 0.4s;
+}
+.tilt-inner {
+  transform: translateZ(30px);
+  transform-style: preserve-3d;
+}
+
+/* === FEATURES GRID === */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  perspective: 1400px;
+}
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.feature-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(600px circle at var(--mx,50%) var(--my,50%), rgba(201,100,66,0.06), transparent 40%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.feature-card:hover::before { opacity: 1; }
+.feature-card:hover {
+  border-color: var(--accent-soft);
+  box-shadow: var(--shadow-3d);
+}
+.feature-icon {
+  width: 50px; height: 50px;
+  border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+  transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  transform-style: preserve-3d;
+}
+.feature-card:hover .feature-icon {
+  transform: translateZ(40px) rotateY(-12deg) scale(1.08);
+}
+.feature-icon svg { width: 24px; height: 24px; }
+.feature-card h3 {
+  font-family: var(--serif);
+  font-size: 20px; font-weight: 600;
+  margin-bottom: 8px;
+}
+.feature-card p {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* === BIG FEATURES === */
+.big-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  perspective: 1600px;
+}
+.big-feature {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+}
+.big-feature:hover {
+  border-color: var(--accent-soft);
+  box-shadow: var(--shadow-3d);
+}
+.big-feature h3 {
+  font-family: var(--serif);
+  font-size: 25px; font-weight: 600;
+  margin-bottom: 12px;
+}
+.big-feature > p {
+  font-size: 15px; color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+.big-feature ul { list-style: none; }
+.big-feature li {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 11px 0;
+  font-size: 15px;
+  border-top: 1px solid var(--border-light);
+}
+.big-feature li:first-child { border-top: none; padding-top: 0; }
+.big-feature li svg {
+  width: 18px; height: 18px;
+  flex-shrink: 0; margin-top: 3px;
+  color: var(--accent);
+}
+
+/* === 3D FLIP MODEL CARDS === */
+.models-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  perspective: 1400px;
+}
+.model-cat {
+  position: relative;
+  height: 130px;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4,0,0.2,1);
+  cursor: pointer;
+}
+.model-cat:hover, .model-cat.flipped { transform: rotateY(180deg); }
+.model-cat:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--radius-md); }
+.model-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 20px;
+  text-align: center;
+}
+.model-face-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border-color: transparent;
+  color: white;
+}
+.model-cat-num {
+  font-family: var(--serif);
+  font-size: 38px; font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.model-cat-label {
+  font-size: 14px; color: var(--text-secondary); font-weight: 500;
+}
+.model-face-back .model-cat-label {
+  color: rgba(255,255,255,0.9);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.model-face-back strong {
+  font-family: var(--serif);
+  font-size: 17px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* === 3D ARCHITECTURE STACK === */
+.arch-3d {
+  perspective: 1400px;
+  max-width: 820px; margin: 0 auto;
+}
+.arch-step {
+  display: flex; gap: 24px;
+  padding: 28px 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), box-shadow 0.5s, border-color 0.4s;
+  will-change: transform;
+}
+.arch-step:hover {
+  transform: translateZ(50px) rotateX(-3deg);
+  box-shadow: var(--shadow-3d);
+  border-color: var(--accent-soft);
+  z-index: 2;
+}
+.arch-step-num {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-light), var(--purple-light));
+  color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif);
+  font-size: 19px; font-weight: 600;
+  flex-shrink: 0;
+  transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+.arch-step:hover .arch-step-num {
+  transform: translateZ(30px) scale(1.1);
+}
+.arch-step-content h3 {
+  font-family: var(--serif);
+  font-size: 20px; font-weight: 600;
+  margin-bottom: 8px;
+}
+.arch-step-content p {
+  font-size: 15px; color: var(--text-secondary); line-height: 1.7;
+}
+
+/* === STATS BANNER (3D) === */
+.stats-banner {
+  background: var(--text);
+  color: var(--bg);
+  border-radius: var(--radius-xl);
+  padding: 52px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  perspective: 1000px;
+}
+.stats-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(700px circle at 20% 0%, rgba(201,100,66,0.22), transparent 55%),
+              radial-gradient(600px circle at 85% 100%, rgba(124,111,158,0.22), transparent 55%);
+  pointer-events: none;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.stat-item {
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  transform-style: preserve-3d;
+  cursor: default;
+}
+.stat-item:hover { transform: translateZ(40px) scale(1.06); }
+.stat-item-num {
+  font-family: var(--serif);
+  font-size: 52px; font-weight: 600;
+  color: #EDD9CF;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+.stat-item-label {
+  font-size: 14px;
+  color: rgba(250,249,246,0.55);
+  font-weight: 500;
+}
+
+/* === TOOLS === */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 32px;
+  perspective: 1200px;
+}
+.tool-chip {
+  display: flex; align-items: center; gap: 10px;
+  padding: 15px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 500;
+  transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), background 0.3s, border-color 0.3s, box-shadow 0.3s;
+  transform-style: preserve-3d;
+  cursor: default;
+}
+.tool-chip:hover {
+  background: var(--accent-light);
+  border-color: var(--accent-soft);
+  transform: translateZ(28px) translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.tool-chip svg {
+  width: 18px; height: 18px;
+  color: var(--accent); flex-shrink: 0;
+}
+
+/* === PRICING === */
+.pricing-toggle {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; margin-bottom: 44px;
+}
+.pricing-toggle label {
+  font-size: 14px; color: var(--text-secondary);
+  font-weight: 500; cursor: pointer;
+}
+.pricing-toggle .active { color: var(--text); font-weight: 600; }
+.pricing-toggle-switch {
+  position: relative;
+  width: 46px; height: 25px;
+  background: var(--border);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.pricing-toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 19px; height: 19px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  transition: left 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.pricing-toggle-switch.annual::after { left: 24px; }
+.pricing-toggle-switch.annual { background: var(--accent); }
+.pricing-badge-annual {
+  font-size: 12px; font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-light);
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  perspective: 1600px;
+}
+.pricing-tier {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 34px 30px;
+  display: flex; flex-direction: column;
+  position: relative;
+  transition: transform 0.45s cubic-bezier(0.4,0,0.2,1), box-shadow 0.45s, border-color 0.4s;
+  transform-style: preserve-3d;
+}
+.pricing-tier:hover {
+  border-color: var(--accent-soft);
+  box-shadow: var(--shadow-3d);
+  transform: translateZ(40px) translateY(-6px);
+  z-index: 2;
+}
+.pricing-tier.featured {
+  border-color: var(--accent);
+  border-width: 2px;
+  transform: scale(1.03);
+  box-shadow: var(--shadow-md);
+}
+.pricing-tier.featured:hover {
+  transform: scale(1.03) translateZ(40px) translateY(-6px);
+}
+.pricing-tier-badge {
+  position: absolute;
+  top: -13px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  color: white;
+  padding: 5px 15px;
+  border-radius: 100px;
+  font-size: 12px; font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(201,100,66,0.3);
+}
+.pricing-tier h3 {
+  font-family: var(--serif);
+  font-size: 23px; font-weight: 600;
+  margin-bottom: 4px;
+}
+.pricing-tier-desc {
+  font-size: 13px; color: var(--text-muted);
+  margin-bottom: 20px; min-height: 34px;
+}
+.pricing-price {
+  font-family: var(--serif);
+  font-size: 42px; font-weight: 600;
+  margin-bottom: 4px; line-height: 1;
+}
+.pricing-price span {
+  font-size: 14px; color: var(--text-muted);
+  font-family: var(--sans); font-weight: 400;
+}
+.pricing-tier ul {
+  list-style: none; margin: 24px 0 30px; flex: 1;
+}
+.pricing-tier li {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0;
+  font-size: 14px; color: var(--text-secondary);
+}
+.pricing-tier li svg {
+  width: 16px; height: 16px;
+  flex-shrink: 0; margin-top: 2px;
+  color: var(--accent);
+}
+.pricing-tier .btn { width: 100%; justify-content: center; }
+
+/* === TOKEN PACKS === */
+.packs-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  perspective: 1400px;
+}
+.pack-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 26px 20px;
+  text-align: center;
+  display: flex; flex-direction: column;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s, border-color 0.3s;
+  transform-style: preserve-3d;
+}
+.pack-card:hover {
+  border-color: var(--accent-soft);
+  box-shadow: var(--shadow-3d);
+  transform: translateZ(35px) translateY(-5px);
+}
+.pack-card h4 {
+  font-family: var(--serif);
+  font-size: 18px; font-weight: 600;
+  margin-bottom: 10px;
+}
+.pack-credits {
+  font-family: var(--serif);
+  font-size: 30px; font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+.pack-credits-label {
+  font-size: 13px; color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.pack-price {
+  font-size: 21px; font-weight: 600; margin-bottom: 6px;
+}
+.pack-desc {
+  font-size: 12px; color: var(--text-muted);
+  margin-bottom: 20px; flex: 1;
+}
+.pack-card .btn {
+  width: 100%; justify-content: center;
+  font-size: 13px; padding: 9px 16px;
+}
+
+/* === HOW IT WORKS === */
+.how-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px; margin-top: 40px;
+  perspective: 1400px;
+}
+.how-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 34px;
+  transition: transform 0.45s cubic-bezier(0.4,0,0.2,1), box-shadow 0.45s, border-color 0.4s;
+  transform-style: preserve-3d;
+}
+.how-card:hover {
+  transform: translateZ(35px);
+  box-shadow: var(--shadow-3d);
+  border-color: var(--accent-soft);
+}
+.how-card h4 {
+  font-family: var(--serif);
+  font-size: 20px; font-weight: 600;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.how-card ul { list-style: none; }
+.how-card li {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0;
+  font-size: 15px; color: var(--text-secondary);
+}
+.how-card li svg {
+  width: 18px; height: 18px;
+  flex-shrink: 0; margin-top: 2px;
+  color: var(--accent);
+}
+
+/* === CTA === */
+.cta-section {
+  text-align: center;
+  padding: 100px 32px;
+  max-width: 760px; margin: 0 auto;
+  position: relative;
+}
+.cta-section h2 {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4.5vw, 44px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin-bottom: 16px;
+}
+.cta-section p {
+  font-size: 17px; color: var(--text-secondary);
+  margin-bottom: 34px;
+}
+
+/* === FOOTER === */
+.footer {
+  background: var(--bg-soft);
+  border-top: 1px solid var(--border);
+  padding: 60px 32px 32px;
+}
+.footer-inner {
+  max-width: 1200px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+.footer-brand h3 {
+  font-family: var(--serif);
+  font-size: 25px; font-weight: 600;
+  margin-bottom: 12px;
+}
+.footer-brand p {
+  font-size: 14px; color: var(--text-secondary);
+  line-height: 1.7; max-width: 320px;
+}
+.footer-col h4 {
+  font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 10px; }
+.footer-col a {
+  text-decoration: none; color: var(--text-secondary);
+  font-size: 14px; transition: var(--transition);
+}
+.footer-col a:hover { color: var(--accent); }
+.footer-bottom {
+  max-width: 1200px; margin: 44px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 13px; color: var(--text-muted);
+}
+.footer-social { display: flex; gap: 12px; }
+.footer-social a {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.3s, border-color 0.3s;
+}
+.footer-social a:hover {
+  background: var(--accent-light);
+  border-color: var(--accent-soft);
+  transform: translateY(-3px) rotate(-6deg);
+}
+.footer-social svg { width: 18px; height: 18px; color: var(--text-secondary); }
+
+/* === SCROLL REVEAL (3D) === */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px) rotateX(-6deg);
+  transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0) rotateX(0);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 968px) {
+  .nav-links { display: none; }
+  .features-grid { grid-template-columns: 1fr; }
+  .big-features { grid-template-columns: 1fr; }
+  .models-grid { grid-template-columns: repeat(2, 1fr); }
+  .pricing-grid { grid-template-columns: 1fr 1fr; }
+  .packs-grid { grid-template-columns: repeat(2, 1fr); }
+  .tools-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+  .footer-bottom { flex-direction: column; gap: 16px; }
+  .how-grid { grid-template-columns: 1fr; }
+  .pricing-tier.featured { transform: none; }
+}
+@media (max-width: 600px) {
+  .pricing-grid, .packs-grid, .tools-grid { grid-template-columns: 1fr; }
+  .hero { padding: 110px 20px 70px; }
+  .section { padding: 64px 20px; }
+  .stats-banner { padding: 36px 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  #hero-canvas { display: none; }
+}
+
+/* ============================================================
+   ANIMATION LAYER
+   ============================================================ */
+
+/* --- Scroll progress bar --- */
+.scroll-progress {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 3px; z-index: 300;
+  pointer-events: none;
+}
+.scroll-progress span {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--accent), var(--purple), var(--accent));
+  background-size: 200% 100%;
+  animation: progressHue 4s linear infinite;
+  box-shadow: 0 0 14px rgba(201,100,66,0.45);
+}
+@keyframes progressHue { to { background-position: 200% 0; } }
+
+/* --- Living gradient on the italic headline --- */
+.hero h1 em {
+  background: linear-gradient(100deg,
+    var(--purple) 0%, var(--accent) 26%, #D8A98F 46%,
+    var(--purple) 66%, var(--accent) 86%, var(--purple) 100%);
+  background-size: 280% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: sweep 9s ease-in-out infinite;
+}
+@keyframes sweep {
+  0%, 100% { background-position: 0% 0; }
+  50%      { background-position: 100% 0; }
+}
+
+/* --- Shine sweep across buttons on hover --- */
+.btn { position: relative; overflow: hidden; }
+.btn > * { position: relative; z-index: 1; }
+.btn::after {
+  content: ''; position: absolute; top: 0; left: -130%;
+  width: 55%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.38), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.7s cubic-bezier(0.4,0,0.2,1);
+  pointer-events: none; z-index: 0;
+}
+.btn:hover::after { left: 140%; }
+.btn-ghost::after, .btn-secondary::after {
+  background: linear-gradient(100deg, transparent, rgba(201,100,66,0.16), transparent);
+}
+
+/* --- Badge shimmer --- */
+.hero-tag { position: relative; overflow: hidden; }
+.hero-tag::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(100deg, transparent 25%, rgba(255,255,255,0.5) 50%, transparent 75%);
+  transform: translateX(-100%);
+  animation: tagShine 6s ease-in-out infinite 2s;
+  pointer-events: none;
+}
+@keyframes tagShine { 0%, 72% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+/* --- Marquee ticker --- */
+.marquee-wrap {
+  overflow: hidden;
+  padding: 7px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+          mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+}
+.marquee {
+  display: flex; width: max-content; gap: 14px;
+  animation: marquee 40s linear infinite;
+  will-change: transform;
+}
+.marquee.rev { animation-direction: reverse; animation-duration: 52s; }
+.marquee-wrap:hover .marquee { animation-play-state: paused; }
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-50% - 7px)); }
+}
+.mq-item {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 9px;
+  padding: 9px 17px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 100px;
+  white-space: nowrap;
+  transition: color .3s, border-color .3s, background .3s, transform .3s;
+}
+.mq-item:hover {
+  color: var(--accent); border-color: var(--accent-soft);
+  background: var(--accent-light); transform: translateY(-2px);
+}
+.mq-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: .7; flex-shrink: 0; }
+.marquee.rev .mq-dot { background: var(--purple); }
+
+/* --- Section title: word-by-word 3D reveal --- */
+.section-title .w, .section-title .w-sp { display: inline-block; }
+.section-title.wsplit .w {
+  opacity: 0;
+  transform: translateY(20px) rotateX(-55deg);
+  transition: opacity .65s cubic-bezier(.16,1,.3,1), transform .65s cubic-bezier(.16,1,.3,1);
+}
+.section-title.wsplit.won .w { opacity: 1; transform: none; }
+
+/* --- Architecture: growing accent rail + number pop --- */
+.arch-step { position: relative; }
+.arch-step::after {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: linear-gradient(180deg, var(--accent), var(--purple));
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  transform: scaleY(0); transform-origin: top;
+  transition: transform .9s cubic-bezier(.16,1,.3,1);
+}
+.arch-step.visible::after { transform: scaleY(1); }
+.arch-step.visible .arch-step-num { animation: numPop .75s cubic-bezier(.34,1.56,.64,1) both .15s; }
+@keyframes numPop {
+  0%   { transform: scale(.35) rotate(-30deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* --- Stats banner: slow light sheen --- */
+.stats-banner::after {
+  content: ''; position: absolute;
+  top: -60%; left: -40%; width: 38%; height: 220%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.075), transparent);
+  transform: rotate(14deg);
+  animation: sheen 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes sheen { 0% { left: -40%; } 62%, 100% { left: 130%; } }
+
+/* --- Feature icon: pulsing ring on card hover --- */
+.feature-icon { position: relative; }
+.feature-icon::after {
+  content: ''; position: absolute; inset: 0;
+  border-radius: inherit;
+  border: 1px solid var(--accent-soft);
+  opacity: 0;
+}
+.feature-card:hover .feature-icon::after { animation: iconRing 1.5s ease-out infinite; }
+@keyframes iconRing {
+  0%   { opacity: .65; transform: scale(1); }
+  100% { opacity: 0;   transform: scale(1.55); }
+}
+
+/* --- Tool chips: springy stagger entrance --- */
+.tool-chip.reveal { transform: translateY(26px) scale(.94); }
+.tool-chip.reveal.visible {
+  transform: translateY(0) scale(1);
+  transition: opacity .5s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* --- Parallax drift for section headers --- */
+.section-header { will-change: transform; }
+
+/* --- Respect reduced motion --- */
+@media (prefers-reduced-motion: reduce) {
+  .marquee, .scroll-progress span, .hero h1 em,
+  .stats-banner::after, .hero-tag::after,
+  .feature-card:hover .feature-icon::after { animation: none !important; }
+  .section-title.wsplit .w { opacity: 1 !important; transform: none !important; }
+}
+
+
+/* ============================================================
+   BRAND MARK
+   ============================================================ */
+.nav-logo-icon {
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  background: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  transform-style: preserve-3d;
+  transition: transform .65s cubic-bezier(.4,0,.2,1);
+}
+.nav-logo-icon svg {
+  width: 100%; height: 100%; display: block;
+  filter: drop-shadow(0 3px 10px rgba(201,100,66,.26));
+}
+.nav-logo:hover .nav-logo-icon { transform: rotateY(180deg) rotateX(8deg); }
+
+.nav-logo-text .os, .footer-brand h3 .os {
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.footer-logo { display: flex; align-items: center; gap: 11px; margin-bottom: 14px; }
+.footer-logo-icon { width: 30px; height: 30px; flex-shrink: 0; }
+.footer-logo-icon svg { width: 100%; height: 100%; display: block; }
+.footer-logo h3 { margin: 0 !important; }
+
+
+/* ============================================================
+   BRAND MARK v2 — depth + light sweep
+   ============================================================ */
+.evx-mark { width: 100%; height: 100%; display: block; overflow: visible; }
+.evx-mark .es1 { animation: evxStop1 9s ease-in-out infinite; }
+.evx-mark .es3 { animation: evxStop3 9s ease-in-out infinite; }
+@keyframes evxStop1 { 0%,100% { stop-color:#EE8A52 } 50% { stop-color:#F5A468 } }
+@keyframes evxStop3 { 0%,100% { stop-color:#7B3FA0 } 50% { stop-color:#9D50C8 } }
+
+.evx-sheen {
+  transform-box: view-box;
+  transform: translateX(-14px) skewX(-18deg);
+  opacity: 0;
+  animation: evxSheen 5.2s cubic-bezier(.42,0,.35,1) infinite;
+}
+@keyframes evxSheen {
+  0%   { transform: translateX(-14px) skewX(-18deg); opacity: 0; }
+  10%  { opacity: .95; }
+  42%  { opacity: .95; }
+  54%  { transform: translateX(52px) skewX(-18deg); opacity: 0; }
+  100% { transform: translateX(52px) skewX(-18deg); opacity: 0; }
+}
+
+.nav-logo-icon svg { animation: evxGlow 6.5s ease-in-out infinite; }
+@keyframes evxGlow {
+  0%,100% { filter: drop-shadow(0 3px 10px rgba(201,100,66,.26)); }
+  50%     { filter: drop-shadow(0 5px 17px rgba(124,111,158,.36)); }
+}
+.nav-logo-icon { transition: transform .95s cubic-bezier(.34,1.24,.5,1) !important; }
+.nav-logo:hover .nav-logo-icon { transform: rotateY(360deg) scale(1.07); }
+
+/* ============================================================
+   FOOTER — dark bookend
+   ============================================================ */
+.footer {
+  position: relative; overflow: hidden;
+  background: #14121A;
+  border-top: none !important;
+  padding: 0 32px 26px !important;
+  color: #B4AEC2;
+}
+.footer::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--purple), var(--accent), transparent);
+  background-size: 220% 100%;
+  animation: footerRule 11s linear infinite;
+}
+@keyframes footerRule { to { background-position: 220% 0; } }
+
+.footer-glow { position: absolute; inset: 0; pointer-events: none; }
+.footer-glow::before, .footer-glow::after {
+  content: ''; position: absolute;
+  width: 540px; height: 540px; border-radius: 50%;
+  filter: blur(120px); opacity: .20;
+}
+.footer-glow::before { background:#C96442; top:-210px; left:6%;  animation: fGlowA 17s ease-in-out infinite; }
+.footer-glow::after  { background:#7C6F9E; bottom:-260px; right:4%; animation: fGlowB 21s ease-in-out infinite; }
+@keyframes fGlowA { 0%,100%{transform:translate(0,0)} 50%{transform:translate(70px,34px)} }
+@keyframes fGlowB { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-80px,-34px)} }
+
+.footer-watermark {
+  position: absolute; left: 50%; bottom: -4.6vw; transform: translateX(-50%);
+  z-index: 0;
+  font-family: var(--serif); font-weight: 700; font-size: 15.5vw; line-height: .78;
+  letter-spacing: -.045em; white-space: nowrap; pointer-events: none; user-select: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.062), rgba(255,255,255,0) 72%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.footer-cta, .footer-inner, .footer-bottom { z-index: 2; }
+.footer-cta { position: relative; }
+
+.footer-cta { position: relative; max-width: 800px; margin: 0 auto; padding: 84px 0 64px; text-align: center; }
+.footer-cta h2 {
+  font-family: var(--serif); font-weight: 600; color: #fff;
+  font-size: clamp(30px, 4.1vw, 47px); line-height: 1.12;
+  letter-spacing: -.028em; margin-bottom: 15px;
+}
+.footer-cta h2 em {
+  font-style: italic;
+  background: linear-gradient(115deg, #EE8A52 8%, #D9663A 46%, #A87BD4 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.footer-cta p { color: #948EA3; font-size: 16px; line-height: 1.7; max-width: 545px; margin: 0 auto 32px; }
+.footer-cta-row { display: flex; gap: 13px; justify-content: center; flex-wrap: wrap; }
+
+.btn-ghost-dark {
+  background: rgba(255,255,255,.055); color: #EFECF5;
+  border: 1px solid rgba(255,255,255,.15);
+  backdrop-filter: blur(8px);
+}
+.btn-ghost-dark:hover {
+  background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.3);
+  transform: translateY(-2px);
+}
+
+.footer-inner {
+  position: relative;
+  padding-top: 46px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.footer-brand h3 { color: #fff; }
+.footer-brand p { color: #8F8A9E !important; }
+.footer-logo-icon { filter: drop-shadow(0 3px 12px rgba(201,100,66,.3)); }
+
+.footer-status {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 20px;
+  padding: 7px 14px; border-radius: 999px;
+  background: rgba(74,222,128,.07); border: 1px solid rgba(74,222,128,.2);
+  font-size: 12.5px; font-weight: 500; color: #7FD99A;
+}
+.footer-status .dot {
+  width: 7px; height: 7px; border-radius: 50%; background: #4ADE80;
+  animation: statusPulse 2.3s ease-out infinite;
+}
+@keyframes statusPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(74,222,128,.55); }
+  70%  { box-shadow: 0 0 0 9px rgba(74,222,128,0); }
+  100% { box-shadow: 0 0 0 0 rgba(74,222,128,0); }
+}
+
+.footer-col h4 { color: #6E6880 !important; }
+.footer-col a { color: #A29CB2 !important; position: relative; }
+.footer-col a::after {
+  content: '\2192'; display: inline-block; margin-left: 6px;
+  opacity: 0; transform: translateX(-7px);
+  transition: opacity .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1);
+}
+.footer-col a:hover { color: #fff !important; }
+.footer-col a:hover::after { opacity: .65; transform: translateX(0); }
+
+.footer-bottom {
+  position: relative;
+  border-top: 1px solid rgba(255,255,255,.08) !important;
+  color: #6E6880 !important;
+  margin-top: 48px !important; padding-top: 24px !important;
+  gap: 20px; flex-wrap: wrap;
+}
+.footer-social a {
+  background: rgba(255,255,255,.05) !important;
+  border-color: rgba(255,255,255,.1) !important;
+}
+.footer-social a:hover {
+  background: var(--accent) !important; border-color: var(--accent) !important;
+}
+.footer-social svg { color: #A29CB2; transition: color .3s; }
+.footer-social a:hover svg { color: #fff; }
+
+.footer-top {
+  width: 40px; height: 40px; border-radius: 11px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12);
+  color: #A29CB2; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .34s cubic-bezier(.34,1.56,.64,1);
+}
+.footer-top svg { width: 17px; height: 17px; }
+.footer-top:hover {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+  transform: translateY(-4px);
+}
+
+@media (max-width: 968px) {
+  .footer-inner { grid-template-columns: 1fr 1fr !important; gap: 34px !important; }
+  .footer-brand { grid-column: 1 / -1; }
+  .footer-bottom { justify-content: center; text-align: center; }
+  .footer-watermark { font-size: 22vw; bottom: -4vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .evx-sheen, .nav-logo-icon svg, .evx-mark .es1, .evx-mark .es3,
+  .footer::before, .footer-glow::before, .footer-glow::after, .footer-status .dot {
+    animation: none !important;
+  }
+  .evx-sheen { opacity: 0 !important; }
+}
+
+</style>
+</head>
+<body>
+<div class="scroll-progress" aria-hidden="true"><span></span></div>
+
+<!-- ============ NAV ============ -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <span class="nav-logo-icon"><svg class="evx-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="EvolvixOS"><defs><linearGradient id="gN" x1="0.05" y1="0" x2="0.95" y2="1"><stop class="es1" offset="0" stop-color="#EE8A52"/><stop offset="0.42" stop-color="#D9663A"/><stop class="es3" offset="1" stop-color="#7B3FA0"/></linearGradient><linearGradient id="hN" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="0.6" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="sN" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.5" stop-color="#fff" stop-opacity=".62"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><clipPath id="cN"><path d="M26.77,5.20 Q24.00,3.60 21.23,5.20 L9.10,12.20 Q6.33,13.80 6.33,17.00 L6.33,31.00 Q6.33,34.20 9.10,35.80 L21.23,42.80 Q24.00,44.40 26.77,42.80 L38.90,35.80 Q41.67,34.20 41.67,31.00 L41.67,17.00 Q41.67,13.80 38.90,12.20 Z M13.20,28.40 L24.00,16.80 L34.80,28.40 L34.80,33.40 L24.00,21.80 L13.20,33.40 Z" clip-rule="evenodd"/></clipPath></defs><path d="M26.77,5.20 Q24.00,3.60 21.23,5.20 L9.10,12.20 Q6.33,13.80 6.33,17.00 L6.33,31.00 Q6.33,34.20 9.10,35.80 L21.23,42.80 Q24.00,44.40 26.77,42.80 L38.90,35.80 Q41.67,34.20 41.67,31.00 L41.67,17.00 Q41.67,13.80 38.90,12.20 Z M13.20,28.40 L24.00,16.80 L34.80,28.40 L34.80,33.40 L24.00,21.80 L13.20,33.40 Z" fill="url(#gN)" fill-rule="evenodd"/><g clip-path="url(#cN)"><path d="M26.77,5.20 Q24.00,3.60 21.23,5.20 L9.10,12.20 Q6.33,13.80 6.33,17.00 L6.33,31.00 Q6.33,34.20 9.10,35.80 L21.23,42.80 Q24.00,44.40 26.77,42.80 L38.90,35.80 Q41.67,34.20 41.67,31.00 L41.67,17.00 Q41.67,13.80 38.90,12.20 Z" fill="none" stroke="url(#hN)" stroke-width="1.7" opacity=".55"/><rect class="evx-sheen" x="-14" y="-8" width="13" height="64" fill="url(#sN)"/></g></svg></span>
+      <span class="nav-logo-text">Evolvix<span class="os">OS</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#models">AI Models</a></li>
+      <li><a href="#tools">Tools</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="https://github.com/Protremix/EvolvixOS">GitHub</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="/platform/" class="btn btn-ghost">Sign In</a>
+      <a href="#pricing" class="btn btn-primary">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO (3D) ============ -->
+<div class="hero-wrap">
+  <canvas id="hero-canvas"></canvas>
+  <section class="hero">
+    <div class="hero-tag">
+      <div class="hero-tag-dot"></div>
+      Open-source &middot; 281+ AI Models &middot; Self-hosted
+    </div>
+    <h1>
+      <span class="line">Engineer AI Systems</span>
+      <span class="line"><em>Without Limits</em></span>
+    </h1>
+    <p class="hero-sub">
+      The open-source AI engineering platform that combines a full-stack engineering workbench,
+      281+ AI models, cinematic media production, and zero-knowledge dashboards —
+      all running on your own infrastructure. No vendor lock-in, no limits.
+    </p>
+    <div class="hero-cta">
+      <a href="/platform/" class="btn btn-primary btn-lg magnetic">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Launch Studio
+      </a>
+      <a href="https://github.com/Protremix/EvolvixOS" class="btn btn-ghost btn-lg magnetic">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.37 1.23-3.21-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.21 0 4.595-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        Star on GitHub
+      </a>
+    </div>
+  </section>
+  <div class="scroll-hint">
+    Scroll to explore
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</div>
+
+<!-- ============ STATS ============ -->
+<div class="section" style="padding-top: 20px;">
+  <div class="stats-banner reveal">
+    <div class="stats-grid">
+      <div class="stat-item"><div class="stat-item-num" data-count="281">281+</div><div class="stat-item-label">AI Models</div></div>
+      <div class="stat-item"><div class="stat-item-num" data-count="44">44+</div><div class="stat-item-label">Agent Tools</div></div>
+      <div class="stat-item"><div class="stat-item-num" data-count="12">12</div><div class="stat-item-label">Categories</div></div>
+      <div class="stat-item"><div class="stat-item-num" data-count="217">217</div><div class="stat-item-label">Subagent Templates</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LIVE TICKER ============ -->
+<div class="section" id="live" style="padding-top: 34px; padding-bottom: 8px;">
+  <div class="section-header reveal" style="margin-bottom: 26px;">
+    <div class="section-label">Running Right Now</div>
+  </div>
+<div class="marquee-wrap"><div class="marquee"><div class="mq-item"><span class="mq-dot"></span>Qwen 2.5 72B</div><div class="mq-item"><span class="mq-dot"></span>Llama 3.3</div><div class="mq-item"><span class="mq-dot"></span>DeepSeek V3</div><div class="mq-item"><span class="mq-dot"></span>Wan 2.2 Video</div><div class="mq-item"><span class="mq-dot"></span>SDXL Turbo</div><div class="mq-item"><span class="mq-dot"></span>Whisper STT</div><div class="mq-item"><span class="mq-dot"></span>Piper TTS</div><div class="mq-item"><span class="mq-dot"></span>Gemini 3.6 Flash</div><div class="mq-item"><span class="mq-dot"></span>Groq gpt-oss-120b</div><div class="mq-item"><span class="mq-dot"></span>Kimi 32k</div><div class="mq-item"><span class="mq-dot"></span>Flux Schnell</div><div class="mq-item"><span class="mq-dot"></span>ComfyUI</div><div class="mq-item"><span class="mq-dot"></span>Nemotron</div><div class="mq-item"><span class="mq-dot"></span>Stable Diffusion 3</div><div class="mq-item"><span class="mq-dot"></span>AnimateDiff</div><div class="mq-item"><span class="mq-dot"></span>Blender Cycles</div></div></div>
+<div class="marquee-wrap"><div class="marquee rev"><div class="mq-item"><span class="mq-dot"></span>Code Execution</div><div class="mq-item"><span class="mq-dot"></span>File Operations</div><div class="mq-item"><span class="mq-dot"></span>Server Management</div><div class="mq-item"><span class="mq-dot"></span>Docker Control</div><div class="mq-item"><span class="mq-dot"></span>Web Search</div><div class="mq-item"><span class="mq-dot"></span>Web Fetch</div><div class="mq-item"><span class="mq-dot"></span>PostgreSQL</div><div class="mq-item"><span class="mq-dot"></span>SSH Remote</div><div class="mq-item"><span class="mq-dot"></span>Media Production</div><div class="mq-item"><span class="mq-dot"></span>Voice Commands</div><div class="mq-item"><span class="mq-dot"></span>GitHub Discovery</div><div class="mq-item"><span class="mq-dot"></span>Subagent Search</div><div class="mq-item"><span class="mq-dot"></span>Stripe Billing</div><div class="mq-item"><span class="mq-dot"></span>Brevo Email</div><div class="mq-item"><span class="mq-dot"></span>Telegram Bot</div><div class="mq-item"><span class="mq-dot"></span>WhatsApp Bot</div><div class="mq-item"><span class="mq-dot"></span>OWASP ZAP</div></div></div>
+</div>
+
+<!-- ============ FEATURES ============ -->
+<section class="section" id="features">
+  <div class="section-header reveal">
+    <div class="section-label">Platform Capabilities</div>
+    <h2 class="section-title">Everything You Need to Build, Ship &amp; Scale</h2>
+    <p class="section-desc">From system engineering to 4K media production, EvolvixOS gives you the full AI engineering toolkit in a single, self-hosted platform. Describe what you want — we build it.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card tilt reveal">
+      <div class="feature-icon" style="background: var(--accent-light);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></div>
+      <h3>Engineering Workbench</h3>
+      <p>Engineer full-stack systems with entity-based data, auto-generated APIs, and an AI-driven build layer.</p>
+    </div>
+    <div class="feature-card tilt reveal">
+      <div class="feature-icon" style="background: var(--purple-light);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg></div>
+      <h3>281+ AI Models</h3>
+      <p>From text generation to 4K video, auto-selects the best AI engine for every task. No juggling multiple APIs.</p>
+    </div>
+    <div class="feature-card tilt reveal">
+      <div class="feature-icon" style="background: var(--accent-light);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M23 7l-7 5 7 5V7zM1 5v14l13-7L1 5z"/></svg></div>
+      <h3>Full-Stack Media Production</h3>
+      <p>4K video, AI voice synthesis, image generation, and cinematic assembly — all from voice commands.</p>
+    </div>
+    <div class="feature-card tilt reveal">
+      <div class="feature-icon" style="background: var(--purple-light);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
+      <h3>Entity CRUD API</h3>
+      <p>JSON schemas become PostgreSQL tables instantly. Auto-generated CRUD, pagination, filtering, sorting.</p>
+    </div>
+    <div class="feature-card tilt reveal">
+      <div class="feature-icon" style="background: var(--accent-light);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+      <h3>Workflow Automation</h3>
+      <p>Scheduled and triggered automations. Entity events, connector webhooks, or cron — all with a visual builder.</p>
+    </div>
+    <div class="feature-card tilt reveal">
+      <div class="feature-icon" style="background: var(--purple-light);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div>
+      <h3>Privacy-First Architecture</h3>
+      <p>LOCAL, HYBRID, and CLOUD privacy modes. Your data stays on your infrastructure. Zero vendor lock-in.</p>
+    </div>
+    <div class="feature-card tilt reveal">
+      <div class="feature-icon" style="background: var(--accent-light);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M12 2a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v3"/></svg></div>
+      <h3>Voice-Command Interface</h3>
+      <p>Alexa-level voice processing for all platform commands. Media generation, server management, and more.</p>
+    </div>
+    <div class="feature-card tilt reveal">
+      <div class="feature-icon" style="background: var(--purple-light);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6M14.5 4l-5 16"/></svg></div>
+      <h3>REST API &amp; SDK</h3>
+      <p>Auto-generated TypeScript &amp; JavaScript SDKs from entity schemas. Connect EvolvixOS to any external project.</p>
+    </div>
+    <div class="feature-card tilt reveal">
+      <div class="feature-icon" style="background: var(--accent-light);"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 4-6"/></svg></div>
+      <h3>Analytics Dashboard</h3>
+      <p>Monitor usage, model performance, and costs. Zero-knowledge dashboard for non-technical interaction.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEV EXPERIENCE ============ -->
+<section class="section" style="padding-top: 0;">
+  <div class="big-features">
+    <div class="big-feature tilt reveal">
+      <div class="feature-icon" style="background: var(--accent-light); margin-bottom: 20px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+      <h3>Developer Experience</h3>
+      <p>Everything you need to engineer and ship AI-powered systems without fighting infrastructure.</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Auto-generated TypeScript &amp; JavaScript SDKs from entity schemas</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Deploy Python code as HTTP backend functions in one command</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Visual page builder with drag-and-drop components and live preview</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Public service viewer — share your services with anyone via URL</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> One-click engineering templates for common patterns</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> API documentation auto-generated for every entity</li>
+      </ul>
+    </div>
+    <div class="big-feature tilt reveal">
+      <div class="feature-icon" style="background: var(--purple-light); margin-bottom: 20px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4M8 16h.01M16 16h.01"/></svg></div>
+      <h3>Agent Capabilities</h3>
+      <p>Mr. James — the built-in AI agent — has 44+ tools and can autonomously build, deploy, and manage.</p>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 217 subagent templates across 16 categories</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 16 MBTI personality profiles for customized interaction</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Voice command processing (Alexa-level, smarter)</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Self-improvement capabilities with self-correction</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> GitHub Discovery Engine — auto-learns new tools</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Tencent Cloud, Google Gemini, Groq, and Kimi integrations</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODELS (3D FLIP) ============ -->
+<section class="section" id="models" style="background: var(--bg-soft);">
+  <div class="section-header reveal">
+    <div class="section-label">AI Model Catalog</div>
+    <h2 class="section-title">281 Models. 12 Categories. One Platform.</h2>
+    <p class="section-desc">From text generation to 4K video, EvolvixOS auto-selects the best AI engine for every task. Hover a card to see what's inside.</p>
+  </div>
+  <div class="models-grid">
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">42</div><div class="model-cat-label">LLM &amp; Text</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>LLM &amp; Text</strong>Qwen, Llama, GPT-OSS, Kimi, Gemini, Nemotron</div></div></div>
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">30</div><div class="model-cat-label">Image Generation</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>Image Generation</strong>SDXL Turbo, Flux, Pollinations, AIArt</div></div></div>
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">61</div><div class="model-cat-label">Video Generation</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>Video Generation</strong>Wan 2.1/2.2, AnimateDiff, SVD, ComfyUI</div></div></div>
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">16</div><div class="model-cat-label">Vision &amp; Multimodal</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>Vision &amp; Multimodal</strong>Gemini Vision, LLaVA, Qwen-VL, OCR</div></div></div>
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">21</div><div class="model-cat-label">Speech &amp; Voice</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>Speech &amp; Voice</strong>Whisper STT, Piper, Edge Neural TTS</div></div></div>
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">14</div><div class="model-cat-label">Music &amp; Audio</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>Music &amp; Audio</strong>MusicGen, AudioCraft, Bark, RVC</div></div></div>
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">21</div><div class="model-cat-label">3D Generation</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>3D Generation</strong>Blender Cycles, TripoSR, Shap-E, Zero123</div></div></div>
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">16</div><div class="model-cat-label">AI Coding</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>AI Coding</strong>Qwen Coder, DeepSeek, StarCoder, CodeLlama</div></div></div>
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">19</div><div class="model-cat-label">RAG &amp; Agents</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>RAG &amp; Agents</strong>LangChain, LlamaIndex, ChromaDB, Memory Hub</div></div></div>
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">17</div><div class="model-cat-label">Image Control</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>Image Control</strong>ControlNet, IP-Adapter, LoRA, Inpainting</div></div></div>
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">18</div><div class="model-cat-label">Local Engines</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>Local Engines</strong>Ollama, llama.cpp, vLLM, ComfyUI</div></div></div>
+    <div class="model-cat reveal"><div class="model-face"><div class="model-cat-num">6</div><div class="model-cat-label">Frameworks</div></div><div class="model-face model-face-back"><div class="model-cat-label"><strong>Frameworks</strong>FastAPI, PostgreSQL, Docker, Nginx</div></div></div>
+  </div>
+</section>
+
+<!-- ============ TOOLS ============ -->
+<section class="section" id="tools">
+  <div class="section-header reveal">
+    <div class="section-label">Agent Toolkit</div>
+    <h2 class="section-title">44+ Built-in Tools</h2>
+    <p class="section-desc">Mr. James has an arsenal of 44+ tools at its disposal. From file operations to cloud management, it can autonomously build, deploy, and manage your entire stack.</p>
+  </div>
+  <div class="tools-grid">
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Code Execution</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M13 2v7h7"/></svg> File Operations</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Server Management</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> Docker Control</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg> Web Search</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg> Web Fetch</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7zM1 5v14l13-7L1 5z"/></svg> Media Production</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v7a3 3 0 006 0V5a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v3"/></svg> Voice Synthesis</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg> Cloud Management</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Scheduled Tasks</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg> Subagent Search</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0113 0"/></svg> Personality Switch</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg> Skill Import</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20"/></svg> Team Memory</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> GitHub Discovery</div>
+    <div class="tool-chip reveal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 4-6"/></svg> Analytics</div>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE (3D STACK) ============ -->
+<section class="section" id="architecture" style="background: var(--bg-soft);">
+  <div class="section-header reveal">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">A Platform Built in Layers</h2>
+    <p class="section-desc">EvolvixOS is built on a proven layered architecture — entity-based data, auto-generated APIs, and an AI-driven engineering layer, all on your own infrastructure.</p>
+  </div>
+  <div class="arch-3d">
+    <div class="arch-step reveal">
+      <div class="arch-step-num">1</div>
+      <div class="arch-step-content">
+        <h3>Entity Layer — Define Your Data</h3>
+        <p>JSON schemas become PostgreSQL tables instantly. Every entity gets auto-generated CRUD APIs with pagination, sorting, filtering, and row-level security. No ORM boilerplate, no migrations to manage.</p>
+      </div>
+    </div>
+    <div class="arch-step reveal">
+      <div class="arch-step-num">2</div>
+      <div class="arch-step-content">
+        <h3>Function Layer — Deploy Logic</h3>
+        <p>Write Python code and deploy it as an HTTP endpoint in one command. Backend functions run server-side with full access to entities, file storage, and external APIs. Auto-scaled and monitored.</p>
+      </div>
+    </div>
+    <div class="arch-step reveal">
+      <div class="arch-step-num">3</div>
+      <div class="arch-step-content">
+        <h3>Workflow Layer — Automate Everything</h3>
+        <p>Schedule recurring tasks, trigger on entity changes, or fire on connector webhooks. Build complex multi-step workflows with conditions, waits, and AI-driven steps — all with a visual builder.</p>
+      </div>
+    </div>
+    <div class="arch-step reveal">
+      <div class="arch-step-num">4</div>
+      <div class="arch-step-content">
+        <h3>AI Layer — Build with Intelligence</h3>
+        <p>Describe what you want in natural language. Mr. James — the built-in AI agent — creates entities, deploys functions, builds pages, and manages your entire stack autonomously using 44+ tools.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="section" id="pricing">
+  <div class="section-header reveal">
+    <div class="section-label">Subscription Plans</div>
+    <h2 class="section-title">Simple, Transparent Pricing</h2>
+    <p class="section-desc">Start free, scale as you grow. Every plan includes the full platform — the difference is compute power and model access. No hidden fees, no surprises.</p>
+  </div>
+  <div class="pricing-toggle reveal">
+    <label class="active" id="label-monthly">Monthly</label>
+    <div class="pricing-toggle-switch" id="toggle"></div>
+    <label id="label-annual">Annual</label>
+    <span class="pricing-badge-annual">Save 20%</span>
+  </div>
+  <div class="pricing-grid">
+    <div class="pricing-tier reveal">
+      <h3>Free</h3>
+      <p class="pricing-tier-desc">Perfect for exploring the platform</p>
+      <div class="pricing-price" data-monthly="0">$0<span>/month</span></div>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 100 credits/month</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> All 281+ models (limited)</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 5 entities</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 3 backend functions</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Community support</li>
+      </ul>
+      <a href="/platform/" class="btn btn-ghost">Start Free</a>
+    </div>
+    <div class="pricing-tier reveal">
+      <h3>Starter</h3>
+      <p class="pricing-tier-desc">For indie developers and small projects</p>
+      <div class="pricing-price" data-monthly="9">$9<span>/month</span></div>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 2,000 credits/month</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> All 281+ models</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 25 entities</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 15 backend functions</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 5 workflows</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Email support</li>
+      </ul>
+      <a href="/platform/" class="btn btn-ghost">Start Starter</a>
+    </div>
+    <div class="pricing-tier featured reveal">
+      <div class="pricing-tier-badge">Most Popular</div>
+      <h3>Pro</h3>
+      <p class="pricing-tier-desc">For growing teams and production apps</p>
+      <div class="pricing-price" data-monthly="29">$29<span>/month</span></div>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 10,000 credits/month</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> All 281+ models (priority)</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Unlimited entities</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Unlimited functions</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Unlimited workflows</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Voice commands</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Priority support</li>
+      </ul>
+      <a href="/platform/" class="btn btn-primary">Start Pro Trial</a>
+    </div>
+    <div class="pricing-tier reveal">
+      <h3>Scale</h3>
+      <p class="pricing-tier-desc">For enterprises and high-volume usage</p>
+      <div class="pricing-price" data-monthly="99">$99<span>/month</span></div>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> 50,000 credits/month</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> All models (highest priority)</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Everything in Pro</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Custom integrations</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Team memory hub</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Dedicated support</li>
+      </ul>
+      <a href="/platform/" class="btn btn-ghost">Start Scale</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TOKEN PACKS ============ -->
+<section class="section" id="token-packs" style="background: var(--bg-soft);">
+  <div class="section-header reveal">
+    <div class="section-label">Token Packs</div>
+    <h2 class="section-title">Need More Credits?</h2>
+    <p class="section-desc">One-time credit purchases that never expire. Top up your account anytime — no subscription needed. Credits work with all AI models on the platform.</p>
+  </div>
+  <div class="packs-grid">
+    <div class="pack-card reveal"><h4>Starter Pack</h4><div class="pack-credits">500</div><div class="pack-credits-label">Credits</div><div class="pack-price">$5</div><div class="pack-desc">All Standard Models &middot; No Expiry</div><a href="/platform/" class="btn btn-ghost">Buy Now</a></div>
+    <div class="pack-card reveal"><h4>Boost Pack</h4><div class="pack-credits">2,000</div><div class="pack-credits-label">Credits</div><div class="pack-price">$19</div><div class="pack-desc">All Models &middot; No Expiry</div><a href="/platform/" class="btn btn-ghost">Buy Now</a></div>
+    <div class="pack-card reveal"><h4>Pro Pack</h4><div class="pack-credits">5,000</div><div class="pack-credits-label">Credits</div><div class="pack-price">$49</div><div class="pack-desc">All Models + Priority &middot; No Expiry</div><a href="/platform/" class="btn btn-ghost">Buy Now</a></div>
+    <div class="pack-card reveal"><h4>Mega Pack</h4><div class="pack-credits">15,000</div><div class="pack-credits-label">Credits</div><div class="pack-price">$99</div><div class="pack-desc">All Models + Priority &middot; No Expiry</div><a href="/platform/" class="btn btn-ghost">Buy Now</a></div>
+    <div class="pack-card reveal"><h4>Whale Pack</h4><div class="pack-credits">50,000</div><div class="pack-credits-label">Credits</div><div class="pack-price">$299</div><div class="pack-desc">All Models + VIP &middot; No Expiry</div><a href="/platform/" class="btn btn-primary">Buy Now</a></div>
+  </div>
+</section>
+
+<!-- ============ HOW CREDITS WORK ============ -->
+<section class="section" id="how-credits-work">
+  <div class="section-header reveal">
+    <div class="section-label">How Credits Work</div>
+    <h2 class="section-title">Simple, Usage-Based Credits</h2>
+    <p class="section-desc">Credits are the universal currency on EvolvixOS. Use them for AI chat, function calls, media generation, and more. Different models cost different amounts.</p>
+  </div>
+  <div class="how-grid">
+    <div class="how-card reveal">
+      <h4><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6" opacity="0.5"/><path d="M12 6v12"/></svg> How Credits Work</h4>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Each AI model has a per-call credit cost</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Simple models cost 1-2 credits, advanced models 5-20</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Credits never expire (token packs)</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Monthly credits refresh each billing cycle</li>
+      </ul>
+    </div>
+    <div class="how-card reveal">
+      <h4><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> What Costs Credits</h4>
+      <ul>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> AI chat (per message based on model)</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Backend function calls (agent tasks)</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Image generation (per image)</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Voice synthesis (per minute of audio)</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Video generation (per second of video)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta-section reveal">
+  <h2>Ready to Build?</h2>
+  <p>Start engineering AI systems on your own infrastructure today. Free to start, no credit card required.</p>
+  <div class="hero-cta">
+    <a href="/platform/" class="btn btn-primary btn-lg magnetic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg> Launch Studio</a>
+    <a href="https://github.com/Protremix/EvolvixOS" class="btn btn-ghost btn-lg magnetic">View on GitHub</a>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-glow" aria-hidden="true"></div>
+  <div class="footer-watermark" aria-hidden="true">EvolvixOS</div>
+
+  <div class="footer-cta reveal">
+    <h2>Ready to build <em>without limits?</em></h2>
+    <p>Stand up the full stack on your own infrastructure in minutes. 281+ models, every tool local, no vendor lock-in.</p>
+    <div class="footer-cta-row">
+      <a href="/platform/" class="btn btn-primary btn-lg magnetic"><span>Launch Studio</span></a>
+      <a href="https://github.com/Protremix/EvolvixOS" class="btn btn-ghost-dark btn-lg magnetic"><span>Star on GitHub</span></a>
+    </div>
+  </div>
+
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo"><span class="footer-logo-icon"><svg class="evx-mark" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="EvolvixOS"><defs><linearGradient id="gF" x1="0.05" y1="0" x2="0.95" y2="1"><stop class="es1" offset="0" stop-color="#EE8A52"/><stop offset="0.42" stop-color="#D9663A"/><stop class="es3" offset="1" stop-color="#7B3FA0"/></linearGradient><linearGradient id="hF" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset="0.6" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="sF" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.5" stop-color="#fff" stop-opacity=".62"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><clipPath id="cF"><path d="M26.77,5.20 Q24.00,3.60 21.23,5.20 L9.10,12.20 Q6.33,13.80 6.33,17.00 L6.33,31.00 Q6.33,34.20 9.10,35.80 L21.23,42.80 Q24.00,44.40 26.77,42.80 L38.90,35.80 Q41.67,34.20 41.67,31.00 L41.67,17.00 Q41.67,13.80 38.90,12.20 Z M13.20,28.40 L24.00,16.80 L34.80,28.40 L34.80,33.40 L24.00,21.80 L13.20,33.40 Z" clip-rule="evenodd"/></clipPath></defs><path d="M26.77,5.20 Q24.00,3.60 21.23,5.20 L9.10,12.20 Q6.33,13.80 6.33,17.00 L6.33,31.00 Q6.33,34.20 9.10,35.80 L21.23,42.80 Q24.00,44.40 26.77,42.80 L38.90,35.80 Q41.67,34.20 41.67,31.00 L41.67,17.00 Q41.67,13.80 38.90,12.20 Z M13.20,28.40 L24.00,16.80 L34.80,28.40 L34.80,33.40 L24.00,21.80 L13.20,33.40 Z" fill="url(#gF)" fill-rule="evenodd"/><g clip-path="url(#cF)"><path d="M26.77,5.20 Q24.00,3.60 21.23,5.20 L9.10,12.20 Q6.33,13.80 6.33,17.00 L6.33,31.00 Q6.33,34.20 9.10,35.80 L21.23,42.80 Q24.00,44.40 26.77,42.80 L38.90,35.80 Q41.67,34.20 41.67,31.00 L41.67,17.00 Q41.67,13.80 38.90,12.20 Z" fill="none" stroke="url(#hF)" stroke-width="1.7" opacity=".55"/><rect class="evx-sheen" x="-14" y="-8" width="13" height="64" fill="url(#sF)"/></g></svg></span>
+      <h3>Evolvix<span class="os">OS</span></h3></div>
+      <p>The open-source AI engineering platform. Engineer, deploy, and scale AI-powered systems on your own infrastructure.</p>
+      <div class="footer-status"><span class="dot"></span> All systems operational</div>
+    </div>
+    <div class="footer-col">
+      <h4>Platform</h4>
+      <ul>
+        <li><a href="/platform/">Studio</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#models">AI Models</a></li>
+        <li><a href="#tools">Tools</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <ul>
+        <li><a href="https://github.com/Protremix/EvolvixOS">GitHub</a></li>
+        <li><a href="#">Documentation</a></li>
+        <li><a href="#">API Reference</a></li>
+        <li><a href="#">SDK Guide</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Open Source</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>&copy; 2026 EvolvixOS &middot; Open-source under the MIT License</span>
+    <div class="footer-social">
+      <a href="https://github.com/Protremix/EvolvixOS" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.37 1.23-3.21-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.21 0 4.595-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a>
+      <a href="#" aria-label="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+    </div>
+    <button class="footer-top" id="footerTop" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+  </div>
+</footer>
+
+<script>
+/* ============================================
+   3D HERO SCENE (Three.js) — lit gem + rings
+   + constellation network, mouse parallax
+   ============================================ */
+(function () {
+  if (typeof THREE === 'undefined') return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const canvas = document.getElementById('hero-canvas');
+  const wrap = canvas.parentElement;
+
+  const ACCENT = 0xC96442, PURPLE = 0x7C6F9E, SAND = 0xD8A98F;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(58, wrap.clientWidth / wrap.clientHeight, 0.1, 400);
+  camera.position.z = 34;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+
+  // ---- Lighting ----
+  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+  const l1 = new THREE.PointLight(ACCENT, 1.5, 200); l1.position.set(20, 14, 26); scene.add(l1);
+  const l2 = new THREE.PointLight(PURPLE, 1.2, 200); l2.position.set(-24, -10, 16); scene.add(l2);
+  const l3 = new THREE.DirectionalLight(0xffffff, 0.5); l3.position.set(0, 1, 1); scene.add(l3);
+
+  const world = new THREE.Group();
+  scene.add(world);
+
+  // ---- Central faceted gem (soft solid + wireframe) ----
+  const gemGroup = new THREE.Group();
+  gemGroup.position.z = -34;
+  world.add(gemGroup);
+
+  const gemGeo = new THREE.IcosahedronGeometry(10, 1);
+  const gemSolid = new THREE.Mesh(gemGeo, new THREE.MeshStandardMaterial({
+    color: ACCENT, metalness: 0.45, roughness: 0.3,
+    transparent: true, opacity: 0.07, flatShading: true
+  }));
+  gemGroup.add(gemSolid);
+
+  const gemWire = new THREE.LineSegments(
+    new THREE.WireframeGeometry(gemGeo),
+    new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.13 })
+  );
+  gemGroup.add(gemWire);
+
+  const gemCore = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(4.2, 0),
+    new THREE.MeshStandardMaterial({
+      color: PURPLE, metalness: 0.6, roughness: 0.25,
+      transparent: true, opacity: 0.11, flatShading: true
+    })
+  );
+  gemGroup.add(gemCore);
+
+  // ---- Orbiting rings ----
+  const rings = [];
+  [[21, 0.07, PURPLE, 0.28, 1.15, 0.25], [27, 0.055, ACCENT, 0.22, -0.5, 1.1], [33, 0.045, SAND, 0.16, 0.7, -0.6]]
+    .forEach(([r, t, col, op, rx, rz]) => {
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(r, t, 3, 140),
+        new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: op })
+      );
+      ring.rotation.x = rx; ring.rotation.z = rz;
+      ring.position.z = -14;
+      world.add(ring);
+      rings.push(ring);
+    });
+
+  // ---- Floating shapes ----
+  const palette = [ACCENT, PURPLE, SAND, 0xE0BCA9];
+  const geos = [
+    new THREE.IcosahedronGeometry(1, 0),
+    new THREE.OctahedronGeometry(1, 0),
+    new THREE.TetrahedronGeometry(1, 0),
+    new THREE.TorusGeometry(0.75, 0.3, 8, 20),
+    new THREE.BoxGeometry(1.2, 1.2, 1.2)
+  ];
+  // Seeded RNG so the layout is identical on every load (no random text collisions)
+  let _seed = 20260829;
+  const rnd = () => { _seed = (_seed * 1664525 + 1013904223) % 4294967296; return _seed / 4294967296; };
+
+  const shapes = [];
+  for (let i = 0; i < 20; i++) {
+    const geo = geos[i % geos.length];
+    const col = palette[i % palette.length];
+    const solid = rnd() > 0.55;
+    const mat = solid
+      ? new THREE.MeshStandardMaterial({ color: col, metalness: 0.5, roughness: 0.35, transparent: true, opacity: 0.30, flatShading: true })
+      : new THREE.MeshBasicMaterial({ color: col, wireframe: true, transparent: true, opacity: 0.32 });
+    const mesh = new THREE.Mesh(geo, mat);
+
+    // Ring layout with an elliptical dead-zone over the headline block
+    const ang = (i / 20) * Math.PI * 2 + 0.31;
+    let px = Math.cos(ang) * (30 + rnd() * 12);
+    let py = Math.sin(ang) * (17 + rnd() * 9);
+    // push out of the central text safe-zone
+    const SAFE_X = 26, SAFE_Y = 15;
+    const k = Math.hypot(px / SAFE_X, py / SAFE_Y);
+    if (k < 1) { const b = 1.06 / Math.max(k, 0.001); px *= b; py *= b; }
+    mesh.position.set(px, py, -8 - rnd() * 20);
+    const s = 0.7 + rnd() * 1.6;
+    mesh.scale.setScalar(s);
+    mesh.userData = {
+      rx: (rnd() - 0.5) * 0.007,
+      ry: (rnd() - 0.5) * 0.007,
+      phase: rnd() * Math.PI * 2,
+      speed: 0.25 + rnd() * 0.5,
+      baseY: mesh.position.y
+    };
+    world.add(mesh);
+    shapes.push(mesh);
+  }
+
+  // ---- Constellation network ----
+  const pCount = 240;
+  const pPos = new Float32Array(pCount * 3);
+  for (let i = 0; i < pCount; i++) {
+    pPos[i*3]   = (rnd() - 0.5) * 82;
+    pPos[i*3+1] = (rnd() - 0.5) * 48;
+    pPos[i*3+2] = (rnd() - 0.5) * 34 - 14;
+  }
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const points = new THREE.Points(pGeo, new THREE.PointsMaterial({
+    color: ACCENT, size: 0.17, transparent: true, opacity: 0.38, sizeAttenuation: true
+  }));
+  world.add(points);
+
+  const linePts = [];
+  const MAXD = 7.5;
+  for (let i = 0; i < pCount; i++) {
+    for (let j = i + 1; j < pCount; j++) {
+      const dx = pPos[i*3] - pPos[j*3];
+      const dy = pPos[i*3+1] - pPos[j*3+1];
+      const dz = pPos[i*3+2] - pPos[j*3+2];
+      if (dx*dx + dy*dy + dz*dz < MAXD * MAXD) {
+        linePts.push(pPos[i*3], pPos[i*3+1], pPos[i*3+2], pPos[j*3], pPos[j*3+1], pPos[j*3+2]);
+      }
+    }
+  }
+  const lGeo = new THREE.BufferGeometry();
+  lGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(linePts), 3));
+  const lines = new THREE.LineSegments(lGeo, new THREE.LineBasicMaterial({
+    color: PURPLE, transparent: true, opacity: 0.085
+  }));
+  world.add(lines);
+
+  // ---- Interaction ----
+  let mx = 0, my = 0, tx = 0, ty = 0, scrollY = 0;
+  window.addEventListener('mousemove', (e) => {
+    tx = (e.clientX / window.innerWidth - 0.5) * 2;
+    ty = (e.clientY / window.innerHeight - 0.5) * 2;
+  }, { passive: true });
+  window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+
+  const clock = new THREE.Clock();
+  let running = true;
+
+  function animate() {
+    if (!running) return;
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    mx += (tx - mx) * 0.05;
+    my += (ty - my) * 0.05;
+
+    gemGroup.rotation.y = t * 0.075;
+    gemGroup.rotation.x = Math.sin(t * 0.22) * 0.14;
+    gemCore.rotation.y = -t * 0.22;
+    gemCore.rotation.x = t * 0.16;
+
+    rings[0].rotation.z += 0.0016;
+    rings[1].rotation.z -= 0.0011;
+    rings[2].rotation.z += 0.0007;
+    rings[0].rotation.y = Math.sin(t * 0.18) * 0.22;
+    rings[1].rotation.y = Math.cos(t * 0.14) * 0.26;
+
+    shapes.forEach((m) => {
+      m.rotation.x += m.userData.rx;
+      m.rotation.y += m.userData.ry;
+      m.position.y = m.userData.baseY + Math.sin(t * m.userData.speed + m.userData.phase) * 1.5;
+    });
+
+    points.rotation.y = t * 0.014;
+    lines.rotation.y = t * 0.014;
+
+    world.rotation.y = mx * 0.2;
+    world.rotation.x = my * 0.12;
+
+    camera.position.x = mx * 2.2;
+    camera.position.y = -scrollY * 0.014 - my * 1.2;
+    camera.lookAt(0, camera.position.y * 0.35, -10);
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  const heroObs = new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (en.isIntersecting && !running) { running = true; clock.getDelta(); animate(); }
+      else if (!en.isIntersecting) { running = false; }
+    });
+  }, { threshold: 0 });
+  heroObs.observe(wrap);
+
+  window.addEventListener('resize', () => {
+    camera.aspect = wrap.clientWidth / wrap.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(wrap.clientWidth, wrap.clientHeight);
+  });
+})();
+
+/* ============================================
+   3D CARD TILT (mouse-follow perspective)
+   ============================================ */
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (window.matchMedia('(hover: none)').matches) return;
+
+  document.querySelectorAll('.tilt').forEach((card) => {
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      const rx = (py - 0.5) * -9;
+      const ry = (px - 0.5) * 12;
+      card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(20px)`;
+      card.style.setProperty('--mx', px * 100 + '%');
+      card.style.setProperty('--my', py * 100 + '%');
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+})();
+
+/* ============================================
+   MAGNETIC BUTTONS
+   ============================================ */
+(function () {
+  if (window.matchMedia('(hover: none)').matches) return;
+  document.querySelectorAll('.magnetic').forEach((btn) => {
+    btn.addEventListener('mousemove', (e) => {
+      const r = btn.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width / 2) * 0.22;
+      const y = (e.clientY - r.top - r.height / 2) * 0.28;
+      btn.style.transform = `translate(${x}px, ${y}px) translateY(-2px) scale(1.02)`;
+    });
+    btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  });
+})();
+
+/* ============================================
+   MODEL CARD FLIP — tap / keyboard support
+   ============================================ */
+(function () {
+  document.querySelectorAll('.model-cat').forEach((card) => {
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    const toggle = () => card.classList.toggle('flipped');
+    card.addEventListener('click', toggle);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+})();
+
+/* ============================================
+   NAV SCROLL
+   ============================================ */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+}, { passive: true });
+
+/* ============================================
+   SCROLL REVEAL (staggered 3D)
+   ============================================ */
+(function () {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        const siblings = Array.from(entry.target.parentElement.children).filter(c => c.classList.contains('reveal'));
+        const idx = siblings.indexOf(entry.target);
+        entry.target.style.transitionDelay = (Math.max(0, idx) * 0.06) + 's';
+        entry.target.classList.add('visible');
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+})();
+
+/* ============================================
+   ANIMATED STAT COUNTERS
+   ============================================ */
+(function () {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = parseInt(el.dataset.count, 10);
+      const suffix = el.textContent.includes('+') ? '+' : '';
+      let cur = 0;
+      const dur = 1400, start = performance.now();
+      function step(now) {
+        const p = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(target * eased) + suffix;
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+      obs.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('[data-count]').forEach(el => obs.observe(el));
+})();
+
+/* ============================================
+   PRICING TOGGLE
+   ============================================ */
+(function () {
+  const toggle = document.getElementById('toggle');
+  const lm = document.getElementById('label-monthly');
+  const la = document.getElementById('label-annual');
+  if (!toggle) return;
+  toggle.addEventListener('click', () => {
+    const annual = toggle.classList.toggle('annual');
+    lm.classList.toggle('active', !annual);
+    la.classList.toggle('active', annual);
+    document.querySelectorAll('.pricing-price').forEach((el) => {
+      const m = parseInt(el.dataset.monthly, 10);
+      const val = annual ? Math.round(m * 0.8) : m;
+      el.innerHTML = '$' + val + '<span>/month</span>';
+    });
+  });
+})();
+
+/* ============================================
+   SCROLL PROGRESS BAR
+   ============================================ */
+(function () {
+  const bar = document.querySelector('.scroll-progress span');
+  if (!bar) return;
+  let queued = false;
+  function update() {
+    queued = false;
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const p = max > 0 ? (window.scrollY / max) * 100 : 0;
+    bar.style.width = Math.min(100, Math.max(0, p)) + '%';
+  }
+  window.addEventListener('scroll', () => {
+    if (!queued) { queued = true; requestAnimationFrame(update); }
+  }, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
+  update();
+})();
+
+/* ============================================
+   SEAMLESS MARQUEE (duplicate track for loop)
+   ============================================ */
+(function () {
+  document.querySelectorAll('.marquee').forEach((track) => {
+    track.innerHTML += track.innerHTML;   // exact 2x for the -50% keyframe
+  });
+})();
+
+/* ============================================
+   SECTION TITLES — word-by-word 3D reveal
+   ============================================ */
+(function () {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const titles = document.querySelectorAll('.section-title');
+  if (!titles.length) return;
+
+  titles.forEach((t) => {
+    const words = t.textContent.trim().split(/\s+/);
+    t.textContent = '';
+    words.forEach((word, i) => {
+      const s = document.createElement('span');
+      s.className = 'w';
+      s.textContent = word;
+      s.style.transitionDelay = (i * 0.045) + 's';
+      t.appendChild(s);
+      if (i < words.length - 1) t.appendChild(document.createTextNode(' '));
+    });
+    t.classList.add('wsplit');
+  });
+
+  if (reduce) { titles.forEach(t => t.classList.add('won')); return; }
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.add('won'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.25 });
+  titles.forEach(t => obs.observe(t));
+})();
+
+/* ============================================
+   SUBTLE PARALLAX ON SECTION HEADERS
+   ============================================ */
+(function () {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const heads = Array.from(document.querySelectorAll('.section-header'));
+  if (!heads.length) return;
+  let queued = false;
+  function update() {
+    queued = false;
+    const vh = window.innerHeight;
+    heads.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.bottom < -100 || r.top > vh + 100) return;
+      const centre = r.top + r.height / 2;
+      const off = (centre - vh / 2) / vh;          // -0.5 .. 0.5
+      el.style.transform = 'translateY(' + (off * -16).toFixed(2) + 'px)';
+    });
+  }
+  window.addEventListener('scroll', () => {
+    if (!queued) { queued = true; requestAnimationFrame(update); }
+  }, { passive: true });
+  update();
+})();
+
+
+/* back to top */
+(function(){
+  var b = document.getElementById('footerTop');
+  if (!b) return;
+  b.addEventListener('click', function(){
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EvolvixOS — The Open-Source AI Engineering Platform</title>
+<meta name="description" content="Self-hosted AI engineering platform. Unified model routing, entity CRUD, backend functions, workflows. Yours, on your own metal.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M24 4 L42 14 V34 L24 44 L6 34 V14 Z' fill='none' stroke='%23007aff' stroke-width='2.5' stroke-linejoin='round'/%3E%3Cpath d='M16 30 L24 18 L32 30' fill='none' stroke='%23007aff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset & Base ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #ffffff;
+  --bg-alt: #f5f5f7;
+  --bg-dark: #1d1d1f;
+  --fg: #1d1d1f;
+  --muted: #86868b;
+  --dim: #d2d2d7;
+  --accent: #007aff;
+  --accent-dim: #0051a8;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --ease: cubic-bezier(0.28, 0.11, 0.32, 1);
+  --container: 980px;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.47;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.016em;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+::selection { background: var(--accent); color: #fff; }
+
+/* ─── Nav (Apple style — thin, translucent, sticky) ──── */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+.nav.scrolled {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.nav-inner {
+  max-width: var(--container);
+  width: 100%;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 6px;
+  font-weight: 600; font-size: 15px;
+  color: var(--fg);
+  letter-spacing: -0.02em;
+}
+.nav-logo svg { width: 20px; height: 20px; }
+.nav-logo:hover { text-decoration: none; opacity: 0.7; }
+.nav-links {
+  display: flex;
+  gap: 0;
+}
+.nav-links a {
+  padding: 0 12px;
+  font-size: 12px;
+  color: var(--fg);
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  text-decoration: none;
+}
+.nav-links a:hover { opacity: 1; text-decoration: none; }
+.nav-cta {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: none;
+}
+.nav-cta:hover { text-decoration: underline; }
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+}
+
+/* ─── Canvas Background ─────────────────────────────────── */
+#bg-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 1;
+}
+
+/* ─── Sections ─────────────────────────────────────────── */
+section {
+  position: relative;
+  z-index: 2;
+  padding: 115px 22px;
+  text-align: center;
+}
+
+/* ─── Hero Aurora Animation ────────────────────────────── */
+#hero-aurora {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 80vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  animation: auroraFloat 20s ease-in-out infinite;
+}
+.aurora-blob:nth-child(1) {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, #007aff, transparent 70%);
+  top: -20%; left: -10%;
+  animation-delay: 0s;
+  animation-duration: 18s;
+}
+.aurora-blob:nth-child(2) {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, #5856d6, transparent 70%);
+  top: -10%; right: -5%;
+  animation-delay: -4s;
+  animation-duration: 22s;
+}
+.aurora-blob:nth-child(3) {
+  width: 450px; height: 450px;
+  background: radial-gradient(circle, #5ac8fa, transparent 70%);
+  top: 20%; left: 30%;
+  animation-delay: -8s;
+  animation-duration: 16s;
+  opacity: 0.25;
+}
+.aurora-blob:nth-child(4) {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, #af52de, transparent 70%);
+  top: 5%; right: 20%;
+  animation-delay: -12s;
+  animation-duration: 25s;
+  opacity: 0.2;
+}
+.aurora-blob:nth-child(5) {
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, #30b0c7, transparent 70%);
+  bottom: -10%; left: 40%;
+  animation-delay: -6s;
+  animation-duration: 20s;
+  opacity: 0.2;
+}
+@keyframes auroraFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(80px, -60px) scale(1.15); }
+  50% { transform: translate(-40px, 80px) scale(0.9); }
+  75% { transform: translate(60px, 40px) scale(1.1); }
+}
+
+/* Animated gradient text shimmer for hero title */
+.hero-title {
+  position: relative;
+}
+.hero-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px; left: 50%;
+  transform: translateX(-50%);
+  width: 120px; height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #007aff, #5856d6, #007aff, transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Scroll indicator animation */
+.scroll-indicator {
+  position: absolute;
+  bottom: 30px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  opacity: 0;
+  animation: fadeIn 1s 2s forwards;
+}
+.scroll-indicator svg {
+  width: 24px; height: 36px;
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(8px); opacity: 0.8; }
+}
+
+/* Floating hexagon particles */
+.hex-particle {
+  position: absolute;
+  opacity: 0;
+  animation: hexFloat 15s ease-in-out infinite;
+}
+@keyframes hexFloat {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.15; }
+  90% { opacity: 0.15; }
+  100% { transform: translateY(-200px) rotate(360deg); opacity: 0; }
+}
+
+/* ─── Hero ────────────────────────────────────── */
+#hero {
+  min-height: auto;
+  display: flex;
+  align-items: center;
+  padding: 60px 40px 10px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+.hero-left {
+  opacity: 0;
+  animation: fadeInLeft 1s 0.2s ease forwards;
+}
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.hero-right {
+  opacity: 0;
+  animation: fadeInRight 1s 0.5s ease forwards;
+}
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(30px) scale(0.95); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--bg-alt);
+  border: 1px solid rgba(0,122,255,0.12);
+  border-radius: 100px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+.hero-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: #34c759;
+  border-radius: 50%;
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.hero-title {
+  font-size: clamp(36px, 4.5vw, 56px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  margin-bottom: 4px;
+}
+.hero-title .os {
+  background: linear-gradient(135deg, #007aff, #5856d6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+}
+.hero-morph {
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  margin-bottom: 12px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+}
+.hero-morph-text {
+  background: linear-gradient(135deg, #007aff, #5856d6, #af52de);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s ease infinite;
+}
+.hero-morph-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 28px;
+  background: #007aff;
+  margin-left: 4px;
+  animation: blink 0.8s step-end infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.hero-sub {
+  font-size: clamp(15px, 1.6vw, 18px);
+  color: var(--muted);
+  max-width: 520px;
+  font-weight: 400;
+  letter-spacing: -0.012em;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+.hero-stats {
+  display: flex;
+  gap: 28px;
+  margin-bottom: 20px;
+}
+.hero-stat { display: flex; flex-direction: column; }
+.hero-stat-num {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+.hero-stat-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+.hero-cta { display: flex; gap: 16px; align-items: center; }
+
+/* Terminal */
+.terminal {
+  background: #0d0d12;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 4px 20px rgba(0,122,255,0.06), 0 0 0 1px rgba(0,0,0,0.06);
+  font-family: 'SF Mono','JetBrains Mono','Fira Code',monospace;
+  transition: transform 0.3s ease;
+}
+.terminal:hover { transform: translateY(-4px) rotate(-0.3deg); }
+.terminal-header {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.terminal-dot { width: 11px; height: 11px; border-radius: 50%; }
+.terminal-dot.r { background: #ff5f57; }
+.terminal-dot.y { background: #febc2e; }
+.terminal-dot.g { background: #28c840; }
+.terminal-title {
+  font-size: 12px; color: rgba(255,255,255,0.4);
+  margin-left: 10px; font-family: -apple-system,sans-serif;
+}
+.terminal-body {
+  padding: 16px; min-height: 280px; max-height: 280px;
+  overflow: hidden; font-size: 13px; line-height: 1.65;
+  color: rgba(255,255,255,0.85);
+}
+.terminal-line { margin-bottom: 4px; white-space: pre-wrap; word-break: break-word; }
+.terminal-prompt { color: #007aff; font-weight: 600; }
+.terminal-cmd { color: #e0e0e6; }
+.terminal-output { color: rgba(255,255,255,0.5); padding-left: 16px; margin-bottom: 8px; }
+.terminal-success { color: #28c840; }
+.terminal-info { color: #5ac8fa; }
+.terminal-warn { color: #febc2e; }
+.terminal-comment { color: rgba(255,255,255,0.3); }
+
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  .hero-right { display: none; }
+}
+
+/* ─── Section Headers/* ─── Section Headers ─────────────────────────────────── */
+.section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 12px;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Scroll Reveal Titles (Apple style) ─────────────────── */
+.section-title, .cta-title, .section-sub, .section-label {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 1.1s cubic-bezier(0.28, 0.11, 0.32, 1),
+              transform 1.1s cubic-bezier(0.28, 0.11, 0.32, 1);
+}
+.section-title.revealed, .cta-title.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.section-label.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.1s;
+}
+.section-sub.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.25s;
+}
+
+/* Hero parallax — fades & scales up on scroll */
+#hero .hero-badge,
+#hero .hero-title,
+#hero .hero-sub,
+#hero .hero-cta,
+#hero .scroll-indicator {
+  will-change: transform, opacity;
+}
+
+/* Sticky section headers that shrink on scroll */
+.section-sticky {
+  position: sticky;
+  top: 44px;
+  z-index: 5;
+  padding: 24px 22px 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(255,255,255,0.7) 80%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.section-sticky .section-title {
+  font-size: clamp(24px, 4vw, 40px);
+  margin-bottom: 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.section-sticky .section-title.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-title {
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+  margin-bottom: 20px;
+}
+.section-title .gradient {
+  background: linear-gradient(135deg, #007aff, #5856d6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.section-sub {
+  font-size: clamp(17px, 2.5vw, 24px);
+  color: var(--muted);
+  max-width: 680px;
+  margin: 0 auto 60px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.012em;
+}
+
+/* ─── Feature Cards ────────────────────────────────────── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+.feature-card {
+  background: var(--bg);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius);
+  padding: 40px 32px;
+  text-align: left;
+  transition: all 0.4s var(--ease);
+  opacity: 0;
+  transform: translateY(40px);
+}
+.feature-card.revealed { opacity: 1; transform: translateY(0); }
+.feature-card:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-6px);
+}
+.feature-icon {
+  width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #007aff15, #5856d615);
+  border-radius: var(--radius-sm);
+  margin-bottom: 24px;
+}
+.feature-icon svg { width: 24px; height: 24px; stroke: var(--accent); fill: none; stroke-width: 1.5; }
+.feature-card h3 {
+  font-size: 21px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  letter-spacing: -0.015em;
+}
+.feature-card p {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.feature-card .feature-stat {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 500;
+  margin-top: 16px;
+}
+
+/* ─── Models Section ───────────────────────────────────── */
+#models { background: var(--bg-alt); }
+.models-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+}
+.model-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  text-align: left;
+  transition: all 0.4s var(--ease);
+  opacity: 0;
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.model-card.revealed { opacity: 1; transform: scale(1); }
+.model-card:hover {
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+.model-name {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.model-desc {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.model-stat {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--muted);
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+.model-stat span:last-child { color: var(--accent); font-weight: 600; }
+
+/* ─── Stats Band ───────────────────────────────────────── */
+.stats-band {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  flex-wrap: wrap;
+  margin: 60px auto;
+}
+.stat {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s var(--ease);
+}
+.stat.revealed { opacity: 1; transform: translateY(0); }
+.stat-num {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: -0.03em;
+}
+.stat-num .accent {
+  background: linear-gradient(135deg, #007aff, #5856d6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stat-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* ─── Architecture ─────────────────────────────────────── */
+.arch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+}
+@media (max-width: 768px) { .arch-grid { grid-template-columns: 1fr; } }
+.arch-item {
+  text-align: center;
+  padding: 48px 24px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s var(--ease);
+}
+.arch-item.revealed { opacity: 1; transform: translateY(0); }
+.arch-num {
+  font-size: 15px;
+  color: var(--accent);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+.arch-item h3 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  letter-spacing: -0.015em;
+}
+.arch-item p {
+  font-size: 15px;
+  color: var(--muted);
+  max-width: 260px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ─── Pricing ─────────────────────────────────────────── */
+#pricing { background: var(--bg-alt); }
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+}
+.price-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 40px 32px;
+  text-align: left;
+  transition: all 0.4s var(--ease);
+  opacity: 0;
+  transform: translateY(30px);
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.price-card.revealed { opacity: 1; transform: translateY(0); }
+.price-card.featured {
+  box-shadow: 0 8px 40px -8px rgba(0, 122, 255, 0.15);
+  border: 2px solid var(--accent);
+}
+.price-card.featured::before {
+  content: 'Most Popular';
+  position: absolute;
+  top: -14px; left: 32px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  padding: 4px 14px;
+  border-radius: 100px;
+}
+.price-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.12); }
+.price-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.price-amount {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 4px;
+}
+.price-amount .per { font-size: 18px; color: var(--muted); font-weight: 400; }
+.price-desc {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+.price-features {
+  list-style: none;
+  margin-bottom: 24px;
+}
+.price-features li {
+  font-size: 14px;
+  color: var(--fg);
+  padding: 7px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.price-features li::before {
+  content: '✓';
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+.price-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  text-decoration: none;
+  display: block;
+  text-align: center;
+}
+.price-card.featured .price-btn {
+  background: var(--accent);
+  color: #fff;
+}
+.price-card.featured .price-btn:hover {
+  background: #0071e3;
+}
+.price-card:not(.featured) .price-btn {
+  background: var(--bg-alt);
+  color: var(--accent);
+}
+.price-card:not(.featured) .price-btn:hover {
+  background: #e8e8ed;
+}
+
+/* ─── CTA Section ─────────────────────────────────────── */
+.cta-section {
+  padding: 120px 22px 140px;
+  text-align: center;
+}
+.cta-title {
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  margin-bottom: 20px;
+  line-height: 1.1;
+}
+.cta-sub {
+  font-size: clamp(17px, 2.5vw, 22px);
+  color: var(--muted);
+  margin-bottom: 40px;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
+}
+
+/* ─── Footer ───────────────────────────────────────────── */
+footer {
+  background: var(--bg-alt);
+  padding: 60px 22px 40px;
+  position: relative;
+  z-index: 2;
+}
+.footer-inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px;
+}
+.footer-brand {
+  flex: 1;
+  min-width: 200px;
+}
+.footer-brand .logo {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.footer-brand .logo svg { width: 22px; height: 22px; }
+.footer-brand p { font-size: 13px; color: var(--muted); max-width: 280px; line-height: 1.5; }
+.footer-cols {
+  display: flex;
+  gap: 64px;
+  flex-wrap: wrap;
+}
+.footer-col h4 {
+  font-size: 12px;
+  color: var(--fg);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.footer-col a {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 5px 0;
+  transition: color 0.2s;
+  text-decoration: none;
+}
+.footer-col a:hover { color: var(--fg); text-decoration: none; }
+.footer-bottom {
+  max-width: var(--container);
+  margin: 40px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ─── Animations ───────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ─── Reduced Motion ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ─── Scroll Progress Bar ──────────────────────────────── */
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  width: 0%; height: 3px;
+  background: linear-gradient(90deg, #007aff, #5856d6, #af52de);
+  z-index: 9999;
+  transition: width 0.1s ease-out;
+  box-shadow: 0 0 10px rgba(0, 122, 255, 0.5);
+}
+
+/* ─── 3D Card Tilt ─────────────────────────────────────── */
+.feature-card, .model-card, .price-card {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  will-change: transform;
+}
+.card-tilt-inner {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease-out;
+}
+.feature-card .feature-icon, .model-card .model-name {
+  transform: translateZ(40px);
+}
+.feature-card h3, .feature-card p, .feature-card .feature-stat {
+  transform: translateZ(20px);
+}
+.price-card .price-name, .price-card .price-amount, .price-card .price-features {
+  transform: translateZ(30px);
+}
+
+/* ─── Magnetic Buttons ─────────────────────────────────── */
+.btn-primary, .nav-cta, .price-btn {
+  will-change: transform;
+  transition: transform 0.2s ease-out;
+}
+
+/* ─── Gradient text animation ─────────────────────────── */
+.section-title .gradient, .hero-title .os {
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+}
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ─── Feature icon pulse on reveal ─────────────────────── */
+.feature-card.revealed .feature-icon {
+  animation: iconPop 0.6s ease-out;
+}
+@keyframes iconPop {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  60% { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+/* ─── Model card glow on hover ─────────────────────────── */
+.model-card {
+  position: relative;
+  overflow: hidden;
+}
+.model-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,122,255,0.05), transparent);
+  transition: left 0.5s ease;
+}
+.model-card:hover::before { left: 100%; }
+
+/* ─── Animated counter ─────────────────────────────────── */
+.stat-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Floating animation for CTA ───────────────────────── */
+.cta-section .btn-primary {
+  animation: ctaFloat 3s ease-in-out infinite;
+}
+@keyframes ctaFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ─── Text letter reveal ───────────────────────────────── */
+.text-reveal {
+  display: inline-block;
+  overflow: hidden;
+}
+.text-reveal span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(100%);
+  animation: letterReveal 0.5s ease forwards;
+}
+
+/* ─── Section divider gradient line ────────────────────── */
+.section-divider {
+  width: 60%;
+  max-width: 400px;
+  height: 1px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, rgba(0,122,255,0.3), rgba(88,86,214,0.3), transparent);
+  opacity: 0;
+  transition: opacity 1s ease, width 1s ease;
+}
+.section-divider.revealed {
+  opacity: 1;
+  width: 80%;
+}
+
+/* ─── Price card glow pulse ────────────────────────────── */
+.price-card.featured {
+  animation: priceGlow 4s ease-in-out infinite;
+}
+@keyframes priceGlow {
+  0%, 100% { box-shadow: 0 8px 40px -8px rgba(0, 122, 255, 0.15); }
+  50% { box-shadow: 0 8px 60px -4px rgba(0, 122, 255, 0.25); }
+}
+
+/* ─── Aurora blob speed boost ──────────────────────────── */
+.aurora-blob {
+  filter: blur(60px) !important;
+}
+
+
+
+/* ─── Token Packs ─────────────────────────────────────────── */
+.packs-section { background: var(--bg); padding: 80px 40px; }
+.packs-grid {
+  max-width: 1200px; margin: 40px auto 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+.pack-card {
+  background: var(--bg-alt);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 20px;
+  padding: 24px 20px;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+}
+.pack-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(0,122,255,0.12);
+  border-color: rgba(0,122,255,0.2);
+}
+.pack-card.featured { border-color: rgba(0,122,255,0.3); box-shadow: 0 4px 20px rgba(0,122,255,0.08); }
+.pack-badge {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  padding: 4px 12px; border-radius: 100px;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+  background: linear-gradient(90deg, #007aff, #5856d6);
+  color: #fff; white-space: nowrap;
+}
+.pack-icon { width: 32px; height: 32px; margin: 0 auto 8px; }
+.pack-name { font-size: 14px; font-weight: 700; color: #1d1d1f; margin-bottom: 4px; }
+.pack-credits {
+  font-size: 28px; font-weight: 800; font-family: 'SF Mono', 'Fira Code', monospace;
+  background: linear-gradient(90deg, #1d1d1f, #007aff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.pack-credits-label { font-size: 10px; color: #86868b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.pack-price { font-size: 22px; font-weight: 700; color: #1d1d1f; margin-bottom: 4px; }
+.pack-save {
+  display: inline-block; padding: 2px 8px; border-radius: 100px;
+  font-size: 11px; font-weight: 700;
+  background: rgba(52,199,89,0.1); color: #34c759;
+  border: 1px solid rgba(52,199,89,0.2);
+}
+.pack-features { text-align: left; margin-top: 12px; }
+.pack-features li {
+  font-size: 12px; color: #86868b; line-height: 1.6;
+  list-style: none; padding-left: 16px; position: relative;
+}
+.pack-features li::before { content: '✓'; position: absolute; left: 0; color: #34c759; font-weight: 700; }
+.pack-cta {
+  display: block; margin-top: 16px; padding: 8px 0;
+  background: rgba(0,122,255,0.08);
+  border: 1px solid rgba(0,122,255,0.15);
+  border-radius: 12px;
+  font-size: 13px; font-weight: 600; color: #007aff;
+  text-decoration: none; transition: all 0.2s;
+}
+.pack-cta:hover { background: rgba(0,122,255,0.15); border-color: rgba(0,122,255,0.3); }
+@media (max-width: 1024px) {
+  .packs-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .packs-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .packs-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Scroll Progress Bar -->
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<!-- Subtle Canvas Background -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- Nav -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M24 4 L42 14 V34 L24 44 L6 34 V14 Z" stroke="#007aff" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M16 30 L24 18 L32 30" stroke="#007aff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      EvolvixOS
+    </a>
+    <div class="nav-links">
+      <a href="#features">Platform</a>
+      <a href="#models">Models</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#pricing">Pricing</a>
+      <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
+    </div>
+    <a href="/platform/" class="nav-cta">Launch Studio →</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div id="hero-aurora">
+    <div class="aurora-blob"></div>
+    <div class="aurora-blob"></div>
+    <div class="aurora-blob"></div>
+    <div class="aurora-blob"></div>
+    <div class="aurora-blob"></div>
+  </div>
+  <div class="hero-grid">
+    <div class="hero-left">
+      <div class="hero-badge">Open Source · Self-Hosted · MIT</div>
+      <h1 class="hero-title">Evolvix<span class="os">OS</span></h1>
+      <div class="hero-morph">
+        <span class="hero-morph-text" id="morphText">An OS for AI engineering</span>
+        <span class="hero-morph-cursor"></span>
+      </div>
+      <p class="hero-sub">281 models. Five agents. Every tool local. Build, orchestrate, and ship — without leaving your infrastructure.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">281+</div><div class="hero-stat-label">AI MODELS</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">44+</div><div class="hero-stat-label">INTEGRATED TOOLS</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">350+</div><div class="hero-stat-label">SECURITY CHECKS</div></div>
+      </div>
+      <div class="hero-cta">
+        <a href="/platform/" class="btn btn-primary">Launch Studio</a>
+        <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn btn-link">View Source</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="terminal" id="heroTerminal">
+        <div class="terminal-header">
+          <div class="terminal-dot r"></div>
+          <div class="terminal-dot y"></div>
+          <div class="terminal-dot g"></div>
+          <div class="terminal-title">evolvixos@localhost — zsh</div>
+        </div>
+        <div class="terminal-body" id="terminalBody"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+  <div class="section-label">PLATFORM</div>
+  <h2 class="section-title">Everything you need<br>to <span class="gradient">build, ship & scale</span></h2>
+  <p class="section-sub">A complete engineering layer — model routing, entities, backend functions, workflows — running entirely on your infrastructure.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 9h6v6H9z"/></svg>
+      </div>
+      <h3>Self-Hosted</h3>
+      <p>Runs on your own server. Zero external dependencies for core logic. Your data never leaves your metal.</p>
+      <div class="feature-stat">100% Private</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 7l3 3M17 7l-3 3M7 17l3-3M17 17l-3-3"/></svg>
+      </div>
+      <h3>Unified Model Routing</h3>
+      <p>6+ AI providers — Groq, Gemini, Kimi, Ollama, OpenRouter, Tencent — with LOCAL, HYBRID, and CLOUD privacy modes.</p>
+      <div class="feature-stat">6 Providers · 3 Privacy Modes</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/></svg>
+      </div>
+      <h3>Entity CRUD API</h3>
+      <p>Define data models as JSON schemas. Get instant PostgreSQL-backed CRUD with pagination, filtering, and row-level security.</p>
+      <div class="feature-stat">Auto PostgreSQL · RLS</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 14 15 20 7"/><polyline points="15 7 20 7 20 12"/></svg>
+      </div>
+      <h3>Backend Functions</h3>
+      <p>Deploy Python code as HTTP endpoints. No servers to manage. Your functions, your API, your rules.</p>
+      <div class="feature-stat">Python · No Cold Starts</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      </div>
+      <h3>Workflow Automation</h3>
+      <p>Schedule recurring tasks, trigger on entity changes, react to connector events. Durable workflows that survive restarts.</p>
+      <div class="feature-stat">Scheduled · Entity · Connector</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <h3>Security Hardened</h3>
+      <p>350+ passing tests. Fuzzing, SSRF/XSS protection, audit logging, permission-gated tools. Fails closed on errors.</p>
+      <div class="feature-stat">350+ Tests · Fuzzing · SSRF</div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider" data-divider="0"></div>
+<!-- Models -->
+<section id="models">
+  <div class="section-label">AI MODELS</div>
+  <h2 class="section-title">Six brains.<br><span class="gradient">One router.</span></h2>
+  <p class="section-sub">Per-task model selection. Local-first with cloud fallback. Privacy modes that actually mean something.</p>
+  <div class="models-grid">
+    <div class="model-card">
+      <div class="model-name">Groq</div>
+      <div class="model-desc">gpt-oss-120b</div>
+      <div class="model-stat"><span>Speed</span><span>467 tok/s</span></div>
+    </div>
+    <div class="model-card">
+      <div class="model-name">Google Gemini</div>
+      <div class="model-desc">3.6 Flash · 1M context</div>
+      <div class="model-stat"><span>Vision</span><span>Multimodal</span></div>
+    </div>
+    <div class="model-card">
+      <div class="model-name">Kimi Moonshot</div>
+      <div class="model-desc">v1-32k</div>
+      <div class="model-stat"><span>Context</span><span>32K tokens</span></div>
+    </div>
+    <div class="model-card">
+      <div class="model-name">Ollama</div>
+      <div class="model-desc">qwen2.5:7b / 14b / 3b</div>
+      <div class="model-stat"><span>Local</span><span>100% private</span></div>
+    </div>
+    <div class="model-card">
+      <div class="model-name">OpenRouter</div>
+      <div class="model-desc">Multi-model gateway</div>
+      <div class="model-stat"><span>Models</span><span>281+</span></div>
+    </div>
+    <div class="model-card">
+      <div class="model-name">Tencent Hunyuan</div>
+      <div class="model-desc">Cloud LLM + Vision</div>
+      <div class="model-stat"><span>Region</span><span>Asia-Pacific</span></div>
+    </div>
+  </div>
+  <div class="stats-band">
+    <div class="stat"><div class="stat-num" data-target="281" data-suffix="+">0</div><div class="stat-label">AI MODELS</div></div>
+    <div class="stat"><div class="stat-num" data-target="44" data-suffix="">0</div><div class="stat-label">BUILT-IN TOOLS</div></div>
+    <div class="stat"><div class="stat-num" data-target="350" data-suffix="+">0</div><div class="stat-label">TESTS PASSING</div></div>
+    <div class="stat"><div class="stat-num" data-target="6" data-suffix="" data-accent="true">0</div><div class="stat-label">AI PROVIDERS</div></div>
+  </div>
+</section>
+
+<div class="section-divider" data-divider="1"></div>
+<!-- Architecture -->
+<section id="architecture">
+  <div class="section-label">ARCHITECTURE</div>
+  <h2 class="section-title">Built in layers,<br><span class="gradient">like nature intended</span></h2>
+  <p class="section-sub">Base44-style architecture, running on your own infrastructure. FastAPI, PostgreSQL, Three.js — nothing proprietary.</p>
+  <div class="arch-grid">
+    <div class="arch-item">
+      <div class="arch-num">01</div>
+      <h3>Entities</h3>
+      <p>JSON schema → instant PostgreSQL CRUD API. Pagination, sorting, filtering, row-level security — automatic.</p>
+    </div>
+    <div class="arch-item">
+      <div class="arch-num">02</div>
+      <h3>Backend Functions</h3>
+      <p>Deploy Python as HTTP endpoints. Call external APIs, transform data, run cron jobs. No cold starts.</p>
+    </div>
+    <div class="arch-item">
+      <div class="arch-num">03</div>
+      <h3>Workflows</h3>
+      <p>Scheduled, entity-triggered, or connector-triggered. Durable execution that survives restarts.</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider" data-divider="2"></div>
+<!-- Pricing -->
+<section id="pricing">
+  <div class="section-label">PRICING</div>
+  <h2 class="section-title">Simple, transparent</h2>
+  <p class="section-sub">Start free. Upgrade when you need more. Cancel anytime.</p>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-name">FREE</div>
+      <div class="price-amount">€0<span class="per">/mo</span></div>
+      <div class="price-desc">For trying things out</div>
+      <ul class="price-features">
+        <li>100 credits / month</li>
+        <li>All 281+ models</li>
+        <li>Local model routing</li>
+        <li>Community support</li>
+      </ul>
+      <a href="/platform/" class="price-btn">Start Free</a>
+    </div>
+    <div class="price-card featured">
+      <div class="price-name">PRO</div>
+      <div class="price-amount">€19<span class="per">/mo</span></div>
+      <div class="price-desc">For serious builders</div>
+      <ul class="price-features">
+        <li>5,000 credits / month</li>
+        <li>All models + cloud routing</li>
+        <li>Backend functions</li>
+        <li>Workflow automation</li>
+        <li>Priority support</li>
+      </ul>
+      <a href="/platform/" class="price-btn">Start Pro</a>
+    </div>
+    <div class="price-card">
+      <div class="price-name">TEAM</div>
+      <div class="price-amount">€49<span class="per">/mo</span></div>
+      <div class="price-desc">For teams shipping together</div>
+      <ul class="price-features">
+        <li>20,000 credits / month</li>
+        <li>Everything in Pro</li>
+        <li>Team collaboration</li>
+        <li>SSO & audit logs</li>
+        <li>Dedicated support</li>
+      </ul>
+      <a href="/platform/" class="price-btn">Start Team</a>
+    </div>
+  </div>
+</section>
+
+<!-- Token Packs -->
+<section class="packs-section" id="token-packs">
+  <div class="section-label">CREDIT PACKS</div>
+  <h2 class="section-title">Buy credits, top up anytime</h2>
+  <p class="section-sub">One-time purchases. Never expire. Instant delivery.</p>
+  <div class="packs-grid" id="landing-token-packs">
+    <div style="grid-column: 1/-1; text-align: center; color: #86868b; padding: 40px 0;">Loading token packs...</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">Ready to engineer<br>something extraordinary?</h2>
+  <p class="cta-sub">Open source. Self-hosted. No vendor lock-in. Just you, your metal, and 281+ AI models.</p>
+  <div class="hero-cta">
+    <a href="/platform/" class="btn btn-primary">Launch Studio</a>
+    <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn btn-link">Star on GitHub</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M24 4 L42 14 V34 L24 44 L6 34 V14 Z" stroke="#007aff" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M16 30 L24 18 L32 30" stroke="#007aff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        EvolvixOS
+      </div>
+      <p>The open-source AI engineering platform. Built for engineers who want to own their stack.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4>PRODUCT</h4>
+        <a href="/platform/">Studio</a>
+        <a href="#features">Features</a>
+        <a href="#models">AI Models</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="footer-col">
+        <h4>RESOURCES</h4>
+        <a href="/api/docs">Documentation</a>
+        <a href="/api/docs">API Reference</a>
+        <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
+        <a href="/terms">Terms</a>
+        <a href="/privacy">Privacy</a>
+      </div>
+      <div class="footer-col">
+        <h4>COMPANY</h4>
+        <a href="mailto:support@evolvixos.com">Contact</a>
+        <a href="/refund-policy">Refund Policy</a>
+        <a href="https://github.com/Protremix/EvolvixOS" target="_blank">Open Source</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 EvolvixOS. MIT Licensed.</span>
+    <span>Built on your own metal.</span>
+  </div>
+</footer>
+
+<script>
+// ─── Subtle Animated Background ─────────────────────────
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], orbs = [];
+  let time = 0;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Apple palette: blue (#007aff), indigo (#5856d6), teal (#30b0c7)
+  const COLORS = ['#007aff', '#5856d6', '#30b0c7', '#5ac8fa', '#34c759'];
+
+  const PCOUNT = Math.min(50, Math.floor(W / 30));
+  for (let i = 0; i < PCOUNT; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: (Math.random() - 0.5) * 0.15,
+      r: Math.random() * 1.5 + 0.5,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      pulse: Math.random() * Math.PI * 2,
+      pulseSpeed: 0.008 + Math.random() * 0.015,
+    });
+  }
+
+  // Soft gradient orbs
+  for (let i = 0; i < 3; i++) {
+    orbs.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.08,
+      vy: (Math.random() - 0.5) * 0.08,
+      r: 250 + Math.random() * 200,
+      color: COLORS[i],
+      phase: Math.random() * Math.PI * 2,
+    });
+  }
+
+  const MAX_DIST = 120;
+
+  function draw() {
+    time += 0.016;
+    ctx.clearRect(0, 0, W, H);
+
+    // Gradient orbs (very subtle on white)
+    for (const orb of orbs) {
+      orb.x += orb.vx;
+      orb.y += orb.vy;
+      orb.phase += 0.003;
+      if (orb.x < -orb.r || orb.x > W + orb.r) orb.vx *= -1;
+      if (orb.y < -orb.r || orb.y > H + orb.r) orb.vy *= -1;
+      const pulseR = orb.r * (0.85 + 0.15 * Math.sin(orb.phase));
+      const grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, pulseR);
+      const hex = orb.color;
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      grad.addColorStop(0, `rgba(${r},${g},${b},0.03)`);
+      grad.addColorStop(0.5, `rgba(${r},${g},${b},0.01)`);
+      grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // Particles
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.pulse += p.pulseSpeed;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+      p.vx *= 0.995;
+      p.vy *= 0.995;
+
+      const pulse = 0.5 + 0.5 * Math.sin(p.pulse);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * (1 + pulse * 0.3), 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = 0.1 + pulse * 0.15;
+      ctx.fill();
+
+      // Glow
+      const glowR = p.r * 4;
+      const glowGrad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowR);
+      const hex = p.color;
+      const gr = parseInt(hex.slice(1, 3), 16);
+      const gg = parseInt(hex.slice(3, 5), 16);
+      const gb = parseInt(hex.slice(5, 7), 16);
+      glowGrad.addColorStop(0, `rgba(${gr},${gg},${gb},0.08)`);
+      glowGrad.addColorStop(1, `rgba(${gr},${gg},${gb},0)`);
+      ctx.fillStyle = glowGrad;
+      ctx.globalAlpha = pulse * 0.4;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, glowR, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Connections
+      for (let j = i + 1; j < particles.length; j++) {
+        const p2 = particles[j];
+        const dx = p.x - p2.x;
+        const dy = p.y - p2.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MAX_DIST) {
+          const alpha = (1 - dist / MAX_DIST) * 0.06;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(p2.x, p2.y);
+          ctx.strokeStyle = `rgba(0, 122, 255, ${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ─── Apple-style Scroll Reveals ──────────────────────────
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      // Stagger child reveals
+      const el = entry.target;
+      const siblings = el.parentElement ? Array.from(el.parentElement.children).indexOf(el) : 0;
+      setTimeout(() => el.classList.add('revealed'), Math.min(siblings, 6) * 80);
+      revealObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -80px 0px' });
+
+// Observe all revealable elements
+document.querySelectorAll(
+  '.feature-card, .model-card, .arch-item, .price-card, .stat, .section-title, .cta-title, .section-label, .section-sub'
+).forEach(el => revealObserver.observe(el));
+
+// ─── Hero Parallax: fade + scale + blur on scroll ────────
+const hero = document.getElementById('hero');
+const heroBadge = hero?.querySelector('.hero-badge');
+const heroTitle = hero?.querySelector('.hero-title');
+const heroSub = hero?.querySelector('.hero-sub');
+const heroCta = hero?.querySelector('.hero-cta');
+const heroAurora = document.getElementById('hero-aurora');
+const scrollIndicator = hero?.querySelector('.scroll-indicator');
+
+let ticking = false;
+
+function updateHeroParallax() {
+  const scrollY = window.scrollY;
+  const heroHeight = hero ? hero.offsetHeight : window.innerHeight;
+  const progress = Math.min(scrollY / heroHeight, 1);
+
+  if (heroBadge) {
+    heroBadge.style.transform = `translateY(${progress * -30}px)`;
+    heroBadge.style.opacity = String(Math.max(1 - progress * 2, 0));
+  }
+  if (heroTitle) {
+    heroTitle.style.transform = `translateY(${progress * -60}px) scale(${1 - progress * 0.05})`;
+    heroTitle.style.opacity = String(Math.max(1 - progress * 1.5, 0));
+  }
+  if (heroSub) {
+    heroSub.style.transform = `translateY(${progress * -40}px)`;
+    heroSub.style.opacity = String(Math.max(1 - progress * 1.8, 0));
+  }
+  if (heroCta) {
+    heroCta.style.transform = `translateY(${progress * -20}px)`;
+    heroCta.style.opacity = String(Math.max(1 - progress * 2, 0));
+  }
+  if (heroAurora) {
+    heroAurora.style.transform = `translateY(${scrollY * 0.3}px)`;
+    heroAurora.style.opacity = String(Math.max(1 - progress * 0.8, 0.2));
+  }
+  if (scrollIndicator) {
+    scrollIndicator.style.opacity = String(Math.max(1 - progress * 3, 0));
+  }
+  ticking = false;
+}
+
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 10);
+  if (!ticking) {
+    requestAnimationFrame(updateHeroParallax);
+    ticking = true;
+  }
+}, { passive: true });
+
+// ─── Section title scroll progress ──────────────────────
+// Titles get a subtle scale + translate based on scroll position within section
+const sections = document.querySelectorAll('section');
+const titleObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.section-title, .section-label, .section-sub').forEach((el, i) => {
+        setTimeout(() => el.classList.add('revealed'), i * 150);
+      });
+    }
+  });
+}, { threshold: 0.05, rootMargin: '0px 0px -100px 0px' });
+
+sections.forEach(s => titleObserver.observe(s));
+
+// Initial parallax call
+updateHeroParallax();
+
+// ─── Scroll Progress Bar ────────────────────────────────
+const progressBar = document.getElementById('scroll-progress');
+window.addEventListener('scroll', () => {
+  const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = (window.scrollY / scrollHeight) * 100;
+  progressBar.style.width = progress + '%';
+}, { passive: true });
+
+// ─── Animated Counters ──────────────────────────────────
+function animateCounter(el, target, suffix, duration = 2000) {
+  const start = 0;
+  const startTime = performance.now();
+  const isAccent = el.dataset.accent === 'true';
+
+  function update(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // Ease out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.floor(start + (target - start) * eased);
+    el.textContent = current + suffix;
+    if (isAccent) {
+      el.innerHTML = '<span class="accent">' + current + '</span>';
+    }
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    } else {
+      el.textContent = target + suffix;
+      if (isAccent) {
+        el.innerHTML = '<span class="accent">' + target + '</span>';
+      }
+    }
+  }
+  requestAnimationFrame(update);
+}
+
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const target = parseInt(el.dataset.target);
+      const suffix = el.dataset.suffix || '';
+      animateCounter(el, target, suffix);
+      counterObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.stat-num[data-target]').forEach(el => counterObserver.observe(el));
+
+// ─── 3D Card Tilt on Mouse Move ──────────────────────────
+document.querySelectorAll('.feature-card, .model-card').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -6;
+    const rotateY = ((x - centerX) / centerX) * 6;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+  });
+});
+
+// ─── Magnetic Buttons ───────────────────────────────────
+document.querySelectorAll('.btn-primary, .nav-cta, .price-btn').forEach(btn => {
+  btn.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    btn.style.transform = `translate(${x * 0.15}px, ${y * 0.15}px)`;
+  });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = '';
+  });
+});
+
+// ─── Section Dividers Reveal ─────────────────────────────
+const dividerObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('revealed');
+      dividerObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.section-divider').forEach(el => dividerObserver.observe(el));
+
+// ─── Smooth scroll with offset for nav ──────────────────
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', (e) => {
+    const targetId = anchor.getAttribute('href');
+    if (targetId === '#') return;
+    const target = document.querySelector(targetId);
+    if (target) {
+      e.preventDefault();
+      const offset = 44;
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  });
+});
+
+</script>
+
+<!-- Hero Terminal + Morph Script -->
+<script>
+(function() {
+  var morphs = [
+    "An OS for AI engineering",
+    "281 models, one router",
+    "Your infrastructure, automated",
+    "Self-hosted. Self-correcting.",
+    "From prompt to production",
+    "The open-source agent platform"
+  ];
+  var morphEl = document.getElementById('morphText');
+  var morphIdx = 0;
+  function typeMorph(text, cb) {
+    morphEl.textContent = '';
+    var i = 0;
+    var timer = setInterval(function() {
+      morphEl.textContent = text.slice(0, ++i);
+      if (i >= text.length) { clearInterval(timer); setTimeout(cb, 2500); }
+    }, 35);
+  }
+  function eraseMorph(cb) {
+    var text = morphEl.textContent;
+    var i = text.length;
+    var timer = setInterval(function() {
+      morphEl.textContent = text.slice(0, --i);
+      if (i <= 0) { clearInterval(timer); cb(); }
+    }, 20);
+  }
+  function cycleMorph() {
+    var text = morphs[morphIdx];
+    typeMorph(text, function() {
+      eraseMorph(function() {
+        morphIdx = (morphIdx + 1) % morphs.length;
+        cycleMorph();
+      });
+    });
+  }
+  cycleMorph();
+
+  var body = document.getElementById('terminalBody');
+  var lines = [
+    { type: 'comment', text: '\u2500\u2500 EvolvixOS v10.0 \u2500\u2500' },
+    { type: 'cmd', text: 'evx models list --local' },
+    { type: 'output', text: 'qwen2.5:7b    ready   4.1 GB' },
+    { type: 'output', text: 'qwen2.5:14b   ready   7.8 GB' },
+    { type: 'output', text: 'qwen2.5:3b    ready   1.9 GB' },
+    { type: 'success', text: '3 local models loaded' },
+    { type: 'spacer' },
+    { type: 'cmd', text: 'evx chat "Design a REST API for auth"' },
+    { type: 'info', text: 'Routing \u2192 qwen2.5:14b (code task)' },
+    { type: 'output', text: 'Building FastAPI auth with JWT...' },
+    { type: 'output', text: '  POST /auth/register \u2192 201' },
+    { type: 'output', text: '  POST /auth/login    \u2192 200' },
+    { type: 'output', text: '  GET  /auth/me       \u2192 200' },
+    { type: 'success', text: '\u2713 Generated 142 lines \u00b7 0 errors' },
+    { type: 'spacer' },
+    { type: 'cmd', text: 'evx generate video --style cinematic' },
+    { type: 'info', text: 'Routing \u2192 pipeline: SDXL \u2192 ffmpeg' },
+    { type: 'output', text: 'Rendering scene 1/8...' },
+    { type: 'output', text: 'Synthesizing voice (en-US-GuyNeural)...' },
+    { type: 'success', text: '\u2713 25s video @ 4K \u00b7 8.2 MB' },
+    { type: 'spacer' },
+    { type: 'cmd', text: 'evx scan --security' },
+    { type: 'warn', text: 'Checking 350 patterns...' },
+    { type: 'output', text: '  XSS: 0  SSRF: 0  Injection: 0' },
+    { type: 'success', text: '\u2713 All security checks passed' },
+    { type: 'spacer' },
+    { type: 'cmd', text: 'evx deploy --prod' },
+    { type: 'info', text: 'Building \u2192 Deploying...' },
+    { type: 'success', text: '\u2713 Live at https://evolvixos.com' },
+    { type: 'spacer' },
+    { type: 'comment', text: '\u2500\u2500 session active \u2500\u2500' }
+  ];
+  var lineIdx = 0;
+  function addLine(line) {
+    var div = document.createElement('div');
+    div.className = 'terminal-line';
+    if (line.type === 'cmd') {
+      div.innerHTML = '<span class="terminal-prompt">$ </span><span class="terminal-cmd"></span>';
+      var cmdEl = div.querySelector('.terminal-cmd');
+      body.appendChild(div);
+      typeText(cmdEl, line.text, function() { next(); });
+      return;
+    }
+    if (line.type === 'spacer') { div.innerHTML = '&nbsp;'; body.appendChild(div); next(); return; }
+    if (line.type === 'output') { div.className = 'terminal-output'; }
+    else if (line.type === 'success') { div.className = 'terminal-output terminal-success'; }
+    else if (line.type === 'info') { div.className = 'terminal-output terminal-info'; }
+    else if (line.type === 'warn') { div.className = 'terminal-output terminal-warn'; }
+    else if (line.type === 'comment') { div.className = 'terminal-comment'; }
+    div.textContent = line.text;
+    body.appendChild(div);
+    while (body.children.length > 18) { body.removeChild(body.firstChild); }
+    body.scrollTop = body.scrollHeight;
+    setTimeout(next, 200);
+  }
+  function typeText(el, text, cb) {
+    var i = 0;
+    var timer = setInterval(function() {
+      el.textContent = text.slice(0, ++i);
+      if (i >= text.length) { clearInterval(timer); setTimeout(cb, 400); }
+    }, 25);
+  }
+  function next() {
+    if (lineIdx >= lines.length) {
+      setTimeout(function() { body.innerHTML = ''; lineIdx = 0; next(); }, 4000);
+      return;
+    }
+    addLine(lines[lineIdx++]);
+  }
+  setTimeout(next, 800);
+})();
+
+</script>
+<script>
+// Load token packs on landing page
+(function() {
+  fetch('https://evolvixos.com/platform/api/billing/token-packs')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var packs = data.packs || [];
+      if (!packs.length) {
+        document.getElementById('landing-token-packs').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#86868b;padding:40px 0;">Token packs coming soon.</div>';
+        return;
+      }
+      var icons = { emerald: "#34c759", purple: "#007aff", pink: "#5856d6", blue: "#3b82f6", amber: "#f59e0b" };
+      var html = '';
+      packs.forEach(function(pack) {
+        var featured = pack.is_popular ? ' featured' : '';
+        var badge = pack.is_popular ? '<div class="pack-badge">Best Value</div>' : '';
+        var save = pack.discount_percent > 0 ? '<div class="pack-save">Save ' + pack.discount_percent + '%</div>' : '<div style="height:22px"></div>';
+        var features = (pack.features || []).map(function(f) { return '<li>' + f + '</li>'; }).join('');
+        var color = icons[pack.color] || '#86868b';
+        html += '<div class="pack-card' + featured + '">' + badge +
+          '<svg class="pack-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="' + color + '" opacity="0.15"/><path d="M12 7v10M9 10l3-3 3 3M9 14l3 3 3-3" stroke="' + color + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+          '<div class="pack-name">' + pack.name + '</div>' +
+          '<div class="pack-credits">' + pack.credits.toLocaleString() + '</div>' +
+          '<div class="pack-credits-label">Credits</div>' +
+          '<div class="pack-price">$' + pack.price + '</div>' + save +
+          '<ul class="pack-features">' + features + '</ul>' +
+          '<a href="/platform/" class="pack-cta">Buy Now</a>' +
+          '</div>';
+      });
+      document.getElementById('landing-token-packs').innerHTML = html;
+    })
+    .catch(function(e) {
+      document.getElementById('landing-token-packs').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#86868b;padding:40px 0;">Failed to load token packs.</div>';
+    });
+})();
+</script>
+</body>
+</html>
