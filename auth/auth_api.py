@@ -529,6 +529,53 @@ class AuthHandler(BaseHTTPRequestHandler):
         if self.path == "/auth/health":
             self._send_json(200, {"status": "online", "service": "EvolvixOS Auth v9.1"})
             return
+        if self.path == "/auth/paddle-config":
+            # Returns client-side config for Paddle.js frontend
+            # Server-side API key is NEVER included here
+            import os as _os
+
+            token = _os.environ.get("PADDLE_CLIENT_TOKEN", "")
+            env = _os.environ.get("PADDLE_ENVIRONMENT", "production")
+
+            if not token:
+                self._send_json(500, {"error": "PADDLE_CLIENT_TOKEN not set"})
+                return
+
+            # Country detection from request headers
+            country = None
+            for header in ["x-vercel-ip-country", "cf-ipcountry", "x-country-code",
+                          "x-geoip-country-code", "x-geo-country"]:
+                val = self.headers.get(header, "").strip().upper()
+                if val and len(val) == 2 and val != "OTHERS":
+                    country = val
+                    break
+
+            # If signed in, get customer info
+            customer_email = None
+            paddle_customer_id = None
+            try:
+                user_id = is_authorized(self)
+                if user_id:
+                    with sqlite3.connect(DB_PATH) as conn:
+                        c = conn.cursor()
+                        c.execute("SELECT email, paddle_customer_id FROM users WHERE id = ?", (user_id,))
+                        row = c.fetchone()
+                        if row:
+                            customer_email = row[0]
+                            paddle_customer_id = row[1]
+            except Exception:
+                pass
+
+            self._send_json(200, {
+                "token": token,
+                "environment": env,
+                "country": country,
+                "customerEmail": customer_email,
+                "customerId": paddle_customer_id,
+            })
+            return
+
+
         if self.path == "/auth/me":
             user_id = is_authorized(self)
             if not user_id:
@@ -649,6 +696,8 @@ class AuthHandler(BaseHTTPRequestHandler):
             self._send_json(200, {"payments": payments})
             return
         self._send_json(404, {"error": "Not found"})
+
+
 
     def do_POST(self):
         # Stripe webhook — needs raw body for signature verification
@@ -1284,6 +1333,43 @@ class AuthHandler(BaseHTTPRequestHandler):
             except Exception as e:
                 self._send_json(500, {"error": "Portal session failed: " + str(e)})
                 return
+
+
+
+            # Country detection from request headers
+            # Check common headers set by CDNs/proxies
+            country = None
+            for header in ["x-vercel-ip-country", "cf-ipcountry", "x-country-code",
+                          "x-geoip-country-code", "x-geo-country"]:
+                val = self.headers.get(header, "").strip().upper()
+                if val and len(val) == 2 and val != "OTHERS":
+                    country = val
+                    break
+
+            # If signed in, get customer info
+            customer_email = None
+            paddle_customer_id = None
+            try:
+                user_id = self._get_user_id(self.headers.get("Authorization", ""))
+                if user_id:
+                    with sqlite3.connect(DB_PATH) as conn:
+                        c = conn.cursor()
+                        c.execute("SELECT email, paddle_customer_id FROM users WHERE id = ?", (user_id,))
+                        row = c.fetchone()
+                        if row:
+                            customer_email = row[0]
+                            paddle_customer_id = row[1]
+            except Exception:
+                pass  # Not signed in — that's fine
+
+            self._send_json(200, {
+                "token": token,
+                "environment": env,
+                "country": country,  # null if undetected → Paddle auto-detects
+                "customerEmail": customer_email,
+                "customerId": paddle_customer_id,
+            })
+            return
 
         if path == "/auth/paddle-checkout":
             user_id = is_authorized(self)
