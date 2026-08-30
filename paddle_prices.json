@@ -1,0 +1,24 @@
+{
+  "api_base": "https://api.paddle.com",
+  "currency": "EUR",
+  "subscriptions": {
+    "Starter_monthly": "pri_01m194907w2aypwa78tfxg3pfz",
+    "Starter_yearly": "pri_01m19490dcsqwmcah27wzv56y0",
+    "Pro_monthly": "pri_01m19490sttx901004gwtzpdyh",
+    "Pro_yearly": "pri_01m194910cj42153gwj8zzsz8m",
+    "Team_monthly": "pri_01m19491c4r1196gd2kt75c26n",
+    "Team_yearly": "pri_01m19491h9t911508gfp1gdvhf",
+    "Business_monthly": "pri_01m19491xj87gjrz3dq907rz6m",
+    "Business_yearly": "pri_01m194922v16p3595wftwza40n",
+    "Enterprise_monthly": "pri_01m19492f315zxcc7sj3g9qz8b",
+    "Enterprise_yearly": "pri_01m19492mekgnk7kka4z6w1rbs",
+    "Enterprise+_monthly": "pri_01m194930fw0yvmd4pm5g06zk7",
+    "Enterprise+_yearly": "pri_01m194935t1p47fpzwfm0bc9xn"
+  },
+  "credits": {
+    "credits_1000": "pri_01m19493j7vmwpenqgy5cdswze",
+    "credits_5000": "pri_01m19493y51bzkgr80pwqfj2v6",
+    "credits_15000": "pri_01m194949vwb921r7j5zspmpj5",
+    "credits_50000": "pri_01m19494p7k6w88wkx56vctk3e"
+  }
+}

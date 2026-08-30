@@ -1244,6 +1244,87 @@ class AuthHandler(BaseHTTPRequestHandler):
             except Exception as e:
                 self._send_json(500, {"error": "Payment setup failed: " + str(e)})
                 return
+
+        if path == "/auth/paddle-checkout":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            item_type = body.get("type", "subscription")
+            plan_name = body.get("plan", "")
+            cycle = body.get("cycle", "monthly")
+            credits_amount = body.get("credits", 0)
+            try:
+                # Load paddle price IDs
+                prices_path = os.path.join(os.path.dirname(__file__), '..', 'paddle_prices.json')
+                with open(prices_path) as f:
+                    paddle_prices = json.load(f)
+
+                # Get user email
+                with sqlite3.connect(DB_PATH) as conn:
+                    c = conn.cursor()
+                    c.execute("SELECT email, display_name FROM users WHERE id = ?", (user_id,))
+                    row = c.fetchone()
+                    if not row:
+                        self._send_json(400, {"error": "User not found"})
+                        return
+                    user_email, display_name = row
+
+                price_id = None
+                if item_type == "subscription":
+                    key = f"{plan_name}_{cycle}"
+                    price_id = paddle_prices.get("subscriptions", {}).get(key)
+                else:
+                    key = f"credits_{credits_amount}"
+                    price_id = paddle_prices.get("credits", {}).get(key)
+
+                if not price_id:
+                    self._send_json(400, {"error": f"No Paddle price found for {item_type} {plan_name} {cycle}"})
+                    return
+
+                # Create Paddle transaction/checkout
+                paddle_api = PADDLE_API_BASE.rstrip('/')
+                checkout_body = {
+                    "items": [{"price_id": price_id, "quantity": 1}],
+                    "customer": {"email": user_email},
+                    "custom_data": {"user_id": str(user_id), "type": item_type},
+                    "success_url": f"https://evolvixos.com/platform/?payment=success&plan={plan_name}",
+                }
+                if item_type == "subscription":
+                    checkout_body["custom_data"]["plan"] = plan_name
+                    checkout_body["custom_data"]["cycle"] = cycle
+
+                req = urllib.request.Request(
+                    f"{paddle_api}/transactions",
+                    data=json.dumps(checkout_body).encode(),
+                    method="POST",
+                    headers={
+                        "Authorization": f"Bearer {PADDLE_API_KEY}",
+                        "Content-Type": "application/json",
+                    }
+                )
+                with urllib.request.urlopen(req, timeout=30) as r:
+                    txn = json.loads(r.read().decode())
+
+                checkout_url = txn.get("data", {}).get("checkout", {}).get("url", "")
+                txn_id = txn.get("data", {}).get("id", "")
+
+                # Record pending payment
+                with sqlite3.connect(DB_PATH) as conn:
+                    c = conn.cursor()
+                    c.execute("INSERT INTO payments (user_id, amount, currency, plan_name, billing_cycle, status, provider, provider_charge_id, created_date) VALUES (?, ?, 'EUR', ?, ?, 'pending', 'paddle', ?, ?)",
+                        (user_id, 0, plan_name or "Credit Pack", cycle if item_type == "subscription" else "one-time", txn_id, time.strftime("%Y-%m-%d %H:%M:%S")))
+                    conn.commit()
+
+                self._send_json(200, {"checkout_url": checkout_url, "transaction_id": txn_id})
+            except urllib.error.HTTPError as e:
+                err_body = e.read().decode()
+                self._send_json(400, {"error": f"Paddle API error: {err_body[:300]}"})
+                return
+            except Exception as e:
+                self._send_json(500, {"error": "Paddle checkout failed: " + str(e)})
+                return
+
         if path == "/auth/stripe-portal":
             user_id = is_authorized(self)
             if not user_id:
