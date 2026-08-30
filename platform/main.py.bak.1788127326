@@ -1,0 +1,1531 @@
+"""
+EvolvixOS Platform API — Base44-style platform layer.
+Provides: Entity system, Backend functions, Workflows, File storage, Chat builder.
+Runs on port 8080 alongside the existing Mr James API on port 8000.
+"""
+# Load environment from .env file
+import os as _os
+from pathlib import Path as _Path
+_env_file = _Path(_os.path.dirname(__file__)).parent / '.env'
+if _env_file.exists():
+    for _line in _env_file.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith('#') and '=' in _line:
+            _k, _, _v = _line.partition('=')
+            _os.environ.setdefault(_k.strip(), _v.strip())
+
+
+import os
+import sys
+import json
+import time
+import uuid
+import asyncio
+import importlib.util
+import traceback
+from datetime import datetime, timezone
+from typing import Any, Optional
+
+from fastapi import FastAPI, HTTPException, Depends, Request, UploadFile, File, Query, Body
+from fastapi.middleware.cors import CORSMiddleware
+from awesome_routes import router as awesome_router
+from fastapi.responses import JSONResponse, StreamingResponse
+from pydantic import BaseModel, Field
+from sqlalchemy import text
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from database import get_db, init_db, async_session
+from entities.manager import EntityManager
+from entities.crud import EntityCRUD as EnhancedCRUD
+from templates import get_template_list, get_template, instantiate_template
+from auth.middleware import optional_auth, require_auth, require_admin, get_user_from_token
+JWT_SECRET = os.environ.get('JWT_SECRET', 'evolvixos-platform-secret-2026')
+from routing_bridge import unified_chat
+import sqlite3 as sqlite3_billing
+
+AUTH_DB_PATH = "/opt/evolvixos/auth/users.db"
+
+def deduct_user_credits(user_id, model_id, tokens_in=0, tokens_out=0):
+    """Deduct credits from user subscription based on model tier."""
+    if not user_id:
+        return {"ok": True, "cost": 0}  # No user = free (internal calls)
+    # Model tier costs
+    model_lower = (model_id or "").lower()
+    if ":free" in model_lower:
+        cost = 1
+    elif any(m in model_lower for m in ["gpt-oss-20b", "gpt-oss-120b", "deepseek-v4-flash", "nemotron-3-super", "gemma-4-31b"]):
+        cost = 2
+    elif any(m in model_lower for m in ["gemini-3.1-pro-preview", "claude-opus", "gemini-3.7-flash"]):
+        cost = 20
+    elif any(m in model_lower for m in ["glm-5.2", "glm-5.3", "claude-sonnet-5", "gemini-3.1-pro", "kimi-k2.7", "nemotron-3-ultra", "qwen3.8"]):
+        cost = 10
+    elif any(m in model_lower for m in ["glm-5", "kimi-k2", "qwen2.5", "step-3.7"]):
+        cost = 5
+    else:
+        cost = 3
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute("SELECT id, credits_remaining FROM subscriptions WHERE user_id = ? AND status = ?", (int(user_id), "active"))
+        row = c.fetchone()
+        if not row:
+            conn.close()
+            return {"ok": True, "cost": 0}  # No subscription = free for now
+        sub_id, remaining = row
+        if remaining < cost:
+            conn.close()
+            return {"ok": False, "error": "Insufficient credits. Upgrade your plan or buy more credits.", "remaining": remaining, "cost": cost}
+        new_balance = remaining - cost
+        c.execute("UPDATE subscriptions SET credits_remaining = ?, credits_used = credits_used + ? WHERE id = ?", (new_balance, cost, sub_id))
+        c.execute("INSERT INTO credit_transactions (user_id, amount, type, description, model_used, tokens_in, tokens_out, balance_after, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (int(user_id), cost, "debit", "API call: " + (model_id or "auto"), model_id or "auto", tokens_in, tokens_out, new_balance, time.strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+        conn.close()
+        return {"ok": True, "cost": cost, "remaining": new_balance}
+    except Exception as e:
+        return {"ok": True, "cost": 0}  # Don't block API on billing errors
+
+def get_user_plan_limits(user_id):
+    """Get user plan limits for resource gating."""
+    if not user_id:
+        return None
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute("SELECT s.credits_remaining, p.name, p.max_agents, p.max_entities, p.max_functions, p.max_workflows FROM subscriptions s JOIN plans p ON s.plan_id = p.id WHERE s.user_id = ? AND s.status = ?", (int(user_id), "active"))
+        row = c.fetchone()
+        conn.close()
+        if not row:
+            return None
+        return {"credits": row[0], "plan": row[1], "max_agents": row[2], "max_entities": row[3], "max_functions": row[4], "max_workflows": row[5]}
+    except:
+        return None
+from workflows.engine import WorkflowEngine
+from agents.manager import AgentManager
+from plugins.registry import PluginRegistry
+
+# ─── App ───
+app = FastAPI(
+    title="EvolvixOS Platform API",
+    description="Base44-style entity system, backend functions, workflows, and AI builder.",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc"
+)
+app.include_router(awesome_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ─── Pydantic Models ───
+class EntityCreate(BaseModel):
+    name: str = Field(..., description="PascalCase entity name")
+    schema: dict = Field(..., description="JSON schema for entity fields")
+    app_id: Optional[int] = Field(None, description="App ID to scope entity to")
+
+class EntityUpdate(BaseModel):
+    schema: dict = Field(..., description="Updated JSON schema")
+
+class RecordCreate(BaseModel):
+    data: dict = Field(..., description="Record data")
+
+class RecordUpdate(BaseModel):
+    data: dict = Field(..., description="Updated record data")
+
+class FunctionCreate(BaseModel):
+    name: str = Field(..., description="Function name (camelCase)")
+    code: str = Field(..., description="Python function code")
+    env_vars: dict = Field(default_factory=dict)
+
+class WorkflowCreate(BaseModel):
+    name: str
+    definition: dict
+    trigger_type: str = Field(..., description="scheduled | entity | connector")
+    trigger_config: Optional[dict] = None
+
+class AgentCreate(BaseModel):
+    name: str = Field(..., description="Agent name")
+    system_prompt: str = Field(..., description="System prompt — defines agent personality and behavior")
+    model: str = Field("auto", description="AI model (auto, openai/gpt-oss-120b, z-ai/glm-5, qwen2.5:7b, etc.)")
+    temperature: float = Field(0.7, description="Temperature 0-1 (lower=precise, higher=creative)")
+    tools: list = Field(default_factory=list, description="Available tools")
+    max_tokens: int = Field(4096, description="Max response tokens")
+    top_p: float = Field(0.9, description="Top-p nucleus sampling")
+    memory_enabled: bool = Field(True, description="Whether agent persists memory across sessions")
+    stream: bool = Field(False, description="Stream responses")
+
+class AgentUpdate(BaseModel):
+    system_prompt: Optional[str] = None
+    model: Optional[str] = None
+    temperature: Optional[float] = None
+    tools: Optional[list] = None
+    max_tokens: Optional[int] = None
+    top_p: Optional[float] = None
+    memory_enabled: Optional[bool] = None
+    status: Optional[str] = None
+    stream: Optional[bool] = None
+    automation_model: Optional[str] = None
+    cross_app_access: Optional[bool] = None
+    avatar: Optional[str] = None
+    identity_doc: Optional[str] = None
+    share_enabled: Optional[bool] = None
+    collaborators: Optional[list] = None
+    channel_config: Optional[dict] = None
+    allow_update_data: Optional[bool] = None
+    allow_delete_data: Optional[bool] = None
+    auto_detect_secrets: Optional[bool] = None
+    agent_secrets: Optional[dict] = None
+    api_key: Optional[str] = None
+
+class AgentInvoke(BaseModel):
+    message: str = Field(..., description="Message to the agent")
+    context: Optional[dict] = None
+
+class ChatMessage(BaseModel):
+    message: str
+    context: Optional[dict] = None
+    model: Optional[str] = None  # OpenRouter model ID, e.g. "z-ai/glm-5"
+
+
+# ─── Health ───
+@app.get("/health")
+async def health():
+    return {"status": "healthy", "service": "EvolvixOS Platform API", "version": "1.0.0"}
+
+@app.get("/api/health")
+async def api_health():
+    return {"status": "healthy", "service": "EvolvixOS Platform API", "version": "1.0.0"}
+
+
+# ─── Entity Routes ───
+@app.get("/api/entities")
+async def list_entities(db=Depends(get_db), request: Request = None, app_id: int = None):
+    """List all entity schemas — optionally scoped to an app. Requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    try:
+        entities = await EntityManager.list_entities(db, app_id=app_id)
+        return {"entities": entities}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.post("/api/entities")
+async def create_entity(entity: EntityCreate, db=Depends(get_db), request: Request = None):
+    """Create a new entity — requires auth. Optionally scoped to an app."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    try:
+        result = await EntityManager.create_entity(db, entity.name, entity.schema, created_by=user.get("user_id") if user else None, app_id=entity.app_id)
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.get("/api/entities/{name}")
+async def get_entity(name: str, db=Depends(get_db), request: Request = None):
+    """Get entity schema — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    entity = await EntityManager.get_entity(db, name)
+    if not entity:
+        raise HTTPException(404, f"Entity '{name}' not found")
+    return entity
+
+@app.put("/api/entities/{name}")
+async def update_entity(name: str, entity: EntityUpdate, db=Depends(get_db), request: Request = None):
+    """Update entity schema — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    try:
+        return await EntityManager.update_entity(db, name, entity.schema)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@app.delete("/api/entities/{name}")
+async def delete_entity(name: str, db=Depends(get_db), request: Request = None):
+    """Delete entity — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    try:
+        return await EntityManager.delete_entity(db, name)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+# ─── Entity Relations ───
+@app.get("/api/entities/{name}/relations")
+async def get_entity_relations(name: str, db=Depends(get_db), request: Request = None):
+    """Get all relation fields for an entity."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    try:
+        relations = await EntityManager.get_relations(db, name)
+        return {"relations": relations}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.get("/api/entities/{name}/records/{record_id}/expanded")
+async def get_record_expanded(name: str, record_id: int, db=Depends(get_db), request: Request = None):
+    """Get a record with all relation fields expanded."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    try:
+        record = await EntityManager.fetch_with_relations(db, name, record_id)
+        if not record:
+            raise HTTPException(404, f"Record {record_id} not found in {name}")
+        return record
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+
+# ─── Entity Records (CRUD) ───
+@app.get("/api/entities/{name}/records")
+async def list_records(
+    name: str,
+    limit: int = Query(50, ge=1, le=500),
+    skip: int = Query(0, ge=0),
+    sort: Optional[str] = None,
+    expand: bool = Query(False, description="Expand relation fields with related data"),
+    request: Request = None,
+    db=Depends(get_db)
+):
+    """List entity records with pagination, sorting, and optional relation expansion."""
+    try:
+        filters = {}
+        user = get_user_from_token(request) if request else None
+        user_id = user.get("user_id") if user else None
+        result = await EnhancedCRUD.list_records(db, name, limit=limit, skip=skip, filters=filters, sort=sort, user_id=user_id)
+        if expand:
+            # Expand relations for each record
+            entity = await EntityManager.get_entity(db, name)
+            if entity:
+                expanded = []
+                for record in result.get("records", []):
+                    for fn, fd in entity["schema"].get("properties", {}).items():
+                        if fd.get("type") == "relation" and record.get(fn):
+                            target = fd["relation"]["target"]
+                            display = fd.get("relation", {}).get("display", "name")
+                            try:
+                                rel_res = await db.execute(text(f'SELECT * FROM entity_{target.lower()} WHERE id = :id'), {"id": record[fn]})
+                                rel_row = rel_res.fetchone()
+                                if rel_row:
+                                    rel_cols = rel_res.keys() if hasattr(rel_res, 'keys') else [d[0] for d in rel_res.cursor.description]
+                                    rel_rec = {rel_cols[j]: (rel_row[j].isoformat() if isinstance(rel_row[j], datetime) else rel_row[j]) for j in range(len(rel_cols))}
+                                    record[f"_rel_{fn}"] = rel_rec
+                                    record[f"_rel_{fn}_label"] = rel_rec.get(display, f"#{record[fn]}")
+                            except Exception:
+                                pass
+                    expanded.append(record)
+                result["records"] = expanded
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.post("/api/entities/{name}/records")
+async def create_record(name: str, record: RecordCreate, request: Request, db=Depends(get_db)):
+    """Create a new entity record."""
+    try:
+        user = get_user_from_token(request) if request else None
+        created_by = user.get("user_id") if user else None
+        return await EnhancedCRUD.create_record(db, name, record.data, created_by=created_by)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@app.get("/api/entities/{name}/records/{record_id}")
+async def get_record(name: str, record_id: int, db=Depends(get_db)):
+    """Get a single entity record."""
+    record = await EnhancedCRUD.get_record(db, name, record_id)
+    if not record:
+        raise HTTPException(404, f"Record {record_id} not found")
+    return record
+
+@app.put("/api/entities/{name}/records/{record_id}")
+async def update_record(name: str, record_id: int, record: RecordUpdate, request: Request, db=Depends(get_db)):
+    """Update an entity record."""
+    try:
+        user = get_user_from_token(request) if request else None
+        user_id = user.get("user_id") if user else None
+        return await EnhancedCRUD.update_record(db, name, record_id, record.data, user_id=user_id)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@app.delete("/api/entities/{name}/records/{record_id}")
+async def delete_record(name: str, record_id: int, request: Request, db=Depends(get_db)):
+    """Delete an entity record."""
+    try:
+        user = get_user_from_token(request) if request else None
+        user_id = user.get("user_id") if user else None
+        return await EnhancedCRUD.delete_record(db, name, record_id, user_id=user_id)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+# ─── Backend Functions ───
+@app.get("/api/functions")
+async def list_functions(db=Depends(get_db), request: Request = None):
+    """List all deployed functions — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    result = await db.execute(text("SELECT name, language, created_date FROM platform_functions ORDER BY created_date DESC"))
+    rows = result.fetchall()
+    return {"functions": [{"name": r[0], "language": r[1], "created_date": r[2].isoformat() if r[2] else None} for r in rows]}
+
+@app.post("/api/functions")
+async def create_function(func: FunctionCreate, db=Depends(get_db)):
+    """Deploy a backend function."""
+    # Basic validation
+    if not func.code.strip():
+        raise HTTPException(400, "Function code cannot be empty")
+
+    # Check if function exists
+    result = await db.execute(text("SELECT id FROM platform_functions WHERE name = :name"), {"name": func.name})
+    if result.fetchone():
+        # Update existing
+        await db.execute(text("""
+            UPDATE platform_functions SET code = :code, env_vars = :env, updated_date = NOW()
+            WHERE name = :name
+        """), {"name": func.name, "code": func.code, "env": json.dumps(func.env_vars)})
+    else:
+        await db.execute(text("""
+            INSERT INTO platform_functions (name, code, env_vars)
+            VALUES (:name, :code, :env)
+        """), {"name": func.name, "code": func.code, "env": json.dumps(func.env_vars)})
+    await db.commit()
+    return {"name": func.name, "message": f"Function '{func.name}' deployed", "url": f"/api/fn/{func.name}"}
+
+@app.get("/api/fn/{name}")
+async def run_function_get(name: str, request: Request, db=Depends(get_db)):
+    """Execute a backend function (GET)."""
+    return await _execute_function(name, request, db, method="GET")
+
+@app.post("/api/fn/{name}")
+async def run_function_post(name: str, request: Request, db=Depends(get_db)):
+    """Execute a backend function (POST)."""
+    return await _execute_function(name, request, db, method="POST")
+
+async def _execute_function(name: str, request: Request, db, method: str):
+    # ─── Credit deduction for function calls ───
+    user = get_user_from_token(request)
+    user_id = user.get("user_id") if user else None
+    if user_id:
+        credit_check = deduct_user_credits(user_id, "function-call", 0, 0)
+        if not credit_check.get("ok"):
+            raise HTTPException(402, credit_check.get("error", "Insufficient credits"))
+    """Execute a backend function by name."""
+    result = await db.execute(text("SELECT code, env_vars FROM platform_functions WHERE name = :name"), {"name": name})
+    row = result.fetchone()
+    if not row:
+        raise HTTPException(404, f"Function '{name}' not found")
+
+    code = row[0]
+    env_vars = row[1] if isinstance(row[1], dict) else json.loads(row[1] or "{}")
+
+    # Parse body if POST
+    body = {}
+    if method == "POST":
+        try:
+            body = await request.json()
+        except Exception:
+            body = {}
+
+    # Execute function in sandboxed environment
+    try:
+        local_vars = {"input": body, "request": {"method": method, "query": dict(request.query_params)}}
+        exec_globals = {"__builtins__": __builtins__, "json": json, "time": time, "os": os}
+        exec(code, exec_globals, local_vars)
+
+        # Call the handler function if it exists
+        if "handler" in local_vars and callable(local_vars["handler"]):
+            result_val = local_vars["handler"](body)
+            if asyncio.iscoroutine(result_val):
+                result_val = await result_val
+            return result_val
+        elif "result" in local_vars:
+            return local_vars["result"]
+        else:
+            return {"message": "Function executed", "output": str({k: v for k, v in local_vars.items() if k not in exec_globals})}
+    except Exception as e:
+        raise HTTPException(500, f"Function error: {str(e)}\n{traceback.format_exc()[:500]}")
+
+
+# ─── Workflows ───
+@app.get("/api/workflows")
+async def list_workflows(db=Depends(get_db), request: Request = None):
+    """List all workflows — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    result = await db.execute(text("SELECT name, trigger_type, status, created_date FROM platform_workflows ORDER BY created_date DESC"))
+    rows = result.fetchall()
+    return {"workflows": [{"name": r[0], "trigger_type": r[1], "status": r[2], "created_date": r[3].isoformat() if r[3] else None} for r in rows]}
+
+@app.post("/api/workflows")
+async def create_workflow(wf: WorkflowCreate, db=Depends(get_db)):
+    """Create a new workflow."""
+    if wf.trigger_type not in ("scheduled", "entity", "connector"):
+        raise HTTPException(400, "trigger_type must be: scheduled, entity, or connector")
+
+    await db.execute(text("""
+        INSERT INTO platform_workflows (name, definition, trigger_type, trigger_config)
+        VALUES (:name, :def, :type, :config)
+    """), {"name": wf.name, "def": json.dumps(wf.definition), "type": wf.trigger_type, "config": json.dumps(wf.trigger_config or {})})
+    await db.commit()
+    return {"name": wf.name, "trigger_type": wf.trigger_type, "status": "active", "message": "Workflow created"}
+
+@app.put("/api/workflows/{name}/activate")
+async def activate_workflow(name: str, db=Depends(get_db)):
+    await db.execute(text("UPDATE platform_workflows SET status = 'active' WHERE name = :name"), {"name": name})
+    await db.commit()
+    return {"name": name, "status": "active"}
+
+@app.put("/api/workflows/{name}/deactivate")
+async def deactivate_workflow(name: str, db=Depends(get_db)):
+    await db.execute(text("UPDATE platform_workflows SET status = 'paused' WHERE name = :name"), {"name": name})
+    await db.commit()
+    return {"name": name, "status": "paused"}
+
+@app.delete("/api/workflows/{name}")
+async def delete_workflow(name: str, db=Depends(get_db)):
+    await db.execute(text("DELETE FROM platform_workflows WHERE name = :name"), {"name": name})
+    await db.commit()
+    return {"name": name, "deleted": True}
+
+
+
+# ─── Workflow Execution ───
+@app.post("/api/workflows/{name}/execute")
+async def execute_workflow(name: str, db=Depends(get_db)):
+    """Manually execute a workflow."""
+    result = await WorkflowEngine.execute_workflow(db, name)
+    return result
+
+@app.get("/api/workflows/{name}/logs")
+async def workflow_logs(name: str, limit: int = 10, db=Depends(get_db)):
+    """Get workflow execution logs."""
+    result = await db.execute(text(
+        "SELECT id, results, executed_at FROM platform_workflow_logs WHERE workflow_name = :name ORDER BY executed_at DESC LIMIT :limit"
+    ), {"name": name, "limit": limit})
+    rows = result.fetchall()
+    return {"logs": [{"id": r[0], "results": r[1] if isinstance(r[1], dict) else json.loads(r[1] or "{}"), "executed_at": r[2].isoformat() if r[2] else None} for r in rows]}
+
+
+# ─── Entity Aggregation ───
+class AggregationPipeline(BaseModel):
+    pipeline: list = Field(..., description="MongoDB-style aggregation pipeline")
+
+@app.post("/api/entities/{name}/aggregate")
+async def aggregate_entity(name: str, agg: AggregationPipeline, db=Depends(get_db)):
+    """Run aggregation pipeline on entity (group by, count, sum, avg)."""
+    try:
+        result = await EnhancedCRUD.aggregate(db, name, agg.pipeline)
+        return {"result": result}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+# ─── Enhanced filter endpoint ───
+@app.post("/api/entities/{name}/filter")
+async def filter_records(name: str, filter_req: dict, db=Depends(get_db)):
+    """Filter entity records with operators. POST body: {"filters": {"priority": {"operator": "gte", "value": 3}}, "limit": 50, "skip": 0, "sort": "-created_date"}"""
+    try:
+        filters = filter_req.get("filters", {})
+        limit = filter_req.get("limit", 50)
+        skip = filter_req.get("skip", 0)
+        sort = filter_req.get("sort")
+        user = get_user_from_token(request) if request else None
+        user_id = user.get("user_id") if user else None
+        result = await EnhancedCRUD.list_records(db, name, limit=limit, skip=skip, filters=filters, sort=sort, user_id=user_id)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+# ─── Agents ───
+@app.get("/api/agents")
+async def list_agents(db=Depends(get_db), request: Request = None):
+    """List all AI agents — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    agents = await AgentManager.list_agents(db)
+    return {"agents": agents}
+
+@app.post("/api/agents")
+async def create_agent(agent: AgentCreate, db=Depends(get_db), request: Request = None):
+    """Create a new AI agent with custom system prompt."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    created_by = user.get("user_id", "platform")
+    try:
+        return await AgentManager.create_agent(db, agent.name, agent.system_prompt,
+            agent.model, agent.temperature, agent.tools, created_by,
+            agent.max_tokens, agent.top_p, agent.memory_enabled, agent.stream)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@app.get("/api/agents/{name}")
+async def get_agent(name: str, db=Depends(get_db), request: Request = None):
+    """Get agent details — requires auth, masks secrets."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    agent = await AgentManager.get_agent(db, name)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+    # Mask api_key for everyone, secrets for non-owners
+    if agent.get("api_key"):
+        agent["api_key"] = agent["api_key"][:8] + "..."
+    if agent.get("created_by") != user.get("user_id") and user.get("role") != "admin":
+        agent["agent_secrets"] = {k: "***" for k in (agent.get("agent_secrets") or {})}
+    return agent
+
+@app.put("/api/agents/{name}")
+async def update_agent(name: str, updates: AgentUpdate, db=Depends(get_db), request: Request = None):
+    """Update agent — requires auth + ownership."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    agent = await AgentManager.get_agent(db, name)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+    if agent.get("created_by") != user.get("user_id") and user.get("role") != "admin":
+        raise HTTPException(403, "You can only modify agents you own")
+    try:
+        update_data = {k: v for k, v in updates.dict().items() if v is not None}
+        return await AgentManager.update_agent(db, name, update_data)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@app.delete("/api/agents/{name}")
+async def delete_agent(name: str, db=Depends(get_db), request: Request = None):
+    """Delete agent — requires auth + ownership."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    agent = await AgentManager.get_agent(db, name)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+    if agent.get("created_by") != user.get("user_id") and user.get("role") != "admin":
+        raise HTTPException(403, "You can only delete agents you own")
+    try:
+        return await AgentManager.delete_agent(db, name)
+    except ValueError as e:
+        raise HTTPException(404, str(e))
+
+@app.post("/api/agents/{name}/invoke")
+async def invoke_agent(name: str, msg: AgentInvoke, request: Request, db=Depends(get_db)):
+    """Invoke an agent — send a message and get a response."""
+    # ─── Credit deduction ───
+    user = get_user_from_token(request)
+    user_id = user.get("user_id") if user else None
+    if user_id:
+        # Get agent model for credit cost
+        agent = await AgentManager.get_agent(db, name)
+        agent_model = agent.get("model", "auto") if agent else "auto"
+        credit_check = deduct_user_credits(user_id, agent_model)
+        if not credit_check.get("ok"):
+            raise HTTPException(402, credit_check.get("error", "Insufficient credits"))
+    try:
+        result = await AgentManager.invoke_agent(db, name, msg.message, msg.context)
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+@app.post("/api/agents/{name}/clear-memory")
+async def clear_agent_memory(name: str, db=Depends(get_db)):
+    """Clear agent conversation memory."""
+    return await AgentManager.clear_memory(db, name)
+
+
+# ─── File Storage ───
+UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/opt/evolvixos/uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+@app.post("/api/files/upload")
+async def upload_file(file: UploadFile = File(...), db=Depends(get_db)):
+    """Upload a file (public or private)."""
+    file_id = str(uuid.uuid4())
+    filename = f"{file_id}_{file.filename}"
+    file_path = os.path.join(UPLOAD_DIR, filename)
+
+    content = await file.read()
+    with open(file_path, "wb") as f:
+        f.write(content)
+
+    await db.execute(text("""
+        INSERT INTO platform_files (filename, file_path, content_type, file_size)
+        VALUES (:name, :path, :type, :size)
+    """), {"name": file.filename, "path": file_path, "type": file.content_type, "size": len(content)})
+    await db.commit()
+
+    file_url = f"/api/files/{file_id}"
+    return {"filename": file.filename, "url": file_url, "size": len(content)}
+
+@app.get("/api/files/{file_id}")
+async def get_file(file_id: str):
+    """Download a file."""
+    # Find file by UUID prefix
+    for f in os.listdir(UPLOAD_DIR):
+        if f.startswith(file_id):
+            file_path = os.path.join(UPLOAD_DIR, f)
+            original_name = f.split("_", 1)[1] if "_" in f else f
+            with open(file_path, "rb") as fp:
+                return StreamingResponse(
+                    iter([fp.read()]),
+                    media_type="application/octet-stream",
+                    headers={"Content-Disposition": f"attachment; filename={original_name}"}
+                )
+    raise HTTPException(404, "File not found")
+
+
+# ─── AI Chat Builder ───
+# ─── Plugins ───
+@app.get("/api/plugins")
+async def list_plugins():
+    """List all available plugins."""
+    return {"plugins": PluginRegistry.list_plugins()}
+
+@app.get("/api/plugins/{plugin_id}")
+async def get_plugin_info(plugin_id: str):
+    """Get details of a specific plugin."""
+    plugin = PluginRegistry.get_plugin(plugin_id)
+    if not plugin:
+        raise HTTPException(404, f"Plugin {plugin_id} not found")
+    return {"id": plugin_id, "name": plugin["name"], "description": plugin["description"],
+            "category": plugin["category"], "icon": plugin["icon"], "params": plugin["params"]}
+
+@app.post("/api/plugins/{plugin_id}/execute")
+async def exec_plugin(plugin_id: str, params: dict = Body(...), db=Depends(get_db), request: Request = None):
+    """Execute a plugin — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    result = await PluginRegistry.execute_plugin(plugin_id, params, db)
+    return result
+
+# ─── Chat / AI Builder ───
+@app.post("/api/chat")
+async def chat_build(msg: ChatMessage, request: Request, db=Depends(get_db)):
+    """
+    AI chat builder — talk to the platform to create entities, functions, workflows.
+    Uses the local Ollama LLM to interpret intent and execute actions.
+    """
+    import urllib.request
+
+    # ─── Credit deduction ───
+    user = get_user_from_token(request)
+    user_id = user.get("user_id") if user else None
+    if user_id:
+        # Determine model that will be used for credit cost
+        pre_model = msg.model or "auto"
+        if pre_model == "auto":
+            msg_lower = msg.message.lower()
+            if any(w in msg_lower for w in ["build", "create", "make", "entity", "app", "store", "shop", "dashboard", "blog", "task", "project", "note", "feedback", "contact", "order"]):
+                pre_model = "qwen/qwen3.8-27b"        # 80.7% tool accuracy
+            elif any(w in msg_lower for w in ["code", "function", "api", "deploy", "python", "script", "backend", "endpoint"]):
+                pre_model = "deepseek/deepseek-v4-flash-0731"  # 76.3%, bash.010/task
+            elif any(w in msg_lower for w in ["analyze", "reason", "think", "complex", "architect", "design", "plan", "strategy"]):
+                pre_model = "google/gemini-3.7-flash"  # 80.6%, bash.077/task
+            else:
+                pre_model = "google/gemma-4-31b"       # 76.5%, bash.016/task
+        credit_check = deduct_user_credits(user_id, pre_model)
+        if not credit_check.get("ok"):
+            raise HTTPException(402, credit_check.get("error", "Insufficient credits"))
+
+    # Get existing entities so the LLM knows what's already built
+    existing_entities = await EntityManager.list_entities(db)
+    existing_names = [e["name"] for e in existing_entities] if existing_entities else []
+    existing_summary = ", ".join(existing_names) if existing_names else "none yet"
+
+    # Load persistent memory to give the builder context
+    memory_text = ""
+    try:
+        mem_result = await db.execute(text(
+            "SELECT content FROM entity_platformmemory ORDER BY created_date DESC LIMIT 20"
+        ))
+        mem_rows = mem_result.fetchall()
+        if mem_rows:
+            memory_items = [r[0] for r in mem_rows if r[0]]
+            if memory_items:
+                memory_text = "\n\nUSER MEMORY — Things to remember about this user and project:\n" + "\n".join(f"- {m}" for m in memory_items)
+    except Exception:
+        pass
+
+    # System prompt that teaches the LLM about platform capabilities
+    system_prompt = f"""You are EvolvixOS Platform Builder. You help users build apps by creating entities, backend functions, and workflows via natural language.
+
+CURRENT STATE — Entities already in the project: {existing_summary}{memory_text}
+
+Available API actions (respond with JSON):
+- Create entity: {{"action": "create_entity", "name": "Task", "schema": {{"type": "object", "properties": {{"title": {{"type": "string"}}, "done": {{"type": "boolean"}}}}, "required": ["title"]}}}}
+- List entities: {{"action": "list_entities"}}
+- Create function: {{"action": "create_function", "name": "getJoke", "code": "def handler(input):\n    return {{'joke': 'Why did the chicken cross the road?'}}"}}
+- Create workflow: {{"action": "create_workflow", "name": "Daily Report", "trigger_type": "scheduled", "definition": {{}}}}
+
+CRITICAL RULES:
+1. Be proactive, not interrogative. When the user gives a vague request, CREATE something immediately.
+2. CHECK the "CURRENT STATE" list above. If a suitable entity already exists, do NOT create a duplicate. Instead respond with {{"action": "chat", "message": "You already have a 'Post' entity for that — want me to add more fields or create a different entity?"}}.
+3. If the user asks for something related but different from existing entities, create a NEW entity with a distinct name. For example, if "Page" exists and the user wants a delivery app, create "Order" (not another "Page").
+4. Only ask a clarifying question if the request is truly ambiguous with no sensible default.
+
+Proactive defaults (always use action "create_entity"):
+- "website" or "landing page" -> "Page": {{title, slug, content, published}}
+- "blog" -> "Post": {{title, slug, content, author, published}}
+- "store" or "shop" or "ecommerce" -> "Product": {{name, description, price, stock, image_url}}
+- "delivery" or "delivery business" -> "Order": {{order_id, customer_name, customer_email, items, status, delivery_address, estimated_delivery_time, completed}}
+- "CRM" -> "Contact": {{name, email, phone, company, status}}
+- "portfolio" -> "Project": {{title, description, image_url, link, category}}
+- "booking" or "reservations" -> "Booking": {{name, email, date, time, status}}
+- "fitness" or "workout tracker" -> "Workout": {{title, date, duration, calories_burned, type, notes}}
+- "task manager" or "todo" -> "Task": {{title, status, priority, due_date}}
+
+You also have access to PLUGINS for external operations:
+- web_search: Search the internet for current info
+- web_fetch: Fetch and parse any URL
+- email_send: Send emails via Brevo
+- http_request: Call external APIs
+- code_exec: Run Python code
+- github: GitHub repo operations
+- crypto: Get crypto prices
+- weather: Get weather
+- image_gen: Generate images
+- translate: Translate text
+When a user asks for something requiring external data, respond with: {{"action": "plugin", "plugin": "web_search", "params": {{"query": "search term"}}}}
+
+Always respond with a JSON action object. If the user just wants to chat, respond with {{"action": "chat", "message": "your response"}}."""
+
+    # ─── Unified LLM routing via V10 ModelRouter (respects privacy mode) ───
+    llm_messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": msg.message}
+    ]
+    llm_result = await unified_chat(llm_messages, model=msg.model or "auto", temperature=0.3, max_tokens=2000, prefer_cloud=True)
+    ai_response = llm_result.get("content", "")
+    used_model = llm_result.get("model", "auto")
+    used_provider = llm_result.get("provider", "auto")
+    privacy_mode = llm_result.get("privacy_mode", "HYBRID")
+
+    # Extract and save memories from the conversation
+    try:
+        user_msg_lower = msg.message.lower()
+        # Detect preferences, decisions, instructions
+        memory_triggers = ["prefer", "always", "never", "use ", "don't ", "remember", "should", "want", "need", "like", "default"]
+        is_question = "?" in msg.message or msg.message.strip().lower().startswith(("what", "how", "why", "where", "when", "who", "can you", "do you"))
+        should_save = any(t in user_msg_lower for t in memory_triggers) and len(msg.message) > 10 and not is_question
+        if should_save:
+            mem_data = json.dumps({
+                "content": msg.message[:200],
+                "category": "preference",
+                "scope": "builder",
+                "confidence": "inferred",
+                "source": "chat",
+                "timestamp": datetime.now().isoformat()
+            })
+            # Use asyncpg directly to avoid transaction issues
+            try:
+                import asyncpg
+                conn = await asyncpg.connect(
+                    host="127.0.0.1", port=5432,
+                    database="evolvixos", user="evolvixos", password="evolvixos"
+                )
+                await conn.execute(
+                    "INSERT INTO entity_platformmemory (content, category, scope, confidence, source, timestamp, created_date, updated_date) VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())",
+                    msg.message[:200], "preference", "builder", "inferred", "chat", datetime.now().isoformat()
+                )
+                await conn.close()
+                print(f"Memory saved: {msg.message[:40]}")
+            except Exception as sync_err:
+                print(f"Memory save failed: {sync_err}")
+    except Exception as mem_err:
+        print(f"Memory save failed: {mem_err}")
+
+    # Try to parse AI response as JSON action
+    try:
+        # Handle plugin action
+        if '"action": "plugin"' in ai_response or '"action":"plugin"' in ai_response:
+            json_start = ai_response.find("{")
+            if json_start >= 0:
+                json_str = ai_response[json_start:]
+                brace_count = 0
+                end_idx = 0
+                for i, c in enumerate(json_str):
+                    if c == "{": brace_count += 1
+                    elif c == "}": brace_count -= 1
+                    if brace_count == 0:
+                        end_idx = i + 1
+                        break
+                plugin_action = json.loads(json_str[:end_idx])
+                if plugin_action.get("action") == "plugin":
+                    plugin_id = plugin_action.get("plugin", "")
+                    plugin_params = plugin_action.get("params", {})
+                    plugin_result = await PluginRegistry.execute_plugin(plugin_id, plugin_params, db)
+                    return {
+                        "message": f"Plugin '{plugin_id}' executed. Result: {json.dumps(plugin_result.get('result', plugin_result), indent=2)[:1000]}",
+                        "action": "plugin",
+                        "plugin": plugin_id,
+                        "result": plugin_result,
+                    }
+        
+        # Find JSON in response
+        json_start = ai_response.find("{")
+        json_end = ai_response.rfind("}") + 1
+        if json_start >= 0 and json_end > json_start:
+            action = json.loads(ai_response[json_start:json_end])
+        else:
+            return {"action": "chat", "message": ai_response}
+    except json.JSONDecodeError:
+        return {"action": "chat", "message": ai_response}
+
+    # Execute the action
+    action_type = action.get("action")
+    try:
+        if action_type == "create_entity":
+            entity_name = action["name"]
+            # Check existence first for a friendly response instead of raising
+            existing = await EntityManager.get_entity(db, entity_name)
+            if existing:
+                return {
+                    "action": "create_entity",
+                    "already_existed": True,
+                    "message": f"You already have a '{entity_name}' entity set up — no need to create it again. Want me to add fields to it, or build something else?"
+                }
+            result = await EntityManager.create_entity(db, entity_name, action["schema"])
+            fields = ", ".join(action["schema"].get("properties", {}).keys())
+            return {"action": "create_entity", "result": result, "message": f"Created the '{entity_name}' entity with fields: {fields}. You can start adding records to it now."}
+        elif action_type == "list_entities":
+            entities = await EntityManager.list_entities(db)
+            return {"action": "list_entities", "entities": entities}
+        elif action_type == "create_function":
+            await db.execute(text("""
+                INSERT INTO platform_functions (name, code, env_vars)
+                VALUES (:name, :code, '{}')
+                ON CONFLICT (name) DO UPDATE SET code = EXCLUDED.code
+            """), {"name": action["name"], "code": action["code"]})
+            await db.commit()
+            return {"action": "create_function", "name": action["name"], "url": f"/api/fn/{action['name']}", "message": f"Function '{action['name']}' deployed!"}
+        elif action_type == "create_workflow":
+            await db.execute(text("""
+                INSERT INTO platform_workflows (name, definition, trigger_type, trigger_config)
+                VALUES (:name, :def, :type, '{}')
+                ON CONFLICT (name) DO UPDATE SET definition = EXCLUDED.definition
+            """), {"name": action["name"], "def": json.dumps(action.get("definition", {})), "type": action.get("trigger_type", "scheduled")})
+            await db.commit()
+            return {"action": "create_workflow", "name": action["name"], "message": f"Workflow '{action['name']}' created!"}
+        elif action_type == "chat":
+            return {"action": "chat", "message": action.get("message", "How can I help you build today?")}
+        else:
+            return {"action": "unknown", "message": "Got that — but I'm not sure what to build yet. Could you tell me a bit more?"}
+    except ValueError as e:
+        # Known/expected validation errors — show the message cleanly, never raw JSON
+        return {"action": action_type, "error": str(e), "message": str(e)}
+    except Exception as e:
+        return {"action": action_type, "error": str(e), "message": "Something went wrong on my end while doing that — mind trying again?"}
+
+
+# ─── Apps API (Feature 1, 2, 8) ───
+from apps import AppsManager
+from sdk_gen import SDKGenerator
+from pagegen import PageGenerator
+from oauth import OAuthManager
+from realtime import ws_manager as realtime_ws_manager
+from fastapi import WebSocket, WebSocketDisconnect
+
+@app.get("/api/apps")
+async def list_apps(request: Request, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    apps = await AppsManager.list_apps(db, uid)
+    # Enrich with entity and page counts
+    for app in apps:
+        ent_result = await db.execute(text("SELECT COUNT(*) FROM platform_entities WHERE app_id = :aid"), {"aid": app["id"]})
+        app["entity_count"] = ent_result.fetchone()[0]
+        page_result = await db.execute(text("SELECT COUNT(*) FROM platform_pages WHERE app_id = :aid"), {"aid": app["id"]})
+        app["page_count"] = page_result.fetchone()[0]
+    return apps
+
+@app.post("/api/apps")
+async def create_app(app_data: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    name = app_data.get("name", "Untitled App")
+    description = app_data.get("description", "")
+    pages = app_data.get("pages", [])
+    # If auto-generate pages from entities
+    auto_gen = app_data.get("auto_generate", False)
+    if auto_gen:
+        entities = await EntityManager.list_entities(db)
+        pg = PageGenerator()
+        pages = [pg.generate_dashboard_page(entities)]
+        for e in entities:
+            pages.extend(pg.generate_pages_for_entity(e["name"], e.get("schema", {})))
+    result = await AppsManager.create_app(db, name, description, uid, pages)
+    return result
+
+@app.get("/api/apps/{app_id}")
+async def get_app(app_id: int, db=Depends(get_db)):
+    app = await AppsManager.get_app(db, app_id)
+    if not app:
+        raise HTTPException(404, "App not found")
+    pages = await AppsManager.get_pages(db, app_id)
+    app["pages"] = pages
+    return app
+
+@app.put("/api/apps/{app_id}")
+async def update_app(app_id: int, updates: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await AppsManager.update_app(db, app_id, updates, uid)
+
+@app.delete("/api/apps/{app_id}")
+async def delete_app(app_id: int, request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    app = await AppsManager.get_app(db, app_id)
+    if not app:
+        raise HTTPException(404, "App not found")
+    if uid and app.get("created_by") and str(app["created_by"]) != uid:
+        raise HTTPException(403, "Not authorized")
+    await AppsManager.delete_app(db, app_id, uid)
+    return {"deleted": True}
+
+@app.post("/api/apps/{app_id}/publish")
+async def publish_app(app_id: int, request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await AppsManager.publish_app(db, app_id, uid)
+
+@app.get("/api/apps/slug/{slug}")
+async def get_app_by_slug(slug: str, db=Depends(get_db)):
+    app = await AppsManager.get_app_by_slug(db, slug)
+    if not app:
+        raise HTTPException(404, "App not found")
+    if not app.get("is_public"):
+        raise HTTPException(403, "App is not published")
+    pages = await AppsManager.get_pages(db, app["id"])
+    app["pages"] = pages
+    return app
+
+# ─── Pages API ───
+
+@app.get("/api/apps/slug/{slug}/entities")
+async def get_public_entities(slug: str, db=Depends(get_db)):
+    """Public endpoint: get entities for a published app. No auth required."""
+    app = await AppsManager.get_app_by_slug(db, slug)
+    if not app:
+        raise HTTPException(404, "App not found")
+    if app.get("status") != "published":
+        raise HTTPException(403, "App is not published")
+    try:
+        entities = await EntityManager.list_entities(db)
+        # Filter to entities that belong to this app (by app_id if present, otherwise all)
+        app_id = app.get("id")
+        app_entities = [e for e in entities if e.get("app_id") == app_id or not e.get("app_id")]
+        return app_entities
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.get("/api/apps/slug/{slug}/records/{entity_name}")
+async def get_public_records(slug: str, entity_name: str, db=Depends(get_db), limit: int = 100, skip: int = 0):
+    """Public endpoint: get records for a published app entity. No auth required."""
+    app = await AppsManager.get_app_by_slug(db, slug)
+    if not app:
+        raise HTTPException(404, "App not found")
+    if app.get("status") != "published":
+        raise HTTPException(403, "App is not published")
+    try:
+        records = await EnhancedCRUD.list_records(db, entity_name, limit=limit, skip=skip)
+        return records
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.get("/api/apps/{app_id}/pages")
+async def get_pages(app_id: int, db=Depends(get_db)):
+    return await AppsManager.get_pages(db, app_id)
+
+@app.post("/api/apps/{app_id}/pages")
+async def create_page(app_id: int, page_data: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await AppsManager.create_page(db, app_id, page_data.get("name", "New Page"), page_data.get("layout", []), page_data.get("type", "custom"), page_data.get("is_home", False), uid)
+
+@app.put("/api/pages/{page_id}")
+async def update_page(page_id: int, updates: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await AppsManager.update_page(db, page_id, updates, uid)
+
+@app.delete("/api/pages/{page_id}")
+async def delete_page(page_id: int, db=Depends(get_db)):
+    await AppsManager.delete_page(db, page_id)
+    return {"deleted": True}
+
+@app.get("/api/components/palette")
+async def get_component_palette():
+    return PageGenerator.get_component_palette()
+
+# ─── App Templates ───
+@app.get("/api/templates")
+async def list_templates():
+    """List available one-click app templates."""
+    return get_template_list()
+
+@app.get("/api/templates/{template_id}")
+async def get_template_detail(template_id: str):
+    """Get full template definition."""
+    t = get_template(template_id)
+    if not t:
+        raise HTTPException(404, "Template not found")
+    return t
+
+@app.post("/api/templates/{template_id}/create")
+async def create_from_template(template_id: str, body: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    """Create a complete app from a template: app + entities + pages + auto-publish."""
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    app_name = body.get("name")
+    try:
+        result = await instantiate_template(db, template_id, app_name, uid)
+        return result
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+# ─── App Authentication ───
+import hashlib as _hl
+import hmac as _hmac
+import time as _time
+import base64 as _b64
+
+def _hash_password(password: str) -> str:
+    salt = "evolvixos_app_salt_2026"
+    return _hl.sha256((salt + password).encode()).hexdigest()
+
+def _make_app_jwt(user_id: int, email: str, app_id: int) -> str:
+    payload = {"sub": str(user_id), "email": email, "app_id": app_id, "exp": int(_time.time()) + 86400 * 30}
+    payload_json = json.dumps(payload)
+    payload_b64 = _b64.urlsafe_b64encode(payload_json.encode()).decode().rstrip("=")
+    header_b64 = _b64.urlsafe_b64encode(b'{"alg":"HS256","typ":"JWT"}').decode().rstrip("=")
+    signature = _hmac.new(JWT_SECRET.encode(), f"{header_b64}.{payload_b64}".encode(), _hl.sha256).hexdigest()
+    return f"{header_b64}.{payload_b64}.{signature}"
+
+def _verify_app_jwt(token: str) -> dict | None:
+    parts = token.split(".")
+    if len(parts) != 3:
+        return None
+    try:
+        payload_bytes = _b64.urlsafe_b64decode(parts[1] + "==")
+        payload = json.loads(payload_bytes)
+        if payload.get("exp", 0) < _time.time():
+            return None
+        return payload
+    except Exception:
+        return None
+
+@app.post("/api/apps/{app_id}/auth/register")
+async def app_register(app_id: int, body: dict = Body(...), db=Depends(get_db)):
+    """Register a new user for a published app."""
+    email = body.get("email", "").strip().lower()
+    password = body.get("password", "")
+    name = body.get("name", "")
+    if not email or not password or len(password) < 6:
+        raise HTTPException(400, "Email and password (min 6 chars) required")
+    
+    # Check app exists
+    app = await AppsManager.get_app(db, app_id)
+    if not app:
+        raise HTTPException(404, "App not found")
+    
+    # Check if user already exists
+    existing = await db.execute(
+        text("SELECT id FROM app_users WHERE app_id = :aid AND email = :email"),
+        {"aid": app_id, "email": email}
+    )
+    if existing.fetchone():
+        raise HTTPException(409, "Email already registered for this app")
+    
+    # Create user
+    pwd_hash = _hash_password(password)
+    result = await db.execute(
+        text("INSERT INTO app_users (app_id, email, password_hash, name) VALUES (:aid, :email, :pwd, :name) RETURNING id"),
+        {"aid": app_id, "email": email, "pwd": pwd_hash, "name": name}
+    )
+    user_id = result.fetchone()[0]
+    await db.commit()
+    
+    token = _make_app_jwt(user_id, email, app_id)
+    return {"token": token, "user": {"id": user_id, "email": email, "name": name}}
+
+@app.post("/api/apps/{app_id}/auth/login")
+async def app_login(app_id: int, body: dict = Body(...), db=Depends(get_db)):
+    """Login to a published app."""
+    email = body.get("email", "").strip().lower()
+    password = body.get("password", "")
+    if not email or not password:
+        raise HTTPException(400, "Email and password required")
+    
+    pwd_hash = _hash_password(password)
+    result = await db.execute(
+        text("SELECT id, name FROM app_users WHERE app_id = :aid AND email = :email AND password_hash = :pwd"),
+        {"aid": app_id, "email": email, "pwd": pwd_hash}
+    )
+    row = result.fetchone()
+    if not row:
+        raise HTTPException(401, "Invalid credentials")
+    
+    user_id, name = row
+    token = _make_app_jwt(user_id, email, app_id)
+    return {"token": token, "user": {"id": user_id, "email": email, "name": name}}
+
+@app.put("/api/apps/{app_id}/auth-toggle")
+async def toggle_app_auth(app_id: int, body: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    """Toggle requires_auth on an app (platform builder only)."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    requires = body.get("requires_auth", False)
+    await db.execute(
+        text("UPDATE platform_apps SET requires_auth = :ra, updated_date = NOW() WHERE id = :id"),
+        {"ra": requires, "id": app_id}
+    )
+    await db.commit()
+    return {"app_id": app_id, "requires_auth": requires}
+
+# ─── SDK Generator (Feature 5) ───
+@app.get("/api/sdk")
+async def generate_sdk(request: Request, db=Depends(get_db), lang: str = "js"):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    entities = await EntityManager.list_entities(db)
+    gen = SDKGenerator()
+    if lang == "ts":
+        code = gen.generate_ts(entities)
+    else:
+        code = gen.generate_js(entities)
+    return {"code": code, "language": lang, "entity_count": len(entities)}
+
+# ─── OAuth Connectors (Feature 6) ───
+@app.get("/api/connectors/providers")
+async def list_oauth_providers():
+    return OAuthManager.list_providers()
+
+@app.get("/api/connectors")
+async def list_connectors(request: Request, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await OAuthManager.list_connectors(db, uid)
+
+@app.post("/api/connectors")
+async def create_connector(connector_data: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await OAuthManager.create_connector(
+        db, connector_data.get("provider"), connector_data.get("name"),
+        connector_data.get("client_id"), connector_data.get("client_secret"),
+        connector_data.get("scopes"), uid
+    )
+
+@app.get("/api/connectors/{connector_id}/auth-url")
+async def get_auth_url(connector_id: int, request: Request, db=Depends(get_db)):
+    redirect_uri = str(request.url_for("get_auth_url", connector_id=connector_id)).replace("auth-url", "callback")
+    return await OAuthManager.get_auth_url(db, connector_id, redirect_uri)
+
+@app.delete("/api/connectors/{connector_id}")
+async def delete_connector(connector_id: int, request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await OAuthManager.delete_connector(db, connector_id, uid)
+
+# ─── Version History (Feature 10) ───
+@app.get("/api/versions")
+async def get_versions(entity_type: str = None, entity_id: str = None, limit: int = 20, db=Depends(get_db)):
+    return await AppsManager.get_versions(db, entity_type, entity_id, limit)
+
+# ─── Activity Feed ───
+
+@app.get("/api/analytics/overview")
+async def analytics_overview(db=Depends(get_db)):
+    """Platform-wide analytics overview."""
+    # Count entities
+    entity_tables = await db.execute(text("""
+        SELECT tablename FROM pg_tables 
+        WHERE schemaname='public' AND tablename LIKE 'entity_%'
+    """))
+    entity_count = len(entity_tables.fetchall())
+    
+    # Count total records across all entity tables
+    total_records = 0
+    entity_records = []
+    for row in await db.execute(text("""
+        SELECT tablename FROM pg_tables 
+        WHERE schemaname='public' AND tablename LIKE 'entity_%'
+    """)):
+        tbl = row[0]
+        try:
+            cnt = await db.execute(text(f"SELECT count(*) FROM {tbl}"))
+            c = cnt.fetchone()[0]
+            total_records += c
+            entity_name = tbl.replace('entity_', '')
+            entity_records.append({"name": entity_name, "records": c})
+        except:
+            pass
+    entity_records.sort(key=lambda x: x["records"], reverse=True)
+    
+    # Count functions
+    fn_result = await db.execute(text("SELECT count(*) FROM platform_functions"))
+    fn_count = fn_result.fetchone()[0]
+    
+    # Count agents
+    agent_result = await db.execute(text("SELECT count(*) FROM platform_agents"))
+    agent_count = agent_result.fetchone()[0]
+    
+    # Count workflows
+    wf_result = await db.execute(text("SELECT count(*) FROM platform_workflows"))
+    wf_count = wf_result.fetchone()[0]
+    wf_active = await db.execute(text("SELECT count(*) FROM platform_workflows WHERE status='active'"))
+    wf_active_count = wf_active.fetchone()[0]
+    
+    # Count apps
+    app_result = await db.execute(text("SELECT count(*) FROM platform_apps"))
+    app_count = app_result.fetchone()[0]
+    
+    # Count pages
+    page_result = await db.execute(text("SELECT count(*) FROM platform_pages"))
+    page_count = page_result.fetchone()[0]
+    
+    # Workflow executions
+    wf_logs = await db.execute(text("SELECT count(*) FROM platform_workflow_logs"))
+    wf_exec_count = wf_logs.fetchone()[0]
+    
+    # Activity by type (last 30 days)
+    activity_by_type = await db.execute(text("""
+        SELECT entity_type, count(*) as cnt 
+        FROM platform_activity 
+        WHERE created_date > NOW() - INTERVAL '30 days'
+        GROUP BY entity_type 
+        ORDER BY cnt DESC
+    """))
+    activity_data = [{"type": r[0], "count": r[1]} for r in activity_by_type.fetchall()]
+    
+    # Activity over last 7 days (for sparkline)
+    activity_7d = await db.execute(text("""
+        SELECT DATE(created_date) as d, count(*) as cnt 
+        FROM platform_activity 
+        WHERE created_date > NOW() - INTERVAL '7 days'
+        GROUP BY d ORDER BY d
+    """))
+    activity_timeline = [{"date": r[0].isoformat(), "count": r[1]} for r in activity_7d.fetchall()]
+    
+    return {
+        "entities": entity_count,
+        "total_records": total_records,
+        "entity_records": entity_records[:10],
+        "functions": fn_count,
+        "agents": agent_count,
+        "workflows": wf_count,
+        "active_workflows": wf_active_count,
+        "apps": app_count,
+        "pages": page_count,
+        "workflow_executions": wf_exec_count,
+        "activity_by_type": activity_data,
+        "activity_timeline": activity_timeline
+    }
+
+@app.get("/api/activity")
+async def get_activity(request: Request, limit: int = 20, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    return await AppsManager.get_activity(db, limit, uid)
+
+# ─── Real-time WebSocket (Feature 3) ───
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket, entity: str = None):
+    await realtime_ws_manager.connect(websocket, entity)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            # Echo for ping/pong
+            import json
+            msg = json.loads(data)
+            if msg.get("type") == "ping":
+                await websocket.send_text(json.dumps({"type": "pong"}))
+    except WebSocketDisconnect:
+        realtime_ws_manager.disconnect(websocket, entity)
+
+# ─── Enhanced Entity Endpoints with Versioning + Real-time ───
+# Override create to add version tracking + WS broadcast
+@app.post("/api/entities")
+async def create_entity_with_version(entity_data: dict = Body(...), request: Request = None, db=Depends(get_db)):
+    user = get_user_from_token(request)
+    uid = str(user.get("user_id")) if user else None
+    name = entity_data.get("name")
+    schema = entity_data.get("schema", {})
+    result = await EntityManager.create_entity(db, name, schema, uid)
+    # Save version
+    await AppsManager._save_version(db, "entity", name, name, {"name": name, "schema": schema}, "Entity created", uid)
+    # Log activity
+    await AppsManager._log_activity(db, "create", "entity", name, f"Entity '{name}' created", uid)
+    # Broadcast via WebSocket
+    await realtime_ws_manager.broadcast(name, "entity.created", {"entity": name})
+    return result
+
+
+
+# ─── Billing & Token Packs API ───
+
+@app.get('/api/billing/token-packs')
+async def list_token_packs():
+    """List all available token packs."""
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT id, name, credits, price, discount_percent, is_popular, description, features, color FROM token_packs WHERE is_active = 1 ORDER BY sort_order')
+        rows = c.fetchall()
+        conn.close()
+        packs = []
+        for r in rows:
+            packs.append({
+                'id': r[0], 'name': r[1], 'credits': r[2], 'price': r[3],
+                'discount_percent': r[4], 'is_popular': bool(r[5]),
+                'description': r[6],
+                'features': json.loads(r[7]) if r[7] else [],
+                'color': r[8]
+            })
+        return {'packs': packs}
+    except Exception as e:
+        return {'packs': [], 'error': str(e)}
+
+
+@app.get('/api/billing/plans')
+async def list_billing_plans():
+    """List all subscription plans."""
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT id, name, price_monthly, price_yearly, credits_monthly, max_agents, max_entities, max_functions, max_workflows, max_api_calls, features FROM plans WHERE is_active = 1 ORDER BY sort_order')
+        rows = c.fetchall()
+        conn.close()
+        plans = []
+        for r in rows:
+            plans.append({
+                'id': r[0], 'name': r[1], 'price_monthly': r[2], 'price_yearly': r[3],
+                'credits_monthly': r[4], 'max_agents': r[5], 'max_entities': r[6],
+                'max_functions': r[7], 'max_workflows': r[8], 'max_api_calls': r[9],
+                'features': json.loads(r[10]) if r[10] else []
+            })
+        return {'plans': plans}
+    except Exception as e:
+        return {'plans': [], 'error': str(e)}
+
+
+@app.get('/api/billing/credits')
+async def get_user_credits(request: Request):
+    """Get current user credit balance and usage."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, 'Authentication required')
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT s.credits_remaining, s.credits_used, p.name, p.credits_monthly FROM subscriptions s JOIN plans p ON s.plan_id = p.id WHERE s.user_id = ? AND s.status = ?', (user['user_id'], 'active'))
+        row = c.fetchone()
+        conn.close()
+        if row:
+            return {'remaining': row[0], 'used': row[1], 'plan': row[2], 'monthly_allowance': row[3], 'usage_percent': round((row[1] / max(row[3], 1)) * 100, 1)}
+        return {'remaining': 0, 'used': 0, 'plan': 'none', 'monthly_allowance': 0, 'usage_percent': 0}
+    except Exception as e:
+        return {'remaining': 0, 'used': 0, 'plan': 'none', 'monthly_allowance': 0, 'error': str(e)}
+
+
+@app.get('/api/billing/transactions')
+async def get_credit_transactions(request: Request, limit: int = 50):
+    """Get user credit transaction history."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, 'Authentication required')
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT amount, type, description, model_used, tokens_in, tokens_out, balance_after, timestamp FROM credit_transactions WHERE user_id = ? ORDER BY timestamp DESC LIMIT ?', (user['user_id'], limit))
+        rows = c.fetchall()
+        conn.close()
+        return {'transactions': [{'amount': r[0], 'type': r[1], 'description': r[2], 'model': r[3], 'tokens_in': r[4], 'tokens_out': r[5], 'balance_after': r[6], 'timestamp': r[7]} for r in rows]}
+    except Exception as e:
+        return {'transactions': [], 'error': str(e)}
+
+
+@app.get('/api/billing/token-packs/purchases')
+async def get_token_pack_purchases(request: Request):
+    """Get user token pack purchase history."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, 'Authentication required')
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT id, pack_name, credits_added, amount_paid, status, created_date FROM token_pack_purchases WHERE user_id = ? ORDER BY created_date DESC', (user['user_id'],))
+        rows = c.fetchall()
+        conn.close()
+        return {'purchases': [{'id': r[0], 'pack_name': r[1], 'credits_added': r[2], 'amount_paid': r[3], 'status': r[4], 'date': r[5]} for r in rows]}
+    except Exception as e:
+        return {'purchases': [], 'error': str(e)}
+
+
+@app.post('/api/billing/token-packs/{pack_id}/purchase')
+async def purchase_token_pack(pack_id: int, request: Request):
+    """Purchase a token pack — adds credits to user account."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, 'Authentication required')
+    try:
+        conn = sqlite3_billing.connect(AUTH_DB_PATH, timeout=5)
+        c = conn.cursor()
+        c.execute('SELECT name, credits, price FROM token_packs WHERE id = ? AND is_active = 1', (pack_id,))
+        pack = c.fetchone()
+        if not pack:
+            conn.close()
+            raise HTTPException(404, 'Token pack not found')
+        pack_name, credits, price = pack
+        # Create purchase record
+        c.execute('INSERT INTO token_pack_purchases (user_id, pack_id, pack_name, credits_added, amount_paid, status, created_date) VALUES (?, ?, ?, ?, ?, ?, ?)', (user['user_id'], pack_id, pack_name, credits, price, 'completed', time.strftime('%Y-%m-%d %H:%M:%S')))
+        purchase_id = c.lastrowid
+        # Add credits to subscription
+        c.execute('UPDATE subscriptions SET credits_remaining = credits_remaining + ? WHERE user_id = ? AND status = ?', (credits, user['user_id'], 'active'))
+        # Record credit transaction
+        c.execute('SELECT credits_remaining FROM subscriptions WHERE user_id = ? AND status = ?', (user['user_id'], 'active'))
+        row = c.fetchone()
+        balance_after = row[0] if row else 0
+        c.execute('INSERT INTO credit_transactions (user_id, amount, type, description, model_used, tokens_in, tokens_out, balance_after, timestamp) VALUES (?, ?, ?, ?, ?, 0, 0, ?, ?)', (user['user_id'], credits, 'credit', 'Purchased ' + pack_name, 'token-pack', balance_after, time.strftime('%Y-%m-%d %H:%M:%S')))
+        conn.commit()
+        conn.close()
+        return {'ok': True, 'purchase_id': purchase_id, 'pack_name': pack_name, 'credits_added': credits, 'new_balance': balance_after, 'message': 'Successfully purchased ' + pack_name + '! ' + str(credits) + ' credits added.'}
+    except HTTPException:
+        raise
+    except Exception as e:
+        return {'ok': False, 'error': str(e)}
+
+
+# ─── Startup ───
+@app.on_event("startup")
+async def startup():
+    await init_db()
+    print("EvolvixOS Platform API started on port 8080")
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8080)

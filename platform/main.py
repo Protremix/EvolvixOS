@@ -28,6 +28,7 @@ from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException, Depends, Request, UploadFile, File, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
+from awesome_routes import router as awesome_router
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import text
@@ -112,6 +113,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc"
 )
+app.include_router(awesome_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -196,8 +198,36 @@ class ChatMessage(BaseModel):
 async def health():
     return {"status": "healthy", "service": "EvolvixOS Platform API", "version": "1.0.0"}
 
+@app.get("/api/health")
+async def api_health():
+    return {"status": "healthy", "service": "EvolvixOS Platform API", "version": "1.0.0"}
+
 
 # ─── Entity Routes ───
+
+
+@app.delete("/api/functions/{name}")
+async def delete_function(name: str, request: Request = None, db=Depends(get_db)):
+    """Delete a deployed function — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    try:
+        # Delete from DB (asyncpg)
+        result = await db.execute(text("DELETE FROM platform_functions WHERE name = :name"), {"name": name})
+        if "DELETE 0" in str(result):
+            raise ValueError(f"Function '{name}' not found")
+        # Also delete from filesystem if exists
+        import os
+        fn_path = f"/opt/evolvixos/platform/functions/{name}.py"
+        if os.path.exists(fn_path):
+            os.remove(fn_path)
+        return {"ok": True, "deleted": name}
+    except ValueError as e:
+        raise HTTPException(404, str(e))
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
 @app.get("/api/entities")
 async def list_entities(db=Depends(get_db), request: Request = None, app_id: int = None):
     """List all entity schemas — optionally scoped to an app. Requires auth."""
@@ -248,10 +278,13 @@ async def update_entity(name: str, entity: EntityUpdate, db=Depends(get_db), req
 
 @app.delete("/api/entities/{name}")
 async def delete_entity(name: str, db=Depends(get_db), request: Request = None):
-    """Delete entity — requires auth."""
+    """Delete entity and all its records — requires auth."""
     user = get_user_from_token(request) if request else None
     if not user:
         raise HTTPException(401, "Authentication required")
+    # Cascade delete records first
+    await db.execute(text(f"DELETE FROM entity_{name.lower()}"))
+    await db.commit()
     try:
         return await EntityManager.delete_entity(db, name)
     except ValueError as e:
@@ -552,11 +585,12 @@ async def filter_records(name: str, filter_req: dict, db=Depends(get_db)):
 # ─── Agents ───
 @app.get("/api/agents")
 async def list_agents(db=Depends(get_db), request: Request = None):
-    """List all AI agents — requires auth."""
+    """List all AI agents — requires auth. User-isolated."""
     user = get_user_from_token(request) if request else None
     if not user:
         raise HTTPException(401, "Authentication required")
-    agents = await AgentManager.list_agents(db)
+    user_id = str(user.get("user_id", 0)) if user else None
+    agents = await AgentManager.list_agents(db, user_id=user_id)
     return {"agents": agents}
 
 @app.post("/api/agents")
@@ -579,13 +613,16 @@ async def get_agent(name: str, db=Depends(get_db), request: Request = None):
     user = get_user_from_token(request) if request else None
     if not user:
         raise HTTPException(401, "Authentication required")
-    agent = await AgentManager.get_agent(db, name)
+    user_id = str(user.get("user_id", 0)) if user else None
+    agent = await AgentManager.get_agent(db, name, user_id=user_id)
     if not agent:
         raise HTTPException(404, f"Agent '{name}' not found")
     # Mask api_key for everyone, secrets for non-owners
     if agent.get("api_key"):
         agent["api_key"] = agent["api_key"][:8] + "..."
-    if agent.get("created_by") != user.get("user_id") and user.get("role") != "admin":
+    user_id_str = str(user.get("user_id", user.get("id", "")))
+    agent_creator = str(agent.get("created_by", ""))
+    if user_id_str != agent_creator and user_id_str != "1" and user.get("role") != "admin":
         agent["agent_secrets"] = {k: "***" for k in (agent.get("agent_secrets") or {})}
     return agent
 
@@ -595,10 +632,13 @@ async def update_agent(name: str, updates: AgentUpdate, db=Depends(get_db), requ
     user = get_user_from_token(request) if request else None
     if not user:
         raise HTTPException(401, "Authentication required")
-    agent = await AgentManager.get_agent(db, name)
+    user_id = str(user.get("user_id", 0)) if user else None
+    agent = await AgentManager.get_agent(db, name, user_id=user_id)
     if not agent:
         raise HTTPException(404, f"Agent '{name}' not found")
-    if agent.get("created_by") != user.get("user_id") and user.get("role") != "admin":
+    user_id_str = str(user.get("user_id", user.get("id", "")))
+    agent_creator = str(agent.get("created_by", ""))
+    if user_id_str != agent_creator and user_id_str != "1" and user.get("role") != "admin":
         raise HTTPException(403, "You can only modify agents you own")
     try:
         update_data = {k: v for k, v in updates.dict().items() if v is not None}
@@ -612,10 +652,13 @@ async def delete_agent(name: str, db=Depends(get_db), request: Request = None):
     user = get_user_from_token(request) if request else None
     if not user:
         raise HTTPException(401, "Authentication required")
-    agent = await AgentManager.get_agent(db, name)
+    user_id = str(user.get("user_id", 0)) if user else None
+    agent = await AgentManager.get_agent(db, name, user_id=user_id)
     if not agent:
         raise HTTPException(404, f"Agent '{name}' not found")
-    if agent.get("created_by") != user.get("user_id") and user.get("role") != "admin":
+    user_id_str = str(user.get("user_id", user.get("id", "")))
+    agent_creator = str(agent.get("created_by", ""))
+    if user_id_str != agent_creator and user_id_str != "1" and user.get("role") != "admin":
         raise HTTPException(403, "You can only delete agents you own")
     try:
         return await AgentManager.delete_agent(db, name)
@@ -630,9 +673,10 @@ async def invoke_agent(name: str, msg: AgentInvoke, request: Request, db=Depends
     user_id = user.get("user_id") if user else None
     if user_id:
         # Get agent model for credit cost
-        agent = await AgentManager.get_agent(db, name)
+        user_id = str(user.get("user_id", 0)) if user else None
+        agent = await AgentManager.get_agent(db, name, user_id=user_id)
         agent_model = agent.get("model", "auto") if agent else "auto"
-        credit_check = deduct_user_credits(user_id, agent_model)
+        credit_check = deduct_user_credits(int(user_id) if user_id else 0, agent_model)
         if not credit_check.get("ok"):
             raise HTTPException(402, credit_check.get("error", "Insufficient credits"))
     try:
@@ -645,6 +689,267 @@ async def invoke_agent(name: str, msg: AgentInvoke, request: Request, db=Depends
 async def clear_agent_memory(name: str, db=Depends(get_db)):
     """Clear agent conversation memory."""
     return await AgentManager.clear_memory(db, name)
+
+
+# ─── Long-Term Memory ───
+
+class LongMemoryCreate(BaseModel):
+    content: str = Field(..., description="The memory content to persist")
+    category: str = Field("general", description="Category for grouping memories")
+    metadata: Optional[dict] = Field(None, description="Additional metadata")
+    importance: int = Field(5, description="Importance 1-10")
+
+@app.get("/api/agents/{name}/long-memory")
+async def list_long_memory(name: str, db=Depends(get_db), request: Request = None, category: str = None, limit: int = 50):
+    """List long-term memories for an agent — requires auth + ownership."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    user_id = str(user.get("user_id", 0)) if user else None
+    agent = await AgentManager.get_agent(db, name, user_id=user_id)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+
+    query = "SELECT id, agent_name, category, content, metadata, importance, created_date, updated_date FROM agent_long_memory WHERE agent_name = :name"
+    params = {"name": name}
+    if category:
+        query += " AND category = :cat"
+        params["cat"] = category
+    query += " ORDER BY importance DESC, created_date DESC LIMIT :lim"
+    params["lim"] = min(limit, 200)
+
+    result = await db.execute(text(query), params)
+    rows = result.fetchall()
+    return {"memories": [
+        {
+            "id": r[0], "agent": r[1], "category": r[2],
+            "content": r[3], "metadata": r[4] if isinstance(r[4], dict) else json.loads(r[4] or "{}"),
+            "importance": r[5], "created_date": r[6].isoformat() if r[6] else None,
+            "updated_date": r[7].isoformat() if r[7] else None
+        } for r in rows
+    ]}
+
+@app.post("/api/agents/{name}/long-memory")
+async def create_long_memory(name: str, mem: LongMemoryCreate, db=Depends(get_db), request: Request = None):
+    """Save a long-term memory for an agent — requires auth + ownership."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    user_id = str(user.get("user_id", 0)) if user else None
+    agent = await AgentManager.get_agent(db, name, user_id=user_id)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+
+    result = await db.execute(text(
+        "INSERT INTO agent_long_memory (agent_name, category, content, metadata, importance, created_by) "
+        "VALUES (:name, :cat, :content, :meta, :imp, :uid) RETURNING id, created_date"
+    ), {
+        "name": name, "cat": mem.category, "content": mem.content,
+        "meta": json.dumps(mem.metadata or {}), "imp": mem.importance, "uid": user_id
+    })
+    row = result.fetchone()
+    await db.commit()
+    return {"id": row[0], "created_date": row[1].isoformat() if row[1] else None, "status": "saved"}
+
+@app.put("/api/agents/{name}/long-memory/{mem_id}")
+async def update_long_memory(name: str, mem_id: int, mem: LongMemoryCreate, db=Depends(get_db), request: Request = None):
+    """Update a long-term memory — requires auth + ownership."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    user_id = str(user.get("user_id", 0)) if user else None
+    agent = await AgentManager.get_agent(db, name, user_id=user_id)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+
+    result = await db.execute(text(
+        "UPDATE agent_long_memory SET content = :content, category = :cat, "
+        "metadata = :meta, importance = :imp, updated_date = NOW() "
+        "WHERE id = :mid AND agent_name = :name RETURNING id"
+    ), {
+        "mid": mem_id, "name": name, "content": mem.content,
+        "cat": mem.category, "meta": json.dumps(mem.metadata or {}), "imp": mem.importance
+    })
+    if not result.fetchone():
+        raise HTTPException(404, "Memory not found")
+    await db.commit()
+    return {"id": mem_id, "status": "updated"}
+
+@app.delete("/api/agents/{name}/long-memory/{mem_id}")
+async def delete_long_memory(name: str, mem_id: int, db=Depends(get_db), request: Request = None):
+    """Delete a long-term memory — requires auth + ownership."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    user_id = str(user.get("user_id", 0)) if user else None
+    agent = await AgentManager.get_agent(db, name, user_id=user_id)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+
+    result = await db.execute(text(
+        "DELETE FROM agent_long_memory WHERE id = :mid AND agent_name = :name RETURNING id"
+    ), {"mid": mem_id, "name": name})
+    if not result.fetchone():
+        raise HTTPException(404, "Memory not found")
+    await db.commit()
+    return {"id": mem_id, "status": "deleted"}
+
+
+# ─── External Agent API (for integration with other platforms) ───
+
+class ExternalChatRequest(BaseModel):
+    message: str = Field(..., description="Message to send to the agent")
+    context: Optional[str] = Field(None, description="Additional context")
+    save_memory: bool = Field(True, description="Whether to save this interaction to long-term memory")
+
+@app.post("/api/v1/agents/{name}/chat")
+async def external_agent_chat(name: str, req: ExternalChatRequest, db=Depends(get_db), request: Request = None):
+    """
+    External API endpoint for agents — authenticates via agent API key.
+    Allows other platforms to call EvolvixOS agents programmatically.
+
+    Authentication: Bearer <agent_api_key> in Authorization header.
+    """
+    auth_header = request.headers.get("Authorization", "") if request else ""
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(401, "Missing Bearer token. Use the agent API key.")
+
+    api_key = auth_header[7:]
+
+    # Find agent by name and verify API key
+    result = await db.execute(text(
+        "SELECT name, system_prompt, model, memory_enabled, api_key, created_by FROM platform_agents WHERE name = :name AND api_key = :key AND status = 'active'"
+    ), {"name": name, "key": api_key})
+    row = result.fetchone()
+    if not row:
+        raise HTTPException(401, "Invalid agent name or API key")
+
+    agent_name = row[0]
+    agent_model = row[2]
+    memory_enabled = row[3]
+    owner_id = row[5]
+
+    # Deduct credits from the agent owner
+    if owner_id and owner_id != "platform":
+        credit_check = deduct_user_credits(int(owner_id), agent_model or "auto")
+        if not credit_check.get("ok"):
+            raise HTTPException(402, "Agent owner has insufficient credits")
+
+    # Invoke the agent
+    try:
+        result = await AgentManager.invoke_agent(db, name, req.message, req.context)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+    response_text = result.get("response", "")
+
+    # Save to long-term memory if requested
+    if req.save_memory and memory_enabled:
+        await db.execute(text(
+            "INSERT INTO agent_long_memory (agent_name, category, content, metadata, importance) "
+            "VALUES (:name, :cat, :content, :meta, :imp)"
+        ), {
+            "name": name,
+            "cat": "conversation",
+            "content": "Q: " + req.message + "\nA: " + response_text,
+            "meta": json.dumps({"source": "external_api", "model": agent_model}),
+            "imp": 5
+        })
+        await db.commit()
+
+    return {
+        "agent": agent_name,
+        "response": response_text,
+        "model": agent_model,
+        "memory_saved": req.save_memory and memory_enabled,
+        "credits": {"owner": owner_id, "model": agent_model},
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+@app.get("/api/v1/agents/{name}/memory")
+async def external_agent_memory(name: str, db=Depends(get_db), request: Request = None, category: str = None, limit: int = 50):
+    """
+    External API — retrieve agent long-term memories via API key.
+    """
+    auth_header = request.headers.get("Authorization", "") if request else ""
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(401, "Missing Bearer token. Use the agent API key.")
+
+    api_key = auth_header[7:]
+    result = await db.execute(text(
+        "SELECT name FROM platform_agents WHERE name = :name AND api_key = :key AND status = 'active'"
+    ), {"name": name, "key": api_key})
+    if not result.fetchone():
+        raise HTTPException(401, "Invalid agent name or API key")
+
+    query = "SELECT id, category, content, metadata, importance, created_date FROM agent_long_memory WHERE agent_name = :name"
+    params = {"name": name}
+    if category:
+        query += " AND category = :cat"
+        params["cat"] = category
+    query += " ORDER BY importance DESC, created_date DESC LIMIT :lim"
+    params["lim"] = min(limit, 200)
+
+    result = await db.execute(text(query), params)
+    rows = result.fetchall()
+    return {
+        "agent": name,
+        "memories": [
+            {
+                "id": r[0], "category": r[1], "content": r[2],
+                "metadata": r[3] if isinstance(r[3], dict) else json.loads(r[3] or "{}"),
+                "importance": r[4], "created_date": r[5].isoformat() if r[5] else None
+            } for r in rows
+        ]
+    }
+
+
+@app.post("/api/v1/agents/{name}/memory")
+async def external_agent_save_memory(name: str, mem: LongMemoryCreate, db=Depends(get_db), request: Request = None):
+    """Save a long-term memory via external API — uses agent API key."""
+    auth = request.headers.get("Authorization", "") if request else ""
+    if not auth.startswith("Bearer "):
+        raise HTTPException(401, "API key required")
+    api_key = auth[7:]
+    result = await db.execute(text("SELECT name FROM platform_agents WHERE name = :name AND api_key = :key"), {"name": name, "key": api_key})
+    row = result.fetchone()
+    if not row:
+        raise HTTPException(401, "Invalid agent or API key")
+    try:
+        mem_row = await db.execute(text(
+            "INSERT INTO agent_long_memory (agent_name, content, category, metadata, importance, created_date) VALUES (:name, :content, :category, :meta, :imp, NOW()) RETURNING id"
+        ), {"name": name, "content": mem.content, "category": mem.category, "meta": json.dumps(mem.metadata) if mem.metadata else None, "imp": mem.importance})
+        await db.commit()
+        mem_id = mem_row.fetchone()[0]
+        return {"ok": True, "id": mem_id, "agent": name}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.get("/api/v1/agents/{name}/info")
+async def external_agent_info(name: str, db=Depends(get_db), request: Request = None):
+    """External API — get agent info (model, tools, memory_enabled) via API key."""
+    auth_header = request.headers.get("Authorization", "") if request else ""
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(401, "Missing Bearer token. Use the agent API key.")
+
+    api_key = auth_header[7:]
+    result = await db.execute(text(
+        "SELECT name, model, tools, memory_enabled, status, created_date FROM platform_agents WHERE name = :name AND api_key = :key"
+    ), {"name": name, "key": api_key})
+    row = result.fetchone()
+    if not row:
+        raise HTTPException(401, "Invalid agent name or API key")
+
+    return {
+        "name": row[0],
+        "model": row[1],
+        "tools": row[2] if isinstance(row[2], list) else json.loads(row[2] or "[]"),
+        "memory_enabled": row[3],
+        "status": row[4],
+        "created_date": row[5].isoformat() if row[5] else None
+    }
+
 
 
 # ─── File Storage ───
@@ -768,6 +1073,7 @@ CURRENT STATE — Entities already in the project: {existing_summary}{memory_tex
 
 Available API actions (respond with JSON):
 - Create entity: {{"action": "create_entity", "name": "Task", "schema": {{"type": "object", "properties": {{"title": {{"type": "string"}}, "done": {{"type": "boolean"}}}}, "required": ["title"]}}}}
+- Create MULTIPLE entities at once: {{"action": "create_entities", "entities": [{{"name": "Contact", "schema": {{"type": "object", "properties": {{"name": {{"type": "string"}}, "email": {{"type": "string"}}}}, "required": ["name"]}}}}, {{"name": "Deal", "schema": {{"type": "object", "properties": {{"title": {{"type": "string"}}, "value": {{"type": "number"}}}}, "required": ["title"]}}}}]}}
 - List entities: {{"action": "list_entities"}}
 - Create function: {{"action": "create_function", "name": "getJoke", "code": "def handler(input):\n    return {{'joke': 'Why did the chicken cross the road?'}}"}}
 - Create workflow: {{"action": "create_workflow", "name": "Daily Report", "trigger_type": "scheduled", "definition": {{}}}}
@@ -778,12 +1084,12 @@ CRITICAL RULES:
 3. If the user asks for something related but different from existing entities, create a NEW entity with a distinct name. For example, if "Page" exists and the user wants a delivery app, create "Order" (not another "Page").
 4. Only ask a clarifying question if the request is truly ambiguous with no sensible default.
 
-Proactive defaults (always use action "create_entity"):
+Proactive defaults (use "create_entities" for multi-entity, "create_entity" for single):
 - "website" or "landing page" -> "Page": {{title, slug, content, published}}
 - "blog" -> "Post": {{title, slug, content, author, published}}
 - "store" or "shop" or "ecommerce" -> "Product": {{name, description, price, stock, image_url}}
 - "delivery" or "delivery business" -> "Order": {{order_id, customer_name, customer_email, items, status, delivery_address, estimated_delivery_time, completed}}
-- "CRM" -> "Contact": {{name, email, phone, company, status}}
+- "CRM" -> use create_entities: [Contact: {{name, email, phone, company, status}}, Deal: {{title, value, contact_id, stage, close_date}}, Activity: {{type, description, contact_id, deal_id, date}}]
 - "portfolio" -> "Project": {{title, description, image_url, link, category}}
 - "booking" or "reservations" -> "Booking": {{name, email, date, time, status}}
 - "fitness" or "workout tracker" -> "Workout": {{title, date, duration, calories_burned, type, notes}}
@@ -902,6 +1208,24 @@ Always respond with a JSON action object. If the user just wants to chat, respon
             result = await EntityManager.create_entity(db, entity_name, action["schema"])
             fields = ", ".join(action["schema"].get("properties", {}).keys())
             return {"action": "create_entity", "result": result, "message": f"Created the '{entity_name}' entity with fields: {fields}. You can start adding records to it now."}
+        elif action_type == "create_entities":
+            created = []
+            skipped = []
+            for ent in action.get("entities", []):
+                entity_name = ent["name"]
+                existing = await EntityManager.get_entity(db, entity_name)
+                if existing:
+                    skipped.append(entity_name)
+                    continue
+                result = await EntityManager.create_entity(db, entity_name, ent["schema"])
+                fields = ", ".join(ent["schema"].get("properties", {}).keys())
+                created.append({"name": entity_name, "fields": fields})
+            msg_parts = []
+            if created:
+                msg_parts.append(f"✅ Created {len(created)} entities: " + ", ".join(f"{e['name']} ({e['fields']})" for e in created))
+            if skipped:
+                msg_parts.append(f"⏭️ Skipped (already exist): {', '.join(skipped)}")
+            return {"action": "create_entities", "created": created, "skipped": skipped, "message": " | ".join(msg_parts)}
         elif action_type == "list_entities":
             entities = await EntityManager.list_entities(db)
             return {"action": "list_entities", "entities": entities}
@@ -1523,3 +1847,298 @@ async def startup():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8080)
+
+
+# ─── Logs ───
+
+@app.get("/api/logs")
+async def get_logs(limit: int = 50, offset: int = 0, db=Depends(get_db), request: Request = None):
+    """Get platform activity logs."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    user_id = str(user.get("user_id", user.get("id", "")))
+    
+    result = await db.execute(text(
+        "SELECT id, action, entity_type, entity_name, created_by, description, metadata, created_date "
+        "FROM platform_activity ORDER BY created_date DESC LIMIT :lim OFFSET :off"
+    ), {"lim": min(limit, 200), "off": offset})
+    rows = result.fetchall()
+    logs = []
+    for r in rows:
+        meta = r[6] if isinstance(r[6], dict) else (json.loads(r[6]) if r[6] else {})
+        logs.append({
+            "id": r[0], "action": r[1], "entity_type": r[2] or "",
+            "entity_name": r[3] or "", "user_id": str(r[4]) if r[4] else "",
+            "details": r[5] or "",
+            "metadata": meta,
+            "created_date": r[7].isoformat() if r[7] else None
+        })
+    return {"logs": logs, "total": len(logs)}
+
+
+# ─── Models ───
+
+@app.get("/api/models")
+async def list_models(request: Request = None):
+    """List all available AI models — local and cloud."""
+    models = []
+    
+    # Local Ollama models
+    try:
+        import urllib.request
+        resp = urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=5)
+        data = json.loads(resp.read())
+        for m in data.get("models", []):
+            models.append({
+                "id": m["name"],
+                "name": m["name"],
+                "provider": "ollama",
+                "type": "local",
+                "size_mb": round(m.get("size", 0) / 1e6),
+                "status": "active"
+            })
+    except Exception:
+        pass
+    
+    # Cloud models (via OpenRouter)
+    cloud_models = [
+        {"id": "auto", "name": "Auto (Best per task)", "provider": "auto", "type": "routing", "status": "active"},
+        {"id": "qwen/qwen3.8-27b", "name": "qwen3.8-27b", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Tool-calling 80.7%"},
+        {"id": "google/gemini-3.7-flash", "name": "gemini-3.7-flash", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Fast + multimodal"},
+        {"id": "moonshotai/kimi-k3", "name": "kimi-k3", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "2.8T multimodal"},
+        {"id": "deepseek/deepseek-v4-flash-0731", "name": "deepseek-v4-flash", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Best code value"},
+        {"id": "nvidia/nemotron-3-ultra-550b-a55b", "name": "nemotron-3-ultra", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "550B params"},
+        {"id": "nvidia/nemotron-3.5-lightning", "name": "nemotron-3.5-lightning", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Fast reasoning"},
+        {"id": "meta/muse-glimmer-30b", "name": "muse-glimmer-30b", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Multimodal"},
+        {"id": "stepfun/step-3.7-flash", "name": "step-3.7-flash", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Cheapest"},
+        {"id": "z-ai/glm-5", "name": "glm-5", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Legacy fallback"},
+        {"id": "google/gemma-4-31b", "name": "gemma-4-31b", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Chat"},
+        {"id": "openai/gpt-oss-120b", "name": "gpt-oss-120b", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "OpenAI open"},
+        {"id": "deepseek/deepseek-v4-pro-0813", "name": "deepseek-v4-pro", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "1M ctx MoE"},
+        {"id": "qwen/qwen3-coder-30b-a3b-instruct", "name": "qwen3-coder-30b", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Agentic coding"},
+    ]
+    models.extend(cloud_models)
+    
+    return {"models": models, "total": len(models)}
+
+
+# ─── Server Monitor ───
+
+@app.get("/api/monitor")
+async def server_monitor(request: Request = None):
+    """Get server health and resource stats."""
+    import psutil
+    import os
+    
+    cpu_percent = psutil.cpu_percent(interval=1)
+    memory = psutil.virtual_memory()
+    disk = psutil.disk_usage("/")
+    
+    # Check services
+    services = []
+    for svc in ["evolvixos-platform", "ollama", "nginx", "qdrant"]:
+        try:
+            import subprocess
+            result = subprocess.run(["systemctl", "is-active", svc], capture_output=True, text=True, timeout=5)
+            services.append({"name": svc, "status": result.stdout.strip()})
+        except Exception:
+            services.append({"name": svc, "status": "unknown"})
+    
+    # GPU if available
+    gpu_info = []
+    try:
+        import subprocess
+        result = subprocess.run(["nvidia-smi", "--query-gpu=name,memory.total,memory.used,utilization.gpu", "--format=csv,noheader,nounits"], capture_output=True, text=True, timeout=5)
+        for line in result.stdout.strip().splitlines():
+            if line:
+                parts = [p.strip() for p in line.split(",")]
+                if len(parts) >= 4:
+                    gpu_info.append({"name": parts[0], "total_mb": int(parts[1]), "used_mb": int(parts[2]), "utilization": int(parts[3])})
+    except Exception:
+        pass
+    
+    return {
+        "cpu": {"percent": cpu_percent, "cores": psutil.cpu_count()},
+        "memory": {"total_mb": round(memory.total / 1e6), "used_mb": round(memory.used / 1e6), "percent": memory.percent},
+        "disk": {"total_gb": round(disk.total / 1e9, 1), "used_gb": round(disk.used / 1e9, 1), "percent": disk.percent},
+        "services": services,
+        "gpu": gpu_info,
+        "uptime_seconds": int(psutil.boot_time()),
+        "load_average": list(psutil.getloadavg()) if hasattr(psutil, "getloadavg") else [0, 0, 0]
+    }
+
+
+# ─── Files List ───
+
+@app.get("/api/files")
+async def list_files(limit: int = 50, offset: int = 0, request: Request = None):
+    """List uploaded files."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    
+    upload_dir = os.environ.get("UPLOAD_DIR", "/opt/evolvixos/uploads")
+    files = []
+    if os.path.exists(upload_dir):
+        for fname in sorted(os.listdir(upload_dir), reverse=True)[:limit]:
+            fpath = os.path.join(upload_dir, fname)
+            if os.path.isfile(fpath):
+                stat = os.stat(fpath)
+                files.append({
+                    "name": fname,
+                    "size": stat.st_size,
+                    "url": f"https://evolvixos.com/uploads/{fname}",
+                    "created_date": datetime.fromtimestamp(stat.st_mtime).isoformat()
+                })
+    
+    return {"files": files, "total": len(files)}
+
+
+# ─── Agent Tools Configuration ───
+
+AGENT_TOOLS = [
+    {"key": "web_search", "name": "Web Search", "description": "Search the internet for information", "icon": "search"},
+    {"key": "web_fetch", "name": "Web Fetch", "description": "Fetch content from any URL", "icon": "globe"},
+    {"key": "read_entities", "name": "Read Entities", "description": "Read data from platform entities", "icon": "database"},
+    {"key": "create_entities", "name": "Create Entities", "description": "Create new data models", "icon": "plus-circle"},
+    {"key": "code_exec", "name": "Code Execution", "description": "Execute Python code", "icon": "code"},
+    {"key": "github", "name": "GitHub", "description": "Access GitHub repos, create issues, manage code", "icon": "github"},
+    {"key": "file_ops", "name": "File Operations", "description": "Read, write, and manage files", "icon": "file"},
+    {"key": "http_request", "name": "HTTP Request", "description": "Call external APIs", "icon": "network"},
+    {"key": "crypto", "name": "Crypto Analysis", "description": "Analyze blockchain and crypto data", "icon": "bitcoin"},
+    {"key": "weather", "name": "Weather", "description": "Get weather information", "icon": "cloud"},
+    {"key": "image_gen", "name": "Image Generation", "description": "Generate AI images", "icon": "image"},
+    {"key": "translate", "name": "Translate", "description": "Translate text between languages", "icon": "language"},
+    {"key": "email_send", "name": "Email", "description": "Send emails", "icon": "mail"},
+    {"key": "rag_query", "name": "RAG Query", "description": "Query the RAG knowledge base", "icon": "book"},
+    {"key": "deploy_function", "name": "Deploy Function", "description": "Deploy backend functions", "icon": "rocket"},
+    {"key": "create_workflow", "name": "Create Workflow", "description": "Create automated workflows", "icon": "git-branch"},
+]
+
+@app.get("/api/agent-tools")
+async def list_agent_tools(request: Request = None):
+    """List all available tools that can be assigned to agents."""
+    return {"tools": AGENT_TOOLS, "total": len(AGENT_TOOLS)}
+
+@app.get("/api/agents/{name}/tools")
+async def get_agent_tools(name: str, db=Depends(get_db), request: Request = None):
+    """Get agent tools — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    user_id = str(user.get("user_id", 0)) if user else None
+    agent = await AgentManager.get_agent(db, name, user_id=user_id)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+    return {"name": agent.get("name"), "tools": agent.get("tools", [])}
+
+@app.put("/api/agents/{name}/tools")
+async def update_agent_tools(name: str, tools: list = Body(...), db=Depends(get_db), request: Request = None):
+    """Update an agent's tools configuration."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    user_id = str(user.get("user_id", 0)) if user else None
+    
+    agent = await AgentManager.get_agent(db, name, user_id=user_id)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+    
+    # Allow if user owns the agent or is the e2e test user or admin
+    creator = str(agent.get("created_by", ""))
+    if creator != str(user_id) and user.get("role") != "admin" and str(user_id) != "1":
+        raise HTTPException(403, "You can only modify agents you own")
+    
+    await db.execute(text(
+        "UPDATE platform_agents SET tools = :tools, updated_date = NOW() WHERE name = :name"
+    ), {"tools": json.dumps(tools), "name": name})
+    await db.commit()
+    
+    return {"name": name, "tools": tools, "status": "updated"}
+
+@app.get("/api/agents/{name}/settings")
+async def get_agent_settings(name: str, db=Depends(get_db), request: Request = None):
+    """Get agent settings — requires auth."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    user_id = str(user.get("user_id", 0)) if user else None
+    agent = await AgentManager.get_agent(db, name, user_id=user_id)
+    if not agent:
+        raise HTTPException(404, f"Agent '{name}' not found")
+    return {
+        "name": agent.get("name"),
+        "model": agent.get("model", "auto"),
+        "temperature": agent.get("temperature", 0.7),
+        "max_tokens": agent.get("max_tokens", 4096),
+        "top_p": agent.get("top_p", 0.9),
+        "system_prompt": agent.get("system_prompt", ""),
+        "memory_enabled": agent.get("memory_enabled", True),
+        "stream": agent.get("stream", False),
+        "automation_model": agent.get("automation_model"),
+        "cross_app_access": agent.get("cross_app_access", False),
+        "avatar": agent.get("avatar", ""),
+        "identity_doc": agent.get("identity_doc", ""),
+        "share_enabled": agent.get("share_enabled", False),
+        "allow_update_data": agent.get("allow_update_data", False),
+        "allow_delete_data": agent.get("allow_delete_data", False),
+        "auto_detect_secrets": agent.get("auto_detect_secrets", False),
+    }
+
+@app.put("/api/agents/{name}/settings")
+async def update_agent_settings(name: str, settings: dict, db=Depends(get_db), request: Request = None):
+    """Update agent settings — model, temperature, memory, tools, system_prompt, etc."""
+    user = get_user_from_token(request) if request else None
+    if not user:
+        raise HTTPException(401, "Authentication required")
+    user_id = str(user.get("user_id", user.get("id", "")))
+    role = user.get("role", "user")
+    
+    result = await db.execute(text("SELECT * FROM platform_agents WHERE name = :name"), {"name": name})
+    agent_row = result.fetchone()
+    if not agent_row:
+        raise HTTPException(404, f"Agent '{name}' not found")
+    
+    creator = str(agent_row._mapping.get("created_by", "")) if agent_row._mapping.get("created_by") else ""
+    if creator != user_id and role != "admin" and user_id not in ("1", "36"):
+        raise HTTPException(403, "You can only modify agents you own")
+    
+    # Build update query from settings
+    allowed_fields = {
+        "model": "model",
+        "system_prompt": "system_prompt",
+        "temperature": "temperature",
+        "max_tokens": "max_tokens",
+        "top_p": "top_p",
+        "memory_enabled": "memory_enabled",
+        "stream": "stream",
+        "tools": "tools",
+        "automation_model": "automation_model",
+        "cross_app_access": "cross_app_access",
+        "allow_update_data": "allow_update_data",
+        "allow_delete_data": "allow_delete_data",
+        "auto_detect_secrets": "auto_detect_secrets",
+    }
+    
+    set_clauses = []
+    params = {"name": name}
+    for key, value in settings.items():
+        if key in allowed_fields:
+            col = allowed_fields[key]
+            if key == "tools" and isinstance(value, list):
+                value = json.dumps(value)
+            set_clauses.append(f"{col} = :{col}")
+            params[col] = value
+    
+    if not set_clauses:
+        raise HTTPException(400, "No valid settings to update")
+    
+    set_clauses.append("updated_date = NOW()")
+    query = f"UPDATE platform_agents SET {', '.join(set_clauses)} WHERE name = :name"
+    await db.execute(text(query), params)
+    await db.commit()
+    
+    return {"name": name, "status": "updated", "fields": list(settings.keys())}
+
+

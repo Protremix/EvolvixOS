@@ -45,10 +45,16 @@ class AgentManager:
         return {"name": name, "model": model, "tools": tools or [], "message": f"Agent '{name}' created"}
 
     @staticmethod
-    async def list_agents(db: AsyncSession):
-        result = await db.execute(text(
-            "SELECT name, model, temperature, tools, status, created_date, max_tokens, top_p, memory_enabled, stream, avatar, share_enabled FROM platform_agents ORDER BY created_date DESC"
-        ))
+    async def list_agents(db: AsyncSession, user_id: int = None):
+        # User isolation: only show agents created by this user, plus shared/system agents
+        if user_id:
+            result = await db.execute(text(
+                "SELECT name, model, temperature, tools, status, created_date, max_tokens, top_p, memory_enabled, stream, avatar, share_enabled FROM platform_agents WHERE created_by = :uid OR share_enabled = true ORDER BY created_date DESC"
+            ), {"uid": str(user_id)})
+        else:
+            result = await db.execute(text(
+                "SELECT name, model, temperature, tools, status, created_date, max_tokens, top_p, memory_enabled, stream, avatar, share_enabled FROM platform_agents ORDER BY created_date DESC"
+            ))
         rows = result.fetchall()
         return [{
             "name": r[0], "model": r[1], "temperature": r[2],
@@ -63,10 +69,15 @@ class AgentManager:
         } for r in rows]
 
     @staticmethod
-    async def get_agent(db: AsyncSession, name: str):
-        result = await db.execute(text(
-            "SELECT name, system_prompt, model, temperature, tools, memory, status, max_tokens, top_p, memory_enabled, stream, automation_model, cross_app_access, avatar, identity_doc, share_enabled, share_link, collaborators, channel_config, allow_update_data, allow_delete_data, auto_detect_secrets, agent_secrets, api_key, created_date FROM platform_agents WHERE name = :name"
-        ), {"name": name})
+    async def get_agent(db: AsyncSession, name: str, user_id: int = None):
+        if user_id:
+            result = await db.execute(text(
+                "SELECT name, system_prompt, model, temperature, tools, memory, status, max_tokens, top_p, memory_enabled, stream, automation_model, cross_app_access, avatar, identity_doc, share_enabled, share_link, collaborators, channel_config, allow_update_data, allow_delete_data, auto_detect_secrets, agent_secrets, api_key, created_date, created_by FROM platform_agents WHERE name = :name AND (created_by = :uid OR share_enabled = true)"
+            ), {"name": name, "uid": str(user_id)})
+        else:
+            result = await db.execute(text(
+                "SELECT name, system_prompt, model, temperature, tools, memory, status, max_tokens, top_p, memory_enabled, stream, automation_model, cross_app_access, avatar, identity_doc, share_enabled, share_link, collaborators, channel_config, allow_update_data, allow_delete_data, auto_detect_secrets, agent_secrets, api_key, created_date, created_by FROM platform_agents WHERE name = :name"
+            ), {"name": name})
         row = result.fetchone()
         if not row:
             return None
@@ -93,7 +104,8 @@ class AgentManager:
             "auto_detect_secrets": row[21] if row[21] is not None else True,
             "agent_secrets": row[22] if isinstance(row[22], (list, dict)) else (json.loads(row[22]) if row[22] else {}),
             "api_key": row[23] or "",
-            "created_date": row[24].isoformat() if row[24] else None
+            "created_date": row[24].isoformat() if row[24] else None,
+            "created_by": str(row[25]) if row[25] else ""
         }
 
     @staticmethod
@@ -369,7 +381,9 @@ RULES:
             "agent": name, "response": final_message,
             "model": model, "tokens": eval_count,
             "memory_size": len(memory),
-            "tool_action": tool_action, "tool_result": tool_result
+            "tool_action": tool_action, "tool_result": tool_result,
+            "model": used_model,
+            "provider": used_provider
         }
 
     @staticmethod

@@ -1,18 +1,32 @@
 {
   "version": "1.0",
-  "last_updated": "2026-08-30T11:05:01.392523Z",
-  "total_models": 82,
+  "last_updated": "2026-08-30T22:05:01.802732Z",
+  "total_models": 83,
   "categories": {
     "frameworks": 3,
     "image_generation": 17,
     "llm_text": 20,
     "local_engines": 7,
-    "rag_agents": 3,
+    "rag_agents": 4,
     "speech_voice": 17,
     "video_generation": 3,
     "vision_multimodal": 12
   },
   "models": [
+    {
+      "name": "snowflake-arctic-embed:latest",
+      "full_name": "ollama/snowflake-arctic-embed:latest",
+      "description": "Local model via Ollama (snowflake-arctic-embed:latest)",
+      "category": "rag_agents",
+      "source": "ollama",
+      "engine": "ollama",
+      "size": 669493195,
+      "status": "available",
+      "stars": 0,
+      "url": "",
+      "installable": false,
+      "running": true
+    },
     {
       "name": "qwen2.5:7b",
       "full_name": "ollama/qwen2.5:7b",

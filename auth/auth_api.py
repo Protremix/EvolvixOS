@@ -104,6 +104,7 @@ def check_resource_limit(user_id, resource_type):
 
 
 import hmac
+
 import hashlib
 import stripe
 
@@ -112,176 +113,18 @@ STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "whsec_placehold
 
 # Stripe product/price IDs (created via Stripe dashboard or API)
 STRIPE_PRICES = {
-    "Starter_monthly": None,  # price_xxx — set after creating in Stripe
-    "Starter_yearly": None,
-    "Pro_monthly": None,
-    "Pro_yearly": None,
-    "Team_monthly": None,
-    "Team_yearly": None,
-    "credits_1000": None,
-    "credits_5000": None,
-    "credits_15000": None,
-    "credits_50000": None,
+    "Starter_monthly": "price_1UAELl2fz7mjXQMgBNDsM9b1",
+    "Starter_yearly": "price_1UAELl2fz7mjXQMgs0QQovNq",
+    "Pro_monthly": "price_1UAELm2fz7mjXQMgwazTQ2MA",
+    "Pro_yearly": "price_1UAELm2fz7mjXQMg9cy365Xv",
+    "Team_monthly": "price_1UAELn2fz7mjXQMgBCl8SIHM",
+    "Team_yearly": "price_1UAELn2fz7mjXQMgs17UxDHr",
+    "credits_1000": "price_1UAELo2fz7mjXQMg3RC06LQD",
+    "credits_5000": "price_1UAELo2fz7mjXQMgxC6Bb9ep",
+    "credits_15000": "price_1UAELp2fz7mjXQMgTyvbsV2n",
+    "credits_50000": "price_1UAELp2fz7mjXQMgn1XDRMhz",
 }
 
-# ── Paddle Billing configuration ──────────────────────────────────────────────
-PADDLE_API_KEY = os.environ.get("PADDLE_API_KEY", "")
-PADDLE_WEBHOOK_SECRET = os.environ.get("PADDLE_WEBHOOK_SECRET", "")
-PADDLE_API_BASE = os.environ.get("PADDLE_API_BASE", "https://api.paddle.com")
-# Paddle's documented variance tolerance is 5s. Keep NTP synced or raise this.
-PADDLE_WEBHOOK_TOLERANCE = int(os.environ.get("PADDLE_WEBHOOK_TOLERANCE", "5"))
-
-def verify_paddle_signature(raw_body, signature_header, secret=None, tolerance=None):
-    """Verify a Paddle Billing webhook.
-
-    Header format: ts=<unix>;h1=<hex hmac-sha256>
-    Signed payload: b"<ts>:" + raw_body   (raw bytes — never re-serialized JSON)
-    Returns (ok: bool, reason: str).
-    """
-    secret = PADDLE_WEBHOOK_SECRET if secret is None else secret
-    tolerance = PADDLE_WEBHOOK_TOLERANCE if tolerance is None else tolerance
-    if not secret:
-        return False, "no_secret_configured"
-    if not signature_header or raw_body is None:
-        return False, "missing_signature_or_body"
-
-    parts = {}
-    for item in signature_header.split(";"):
-        if "=" in item:
-            k, v = item.split("=", 1)
-            parts[k.strip()] = v.strip()
-    ts_str, h1 = parts.get("ts"), parts.get("h1")
-    if not ts_str or not h1:
-        return False, "malformed_header"
-
-    try:
-        ts = int(ts_str)
-    except (TypeError, ValueError):
-        return False, "bad_timestamp"
-    if abs(time.time() - ts) > tolerance:
-        return False, "timestamp_out_of_tolerance"
-
-    expected = hmac.new(secret.encode("utf-8"),
-                        ts_str.encode("utf-8") + b":" + raw_body,
-                        hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(expected, h1):
-        return False, "signature_mismatch"
-    return True, "ok"
-
-def paddle_event_to_fulfilment(event):
-    """Map a verified Paddle event onto apply_payment_event kwargs, or None to ignore.
-
-    Paddle carries checkout metadata in custom_data (Stripe's metadata equivalent).
-    Expected custom_data: {user_id, type: subscription|credits, plan, cycle, credits}
-    """
-    event_type = event.get("event_type") or ""
-    data = event.get("data", {}) or {}
-    custom = data.get("custom_data") or {}
-    try:
-        user_id = int(custom.get("user_id") or 0)
-    except (TypeError, ValueError):
-        user_id = 0
-
-    if event_type == "transaction.completed":
-        kind = custom.get("type")
-        if kind not in ("subscription", "credits"):
-            return None
-        return {"kind": kind, "user_id": user_id, "charge_id": data.get("id"),
-                "plan": custom.get("plan", "Free"), "cycle": custom.get("cycle", "monthly"),
-                "credits": custom.get("credits", 0), "provider": "paddle"}
-    if event_type in ("subscription.canceled", "subscription.past_due"):
-        return {"kind": "cancel", "user_id": user_id, "provider": "paddle"}
-    return None
-
-# ── Provider-neutral payment fulfilment ───────────────────────────────────────
-# Any payment provider normalizes its webhook into these calls via an adapter.
-# calls. Nothing below is provider-specific — adapters do the translating.
-
-PAYMENT_PROVIDER = os.environ.get("PAYMENT_PROVIDER", "stripe").lower()
-
-def _now():
-    return time.strftime("%Y-%m-%d %H:%M:%S")
-
-def mark_payment_paid(charge_id):
-    """Flag a payment row as paid by its provider charge/session id."""
-    if not charge_id:
-        return
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute("UPDATE payments SET status = 'paid' WHERE provider_charge_id = ?", (charge_id,))
-        conn.commit()
-
-def fulfill_subscription(user_id, plan_name, cycle="monthly"):
-    """Activate or upgrade a user's subscription and reset their credit balance."""
-    if not user_id:
-        return False
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute("SELECT id, credits_monthly FROM plans WHERE name = ?", (plan_name,))
-        plan = c.fetchone()
-        if not plan:
-            return False
-        plan_id, credits = plan
-        now = _now()
-        days = 365 if cycle == "yearly" else 30
-        period_end = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time() + days * 86400))
-        c.execute("SELECT id FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
-        existing = c.fetchone()
-        if existing:
-            c.execute("UPDATE subscriptions SET plan_id = ?, billing_cycle = ?, credits_remaining = ?, "
-                      "current_period_start = ?, current_period_end = ?, updated_date = ? WHERE id = ?",
-                      (plan_id, cycle, credits, now, period_end, now, existing[0]))
-        else:
-            c.execute("INSERT INTO subscriptions (user_id, plan_id, status, billing_cycle, credits_remaining, "
-                      "credits_used, current_period_start, current_period_end, created_date, updated_date) "
-                      "VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?)",
-                      (user_id, plan_id, "active", cycle, credits, now, period_end, now, now))
-        conn.commit()
-    return True
-
-def fulfill_credits(user_id, credits_amount, provider=None):
-    """Add purchased credits to a user's active subscription."""
-    credits_amount = int(credits_amount or 0)
-    if not (user_id and credits_amount):
-        return False
-    provider = provider or PAYMENT_PROVIDER
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute("SELECT id, credits_remaining FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
-        row = c.fetchone()
-        if not row:
-            return False
-        c.execute("UPDATE subscriptions SET credits_remaining = ? WHERE id = ?", (row[1] + credits_amount, row[0]))
-        c.execute("INSERT INTO credit_transactions (user_id, amount, type, description, timestamp) VALUES (?, ?, ?, ?, ?)",
-                  (user_id, credits_amount, "credit",
-                   "Purchased " + str(credits_amount) + " credits via " + str(provider).title(), _now()))
-        conn.commit()
-    return True
-
-def downgrade_to_free(user_id):
-    """Drop a user back to the Free plan (subscription cancelled/expired)."""
-    if not user_id:
-        return False
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        free = c.execute("SELECT id FROM plans WHERE name = 'Free'").fetchone()
-        if not free:
-            return False
-        c.execute("UPDATE subscriptions SET plan_id = ?, credits_remaining = 100, updated_date = ? "
-                  "WHERE user_id = ? AND status = ?", (free[0], _now(), user_id, "active"))
-        conn.commit()
-    return True
-
-def apply_payment_event(kind, user_id, charge_id=None, plan=None, cycle="monthly",
-                        credits=0, provider=None):
-    """Single entry point every provider adapter calls after verifying a webhook."""
-    mark_payment_paid(charge_id)
-    if kind == "subscription":
-        return fulfill_subscription(user_id, plan or "Free", cycle)
-    if kind == "credits":
-        return fulfill_credits(user_id, credits, provider)
-    if kind == "cancel":
-        return downgrade_to_free(user_id)
-    return False
 
 RATE_LIMIT = defaultdict(list)  # ip -> [timestamps]
 MAX_REQUESTS = 10  # per 60 seconds per IP
@@ -529,19 +372,14 @@ class AuthHandler(BaseHTTPRequestHandler):
         if self.path == "/auth/health":
             self._send_json(200, {"status": "online", "service": "EvolvixOS Auth v9.1"})
             return
-        if self.path == "/auth/paddle-config":
-            # Returns client-side config for Paddle.js frontend
             # Server-side API key is NEVER included here
             import os as _os
 
-            token = _os.environ.get("PADDLE_CLIENT_TOKEN", "")
-            env = _os.environ.get("PADDLE_ENVIRONMENT", "production")
 
             if not token:
-                self._send_json(500, {"error": "PADDLE_CLIENT_TOKEN not set"})
                 return
 
-            # Country detection from request headers
+            # Country detection from request headers (Vercel, Cloudflare, etc.)
             country = None
             for header in ["x-vercel-ip-country", "cf-ipcountry", "x-country-code",
                           "x-geoip-country-code", "x-geo-country"]:
@@ -550,19 +388,43 @@ class AuthHandler(BaseHTTPRequestHandler):
                     country = val
                     break
 
+            # Fallback: IP-based geolocation via ip-api.com (free, no key needed)
+            # Only if header detection failed and we have a real client IP
+            if not country:
+                client_ip = self.headers.get("x-forwarded-for", "").split(",")[0].strip()
+                if client_ip and client_ip not in ("127.0.0.1", "::1", "localhost"):
+                    try:
+                        import urllib.request as _urllib_req
+                        resp = _urllib_req.urlopen(
+                            f"http://ip-api.com/json/{client_ip}?fields=countryCode",
+                            timeout=2
+                        )
+                        _geo = json.loads(resp.read())
+                        _code = _geo.get("countryCode", "").strip().upper()
+                        if _code and len(_code) == 2 and _code != "OTHERS":
+                            country = _code
+                    except Exception:
+                        pass
+
             # If signed in, get customer info
             customer_email = None
-            paddle_customer_id = None
             try:
                 user_id = is_authorized(self)
                 if user_id:
                     with sqlite3.connect(DB_PATH) as conn:
                         c = conn.cursor()
-                        c.execute("SELECT email, paddle_customer_id FROM users WHERE id = ?", (user_id,))
                         row = c.fetchone()
                         if row:
                             customer_email = row[0]
-                            paddle_customer_id = row[1]
+            except Exception:
+                pass
+
+            # Also return local user_id for custom_data in checkout
+            local_user_id = None
+            try:
+                uid = is_authorized(self)
+                if uid:
+                    local_user_id = uid
             except Exception:
                 pass
 
@@ -571,8 +433,82 @@ class AuthHandler(BaseHTTPRequestHandler):
                 "environment": env,
                 "country": country,
                 "customerEmail": customer_email,
-                "customerId": paddle_customer_id,
+                "userId": local_user_id,
             })
+            return
+            """Server-side price preview using API key. Supports country for localized pricing."""
+            import urllib.request, json as _json, urllib.parse as _urlparse
+
+
+            if not api_key:
+                return
+
+            # Parse query params for country
+            parsed = _urlparse.urlparse(self.path)
+            qs = _urlparse.parse_qs(parsed.query)
+            country = qs.get("country", [None])[0]
+            if country and (len(country) != 2 or country == "OTHERS"):
+                country = None
+
+            # Price IDs for 3 tiers × 2 billing cycles
+            price_ids = [
+                "pri_01m194907w2aypwa78tfxg3pfz",  # Starter monthly
+                "pri_01m19490dcsqwmcah27wzv56y0",  # Starter yearly
+                "pri_01m19490sttx901004gwtzpdyh",  # Pro monthly
+                "pri_01m194910cj42153gwj8zzsz8m",  # Pro yearly
+                "pri_01m19491xj87gjrz3dq907rz6m",  # Advanced monthly
+                "pri_01m194922v16p3595wftwza40n",  # Advanced yearly
+            ]
+
+            try:
+                body = _json.dumps({
+                    "items": [{"price_id": pid, "quantity": 1} for pid in price_ids],
+                    **(({"address": {"country_code": country}} if country else {}))
+                }).encode()
+
+                req = urllib.request.Request(
+                    api_base + "/pricing-preview",
+                    data=body,
+                    headers={
+                        "Authorization": "Bearer " + api_key,
+                        "Content-Type": "application/json"
+                    }
+                )
+                resp = urllib.request.urlopen(req, timeout=10)
+                data = _json.loads(resp.read())
+
+                prices = {}
+                for item in data.get("data", {}).get("details", {}).get("line_items", []):
+                    pid = item.get("price", {}).get("id", "")
+                    ft = item.get("formatted_totals", {})
+                    prices[pid] = {
+                        "total": ft.get("total", ""),
+                        "tax": ft.get("tax", ""),
+                        "subtotal": ft.get("subtotal", ""),
+                        "currency": item.get("price", {}).get("unit_price", {}).get("currency_code", "")
+                    }
+
+                self._send_json(200, {"prices": prices, "country": country})
+            except Exception as e:
+                self._send_json(500, {"error": str(e)})
+            return
+            # Verify authentication FIRST - never trust client-supplied customer ID
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+
+                self._send_json(500, {"error": "Fulfillment module not loaded"})
+                return
+
+            if not customer_id:
+                return
+
+            result = create_customer_portal_session(customer_id)
+            if "portal_url" in result:
+                self._send_json(200, result)
+            else:
+                self._send_json(400, result)
             return
 
 
@@ -667,6 +603,11 @@ class AuthHandler(BaseHTTPRequestHandler):
             if not sub:
                 self._send_json(404, {"error": "No subscription"})
                 return
+            with sqlite3.connect(DB_PATH) as conn:
+                c = conn.cursor()
+                row = c.fetchone()
+                if row and row[0]:
+                    pass
             self._send_json(200, sub)
             return
         if self.path == "/auth/credits":
@@ -698,7 +639,6 @@ class AuthHandler(BaseHTTPRequestHandler):
         self._send_json(404, {"error": "Not found"})
 
 
-
     def do_POST(self):
         # Stripe webhook — needs raw body for signature verification
         if self.path == "/auth/stripe-webhook":
@@ -714,57 +654,59 @@ class AuthHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"error": "Invalid signature"})
                 return
 
-            # Normalize the Stripe event, then hand off to the neutral layer.
+            # Convert Stripe objects to dicts for safe .get() access
             event_type = event["type"]
             data = event["data"]["object"]
-            metadata = data.get("metadata", {}) or {}
+            # Use to_dict() if available (Stripe v15+), else use the object directly
             try:
-                user_id = int(metadata.get("user_id") or data.get("client_reference_id") or 0)
+                data_dict = data.to_dict() if hasattr(data, "to_dict") else dict(data)
+            except Exception:
+                data_dict = data
+
+            metadata = data_dict.get("metadata", {}) or {}
+            try:
+                user_id_str = metadata.get("user_id") or data_dict.get("client_reference_id") or "0"
+                user_id = int(user_id_str) if str(user_id_str).isdigit() else 0
             except (TypeError, ValueError):
                 user_id = 0
 
+            print(f"[stripe] webhook: type={event_type} user_id={user_id} metadata={metadata}")
+
             if event_type == "checkout.session.completed":
-                kind = metadata.get("type")
+                kind = metadata.get("type", "subscription")
                 apply_payment_event(
-                    kind if kind in ("subscription", "credits") else "none",
+                    kind if kind in ("subscription", "credits") else "subscription",
                     user_id,
-                    charge_id=data.get("id"),
+                    charge_id=data_dict.get("id", ""),
                     plan=metadata.get("plan", "Free"),
                     cycle=metadata.get("cycle", "monthly"),
-                    credits=metadata.get("credits", 0),
+                    credits=int(metadata.get("credits", 0)) if metadata.get("credits") else 0,
                     provider="stripe",
                 )
             elif event_type == "customer.subscription.deleted":
                 apply_payment_event("cancel", user_id, provider="stripe")
+            elif event_type == "invoice.paid":
+                sub_id = data_dict.get("subscription", "") or ""
+                plan_name = ""
+                if not user_id and sub_id:
+                    try:
+                        sub = stripe.Subscription.retrieve(sub_id)
+                        sub_dict = sub.to_dict() if hasattr(sub, "to_dict") else dict(sub)
+                        sub_meta = sub_dict.get("metadata", {}) or {}
+                        uid = sub_meta.get("user_id", "0")
+                        user_id = int(uid) if str(uid).isdigit() else 0
+                        plan_name = sub_meta.get("plan", "")
+                    except Exception as e:
+                        print(f"[stripe] invoice.paid: could not get sub metadata: {e}")
+                if user_id:
+                    apply_payment_event("subscription", user_id, charge_id=data_dict.get("id", ""), plan=plan_name, provider="stripe")
+            elif event_type == "invoice.payment_failed":
+                if user_id:
+                    apply_payment_event("cancel", user_id, provider="stripe")
 
             self._send_json(200, {"received": True})
             return
 
-        # Paddle Billing webhook — raw body required for HMAC verification
-        if self.path == "/auth/paddle-webhook":
-            raw_body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
-            ok, reason = verify_paddle_signature(raw_body, self.headers.get("Paddle-Signature", ""))
-            if not ok:
-                print("[paddle] rejected webhook: " + reason)
-                self._send_json(400, {"error": "Invalid signature", "reason": reason})
-                return
-            try:
-                event = json.loads(raw_body.decode("utf-8"))
-            except (ValueError, UnicodeDecodeError):
-                self._send_json(400, {"error": "Invalid payload"})
-                return
-
-            mapped = paddle_event_to_fulfilment(event)
-            if mapped:
-                try:
-                    apply_payment_event(**mapped)
-                except Exception as exc:
-                    # 500 so Paddle retries rather than dropping a paid order
-                    print("[paddle] fulfilment failed: " + repr(exc))
-                    self._send_json(500, {"error": "Fulfilment failed"})
-                    return
-            self._send_json(200, {"received": True})
-            return
 
         ip = self._get_ip()
         if not check_rate_limit(ip):
@@ -885,6 +827,17 @@ class AuthHandler(BaseHTTPRequestHandler):
                     c.execute("UPDATE users SET verified=1, otp_code=NULL, otp_expires=NULL, otp_attempts=0 WHERE id=?", (user_id,))
                     c.execute("INSERT INTO user_sessions (user_id, token, expires, ip_address) VALUES (?, ?, ?, ?)",
                               (user_id, token, expires_dt, self._get_ip()))
+                    # ── Create free plan subscription with 100 credits for new users ──
+                    c.execute("SELECT id FROM subscriptions WHERE user_id = ? AND status = 'active'", (user_id,))
+                    if not c.fetchone():
+                        c.execute("SELECT id, credits_monthly FROM plans WHERE name = 'Free' AND is_active = 1")
+                        plan = c.fetchone()
+                        if plan:
+                            now = datetime.utcnow().isoformat()
+                            c.execute(
+                                "INSERT INTO subscriptions (user_id, plan_id, status, billing_cycle, credits_remaining, credits_used, current_period_start, current_period_end, created_date, updated_date) VALUES (?, ?, 'active', 'monthly', ?, 0, ?, ?, ?, ?)",
+                                (user_id, plan[0], plan[1], now, now, now, now)
+                            )
                     conn.commit()
             except sqlite3.Error as e:
                 self._send_json(500, {"error": "Database error"})
@@ -1223,13 +1176,13 @@ class AuthHandler(BaseHTTPRequestHandler):
             if not user_id:
                 self._send_json(401, {"error": "Not authenticated"})
                 return
-            item_type = body.get("type", "subscription")
-            plan_name = body.get("plan", "")
-            cycle = body.get("cycle", "monthly")
+            item_type = body.get("item_type", body.get("type", "subscription"))
+            plan_name = body.get("plan_name", body.get("plan", ""))
+            cycle = body.get("billing_cycle", body.get("cycle", "monthly"))
+            price_id = body.get("price_id", "")
             credits_amount = body.get("credits", 0)
             price_cents = body.get("price_cents", 0)
             try:
-                # Get user email for Stripe customer
                 with sqlite3.connect(DB_PATH) as conn:
                     c = conn.cursor()
                     c.execute("SELECT email, display_name FROM users WHERE id = ?", (user_id,))
@@ -1239,216 +1192,64 @@ class AuthHandler(BaseHTTPRequestHandler):
                         return
                     user_email, display_name = row
 
-                if item_type == "subscription":
-                    # Create Stripe Checkout Session for subscription
-                    product_name = plan_name + " Plan - " + cycle.capitalize()
-                    description = "EvolvixOS " + plan_name + " plan (" + cycle + ")"
+                if price_id:
+                    price_obj = stripe.Price.retrieve(price_id)
+                    mode = "subscription" if price_obj.type == "recurring" else "payment"
                     session = stripe.checkout.Session.create(
-                        payment_method_types=["card"],
-                        customer_email=user_email,
+                                                customer_email=user_email,
+                        line_items=[{"price": price_id, "quantity": 1}],
+                        mode=mode,
+                        success_url="https://evolvixos.com/dashboard/billing?payment=success&plan=" + plan_name,
+                        cancel_url="https://evolvixos.com/dashboard/billing?payment=cancelled",
+                        metadata={"user_id": str(user_id), "plan": plan_name, "cycle": cycle, "type": item_type},
+                        client_reference_id=str(user_id)
+                    )
+                elif item_type == "subscription":
+                    session = stripe.checkout.Session.create(
+                                                customer_email=user_email,
                         line_items=[{
                             "price_data": {
-                                "currency": "usd",
-                                "product_data": {"name": product_name, "description": description},
+                                "currency": "eur",
+                                "product_data": {"name": plan_name + " Plan - " + cycle.capitalize()},
                                 "unit_amount": price_cents,
                                 "recurring": {"interval": "year" if cycle == "yearly" else "month"}
                             },
                             "quantity": 1
                         }],
                         mode="subscription",
-                        success_url="https://evolvixos.com/platform/?payment=success&plan=" + plan_name,
-                        cancel_url="https://evolvixos.com/platform/?payment=cancelled",
+                        success_url="https://evolvixos.com/dashboard/billing?payment=success&plan=" + plan_name,
+                        cancel_url="https://evolvixos.com/dashboard/billing?payment=cancelled",
                         metadata={"user_id": str(user_id), "plan": plan_name, "cycle": cycle, "type": "subscription"},
                         client_reference_id=str(user_id)
                     )
                 else:
-                    # One-time credit purchase
                     session = stripe.checkout.Session.create(
-                        payment_method_types=["card"],
-                        customer_email=user_email,
+                                                customer_email=user_email,
                         line_items=[{
                             "price_data": {
-                                "currency": "usd",
-                                "product_data": {"name": str(credits_amount) + " Credits", "description": "EvolvixOS Credit Pack"},
+                                "currency": "eur",
+                                "product_data": {"name": str(credits_amount) + " API Calls"},
                                 "unit_amount": price_cents
                             },
                             "quantity": 1
                         }],
                         mode="payment",
-                        success_url="https://evolvixos.com/platform/?payment=success&credits=" + str(credits_amount),
-                        cancel_url="https://evolvixos.com/platform/?payment=cancelled",
+                        success_url="https://evolvixos.com/dashboard/billing?payment=success&credits=" + str(credits_amount),
+                        cancel_url="https://evolvixos.com/dashboard/billing?payment=cancelled",
                         metadata={"user_id": str(user_id), "credits": str(credits_amount), "type": "credits"},
                         client_reference_id=str(user_id)
                     )
-                # Record pending payment
                 with sqlite3.connect(DB_PATH) as conn:
                     c = conn.cursor()
-                    c.execute("INSERT INTO payments (user_id, amount, currency, plan_name, billing_cycle, status, provider, provider_charge_id, created_date) VALUES (?, ?, 'USD', ?, ?, 'pending', 'stripe', ?, ?)",
-                        (user_id, price_cents / 100, plan_name or "Credit Pack", cycle if item_type == "subscription" else "one-time", session.id, time.strftime("%Y-%m-%d %H:%M:%S")))
+                    c.execute("INSERT INTO payments (user_id, amount, currency, plan_name, billing_cycle, status, provider, provider_charge_id, created_date) VALUES (?, ?, 'EUR', ?, ?, 'pending', 'stripe', ?, ?)",
+                        (user_id, price_cents / 100 if price_cents else 0, plan_name or "Purchase", cycle if item_type == "subscription" else "one-time", session.id, time.strftime("%Y-%m-%d %H:%M:%S")))
                     conn.commit()
-                self._send_json(200, {"checkout_url": session.url, "session_id": session.id})
+                self._send_json(200, {"url": session.url, "checkout_url": session.url, "session_id": session.id})
             except stripe.error.StripeError as e:
                 self._send_json(400, {"error": str(e)})
                 return
             except Exception as e:
                 self._send_json(500, {"error": "Payment setup failed: " + str(e)})
-                return
-
-
-        if path == "/auth/paddle-portal":
-            user_id = is_authorized(self)
-            if not user_id:
-                self._send_json(401, {"error": "Not authenticated"})
-                return
-            try:
-                with sqlite3.connect(DB_PATH) as conn:
-                    c = conn.cursor()
-                    c.execute("SELECT email, paddle_customer_id FROM users WHERE id = ?", (user_id,))
-                    row = c.fetchone()
-                    if not row or not row[1]:
-                        self._send_json(400, {"error": "No Paddle subscription found"})
-                        return
-                    email, paddle_customer_id = row
-
-                # Create customer portal session via Paddle API
-                paddle_api = PADDLE_API_BASE.rstrip('/')
-                req = urllib.request.Request(
-                    f"{paddle_api}/customer-portal-sessions",
-                    data=json.dumps({"customer_id": paddle_customer_id}).encode(),
-                    method="POST",
-                    headers={
-                        "Authorization": f"Bearer {PADDLE_API_KEY}",
-                        "Content-Type": "application/json",
-                    }
-                )
-                with urllib.request.urlopen(req, timeout=30) as r:
-                    session = json.loads(r.read().decode())
-
-                portal_url = session.get("data", {}).get("url", "")
-                self._send_json(200, {"portal_url": portal_url})
-            except urllib.error.HTTPError as e:
-                err_body = e.read().decode()
-                self._send_json(400, {"error": f"Paddle API error: {err_body[:300]}"})
-                return
-            except Exception as e:
-                self._send_json(500, {"error": "Portal session failed: " + str(e)})
-                return
-
-
-
-            # Country detection from request headers
-            # Check common headers set by CDNs/proxies
-            country = None
-            for header in ["x-vercel-ip-country", "cf-ipcountry", "x-country-code",
-                          "x-geoip-country-code", "x-geo-country"]:
-                val = self.headers.get(header, "").strip().upper()
-                if val and len(val) == 2 and val != "OTHERS":
-                    country = val
-                    break
-
-            # If signed in, get customer info
-            customer_email = None
-            paddle_customer_id = None
-            try:
-                user_id = self._get_user_id(self.headers.get("Authorization", ""))
-                if user_id:
-                    with sqlite3.connect(DB_PATH) as conn:
-                        c = conn.cursor()
-                        c.execute("SELECT email, paddle_customer_id FROM users WHERE id = ?", (user_id,))
-                        row = c.fetchone()
-                        if row:
-                            customer_email = row[0]
-                            paddle_customer_id = row[1]
-            except Exception:
-                pass  # Not signed in — that's fine
-
-            self._send_json(200, {
-                "token": token,
-                "environment": env,
-                "country": country,  # null if undetected → Paddle auto-detects
-                "customerEmail": customer_email,
-                "customerId": paddle_customer_id,
-            })
-            return
-
-        if path == "/auth/paddle-checkout":
-            user_id = is_authorized(self)
-            if not user_id:
-                self._send_json(401, {"error": "Not authenticated"})
-                return
-            item_type = body.get("type", "subscription")
-            plan_name = body.get("plan", "")
-            cycle = body.get("cycle", "monthly")
-            credits_amount = body.get("credits", 0)
-            try:
-                # Load paddle price IDs
-                prices_path = os.path.join(os.path.dirname(__file__), '..', 'paddle_prices.json')
-                with open(prices_path) as f:
-                    paddle_prices = json.load(f)
-
-                # Get user email
-                with sqlite3.connect(DB_PATH) as conn:
-                    c = conn.cursor()
-                    c.execute("SELECT email, display_name FROM users WHERE id = ?", (user_id,))
-                    row = c.fetchone()
-                    if not row:
-                        self._send_json(400, {"error": "User not found"})
-                        return
-                    user_email, display_name = row
-
-                price_id = None
-                if item_type == "subscription":
-                    key = f"{plan_name}_{cycle}"
-                    price_id = paddle_prices.get("subscriptions", {}).get(key)
-                else:
-                    key = f"credits_{credits_amount}"
-                    price_id = paddle_prices.get("credits", {}).get(key)
-
-                if not price_id:
-                    self._send_json(400, {"error": f"No Paddle price found for {item_type} {plan_name} {cycle}"})
-                    return
-
-                # Create Paddle transaction/checkout
-                paddle_api = PADDLE_API_BASE.rstrip('/')
-                checkout_body = {
-                    "items": [{"price_id": price_id, "quantity": 1}],
-                    "customer": {"email": user_email},
-                    "custom_data": {"user_id": str(user_id), "type": item_type},
-                    "success_url": f"https://evolvixos.com/platform/?payment=success&plan={plan_name}",
-                }
-                if item_type == "subscription":
-                    checkout_body["custom_data"]["plan"] = plan_name
-                    checkout_body["custom_data"]["cycle"] = cycle
-
-                req = urllib.request.Request(
-                    f"{paddle_api}/transactions",
-                    data=json.dumps(checkout_body).encode(),
-                    method="POST",
-                    headers={
-                        "Authorization": f"Bearer {PADDLE_API_KEY}",
-                        "Content-Type": "application/json",
-                    }
-                )
-                with urllib.request.urlopen(req, timeout=30) as r:
-                    txn = json.loads(r.read().decode())
-
-                checkout_url = txn.get("data", {}).get("checkout", {}).get("url", "")
-                txn_id = txn.get("data", {}).get("id", "")
-
-                # Record pending payment
-                with sqlite3.connect(DB_PATH) as conn:
-                    c = conn.cursor()
-                    c.execute("INSERT INTO payments (user_id, amount, currency, plan_name, billing_cycle, status, provider, provider_charge_id, created_date) VALUES (?, ?, 'EUR', ?, ?, 'pending', 'paddle', ?, ?)",
-                        (user_id, 0, plan_name or "Credit Pack", cycle if item_type == "subscription" else "one-time", txn_id, time.strftime("%Y-%m-%d %H:%M:%S")))
-                    conn.commit()
-
-                self._send_json(200, {"checkout_url": checkout_url, "transaction_id": txn_id})
-            except urllib.error.HTTPError as e:
-                err_body = e.read().decode()
-                self._send_json(400, {"error": f"Paddle API error: {err_body[:300]}"})
-                return
-            except Exception as e:
-                self._send_json(500, {"error": "Paddle checkout failed: " + str(e)})
                 return
 
         if path == "/auth/stripe-portal":
@@ -1471,7 +1272,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                     customer_id = customers.data[0].id
                     session = stripe.billing_portal.Session.create(
                         customer=customer_id,
-                        return_url="https://evolvixos.com/platform/?view=billing"
+                        return_url="https://evolvixos.com/dashboard/billing"
                     )
                     self._send_json(200, {"portal_url": session.url})
                 else:

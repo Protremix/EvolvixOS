@@ -1,3 +1,0 @@
-"""
-EvolvixOS Alembic Migrations Package.
-"""

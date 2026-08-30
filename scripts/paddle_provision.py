@@ -24,7 +24,7 @@ import urllib.error
 import urllib.request
 
 API_KEY = os.environ.get("PADDLE_API_KEY", "")
-API_BASE = os.environ.get("PADDLE_API_BASE", "https://sandbox-api.paddle.com")
+API_BASE = os.environ.get("PADDLE_API_BASE", "https://api.paddle.com")
 DB_PATH = os.environ.get("EVOLVIX_AUTH_DB", "/opt/evolvixos/auth/users.db")
 OUT_FILE = os.environ.get("PADDLE_PRICES_FILE", "paddle_prices.json")
 CURRENCY = os.environ.get("PADDLE_CURRENCY", "EUR")

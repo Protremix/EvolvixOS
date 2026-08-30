@@ -1,1 +1,0 @@
-# EvolvixOS Core Package

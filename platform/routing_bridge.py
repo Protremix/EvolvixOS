@@ -16,7 +16,7 @@ BENCHMARK-DRIVEN MODEL SELECTION:
 
   Simple chat:
     Primary:   google/gemma-4-31b              (76.5%, $0.016/task) — great for chat
-    Fallback1: deepseek/deepseek-v4-flash-0423 (75.2%, $0.009/task) — cheapest
+    Fallback1: deepseek/deepseek-v4-flash (75.2%, $0.009/task) — cheapest
     Fallback2: openai/gpt-oss-20b              (51.5%, $0.021/task) — legacy (BAD, avoid)
 
   Complex/Reasoning:
@@ -54,15 +54,15 @@ BUILDER_MODELS = [
     "z-ai/glm-5",                  # 74.8%, $0.036/task (legacy)
 ]
 CODE_MODELS = [
-    "deepseek-ai/deepseek-v4-flash-0731", # 76.3%, $0.010/task (NVIDIA free)
-    "deepseek-ai/deepseek-v4-pro-0813",   # 1M ctx, MoE (NVIDIA free)
-    "poolside/laguna-xs-2.1",             # 33B MoE, agentic coding (NVIDIA free)
+    "deepseek/deepseek-v4-flash-0731", # 76.3%, $0.010/task (NVIDIA free)
+    "deepseek/deepseek-v4-pro-0813",   # 1M ctx, MoE (NVIDIA free)
+    "qwen/qwen3-coder-30b-a3b-instruct",  # 33B MoE, agentic coding (NVIDIA free)
     "nvidia/nemotron-3-ultra-550b-a55b",  # 76.9%, 1M ctx (NVIDIA free)
 ]
 CHAT_MODELS = [
-    "nvidia/nemotron-3.5-lightning-30b-a3b", # 30B MoE, 3B active, fast (NVIDIA free)
-    "google/gemma-4-31b",               # 76.5%, $0.016/task
-    "deepseek/deepseek-v4-flash-0423",   # 75.2%, $0.009/task
+    "nvidia/nemotron-3.5-lightning", # 30B MoE, 3B active, fast (NVIDIA free)
+    "google/gemma-4-31b-it",               # 76.5%, $0.016/task
+    "deepseek/deepseek-v4-flash",   # 75.2%, $0.009/task
     "openai/gpt-oss-20b",               # 51.5%, $0.021/task (legacy, BAD)
 ]
 REASONING_MODELS = [

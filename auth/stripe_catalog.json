@@ -1,0 +1,132 @@
+{
+  "EvolvixOS Starter": {
+    "product_id": "prod_VAZUx0U46Y0jlf",
+    "prices": [
+      {
+        "price_id": "price_1UAELl2fz7mjXQMgBNDsM9b1",
+        "nickname": "Starter Monthly",
+        "amount": 900
+      },
+      {
+        "price_id": "price_1UAELl2fz7mjXQMgs0QQovNq",
+        "nickname": "Starter Yearly",
+        "amount": 8600
+      }
+    ]
+  },
+  "EvolvixOS Pro": {
+    "product_id": "prod_VAZU4KoTogYKSP",
+    "prices": [
+      {
+        "price_id": "price_1UAELm2fz7mjXQMgwazTQ2MA",
+        "nickname": "Pro Monthly",
+        "amount": 2900
+      },
+      {
+        "price_id": "price_1UAELm2fz7mjXQMg9cy365Xv",
+        "nickname": "Pro Yearly",
+        "amount": 27800
+      }
+    ]
+  },
+  "EvolvixOS Business": {
+    "product_id": "prod_VAZU8LfipsK9Ex",
+    "prices": [
+      {
+        "price_id": "price_1UAELm2fz7mjXQMglGtHJS1a",
+        "nickname": "Business Monthly",
+        "amount": 4900
+      },
+      {
+        "price_id": "price_1UAELm2fz7mjXQMgm9Jv5slH",
+        "nickname": "Business Yearly",
+        "amount": 47000
+      }
+    ]
+  },
+  "EvolvixOS Team": {
+    "product_id": "prod_VAZUvkPyknn2RU",
+    "prices": [
+      {
+        "price_id": "price_1UAELn2fz7mjXQMgBCl8SIHM",
+        "nickname": "Team Monthly",
+        "amount": 9900
+      },
+      {
+        "price_id": "price_1UAELn2fz7mjXQMgs17UxDHr",
+        "nickname": "Team Yearly",
+        "amount": 95000
+      }
+    ]
+  },
+  "EvolvixOS Enterprise": {
+    "product_id": "prod_VAZU9yq0jCnl0j",
+    "prices": [
+      {
+        "price_id": "price_1UAELn2fz7mjXQMgzKIFFsvq",
+        "nickname": "Enterprise Monthly",
+        "amount": 19900
+      },
+      {
+        "price_id": "price_1UAELn2fz7mjXQMgnP0G9ikT",
+        "nickname": "Enterprise Yearly",
+        "amount": 190000
+      }
+    ]
+  },
+  "EvolvixOS Enterprise+": {
+    "product_id": "prod_VAZULoSWACycIF",
+    "prices": [
+      {
+        "price_id": "price_1UAELo2fz7mjXQMgbdwbYobS",
+        "nickname": "Enterprise+ Monthly",
+        "amount": 29900
+      },
+      {
+        "price_id": "price_1UAELo2fz7mjXQMgkckdPAgp",
+        "nickname": "Enterprise+ Yearly",
+        "amount": 287000
+      }
+    ]
+  },
+  "EvolvixOS 1000 API Calls": {
+    "product_id": "prod_VAZU6bd1KcAEqe",
+    "prices": [
+      {
+        "price_id": "price_1UAELo2fz7mjXQMg3RC06LQD",
+        "nickname": "1000 API Calls",
+        "amount": 900
+      }
+    ]
+  },
+  "EvolvixOS 5000 API Calls": {
+    "product_id": "prod_VAZUNpuztmXldu",
+    "prices": [
+      {
+        "price_id": "price_1UAELo2fz7mjXQMgxC6Bb9ep",
+        "nickname": "5000 API Calls",
+        "amount": 3900
+      }
+    ]
+  },
+  "EvolvixOS 15000 API Calls": {
+    "product_id": "prod_VAZUV7NQDOmCuX",
+    "prices": [
+      {
+        "price_id": "price_1UAELp2fz7mjXQMgTyvbsV2n",
+        "nickname": "15000 API Calls",
+        "amount": 9900
+      }
+    ]
+  },
+  "EvolvixOS 50000 API Calls": {
+    "product_id": "prod_VAZUPRYC7ant2c",
+    "prices": [
+      {
+        "price_id": "price_1UAELp2fz7mjXQMgn1XDRMhz",
+        "nickname": "50000 API Calls",
+        "amount": 29900
+      }
+    ]
+  }
+}

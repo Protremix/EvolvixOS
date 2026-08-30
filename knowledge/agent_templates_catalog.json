@@ -1,0 +1,312 @@
+{
+  "starter": {
+    "ai_travel_agent": {
+      "name": "AI Travel Agent",
+      "desc": "Personalized day-by-day travel itineraries",
+      "category": "travel",
+      "file": "starter_ai_agents/ai_travel_agent"
+    },
+    "ai_blog_to_podcast": {
+      "name": "Blog to Podcast",
+      "desc": "Turn any blog URL into a narrated podcast",
+      "category": "media",
+      "file": "starter_ai_agents/ai_blog_to_podcast_agent"
+    },
+    "ai_data_analysis": {
+      "name": "Data Analysis Agent",
+      "desc": "Ask questions of any CSV/Excel in plain English",
+      "category": "data",
+      "file": "starter_ai_agents/ai_data_analysis_agent"
+    },
+    "ai_medical_imaging": {
+      "name": "Medical Imaging Agent",
+      "desc": "Diagnostic analysis of X-rays and scans",
+      "category": "medical",
+      "file": "starter_ai_agents/ai_medical_imaging_agent"
+    },
+    "ai_music_generator": {
+      "name": "Music Generator",
+      "desc": "Prompt in, MP3 track out",
+      "category": "media",
+      "file": "starter_ai_agents/ai_music_generator_agent"
+    },
+    "ai_finance_agent": {
+      "name": "Finance Agent (xAI)",
+      "desc": "Real-time stock analysis powered by Grok",
+      "category": "finance",
+      "file": "starter_ai_agents/xai_finance_agent"
+    },
+    "mixture_of_agents": {
+      "name": "Mixture of Agents",
+      "desc": "Multiple LLMs answer, one aggregates best response",
+      "category": "research",
+      "file": "starter_ai_agents/mixture_of_agents"
+    },
+    "web_scraping": {
+      "name": "Web Scraping Agent",
+      "desc": "Describe what to extract and the agent scrapes it",
+      "category": "web",
+      "file": "starter_ai_agents/web_scraping_ai_agent"
+    },
+    "ai_reasoning": {
+      "name": "Reasoning Agent",
+      "desc": "Step-by-step reasoning with any LLM",
+      "category": "general",
+      "file": "starter_ai_agents/ai_reasoning_agent"
+    }
+  },
+  "advanced": {
+    "ai_deep_research": {
+      "name": "Deep Research Agent",
+      "desc": "Comprehensive web research with multi-step reasoning",
+      "category": "research",
+      "file": "advanced_ai_agents/single_agent_apps/ai_deep_research_agent"
+    },
+    "ai_system_architect": {
+      "name": "System Architect Agent",
+      "desc": "Architecture reviews using DeepSeek R1 reasoning",
+      "category": "engineering",
+      "file": "advanced_ai_agents/single_agent_apps/ai_system_architect_r1"
+    },
+    "ai_journalist": {
+      "name": "Journalist Agent",
+      "desc": "Researches, writes, and edits articles on any topic",
+      "category": "content",
+      "file": "advanced_ai_agents/single_agent_apps/ai_journalist_agent"
+    },
+    "ai_investment": {
+      "name": "Investment Agent",
+      "desc": "Stock comparison reports from Yahoo Finance",
+      "category": "finance",
+      "file": "advanced_ai_agents/single_agent_apps/ai_investment_agent"
+    },
+    "ai_fraud_investigation": {
+      "name": "Fraud Investigation Agent",
+      "desc": "Cross-references public records to flag fraud",
+      "category": "security",
+      "file": "advanced_ai_agents/single_agent_apps/ai_fraud_investigation_agent"
+    },
+    "ai_customer_support": {
+      "name": "Customer Support Agent",
+      "desc": "Production-grade support with tools and memory",
+      "category": "business",
+      "file": "advanced_ai_agents/single_agent_apps/ai_customer_support_agent"
+    },
+    "ai_consultant": {
+      "name": "Consultant Agent",
+      "desc": "Market analysis and strategy recommendations",
+      "category": "business",
+      "file": "advanced_ai_agents/single_agent_apps/ai_consultant_agent"
+    },
+    "ai_health_fitness": {
+      "name": "Health & Fitness Agent",
+      "desc": "Tailored diet and workout plans from goals",
+      "category": "health",
+      "file": "advanced_ai_agents/single_agent_apps/ai_health_fitness_agent"
+    }
+  },
+  "teams": {
+    "ai_finance_team": {
+      "name": "Finance Agent Team",
+      "desc": "A financial analyst team in 20 lines of Python",
+      "category": "finance",
+      "file": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_finance_agent_team"
+    },
+    "ai_legal_team": {
+      "name": "Legal Agent Team",
+      "desc": "Research, contract analysis, and strategy from a legal bench",
+      "category": "legal",
+      "file": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_legal_agent_team"
+    },
+    "ai_game_design_team": {
+      "name": "Game Design Agent Team",
+      "desc": "Full game concepts from a swarm of design specialists",
+      "category": "gaming",
+      "file": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_game_design_agent_team"
+    },
+    "ai_recruitment_team": {
+      "name": "Recruitment Agent Team",
+      "desc": "Resume screening to interview scheduling, end to end",
+      "category": "hr",
+      "file": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_recruitment_agent_team"
+    },
+    "ai_teaching_team": {
+      "name": "Teaching Agent Team",
+      "desc": "A faculty of agents that builds your learning path",
+      "category": "education",
+      "file": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_teaching_agent_team"
+    },
+    "ai_competitor_intel": {
+      "name": "Competitor Intelligence Team",
+      "desc": "Structured competitor teardowns from their websites",
+      "category": "business",
+      "file": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_competitor_intelligence_agent_team"
+    },
+    "ai_seo_audit": {
+      "name": "SEO Audit Team",
+      "desc": "Multi-agent SEO analysis and recommendations",
+      "category": "marketing",
+      "file": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_seo_audit_team"
+    },
+    "ai_vc_due_diligence": {
+      "name": "VC Due Diligence Team",
+      "desc": "Multi-agent startup investment analysis",
+      "category": "finance",
+      "file": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_vc_due_diligence_agent_team"
+    },
+    "ai_travel_planner_team": {
+      "name": "Travel Planner Team",
+      "desc": "Multi-agent travel planning with MCP",
+      "category": "travel",
+      "file": "advanced_ai_agents/multi_agent_apps/agent_teams/ai_travel_planner_agent_team"
+    }
+  },
+  "rag": {
+    "local_rag": {
+      "name": "Local RAG Agent",
+      "desc": "Fully local RAG with Ollama + Qdrant",
+      "category": "rag",
+      "file": "rag_tutorials/local_rag_agent"
+    },
+    "deepseek_rag": {
+      "name": "DeepSeek Local RAG",
+      "desc": "RAG with DeepSeek R1 reasoning, all local",
+      "category": "rag",
+      "file": "rag_tutorials/deepseek_local_rag_agent"
+    },
+    "corrective_rag": {
+      "name": "Corrective RAG",
+      "desc": "Self-correcting RAG with web search fallback",
+      "category": "rag",
+      "file": "rag_tutorials/corrective_rag"
+    },
+    "autonomous_rag": {
+      "name": "Autonomous RAG",
+      "desc": "Self-managing RAG that decides when to search",
+      "category": "rag",
+      "file": "rag_tutorials/autonomous_rag"
+    },
+    "hybrid_rag": {
+      "name": "Hybrid Search RAG",
+      "desc": "Keyword + semantic search for best recall",
+      "category": "rag",
+      "file": "rag_tutorials/hybrid_search_rag"
+    },
+    "knowledge_graph_rag": {
+      "name": "Knowledge Graph RAG",
+      "desc": "RAG with citation graph and entity linking",
+      "category": "rag",
+      "file": "rag_tutorials/knowledge_graph_rag_citations"
+    },
+    "multimodal_rag": {
+      "name": "Multimodal RAG",
+      "desc": "RAG over images, PDFs, and mixed content",
+      "category": "rag",
+      "file": "rag_tutorials/multimodal_agentic_rag"
+    },
+    "qwen_local_rag": {
+      "name": "Qwen Local RAG",
+      "desc": "RAG with Qwen model, fully local",
+      "category": "rag",
+      "file": "rag_tutorials/qwen_local_rag"
+    }
+  },
+  "mcp": {
+    "github_mcp": {
+      "name": "GitHub MCP Agent",
+      "desc": "Agent with GitHub MCP server for repo operations",
+      "category": "mcp",
+      "file": "mcp_ai_agents/github_mcp_agent"
+    },
+    "browser_mcp": {
+      "name": "Browser MCP Agent",
+      "desc": "Agent that drives a real browser via MCP",
+      "category": "mcp",
+      "file": "mcp_ai_agents/browser_mcp_agent"
+    },
+    "notion_mcp": {
+      "name": "Notion MCP Agent",
+      "desc": "Agent with Notion MCP for document operations",
+      "category": "mcp",
+      "file": "mcp_ai_agents/notion_mcp_agent"
+    },
+    "multi_mcp_router": {
+      "name": "Multi-MCP Router",
+      "desc": "Routes queries to specialized agents with different MCP servers",
+      "category": "mcp",
+      "file": "mcp_ai_agents/multi_mcp_agent_router"
+    }
+  },
+  "voice": {
+    "audio_tour": {
+      "name": "Audio Tour Agent",
+      "desc": "Voice-guided tours of any topic",
+      "category": "voice",
+      "file": "voice_ai_agents/ai_audio_tour_agent"
+    },
+    "customer_support_voice": {
+      "name": "Customer Support Voice Agent",
+      "desc": "Live voice customer support agent",
+      "category": "voice",
+      "file": "voice_ai_agents/customer_support_voice_agent"
+    },
+    "insurance_claim_voice": {
+      "name": "Insurance Claim Voice Team",
+      "desc": "Live voice agent team for insurance claims",
+      "category": "voice",
+      "file": "voice_ai_agents/insurance_claim_live_agent_team"
+    }
+  },
+  "skills": {
+    "project_graveyard": {
+      "name": "Project Graveyard",
+      "desc": "Finds abandoned side projects and helps revive the best one",
+      "category": "skill",
+      "file": "agent_skills/project-graveyard"
+    },
+    "scope_creep": {
+      "name": "Scope Creep Detector",
+      "desc": "Checks if a diff grew beyond its stated intent",
+      "category": "skill",
+      "file": "agent_skills/scope-creep-detector"
+    },
+    "dependency_doctor": {
+      "name": "Dependency Doctor",
+      "desc": "Checks dependency manifests for issues",
+      "category": "skill",
+      "file": "agent_skills/dependency-doctor"
+    },
+    "commit_archaeologist": {
+      "name": "Commit Archaeologist",
+      "desc": "Reconstructs why code exists from git history",
+      "category": "skill",
+      "file": "agent_skills/commit-archaeologist"
+    },
+    "self_improving": {
+      "name": "Self-Improving Skills",
+      "desc": "Automatically optimize agent skills using Gemini + ADK",
+      "category": "skill",
+      "file": "agent_skills/self-improving-agent-skills"
+    },
+    "advisor_orchestrator": {
+      "name": "Advisor Orchestrator Worker",
+      "desc": "Meta-loop with Claude as advisor, GPT as orchestrator, Gemini as worker",
+      "category": "skill",
+      "file": "agent_skills/advisor-orchestrator-worker"
+    }
+  },
+  "always_on": {
+    "hn_briefing": {
+      "name": "HN Briefing Agent",
+      "desc": "Scheduled scout that ships a ranked daily brief to Slack/email",
+      "category": "monitor",
+      "file": "always_on_agents/always_on_hn_briefing_agent"
+    },
+    "release_radar": {
+      "name": "Release Radar Agent",
+      "desc": "Watches dependency releases and briefs you on breaking changes",
+      "category": "monitor",
+      "file": "always_on_agents/release_radar_agent"
+    }
+  }
+}

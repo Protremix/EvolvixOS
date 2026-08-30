@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing — EvolvixOS</title>
+  <meta name="description" content="Simple, transparent pricing. Start free. Upgrade when you need more. Cancel anytime.">
+
+  <!-- Paddle.js v2 (provides Paddle.PricePreview, Paddle.Checkout.open, Paddle.Initialize) -->
+  <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; }
+    :root {
+      --bg: #f5f5f7;
+      --card: #ffffff;
+      --text: #1d1d1f;
+      --muted: #86868b;
+      --border: #d2d2d7;
+      --accent: #007aff;
+      --accent-hover: #0066d6;
+      --green: #34c759;
+      --radius: 12px;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Navbar ──────────────────────────────────── */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      max-width: 1024px;
+      margin: 0 auto;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 18px; font-weight: 600; text-decoration: none; color: var(--text);
+    }
+    .nav-logo svg { width: 28px; height: 28px; }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: 14px; font-weight: 500; }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── Hero ────────────────────────────────────── */
+    .hero { text-align: center; padding: 48px 24px 32px; }
+    .hero h1 { font-size: 48px; font-weight: 700; letter-spacing: -0.02em; margin: 0 0 12px; }
+    .hero p { font-size: 19px; color: var(--muted); margin: 0; }
+
+    /* ── Billing toggle ──────────────────────────── */
+    .toggle-wrap { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 28px 0 8px; }
+    .toggle-label { font-size: 15px; font-weight: 500; color: var(--muted); transition: color 0.2s; }
+    .toggle-label.active { color: var(--text); }
+    .toggle {
+      position: relative; width: 52px; height: 31px;
+      background: var(--border); border-radius: 16px; cursor: pointer;
+      transition: background 0.2s; border: none; padding: 2px;
+    }
+    .toggle.active { background: var(--accent); }
+    .toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 27px; height: 27px; background: #fff; border-radius: 50%;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+    .toggle.active::after { transform: translateX(21px); }
+    .save-badge {
+      font-size: 12px; font-weight: 600; color: var(--green);
+      background: rgba(52, 199, 89, 0.12); padding: 3px 8px; border-radius: 6px;
+    }
+
+    /* ── Pricing cards ──────────────────────────── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1024px;
+      margin: 40px auto 60px;
+      padding: 0 24px;
+    }
+    @media (max-width: 768px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+    }
+
+    .tier-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      display: flex; flex-direction: column;
+      transition: box-shadow 0.25s, transform 0.25s;
+      position: relative;
+    }
+    .tier-card:hover { box-shadow: 0 12px 40px -12px rgba(0,0,0,0.1); }
+    .tier-card.featured {
+      border-color: var(--accent);
+      box-shadow: 0 4px 24px -8px rgba(0, 122, 255, 0.2);
+    }
+    .tier-card.featured::before {
+      content: 'Most Popular';
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); color: #fff; font-size: 12px; font-weight: 600;
+      padding: 4px 14px; border-radius: 20px; white-space: nowrap;
+    }
+
+    .tier-name { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+    .tier-desc { font-size: 14px; color: var(--muted); margin: 0 0 24px; min-height: 20px; }
+
+    .tier-price { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
+    .tier-amount { font-size: 40px; font-weight: 700; letter-spacing: -0.02em; }
+    .tier-amount.loading { color: var(--muted); font-size: 28px; }
+    .tier-currency { font-size: 20px; font-weight: 600; color: var(--muted); }
+    .tier-period { font-size: 15px; color: var(--muted); }
+    .tier-tax { font-size: 12px; color: var(--muted); margin-bottom: 24px; }
+
+    .tier-features { list-style: none; padding: 0; margin: 0 0 28px; flex: 1; }
+    .tier-features li {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 14px; color: var(--text); margin-bottom: 10px; line-height: 1.4;
+    }
+    .tier-features li svg {
+      flex-shrink: 0; width: 18px; height: 18px; color: var(--green); margin-top: 1px;
+    }
+
+    .subscribe-btn {
+      width: 100%;
+      padding: 12px 0;
+      border-radius: var(--radius);
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .subscribe-btn:active { transform: scale(0.98); }
+    .subscribe-btn.primary { background: var(--accent); color: #fff; }
+    .subscribe-btn.primary:hover { background: var(--accent-hover); }
+    .subscribe-btn.secondary { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .subscribe-btn.secondary:hover { background: #ececf0; }
+    .subscribe-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Error banner ────────────────────────────── */
+    .error-banner {
+      display: none;
+      max-width: 600px; margin: 0 auto 24px; padding: 12px 20px;
+      background: #fff; border: 1px solid #ff3b30; border-radius: var(--radius);
+      color: #ff3b30; font-size: 14px; text-align: center;
+    }
+
+    /* ── FAQ ─────────────────────────────────────── */
+    .faq { max-width: 720px; margin: 0 auto 60px; padding: 0 24px; }
+    .faq h2 { font-size: 24px; font-weight: 600; text-align: center; margin: 0 0 24px; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 16px 0; }
+    .faq-q { font-size: 16px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .faq-q::after { content: '+'; font-size: 20px; color: var(--muted); }
+    .faq-item.open .faq-q::after { content: '−'; }
+    .faq-a { font-size: 14px; color: var(--muted); overflow: hidden; max-height: 0; transition: max-height 0.3s; }
+    .faq-item.open .faq-a { max-height: 100px; padding-top: 8px; }
+
+    /* ── Footer ──────────────────────────────────── */
+    footer { text-align: center; padding: 24px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── Overlay checkout container ──────────────── */
+    #paddle-checkout-container {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.4); z-index: 9999; display: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ───────────────────────────────────── -->
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <svg viewBox="0 0 48 48" fill="none">
+      <path d="M24 4 L42 14 V34 L24 44 L6 34 V14 Z" stroke="#007aff" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M16 30 L24 18 L32 30" stroke="#007aff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    EvolvixOS
+  </a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="/pricing">Pricing</a>
+    <a href="/terms">Terms</a>
+    <a href="/platform/">Studio</a>
+  </div>
+</nav>
+
+<!-- ── Hero ──────────────────────────────────────── -->
+<section class="hero">
+  <h1>Simple, transparent pricing</h1>
+  <p>Start free. Upgrade when you need more. Cancel anytime.</p>
+</section>
+
+<!-- ── Billing toggle ─────────────────────────────── -->
+<div class="toggle-wrap">
+  <span class="toggle-label active" id="label-monthly">Monthly</span>
+  <button class="toggle" id="billing-toggle" aria-label="Toggle billing cycle"></button>
+  <span class="toggle-label" id="label-yearly">Yearly</span>
+  <span class="save-badge">Save 20%</span>
+</div>
+
+<!-- Error banner -->
+<div class="error-banner" id="error-banner"></div>
+
+<!-- ── Pricing cards ──────────────────────────────── -->
+<div class="pricing-grid" id="pricing-grid">
+  <!-- Cards are rendered by JS -->
+</div>
+
+<!-- ── FAQ ────────────────────────────────────────── -->
+<section class="faq">
+  <h2>Frequently asked questions</h2>
+  <div class="faq-item">
+    <div class="faq-q">Can I change plans anytime?</div>
+    <div class="faq-a">Yes. Upgrades take effect immediately. Downgrades apply at the next billing cycle. No penalties, no lock-in.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">What payment methods do you accept?</div>
+    <div class="faq-a">Paddle handles all payments — major credit cards, PayPal, Apple Pay, and local methods depending on your country.</div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Do credits expire?</div>
+    <div class="faq-a">Subscription credits reset monthly. One-time credit packs never expire — buy once, use anytime.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How does billing work? <span class="faq-toggle">+</span></div>
+        <div class="faq-a">Subscriptions auto-renew monthly or annually until you cancel. Cancel anytime from your dashboard — no penalties, no lock-in. Your plan stays active until the end of the paid period.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How do I cancel? <span class="faq-toggle">+</span></div>
+        <div class="faq-a">Go to Settings in your EvolvixOS dashboard, click Cancel Subscription, and confirm. No email required, no questions asked. Your account reverts to the free tier at the end of the current billing period.</div>
+      </div></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q">Is there a free tier?</div>
+    <div class="faq-a">Yes — 100 credits/month, all models, local routing. No credit card required. Upgrade only when you need more.</div>
+  </div>
+</section>
+
+<!-- ── Footer ─────────────────────────────────────── -->
+<footer>
+  © 2026 GOLAN EUROPE SL ·
+  <a href="/terms">Terms</a> ·
+  <a href="/privacy">Privacy</a> ·
+  <a href="/refund-policy">Refund Policy</a> ·
+  <a href="/contact">Contact</a>
+</footer>
+
+<!-- Paddle Checkout overlay container -->
+<div id="paddle-checkout-container"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  EvolvixOS Pricing Page — Paddle.js v2 Integration
+//  Uses Paddle.PricePreview() for localized prices
+//  Uses Paddle.Checkout.open() for one-page overlay checkout
+// ═══════════════════════════════════════════════════════════════
+
+// ── Tier configuration (easy to edit) ─────────────────────────
+// To add/change tiers, update this array. priceId.month and
+// priceId.year must match live Paddle price IDs.
+const TIERS = [
+  {
+    name: 'Starter',
+    description: 'For trying things out',
+    featured: false,
+    features: [
+      '2,000 credits / month',
+      'Full routing access',
+      'Local model routing',
+      'Community support'
+    ],
+    priceId: {
+      month: 'pri_01m194907w2aypwa78tfxg3pfz',
+      year:  'pri_01m19490dcsqwmcah27wzv56y0'
+    }
+  },
+  {
+    name: 'Pro',
+    description: 'For serious builders',
+    featured: true,
+    features: [
+      '10,000 credits / month',
+      'All models + cloud routing',
+      'Backend functions',
+      'Workflow automation',
+      'Priority support'
+    ],
+    priceId: {
+      month: 'pri_01m19490sttx901004gwtzpdyh',
+      year:  'pri_01m194910cj42153gwj8zzsz8m'
+    }
+  },
+  {
+    name: 'Advanced',
+    description: 'For growing teams',
+    featured: false,
+    features: [
+      '30,000 credits / month',
+      'Everything in Pro',
+      'Team collaboration',
+      'SSO & audit logs',
+      'Dedicated support'
+    ],
+    priceId: {
+      month: 'pri_01m19491xj87gjrz3dq907rz6m',
+      year:  'pri_01m194922v16p3595wftwza40n'
+    }
+  }
+];
+
+// ── State ──────────────────────────────────────────────────────
+let billingCycle = 'month';  // 'month' | 'year'
+let paddleConfig = null;     // { token, environment, country, customerEmail, customerId }
+let pricePreviewData = null; // Result from Paddle.PricePreview()
+
+// ── Init ───────────────────────────────────────────────────────
+async function init() {
+  try {
+    // Fetch server-side config (token, environment, country, email)
+    const resp = await fetch('/auth/paddle-config', {
+      headers: getAuthHeaders()
+    });
+    paddleConfig = await resp.json();
+
+    if (paddleConfig.error) {
+      showError(paddleConfig.error);
+      return;
+    }
+
+    // Fail loudly if environment is not set — never silently default
+    if (!paddleConfig.environment || paddleConfig.environment === '') {
+      showError('PADDLE_ENVIRONMENT is not set. Refusing to initialize checkout.');
+      return;
+    }
+
+    // Initialize Paddle.js with live token
+    // Environment is read from env var (server returns 'production' or 'sandbox')
+    // Paddle.js v2 infers environment from token prefix (live_ = production, test_ = sandbox)
+    // We still validate environment server-side and fail loudly if unset
+    Paddle.Initialize({
+      token: paddleConfig.token,
+      pwCustomer: paddleConfig.customerId ? { id: paddleConfig.customerId } : undefined
+    });
+
+    // Fetch and display prices
+    await fetchPrices();
+
+    // Render cards
+    renderTiers();
+
+  } catch (err) {
+    showError('Failed to initialize pricing: ' + err.message);
+  }
+}
+
+// ── Fetch localized prices from Paddle ──────────────────────────
+// Uses Paddle.PricePreview() — returns formattedTotals only.
+// We do NO price math on the frontend and don't re-format strings.
+async function fetchPrices() {
+  // Build items: all 6 price IDs (3 tiers × 2 cycles)
+  const items = TIERS.flatMap(tier => [
+    { priceId: tier.priceId.month, quantity: 1 },
+    { priceId: tier.priceId.year,  quantity: 1 }
+  ]);
+
+  // Build options — only pass country if detected server-side
+  // If country is null, Paddle auto-detects from visitor IP
+  const options = {
+    items: items
+  };
+  if (paddleConfig.country) {
+    options.address = { countryCode: paddleConfig.country };
+  }
+
+  try {
+    pricePreviewData = await Paddle.PricePreview(options);
+  } catch (err) {
+    showError('Failed to fetch prices: ' + (err.message || err));
+    throw err;
+  }
+}
+
+// ── Render tier cards ──────────────────────────────────────────
+function renderTiers() {
+  const grid = document.getElementById('pricing-grid');
+  grid.innerHTML = '';
+
+  TIERS.forEach((tier, idx) => {
+    const card = document.createElement('div');
+    card.className = 'tier-card' + (tier.featured ? ' featured' : '');
+    card.id = `tier-${tier.name.toLowerCase()}`;
+
+    const checkSvg = '<svg viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 010 1.4l-7.5 7.5a1 1 0 01-1.4 0L3.3 9.7a1 1 0 011.4-1.4l3.5 3.5 6.8-6.8a1 1 0 011.7 0z"/></svg>';
+
+    card.innerHTML = `
+      <h3 class="tier-name">${tier.name}</h3>
+      <p class="tier-desc">${tier.description}</p>
+      <div class="tier-price">
+        <span class="tier-amount loading">Loading…</span>
+      </div>
+      <div class="tier-tax" id="tax-${tier.name.toLowerCase()}"></div>
+      <ul class="tier-features">
+        ${tier.features.map(f => `<li>${checkSvg}<span>${f}</span></li>`).join('')}
+      </ul>
+      <button class="subscribe-btn ${tier.featured ? 'primary' : 'secondary'}"
+              data-tier="${tier.name}"
+              ${tier.name === 'Free' ? 'disabled' : ''}>
+        ${tier.name === 'Free' ? 'Current Plan' : 'Subscribe'}
+      </button>
+    `;
+
+    grid.appendChild(card);
+
+    // Attach click handler
+    const btn = card.querySelector('.subscribe-btn');
+    if (!btn.disabled) {
+      btn.addEventListener('click', () => openCheckout(tier.name));
+    }
+  });
+
+  // Update prices for current billing cycle
+  updatePrices();
+}
+
+// ── Update displayed prices ───────────────────────────────────
+function updatePrices() {
+  if (!pricePreviewData) return;
+
+  TIERS.forEach(tier => {
+    const priceId = billingCycle === 'month' ? tier.priceId.month : tier.priceId.year;
+    const lineItem = pricePreviewData.data.details.lineItems.find(
+      item => item.price.id === priceId
+    );
+
+    if (lineItem) {
+      const amountEl = document.querySelector(`#tier-${tier.name.toLowerCase()} .tier-amount`);
+      const taxEl = document.getElementById(`tax-${tier.name.toLowerCase()}`);
+
+      // Display ONLY Paddle's formatted totals — no re-formatting
+      const formatted = lineItem.formattedTotals.total;
+      // Paddle returns formatted string like "€9.00" or "$9.00"
+      amountEl.textContent = formatted;
+      amountEl.classList.remove('loading');
+
+      // Show period
+      const period = document.createElement('span');
+      period.className = 'tier-period';
+      period.textContent = billingCycle === 'month' ? '/mo' : '/yr';
+
+      // Clear and rebuild price line
+      const priceLine = amountEl.parentElement;
+      priceLine.innerHTML = '';
+      priceLine.appendChild(amountEl);
+      priceLine.appendChild(period);
+
+      // Tax line (Paddle returns this)
+      if (lineItem.formattedTotals.tax) {
+        taxEl.textContent = `Includes ${lineItem.formattedTotals.tax} tax`;
+      }
+    }
+  });
+}
+
+// ── Open Paddle Checkout overlay ──────────────────────────────
+async function openCheckout(tierName) {
+  const tier = TIERS.find(t => t.name === tierName);
+  if (!tier) return;
+
+  const priceId = billingCycle === 'month' ? tier.priceId.month : tier.priceId.year;
+
+  try {
+    // Paddle.Checkout.open with one-page overlay
+    Paddle.Checkout.open({
+      items: [{ priceId: priceId, quantity: 1 }],
+      settings: {
+        displayMode: 'overlay',
+        variant: 'one-page',
+        successUrl: window.location.origin + '/welcome'
+      },
+      // Prefill customer email if signed in
+      customer: paddleConfig.customerEmail ? {
+        email: paddleConfig.customerEmail
+      } : undefined
+    });
+  } catch (err) {
+    showError('Checkout failed: ' + (err.message || err));
+  }
+}
+
+// ── Billing toggle ─────────────────────────────────────────────
+document.getElementById('billing-toggle').addEventListener('click', function() {
+  billingCycle = billingCycle === 'month' ? 'year' : 'month';
+  this.classList.toggle('active');
+  document.getElementById('label-monthly').classList.toggle('active');
+  document.getElementById('label-yearly').classList.toggle('active');
+  updatePrices();
+});
+
+// ── Helper: auth headers ───────────────────────────────────────
+function getAuthHeaders() {
+  const user = localStorage.getItem('evolvixos_user');
+  if (user) {
+    try {
+      const parsed = JSON.parse(user);
+      if (parsed.token) return { 'Authorization': 'Bearer ' + parsed.token };
+    } catch (e) {}
+  }
+  return {};
+}
+
+// ── Helper: show error ─────────────────────────────────────────
+function showError(msg) {
+  const banner = document.getElementById('error-banner');
+  banner.textContent = msg;
+  banner.style.display = 'block';
+  console.error('[Paddle Pricing]', msg);
+}
+
+// ── FAQ toggle ─────────────────────────────────────────────────
+document.querySelectorAll('.faq-item').forEach(item => {
+  item.querySelector('.faq-q').addEventListener('click', () => item.classList.toggle('open'));
+});
+
+// ── Start ──────────────────────────────────────────────────────
+init();
+</script>
+
+</body>
+</html>

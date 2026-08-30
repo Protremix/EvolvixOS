@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refund Policy &middot; EvolvixOS</title>
+<meta name="description" content="When you can get your money back, how to ask, and how long it takes.">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff; --bg-soft:#f5f5f7; --bg-card:#FFF; --bg-warm:#e8e8ed;
+  --text:#1d1d1f; --text-secondary:#86868b; --text-muted:#86868b;
+  --accent:#007aff; --accent-hover:#0051a8; --accent-light:#d6e4ff;
+  --border:#E5E2DA; --border-light:#EFECE4; --purple:#7C6F9E;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --serif:'Newsreader',Georgia,serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);
+  line-height:1.7;-webkit-font-smoothing:antialiased;font-size:16px}
+a{color:var(--accent);text-decoration:none;transition:color .18s ease}
+a:hover{color:var(--accent-hover);text-decoration:underline}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);
+  outline-offset:3px;border-radius:3px}
+
+/* header */
+.nav{position:sticky;top:0;z-index:50;background:rgba(250,249,246,.86);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--border-light)}
+.nav-inner{max-width:1100px;margin:0 auto;padding:14px 28px;display:flex;
+  align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--text)}
+.brand:hover{text-decoration:none;color:var(--text)}
+.brand svg{width:30px;height:30px;display:block}
+.brand-name{font-family:var(--serif);font-size:1.22rem;font-weight:600;
+  letter-spacing:-.01em}
+.brand-name .os{background:linear-gradient(100deg,var(--accent),var(--purple));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:24px;font-size:.9rem}
+.nav-links a{color:var(--text-secondary)}
+.nav-links a:hover{color:var(--accent);text-decoration:none}
+
+/* layout */
+.wrap{max-width:1100px;margin:0 auto;padding:56px 28px 96px;
+  display:grid;grid-template-columns:224px 1fr;gap:56px;align-items:start}
+.toc{position:sticky;top:92px;font-size:.86rem}
+.toc h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--text-muted);margin-bottom:14px;font-weight:600}
+.toc ol{list-style:none;counter-reset:t}
+.toc li{counter-increment:t;margin-bottom:2px}
+.toc a{display:block;padding:5px 10px;border-radius:6px;color:var(--text-secondary);
+  border-left:2px solid transparent;line-height:1.45}
+.toc a:hover{background:var(--bg-warm);color:var(--accent);
+  border-left-color:var(--accent);text-decoration:none}
+.toc a::before{content:counter(t) ".";color:var(--text-muted);
+  margin-right:7px;font-variant-numeric:tabular-nums}
+
+.doc{min-width:0}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.11em;font-weight:600;
+  color:var(--accent);background:var(--accent-light);padding:6px 13px;
+  border-radius:100px;margin-bottom:20px}
+h1{font-family:var(--serif);font-size:clamp(2.1rem,5vw,3.1rem);font-weight:600;
+  letter-spacing:-.025em;line-height:1.1;margin-bottom:16px}
+h1 em{font-style:italic;background:linear-gradient(100deg,var(--accent),var(--purple));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lede{font-size:1.09rem;color:var(--text-secondary);max-width:62ch;margin-bottom:22px}
+.meta{font-size:.84rem;color:var(--text-muted);padding-bottom:26px;
+  border-bottom:1px solid var(--border);margin-bottom:14px}
+
+h2{font-family:var(--serif);font-size:1.52rem;font-weight:600;letter-spacing:-.015em;
+  margin:44px 0 14px;padding-top:14px;scroll-margin-top:96px}
+h2 .num{color:var(--accent);font-size:1.05rem;margin-right:11px;
+  font-family:var(--sans);font-weight:600;font-variant-numeric:tabular-nums}
+h3{font-size:1.02rem;font-weight:600;margin:26px 0 9px;color:var(--text)}
+p{margin-bottom:14px;color:var(--text-secondary);max-width:70ch}
+ul,ol{margin:0 0 15px 22px;color:var(--text-secondary);max-width:68ch}
+li{margin-bottom:7px}
+strong{color:var(--text);font-weight:600}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.87em;
+  background:var(--bg-warm);padding:2px 6px;border-radius:4px;color:var(--text)}
+
+.callout{background:var(--bg-card);border:1px solid var(--border);
+  border-left:3px solid var(--accent);border-radius:10px;padding:18px 22px;
+  margin:22px 0;max-width:70ch}
+.callout p:last-child{margin-bottom:0}
+.callout.warm{background:var(--accent-light);border-color:var(--accent-light);
+  border-left-color:var(--accent)}
+.callout h3{margin-top:0}
+
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.92rem;
+  background:var(--bg-card);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden}
+th,td{text-align:left;padding:11px 15px;border-bottom:1px solid var(--border-light);
+  vertical-align:top}
+th{background:var(--bg-soft);font-weight:600;font-size:.8rem;
+  text-transform:uppercase;letter-spacing:.05em;color:var(--text-secondary)}
+tbody tr:last-child td{border-bottom:none}
+td{color:var(--text-secondary)}
+
+.fill{background:#FFF8E6;border:1px dashed #D9A441;color:#8A6410;
+  padding:1px 7px;border-radius:4px;font-size:.87em;font-weight:600;
+  font-family:ui-monospace,monospace}
+
+/* footer */
+footer{border-top:1px solid var(--border);background:var(--bg-soft);
+  padding:38px 28px;text-align:center;font-size:.86rem;color:var(--text-muted)}
+.foot-links{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;
+  margin-bottom:14px}
+.foot-links a{color:var(--text-secondary)}
+
+@media(max-width:880px){
+  .wrap{grid-template-columns:1fr;gap:28px;padding:36px 22px 72px}
+  .toc{position:static;background:var(--bg-card);border:1px solid var(--border);
+    border-radius:10px;padding:18px 20px;order:-1}
+  .nav-links{display:none}
+}
+@media print{.nav,.toc,footer{display:none}.wrap{display:block;max-width:none}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="brand"><svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="EvolvixOS"><defs><linearGradient id="gL" x1="0.05" y1="0" x2="0.95" y2="1"><stop offset="0" stop-color="#007aff"/><stop offset="0.42" stop-color="#0051a8"/><stop offset="1" stop-color="#5856d6"/></linearGradient></defs><path d="M26.77,5.20 Q24.00,3.60 21.23,5.20 L9.10,12.20 Q6.33,13.80 6.33,17.00 L6.33,31.00 Q6.33,34.20 9.10,35.80 L21.23,42.80 Q24.00,44.40 26.77,42.80 L38.90,35.80 Q41.67,34.20 41.67,31.00 L41.67,17.00 Q41.67,13.80 38.90,12.20 Z M13.20,28.40 L24.00,16.80 L34.80,28.40 L34.80,33.40 L24.00,21.80 L13.20,33.40 Z" fill="url(#gL)" fill-rule="evenodd"/></svg><span class="brand-name">Evolvix<span class="os">OS</span></span></a>
+    <div class="nav-links">
+      <a href="/pricing">Pricing</a>
+      <a href="/terms">Terms</a>
+      <a href="/refund-policy">Refunds</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/dashboard/overview">Studio</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <aside class="toc">
+    <h4>On this page</h4>
+    <ol>
+        <li><a href="#s1">Summary</a></li>
+        <li><a href="#s2">Who processes your refund</a></li>
+        <li><a href="#s3">Your 14-day right of withdrawal (EU and UK consumers)</a></li>
+        <li><a href="#s4">Subscription plans</a></li>
+        <li><a href="#s5">Credit packs</a></li>
+        <li><a href="#s6">Fraud and abuse</a></li>
+        <li><a href="#s7">How to request a refund</a></li>
+        <li><a href="#s8">Chargebacks</a></li>
+        <li><a href="#s9">Changes to this policy</a></li>
+    </ol>
+  </aside>
+
+  <p><strong>GOLAN EUROPE SL</strong><br>Avenida Blai Bonet 8, Bloque 3, Apartamento 301, Santa Ponça, 07180 Calvià (Illes Balears), España<br>Tax ID: B16546020<br>Email: <a href="mailto:support@evolvixos.com">support@evolvixos.com</a><br>Phone: +34 711 011 010</p><main class="doc">
+    <span class="eyebrow">Legal</span>
+    <h1>Refund Policy</h1>
+    <p class="lede">When you can get your money back, how to ask, and how long it takes.</p>
+    <p class="meta">Effective 29 August 2026 &middot; Last updated 29 August 2026</p>
+
+      <h2 id="s1"><span class="num">01</span>Summary</h2>
+
+      <div class="callout warm">
+        <p><strong>The short version.</strong> If you are not satisfied within 14 days of your purchase, contact support@evolvixos.com for a full refund — no questions asked. EU and UK consumers also have a statutory 14-day right of withdrawal. Subscription renewals are refundable within 7 days if the renewal was unintended. Unused purchased Credits are refundable within 14 days. This policy sits alongside our Terms of Service and never reduces your statutory rights.</p>
+
+      <h2 id="s2"><span class="num">02</span>Who processes your refund</h2>
+
+      <p>Paddle is our reseller and merchant of record, so Paddle holds the payment
+      transaction and issues refunds. You can request a refund either way:</p>
+      <ul>
+        <li>email us at <a href="mailto:info@evolvixos.com">info@evolvixos.com</a> and we will authorise it
+        with Paddle; or</li>
+        <li>contact Paddle directly using the order reference in your receipt email.</li>
+      </ul>
+      <p>Coming to us first is usually faster, and it lets us fix the underlying problem
+      if there is one.</p>
+
+      <h2 id="s3"><span class="num">03</span>Your 14-day right of withdrawal (EU and UK consumers)</h2>
+
+      <p>If you are a consumer in the EU or UK, you have a statutory right to withdraw
+      from a distance purchase within <strong>14 days</strong> without giving a reason.</p>
+      <div class="callout">
+        <p><strong>One important exception to understand.</strong> For digital services
+        that begin immediately, the law lets you consent to starting straight away and
+        acknowledge that you lose the withdrawal right once the service is fully
+        performed. At checkout you may be asked to give that consent so you can use the
+        Service without waiting 14 days.</p>
+        <p>Where you have given it, we do not treat the withdrawal right as lost outright.
+        Instead we refund the portion you have not used, and deduct only the value of what
+        you actually consumed &mdash; which is the fair outcome the law is aiming at.</p>
+      </div>
+      <p>To withdraw, email <a href="mailto:info@evolvixos.com">info@evolvixos.com</a> within 14 days of
+      purchase with your account email and order reference. A clear statement is enough;
+      no particular form is required.</p>
+
+      <h2 id="s4"><span class="num">04</span>Subscription plans</h2>
+
+      <table>
+        <thead><tr><th>Situation</th><th>What you get</th></tr></thead>
+        <tbody>
+          <tr><td>Within 14 days of your <strong>first</strong> paid subscription</td>
+              <td>Full refund, less the value of Credits consumed beyond the free
+              allowance</td></tr>
+          <tr><td>Monthly renewal you did not intend</td>
+              <td>Full refund if requested within 7 days of the charge and consumption in
+              the new period was minimal</td></tr>
+          <tr><td>Annual plan, after 14 days</td>
+              <td>Pro-rata refund of complete unused months</td></tr>
+          <tr><td>Mid-period cancellation</td>
+              <td>No automatic refund &mdash; your plan stays active to the end of the
+              paid period</td></tr>
+          <tr><td>We materially reduce or discontinue a feature you rely on</td>
+              <td>Pro-rata refund of the unused paid period</td></tr>
+          <tr><td>Verified outage or defect that prevented substantial use</td>
+              <td>Pro-rata credit or refund for the affected period</td></tr>
+        </tbody>
+      </table>
+      <p>Cancelling and refunding are different actions. Cancelling stops the next
+      renewal; a refund returns money already charged. If you want both, say so.</p>
+
+      <h2 id="s5"><span class="num">05</span>Credit packs</h2>
+
+      <p>Purchased Credits are one-time purchases of consumable capacity.</p>
+      <ul>
+        <li><strong>Unused Credits</strong> &mdash; refundable in full within 14 days of
+        purchase.</li>
+        <li><strong>Partly used packs</strong> &mdash; within 14 days we refund the unused
+        proportion, rounded in your favour to the nearest whole euro.</li>
+        <li><strong>Consumed Credits</strong> &mdash; not refundable. The compute and
+        third-party model calls behind them have already been paid for and cannot be
+        reversed.</li>
+        <li><strong>After 14 days</strong> &mdash; purchased Credits do not expire while
+        your Account is active, so they stay available to use rather than being refunded.</li>
+      </ul>
+      <p>If Credits were consumed by a defect on our side, a runaway retry loop in the
+      Service, or unauthorised access to your Account that you reported promptly, tell us
+      &mdash; we will restore the Credits rather than treat them as consumed.</p>
+
+      <h2 id="s6"><span class="num">06</span>Fraud and abuse</h2>
+
+      <p>We honor all refund requests within the 14-day window without question. The only
+      exception is clear evidence of fraud or abuse, such as:</p>
+      <ul>
+        <li>systematic refund cycling (repeatedly purchasing, consuming credits, and
+        requesting refunds);</li>
+        <li>chargebacks filed without first contacting us to resolve the issue.</li>
+      </ul>
+      <p>If we identify such activity, we will notify you and explain our reasoning. You
+      retain all statutory rights and may escalate to Paddle at any time.</p>
+
+      <h2 id="s7"><span class="num">07</span>How to request a refund</h2>
+
+      <p>Email <a href="mailto:info@evolvixos.com">info@evolvixos.com</a> with:</p>
+      <ul>
+        <li>the email address on your Account;</li>
+        <li>the order or receipt reference from Paddle;</li>
+        <li>what you bought and roughly when;</li>
+        <li>the reason &mdash; brief is fine, and required only outside the statutory
+        withdrawal window.</li>
+      </ul>
+      <h3>Timescales</h3>
+      <ul>
+        <li>We acknowledge requests within <strong>2 business days</strong>.</li>
+        <li>We decide within <strong>5 business days</strong>, sooner for clear-cut
+        statutory withdrawals.</li>
+        <li>Approved refunds are issued by Paddle to the original payment method,
+        typically arriving within <strong>5&ndash;10 business days</strong> depending on
+        your bank.</li>
+      </ul>
+      <p>Refunds go back to the original payment method. We cannot redirect a refund to a
+      different card or account.</p>
+
+      <h2 id="s8"><span class="num">08</span>Chargebacks</h2>
+
+      <p>If something has gone wrong, please contact us before raising a chargeback with
+      your bank. Chargebacks are slow for you, costly for us, and usually resolvable in a
+      single email.</p>
+      <p>While a chargeback is open on your Account we may suspend paid features until it
+      is resolved. If a chargeback is decided in our favour and the Account shows a
+      pattern of abuse, we may decline future service.</p>
+      <p>We would rather fix the problem. Start with
+      <a href="mailto:info@evolvixos.com">info@evolvixos.com</a>.</p>
+
+      <h2 id="s9"><span class="num">09</span>Changes to this policy</h2>
+
+      <p>We may update this policy. Changes apply to purchases made after the new
+      effective date and never retroactively reduce rights attached to a purchase you have
+      already made. Material changes will be announced at least 30 days in advance.</p>
+
+  </main>
+</div>
+
+<footer>
+  <div class="foot-links">
+    <a href="/">Home</a>
+    <a href="/terms">Terms of Service</a>
+    <a href="/refund-policy">Refund Policy</a>
+    <a href="/privacy">Privacy Policy</a>
+    <a href="https://github.com/Protremix/EvolvixOS">GitHub</a>
+  </div>
+  <p>&copy; 2026 EvolvixOS &middot; Software open-source under the MIT License</p>
+</footer>
+</body>
+</html>
