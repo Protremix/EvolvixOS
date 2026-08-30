@@ -255,8 +255,8 @@ async function loadBilling() {
 
 async function subscribe(planName) {
   var cycle = confirm('Monthly billing? Click OK for monthly, Cancel for yearly (20% off)') ? 'monthly' : 'yearly';
-  var priceMap = { 'Free': 0, 'Starter': 900, 'Pro': 2900, 'Team': 9900 };
-  var yearMap = { 'Starter': 8600, 'Pro': 27800, 'Team': 95000 };
+  var priceMap = { 'Free': 0, 'Starter': 900, 'Pro': 2900, 'Team': 9900, 'Business': 4900, 'Enterprise': 19900, 'Enterprise+': 29900 };
+  var yearMap = { 'Starter': 8600, 'Pro': 27800, 'Team': 95000, 'Business': 47000, 'Enterprise': 190000, 'Enterprise+': 287000 };
   var priceCents = cycle === 'yearly' ? (yearMap[planName] || 0) : (priceMap[planName] || 0);
   if (planName === 'Free' || priceCents === 0) {
     // Free plan — no checkout needed
@@ -271,12 +271,12 @@ async function subscribe(planName) {
     else { toast('Error: ' + (data.error || 'Unknown'), 'error'); }
     return;
   }
-  // Stripe Checkout
+  // Paddle Checkout
   var raw = localStorage.getItem('evolvixos_user');
   var user = JSON.parse(raw);
-  var resp = await fetch('https://evolvixos.com/auth/stripe-checkout', {
+  var resp = await fetch('https://evolvixos.com/auth/paddle-checkout', {
     method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'subscription', plan: planName, cycle: cycle, price_cents: priceCents })
+    body: JSON.stringify({ type: 'subscription', plan: planName, cycle: cycle })
   });
   var data = await resp.json();
   if (data.checkout_url) {
@@ -289,9 +289,9 @@ async function subscribe(planName) {
 async function buyCredits(credits, price) {
   var raw = localStorage.getItem('evolvixos_user');
   var user = JSON.parse(raw);
-  var resp = await fetch('https://evolvixos.com/auth/stripe-checkout', {
+  var resp = await fetch('https://evolvixos.com/auth/paddle-checkout', {
     method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'credits', credits: credits, price_cents: price * 100 })
+    body: JSON.stringify({ type: 'credits', credits: credits })
   });
   var data = await resp.json();
   if (data.checkout_url) {
@@ -302,12 +302,12 @@ async function buyCredits(credits, price) {
 }
 
 
-async function openStripePortal() {
+async function openPaddlePortal() {
   var raw = localStorage.getItem('evolvixos_user');
   if (!raw) return;
   var user = JSON.parse(raw);
   try {
-    var resp = await fetch('https://evolvixos.com/auth/stripe-portal', {
+    var resp = await fetch('https://evolvixos.com/auth/paddle-portal', {
       method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
       body: JSON.stringify({})
     });
@@ -1909,6 +1909,21 @@ a, button, .nav-item, .card, .pricing-tier, input, select, textarea {
 .nav-item.active,.nav-item.active span,.nav-item.active a,.nav-item.active svg{color:#007AFF !important}
 .nav-item.active svg{stroke:currentColor}
 </style>
+  <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+  <script>
+    // Initialize Paddle.js with live client-side token
+    Paddle.Initialize({
+      token: 'live_7f2f6d0253fcd0e6defac3eb71d',
+      environment: 'production',
+      pwCustomer: null  // Set after login: { id: 'ctm_...' }
+    });
+    // pwAuth will be called after user session loads
+    function setPaddleCustomer(paddleCustomerId) {
+      if (paddleCustomerId) {
+        Paddle.Update({ pwCustomer: { id: paddleCustomerId } });
+      }
+    }
+  </script>
 </head>
 <body class="bg-white text-gray-900 h-screen overflow-hidden"><div class="bg-mouse-glow"></div>
 <!-- Scroll Progress --><div class="scroll-progress-platform" id="scrollProgressPlat"></div>

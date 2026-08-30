@@ -127,7 +127,7 @@ STRIPE_PRICES = {
 # ── Paddle Billing configuration ──────────────────────────────────────────────
 PADDLE_API_KEY = os.environ.get("PADDLE_API_KEY", "")
 PADDLE_WEBHOOK_SECRET = os.environ.get("PADDLE_WEBHOOK_SECRET", "")
-PADDLE_API_BASE = os.environ.get("PADDLE_API_BASE", "https://sandbox-api.paddle.com")
+PADDLE_API_BASE = os.environ.get("PADDLE_API_BASE", "https://api.paddle.com")
 # Paddle's documented variance tolerance is 5s. Keep NTP synced or raise this.
 PADDLE_WEBHOOK_TOLERANCE = int(os.environ.get("PADDLE_WEBHOOK_TOLERANCE", "5"))
 
@@ -1243,6 +1243,46 @@ class AuthHandler(BaseHTTPRequestHandler):
                 return
             except Exception as e:
                 self._send_json(500, {"error": "Payment setup failed: " + str(e)})
+                return
+
+
+        if path == "/auth/paddle-portal":
+            user_id = is_authorized(self)
+            if not user_id:
+                self._send_json(401, {"error": "Not authenticated"})
+                return
+            try:
+                with sqlite3.connect(DB_PATH) as conn:
+                    c = conn.cursor()
+                    c.execute("SELECT email, paddle_customer_id FROM users WHERE id = ?", (user_id,))
+                    row = c.fetchone()
+                    if not row or not row[1]:
+                        self._send_json(400, {"error": "No Paddle subscription found"})
+                        return
+                    email, paddle_customer_id = row
+
+                # Create customer portal session via Paddle API
+                paddle_api = PADDLE_API_BASE.rstrip('/')
+                req = urllib.request.Request(
+                    f"{paddle_api}/customer-portal-sessions",
+                    data=json.dumps({"customer_id": paddle_customer_id}).encode(),
+                    method="POST",
+                    headers={
+                        "Authorization": f"Bearer {PADDLE_API_KEY}",
+                        "Content-Type": "application/json",
+                    }
+                )
+                with urllib.request.urlopen(req, timeout=30) as r:
+                    session = json.loads(r.read().decode())
+
+                portal_url = session.get("data", {}).get("url", "")
+                self._send_json(200, {"portal_url": portal_url})
+            except urllib.error.HTTPError as e:
+                err_body = e.read().decode()
+                self._send_json(400, {"error": f"Paddle API error: {err_body[:300]}"})
+                return
+            except Exception as e:
+                self._send_json(500, {"error": "Portal session failed: " + str(e)})
                 return
 
         if path == "/auth/paddle-checkout":
