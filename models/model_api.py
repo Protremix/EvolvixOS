@@ -261,6 +261,11 @@ TOOLS = [
     {"type": "function", "function": {"name": "set_persona", "description": "Switch Mr James personality using an MBTI profile (16 types available). Changes response style, communication approach, and behavior patterns.", "parameters": {"type": "object", "properties": {"mbti_type": {"type": "string", "enum": ["INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", "ISTJ", "ISTP", "ESTJ", "ESTP", "ISFJ", "ISFP", "ESFJ", "ESFP"], "description": "MBTI personality type"}, "custom_prompt": {"type": "string", "description": "Optional custom system prompt override"}}, "required": ["mbti_type"]}}},
     {"type": "function", "function": {"name": "tencent_cloud", "description": "Manage Tencent Cloud resources via the official SDK. Supports 10 services: CVM (servers), CDB (databases), VPC (networking), SSL (certificates), DNSPod (DNS), CDN, Billing (costs), CAM (users), Hunyuan (Tencent LLM), and AIArt (image generation). Requires TENCENTCLOUD_SECRET_ID and TENCENTCLOUD_SECRET_KEY.", "parameters": {"type": "object", "properties": {"service": {"type": "string", "enum": ["cvm", "cdb", "vpc", "ssl", "dnspod", "cdn", "billing", "cam", "hunyuan", "aiart"], "description": "Tencent Cloud service name"}, "action": {"type": "string", "description": "Action to perform (e.g., describe_instances, start_instances, chat, text_to_image)"}, "params": {"type": "object", "description": "Parameters for the action"}, "region": {"type": "string", "description": "Tencent Cloud region (default: ap-frankfurt)"}}, "required": ["service", "action"]}}},
     {"type": "function", "function": {"name": "api_auto_route", "description": "Smart API auto-router. Given a task description, searches the 35K+ API directory AND the 85+ AI tools registry to find the best API or tool for the job. Returns ranked matches with URLs, descriptions, and setup instructions. Use when the user needs to accomplish something that an external API could help with.", "parameters": {"type": "object", "properties": {"task": {"type": "string", "description": "Natural language description of what the user wants to accomplish (e.g. 'scrape youtube comments', 'send email notifications', 'analyze sentiment', 'generate QR codes')"}, "prefer_free": {"type": "boolean", "default": True, "description": "Prefer free/open-source APIs over paid ones"}}, "required": ["task"]}}},
+    {"type": "function", "function": {"name": "nvidia_video_generate", "description": "Generate video from text prompt (T2V) or image+text (I2V) using NVIDIA Wan2.2 model. Returns video URL. Async job - returns job ID for status checking.", "parameters": {"type": "object", "properties": {"prompt": {"type": "string", "description": "Text description of the video to generate"}, "image_url": {"type": "string", "description": "Optional image URL for image-to-video mode. If omitted, generates text-to-video."}, "num_frames": {"type": "integer", "default": 81, "description": "Number of frames (81 = ~3.4s at 24fps)"}, "width": {"type": "integer", "default": 1024}, "height": {"type": "integer", "default": 576}}, "required": ["prompt"]}}},
+    {"type": "function", "function": {"name": "nvidia_translate", "description": "Translate text between 37 languages using NVIDIA Riva Translate v2. High-quality neural machine translation.", "parameters": {"type": "object", "properties": {"text": {"type": "string", "description": "Text to translate"}, "source_lang": {"type": "string", "default": "en", "description": "Source language code (en, es, ru, fr, de, zh, ja, etc.)"}, "target_lang": {"type": "string", "default": "es", "description": "Target language code"}}, "required": ["text", "target_lang"]}}},
+    {"type": "function", "function": {"name": "nvidia_tts", "description": "Generate natural speech from text using NVIDIA Magpie TTS Multilingual. Supports 25+ languages with expressive voices.", "parameters": {"type": "object", "properties": {"text": {"type": "string", "description": "Text to convert to speech"}, "language": {"type": "string", "default": "en", "description": "Language code (en, es, ru, fr, de, zh, ja, etc.)"}}, "required": ["text"]}}},
+    {"type": "function", "function": {"name": "nvidia_vision", "description": "Analyze images using NVIDIA Nemotron 3 Nano Omni - omni-modal vision model that understands images, video, speech, and text. Supports OCR, object detection, scene understanding, chart analysis.", "parameters": {"type": "object", "properties": {"image_url": {"type": "string", "description": "URL of the image to analyze"}, "task": {"type": "string", "default": "describe", "enum": ["describe", "ocr", "objects", "scene", "chart", "safety"], "description": "Analysis type"}}, "required": ["image_url"]}}},
+    {"type": "function", "function": {"name": "nvidia_list_models", "description": "List all available NVIDIA NIM models (97 models across 10 categories: reasoning, coding, vision, embedding, safety, translation, creative, image gen, video gen, speech). Shows model IDs, context sizes, and categories.", "parameters": {"type": "object", "properties": {"category": {"type": "string", "default": "all", "enum": ["all", "reasoning_agent", "coding", "multimodal_vision", "embedding", "safety", "translation", "creative", "image_generation", "video_generation", "speech"]}}}}},
 ]
 
 TOOL_NAMES = [t["function"]["name"] for t in TOOLS]
@@ -303,7 +308,7 @@ def load_context(mem_dir=None):
     except Exception:
         uptime = "unknown"
     
-    context_parts.append(f"## Current Context\nTime: {now}\nServer: 2.28.52.223 (evolvixos.com)\nUptime: {uptime}\nPlatform: EvolvixOS v9.0\nModels: 81 across 8 categories\nTools: {len(TOOLS)} available (32 tools: 24 core + 8 API intelligence)")
+    context_parts.append(f"## Current Context\nTime: {now}\nServer: 2.28.52.223 (evolvixos.com)\nUptime: {uptime}\nPlatform: EvolvixOS v9.0\nModels: 81 across 8 categories\nTools: {len(TOOLS)} available (38 tools: 24 core + 8 API + 6 NVIDIA intelligence)")
     
     skills = []
     if os.path.exists(SKILLS_DIR):
@@ -338,7 +343,7 @@ def build_system_prompt(mem_dir=None, user_email=None, user_name=None, uploads_d
     
     # Add tool usage guidance
     parts.append("""## Tool Usage Guide
-You have 32 tools. Use them proactively — don't just talk, DO things.
+You have 38 tools. Use them proactively — don't just talk, DO things.
 
 ### Core Tools (24)
 - **bash** — Your go-to for anything system-related. List files, check services, run scripts, grep logs, etc.
@@ -1875,6 +1880,184 @@ def execute_tool(name, args, mem_dir=None, handler=None, uploads_dir=None):
                 return f"Unknown action: {service}/{action}. Available: " + json.dumps(tc_manager.list_services())
             except Exception as e:
                 return f"Tencent Cloud error: {str(e)}"
+
+        elif name == "nvidia_video_generate":
+            prompt = args.get("prompt", "")
+            image_url = args.get("image_url")
+            num_frames = args.get("num_frames", 81)
+            width = args.get("width", 1024)
+            height = args.get("height", 576)
+            job_id = str(uuid.uuid4())[:8]
+            nvidia_key = os.environ.get("NVIDIA_API_KEY", "")
+            if not nvidia_key:
+                return "NVIDIA API key not configured. Set NVIDIA_API_KEY env var."
+            with JOBS_LOCK:
+                prune_old_jobs()
+                JOBS[job_id] = {"status": "processing", "prompt": prompt, "type": "video", "created": datetime.now().isoformat()}
+            def _gen_video():
+                try:
+                    body_dict = {"prompt": prompt, "seed": 42, "cfg_scale": 7.5, "width": width, "height": height, "num_frames": num_frames, "fps": 24}
+                    if image_url:
+                        body_dict["image_url"] = image_url
+                    body = json.dumps(body_dict).encode()
+                    req = urllib.request.Request("https://ai.api.nvidia.com/v1/genai/wan-ai/wan2.2", data=body, headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {nvidia_key}",
+                        "Accept": "application/json",
+                    })
+                    resp = urllib.request.urlopen(req, timeout=300)
+                    result = json.loads(resp.read())
+                    artifacts = result.get("artifacts", [])
+                    if artifacts:
+                        vid_url = artifacts[0].get("url", "")
+                        with JOBS_LOCK:
+                            JOBS[job_id] = {"status": "done", "url": vid_url, "prompt": prompt, "type": "video", "duration": num_frames / 24}
+                    else:
+                        with JOBS_LOCK:
+                            JOBS[job_id] = {"status": "error", "error": "No video generated", "prompt": prompt}
+                except Exception as e:
+                    with JOBS_LOCK:
+                        JOBS[job_id] = {"status": "error", "error": str(e), "prompt": prompt}
+            threading.Thread(target=_gen_video, daemon=True).start()
+            return f"Video generation started (Wan2.2 {"I2V" if image_url else "T2V"}, {num_frames} frames = ~{num_frames//24}s). Job ID: {job_id}. Check /api/job/{job_id}"
+
+        elif name == "nvidia_translate":
+            text = args.get("text", "")
+            target_lang = args.get("target_lang", "es")
+            source_lang = args.get("source_lang", "en")
+            nvidia_key = os.environ.get("NVIDIA_API_KEY", "")
+            if not nvidia_key:
+                return "NVIDIA API key not configured."
+            try:
+                prompt = f"Translate the following text from {source_lang} to {target_lang}. Provide only the translation:\n\n{text}"
+                body = json.dumps({"model": "nvidia/riva-translate-4b-instruct-v2", "messages": [{"role": "user", "content": prompt}], "max_tokens": 4096, "stream": False}).encode()
+                req = urllib.request.Request("https://integrate.api.nvidia.com/v1/chat/completions", data=body, headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {nvidia_key}",
+                })
+                resp = urllib.request.urlopen(req, timeout=120)
+                result = json.loads(resp.read())
+                translation = result.get("choices", [{}])[0].get("message", {}).get("content", "")
+                return f"Translation ({source_lang} → {target_lang}):\n\n{translation}"
+            except Exception as e:
+                return f"Translation error: {str(e)}"
+
+        elif name == "nvidia_tts":
+            text = args.get("text", "")
+            language = args.get("language", "en")
+            nvidia_key = os.environ.get("NVIDIA_API_KEY", "")
+            if not nvidia_key:
+                return "NVIDIA API key not configured."
+            if not text:
+                return "Error: text required"
+            job_id = str(uuid.uuid4())[:8]
+            with JOBS_LOCK:
+                prune_old_jobs()
+                JOBS[job_id] = {"status": "processing", "text": text[:100], "type": "tts", "created": datetime.now().isoformat()}
+            def _gen_tts():
+                try:
+                    body = json.dumps({"text": text, "language": language}).encode()
+                    req = urllib.request.Request("https://ai.api.nvidia.com/v1/genai/nvidia/magpie-tts-multilingual", data=body, headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Bearer {nvidia_key}",
+                    })
+                    resp = urllib.request.urlopen(req, timeout=120)
+                    result = json.loads(resp.read())
+                    audio_url = result.get("audio_url", result.get("url", ""))
+                    save_path = f"/opt/evolvixos/generated_audio/{job_id}.wav"
+                    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+                    if audio_url:
+                        audio_req = urllib.request.Request(audio_url, headers={"Authorization": f"Bearer {nvidia_key}"})
+                        with urllib.request.urlopen(audio_req, timeout=60) as audio_resp:
+                            with open(save_path, "wb") as f:
+                                f.write(audio_resp.read())
+                    with JOBS_LOCK:
+                        JOBS[job_id] = {"status": "done", "url": f"/generated_audio/{job_id}.wav", "text": text[:100]}
+                except Exception as e:
+                    with JOBS_LOCK:
+                        JOBS[job_id] = {"status": "error", "error": str(e)}
+            threading.Thread(target=_gen_tts, daemon=True).start()
+            return f"TTS generation started (Magpie TTS, language={language}). Job ID: {job_id}. Check /api/job/{job_id}"
+
+        elif name == "nvidia_vision":
+            image_url = args.get("image_url", "")
+            task = args.get("task", "describe")
+            nvidia_key = os.environ.get("NVIDIA_API_KEY", "")
+            if not nvidia_key:
+                return "NVIDIA API key not configured."
+            if not image_url:
+                return "Error: image_url required"
+            task_prompts = {
+                "describe": "Describe this image in detail.",
+                "ocr": "Extract all text visible in this image. Return only the text, formatted cleanly.",
+                "objects": "List all objects detected in this image with their approximate locations.",
+                "scene": "Analyze the scene in this image. What is happening? What is the setting?",
+                "chart": "Analyze any charts, graphs, or data visualizations in this image. Extract the data.",
+                "safety": "Analyze this image for any unsafe, inappropriate, or harmful content.",
+            }
+            prompt = task_prompts.get(task, task_prompts["describe"])
+            try:
+                body = json.dumps({
+                    "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+                    "messages": [{"role": "user", "content": [{"type": "image_url", "image_url": {"url": image_url}}, {"type": "text", "text": prompt}]}],
+                    "max_tokens": 2048,
+                    "stream": False,
+                }).encode()
+                req = urllib.request.Request("https://integrate.api.nvidia.com/v1/chat/completions", data=body, headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {nvidia_key}",
+                })
+                resp = urllib.request.urlopen(req, timeout=120)
+                result = json.loads(resp.read())
+                analysis = result.get("choices", [{}])[0].get("message", {}).get("content", "")
+                return f"[Nemotron Omni Vision — {task.upper()}]\n\n{analysis}"
+            except Exception as e:
+                return f"Vision analysis error: {str(e)}"
+
+        elif name == "nvidia_list_models":
+            category = args.get("category", "all")
+            models = {
+                "reasoning_agent": [
+                    "nvidia/nemotron-3-ultra-550b-a55b (550B MoE, 55B active, 1M ctx)",
+                    "nvidia/nemotron-3-super-120b-a12b (120B MoE, 12B active, 256K ctx)",
+                    "nvidia/nemotron-3.5-lightning-30b-a3b (30B MoE, 3B active, 256K ctx)",
+                ],
+                "coding": [
+                    "deepseek-ai/deepseek-v4-pro-0813 (1M ctx, MoE)",
+                    "deepseek-ai/deepseek-v4-flash-0731 (284B MoE, 13B active)",
+                    "poolside/laguna-xs-2.1 (33B MoE, agentic coding)",
+                ],
+                "multimodal_vision": [
+                    "meta/llama-3.2-90b-vision-instruct (128K ctx)",
+                    "meta/llama-3.2-11b-vision-instruct (128K ctx, fast)",
+                    "meta/muse-glimmer-30b (256K, multimodal reasoning)",
+                    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning (omni: image+video+speech+text)",
+                    "moonshotai/kimi-k3 (2.8T multimodal, 1M ctx)",
+                    "minimaxai/minimax-m3 (multimodal vision-language)",
+                ],
+                "embedding": ["nvidia/nemotron-3-embed-1b (2048 dims)"],
+                "safety": ["nvidia/nemotron-3.5-content-safety (multilingual)"],
+                "translation": ["nvidia/riva-translate-4b-instruct-v2 (37 languages)"],
+                "creative": ["writer/palmyra-creative-122b (creative writing)"],
+                "image_generation": ["black-forest-labs/flux.1-dev (up to 2048x2048)"],
+                "video_generation": ["wan-ai/wan2.2 (T2V + I2V, 1024x576)"],
+                "speech": [
+                    "nvidia/magpie-tts-multilingual (25+ languages)",
+                    "nvidia/magpie-tts-zeroshot (voice cloning)",
+                    "nvidia/nemotron-voicechat (voice-to-voice)",
+                ],
+            }
+            if category == "all":
+                result = "NVIDIA NIM Models (97 total across 10 categories):\n\n"
+                for cat, items in models.items():
+                    result += f"  {cat.upper()} ({len(items)}):\n"
+                    for m in items:
+                        result += f"    • {m}\n"
+                    result += "\n"
+                return result
+            else:
+                items = models.get(category, [])
+                return f"{category.upper()} models ({len(items)}):\n" + "\n".join(f"  • {m}" for m in items)
 
         else:
             return f"Unknown tool: {name}"

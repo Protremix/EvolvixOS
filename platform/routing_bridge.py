@@ -48,15 +48,19 @@ _router = None
 BUILDER_MODELS = [
     "qwen/qwen3.8-27b",           # 80.7% tool accuracy, $0.076/task
     "google/gemini-3.7-flash",     # 80.6%, $0.077/task
+    "moonshotai/kimi-k3",          # 2.8T multimodal, 1M ctx (NVIDIA free)
+    "meta/muse-glimmer-30b",       # multimodal reasoning + tool-calling (NVIDIA free)
     "stepfun/step-3.7-flash",      # 77.3%, $0.020/task
     "z-ai/glm-5",                  # 74.8%, $0.036/task (legacy)
 ]
 CODE_MODELS = [
-    "deepseek/deepseek-v4-flash-0731",  # 76.3%, $0.010/task
-    "nvidia/nemotron-3-ultra",           # 76.9%, $0.10/task
-    "openai/gpt-oss-120b",               # 63.0%, $0.012/task (legacy)
+    "deepseek-ai/deepseek-v4-flash-0731", # 76.3%, $0.010/task (NVIDIA free)
+    "deepseek-ai/deepseek-v4-pro-0813",   # 1M ctx, MoE (NVIDIA free)
+    "poolside/laguna-xs-2.1",             # 33B MoE, agentic coding (NVIDIA free)
+    "nvidia/nemotron-3-ultra-550b-a55b",  # 76.9%, 1M ctx (NVIDIA free)
 ]
 CHAT_MODELS = [
+    "nvidia/nemotron-3.5-lightning-30b-a3b", # 30B MoE, 3B active, fast (NVIDIA free)
     "google/gemma-4-31b",               # 76.5%, $0.016/task
     "deepseek/deepseek-v4-flash-0423",   # 75.2%, $0.009/task
     "openai/gpt-oss-20b",               # 51.5%, $0.021/task (legacy, BAD)
