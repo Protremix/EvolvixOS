@@ -259,8 +259,10 @@ async def create_entity(entity: EntityCreate, db=Depends(get_db), request: Reque
         result = await EntityManager.create_entity(db, entity.name, entity.schema, created_by=user.get("user_id") if user else None, app_id=entity.app_id)
         return result
     except ValueError as e:
+        await db.rollback()
         raise HTTPException(400, str(e))
     except Exception as e:
+        await db.rollback()
         raise HTTPException(500, str(e))
 
 @app.get("/api/entities/{name}")
@@ -1069,6 +1071,118 @@ async def exec_plugin(plugin_id: str, params: dict = Body(...), db=Depends(get_d
     return result
 
 # ─── Chat / AI Builder ───
+
+# === TOOLS API ===
+class BrowserCmd(BaseModel):
+    action: str = "navigate"
+    url: str = ""
+
+@app.post("/api/tools/browser")
+async def browser_tool(cmd: BrowserCmd, request: Request):
+    user = get_user_from_token(request)
+    if not user: raise HTTPException(401, "Auth required")
+    import urllib.request, re as _re
+    if cmd.action == "extract":
+        req = urllib.request.Request(cmd.url, headers={"User-Agent": "EvolvixOS/1.0"})
+        resp = urllib.request.urlopen(req, timeout=15)
+        html = resp.read().decode("utf-8", errors="replace")
+        title_m = _re.search(r"<title>(.*?)</title>", html, _re.IGNORECASE | _re.DOTALL)
+        title = title_m.group(1).strip() if title_m else ""
+        text = _re.sub(r"<script[^>]*>.*?</script>", "", html, flags=_re.DOTALL)
+        text = _re.sub(r"<style[^>]*>.*?</style>", "", text, flags=_re.DOTALL)
+        text = _re.sub(r"<[^>]+>", " ", text)
+        text = _re.sub(r"\s+", " ", text).strip()
+        return {"status": "ok", "url": cmd.url, "title": title, "text": text[:5000]}
+    req = urllib.request.Request(cmd.url, headers={"User-Agent": "EvolvixOS/1.0"})
+    resp = urllib.request.urlopen(req, timeout=15)
+    html = resp.read().decode("utf-8", errors="replace")[:10000]
+    return {"status": "ok", "url": cmd.url, "preview": html[:500]}
+
+class CodeRunReq(BaseModel):
+    code: str
+    language: str = "python"
+
+@app.post("/api/tools/run")
+async def run_code(req: CodeRunReq, request: Request):
+    import subprocess, tempfile, os
+    user = get_user_from_token(request)
+    if not user: raise HTTPException(401, "Auth required")
+    blocked = ["rm -rf /", "shutdown", "reboot"]
+    for b in blocked:
+        if b in req.code: return {"error": "Blocked: " + b}
+    suffix = ".sh" if req.language == "bash" else ".py"
+    cmd_list = ["bash"] if req.language == "bash" else ["python3"]
+    with tempfile.NamedTemporaryFile(mode="w", suffix=suffix, delete=False) as f:
+        f.write(req.code); f.flush(); tmpfile = f.name
+    try:
+        r = subprocess.run(cmd_list + [tmpfile], capture_output=True, text=True, timeout=30,
+            env={"PATH": "/usr/bin:/usr/local/bin", "HOME": "/tmp", "PYTHONPATH": "/opt/evolvixos/platform"})
+        return {"stdout": r.stdout[:5000], "stderr": r.stderr[:2000], "exit_code": r.returncode}
+    except subprocess.TimeoutExpired:
+        return {"error": "Timed out (30s)"}
+    finally:
+        os.unlink(tmpfile)
+
+class GrepReq(BaseModel):
+    pattern: str
+    path: str = "/opt/evolvixos"
+    include: str = "*.py"
+
+@app.post("/api/tools/grep")
+async def file_grep(req: GrepReq, request: Request):
+    import subprocess
+    user = get_user_from_token(request)
+    if not user: raise HTTPException(401, "Auth required")
+    safe = ["/opt/evolvixos", "/tmp", "/var/log/evolvixos"]
+    if not any(req.path.startswith(p) for p in safe): return {"error": "Path not allowed"}
+    r = subprocess.run(["grep", "-rn", "--include=" + req.include, req.pattern, req.path],
+        capture_output=True, text=True, timeout=15)
+    lines = r.stdout.split("\n")[:100] if r.stdout else []
+    return {"matches": lines, "count": len(lines)}
+
+class FileReq(BaseModel):
+    action: str
+    path: str
+    content: str = ""
+
+@app.post("/api/tools/files")
+async def file_ops(req: FileReq, request: Request):
+    import os
+    user = get_user_from_token(request)
+    if not user: raise HTTPException(401, "Auth required")
+    safe = ["/opt/evolvixos", "/tmp", "/var/log/evolvixos"]
+    if not any(req.path.startswith(p) for p in safe): return {"error": "Path not allowed"}
+    if req.action == "read":
+        with open(req.path) as f: return {"path": req.path, "content": f.read()[:10000], "size": os.path.getsize(req.path)}
+    elif req.action == "write":
+        os.makedirs(os.path.dirname(req.path), exist_ok=True)
+        with open(req.path, "w") as f: f.write(req.content)
+        return {"path": req.path, "written": True}
+    elif req.action == "list":
+        entries = []
+        for e in os.listdir(req.path):
+            full = os.path.join(req.path, e)
+            entries.append({"name": e, "type": "dir" if os.path.isdir(full) else "file", "size": os.path.getsize(full) if os.path.isfile(full) else 0})
+        return {"path": req.path, "entries": entries}
+    elif req.action == "delete":
+        if os.path.isfile(req.path): os.unlink(req.path); return {"deleted": req.path}
+        return {"error": "Not a file"}
+    return {"error": "Unknown action"}
+
+class SubAgentReq(BaseModel):
+    task: str
+    context: str = ""
+
+@app.post("/api/tools/subagent")
+async def delegate_subagent(req: SubAgentReq, request: Request):
+    user = get_user_from_token(request)
+    if not user: raise HTTPException(401, "Auth required")
+    sys_prompt = "You are an EvolvixOS sub-agent. Context: " + req.context + ". Task: " + req.task
+    msgs = [{"role": "system", "content": sys_prompt}, {"role": "user", "content": req.task}]
+    result = await unified_chat(msgs, model="auto", temperature=0.3, max_tokens=2000, prefer_cloud=True)
+    return {"result": result.get("content", ""), "model": result.get("model", "auto"), "provider": result.get("provider", "auto")}
+
+
 @app.post("/api/chat")
 async def chat_build(msg: ChatMessage, request: Request, db=Depends(get_db)):
     """
@@ -1114,7 +1228,7 @@ async def chat_build(msg: ChatMessage, request: Request, db=Depends(get_db)):
             if memory_items:
                 memory_text = "\n\nUSER MEMORY — Things to remember about this user and project:\n" + "\n".join(f"- {m}" for m in memory_items)
     except Exception:
-        pass
+        await db.rollback()
 
     # System prompt that teaches the LLM about platform capabilities
     system_prompt = f"""You are EvolvixOS Platform Builder. You help users build apps by creating entities, backend functions, and workflows via natural language.
@@ -1301,8 +1415,10 @@ Always respond with a JSON action object. If the user just wants to chat, respon
             return {"action": "unknown", "message": "Got that — but I'm not sure what to build yet. Could you tell me a bit more?"}
     except ValueError as e:
         # Known/expected validation errors — show the message cleanly, never raw JSON
+        await db.rollback()
         return {"action": action_type, "error": str(e), "message": str(e)}
     except Exception as e:
+        await db.rollback()
         return {"action": action_type, "error": str(e), "message": "Something went wrong on my end while doing that — mind trying again?"}
 
 

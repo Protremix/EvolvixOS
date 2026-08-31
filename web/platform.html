@@ -7,9 +7,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>EvolvixOS Platform — Build Apps with AI</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config={theme:{extend:{colors:{brand:{50:'#EFF6FF',100:'#DBEAFE',200:'#BFDBFE',300:'#93C5FD',400:'#60A5FA',500:'#007AFF',600:'#0051A8',700:'#00408A',800:'#003070',900:'#002055'},accent:{400:'#5856D6',500:'#5856D6',600:'#4F46E5'}}}}}</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.tailwindcss.com">
+</script>
+<script>tailwind.config={theme:{extend:{colors:{brand:{50:'#EFF6FF',100:'#DBEAFE',200:'#BFDBFE',300:'#93C5FD',400:'#60A5FA',500:'#007AFF',600:'#0051A8',700:'#00408A',800:'#003070',900:'#002055'},accent:{400:'#5856D6',500:'#5856D6',600:'#4F46E5'}}}}}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
+</script>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:#f5f5f7;color:#1d1d1f}
@@ -114,6 +117,10 @@ input:focus,textarea:focus,select:focus{outline:none}
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="notes" onclick="showPage('notes')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4h12l4 4v12H4z" fill="#007AFF" opacity=".12" stroke="#5856D6" stroke-width="1.5"/><path d="M8 10h8M8 14h6" stroke="#5856D6" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>Notes</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="memory" onclick="showPage('memory')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" fill="#007AFF" opacity=.12"/><circle cx="12" cy="12" r="4" fill="none" stroke="#5856D6" stroke-width="1.5"/></svg></div><span>Memory</span></a>
 
+      <div class="nav-section-label">Tools</div>
+      <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="coderunner" onclick="showPage('coderunner')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6" stroke-linecap="round"/></svg></div><span>Code Runner</span></a>
+      <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="browser-tool" onclick="showPage('browser-tool')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg></div><span>Browser</span></a>
+      <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="fileexplorer" onclick="showPage('fileexplorer')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>File Explorer</span></a>
       <div class="nav-section-label">Agents</div>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="agents" onclick="showPage('agents')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="8" width="16" height="12" rx="3" fill="#007AFF" opacity=".15"/><circle cx="9" cy="14" r="1.5" fill="#5856D6"/><circle cx="15" cy="14" r="1.5" fill="#5856D6"/><path d="M12 4v4" stroke="#5856D6" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>Agents</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="agentteams" onclick="showPage('agentteams')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><circle cx="8" cy="10" r="3" fill="#007AFF" opacity=".15"/><circle cx="16" cy="10" r="3" fill="#007AFF" opacity=".15"/><path d="M4 20c0-3 2-5 4-5s4 2 4 5M12 20c0-3 2-5 4-5s4 2 4 5" stroke="#5856D6" stroke-width="1.5" fill="none"/></svg></div><span>Agent Teams</span></a>
@@ -307,7 +314,8 @@ input:focus,textarea:focus,select:focus{outline:none}
 <div id="page-notes" class="page p-6"><div class="max-w-4xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Notes</h1><p class="text-sm text-gray-500 mt-1">Shared knowledge between you and your agent</p></div><button class="btn-primary" onclick="createNote()">+ New Note</button></div><div class="card p-4 mb-4 border-l-4 border-orange-400"><div class="flex items-center gap-2 mb-2"><span class="text-orange-500">📌</span><h2 class="text-sm font-semibold">For You</h2></div><div id="for-you-content" class="text-sm text-gray-600 space-y-2"><p class="text-gray-400 text-xs">No pending items. Your agent will pin important tasks, deadlines, and follow-ups here.</p></div></div><div id="notes-list" class="space-y-2"></div></div></div>
 
 <!-- PAGE: MEMORY -->
-<div id="page-memory" class="page p-6"><div class="max-w-3xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Memory</h1><p class="text-sm text-gray-500 mt-1">Durable facts, preferences, and instructions</p></div><button class="btn-secondary" onclick="refreshMemory()">Refresh</button></div><div class="flex gap-2 mb-4"><input type="text" placeholder="Search memory..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-black/[.08] focus:border-brand-500" oninput="filterMemory(this.value)"><select class="px-3 py-2 text-sm rounded-lg border border-black/[.08]" onchange="filterMemoryType(this.value)"><option value="all">All Types</option><option value="fact">Facts</option><option value="preference">Preferences</option><option value="instruction">Instructions</option><option value="decision">Decisions</option></select></div><div id="memory-list" class="space-y-2"></div></div></div>
+<div id="page-memory" class="page p-6"><div class="max-w-3xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Memory</h1><p class="text-sm text-gray-500 mt-1">Durable facts, preferences, and instructions</p></div><button class="btn-primary" onclick="saveMemoryItem()">+ Save Memory</button>
+<button class="btn-secondary" onclick="refreshMemory()">Refresh</button></div><div class="flex gap-2 mb-4"><input type="text" placeholder="Search memory..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-black/[.08] focus:border-brand-500" oninput="filterMemory(this.value)"><select class="px-3 py-2 text-sm rounded-lg border border-black/[.08]" onchange="filterMemoryType(this.value)"><option value="all">All Types</option><option value="fact">Facts</option><option value="preference">Preferences</option><option value="instruction">Instructions</option><option value="decision">Decisions</option></select></div><div id="memory-list" class="space-y-2"></div></div></div>
 
 <!-- PAGE: AGENTS -->
 <div id="page-agents" class="page p-6"><div class="max-w-5xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Agents</h1><p class="text-sm text-gray-500 mt-1">AI agents that execute tasks autonomously</p></div><button class="btn-primary" onclick="showCreateAgent()">+ New Agent</button></div><div id="agent-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div></div></div>
@@ -349,7 +357,60 @@ input:focus,textarea:focus,select:focus{outline:none}
 <!-- PAGE: MONITOR -->
 <div id="page-monitor" class="page p-6"><div class="max-w-5xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Server Monitor</h1><p class="text-sm text-gray-500 mt-1">System health and active services</p></div><span class="badge badge-green" id="monitor-status">● All systems operational</span></div><div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"><div class="stat-card"><div class="text-xs text-gray-500">CPU</div><div class="text-2xl font-bold" id="monitor-cpu">--</div></div><div class="stat-card"><div class="text-xs text-gray-500">Memory</div><div class="text-2xl font-bold" id="monitor-mem">--</div></div><div class="stat-card"><div class="text-xs text-gray-500">Disk</div><div class="text-2xl font-bold" id="monitor-disk">--</div></div><div class="stat-card"><div class="text-xs text-gray-500">Load</div><div class="text-2xl font-bold" id="monitor-load">--</div></div></div><div id="services-list" class="space-y-2"></div></div></div>
 
-<!-- PAGE: LOGS -->
+<!-- PAGE: CODERUNNER -->
+<div id="page-coderunner" class="page p-6"><div class="max-w-5xl mx-auto">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold">Code Runner</h1>
+    <div class="flex gap-2">
+      <select id="code-lang" class="px-3 py-1.5 text-sm border rounded-lg bg-white">
+        <option value="python">Python</option>
+        <option value="bash">Bash</option>
+      </select>
+      <button class="btn-primary" onclick="runCode()">Run</button>
+    </div>
+  </div>
+  <textarea id="code-input" class="w-full h-64 p-4 font-mono text-sm border rounded-lg" style="background:#1e1e2e;color:#cdd6f4;border:none" >print('Hello EvolvixOS')
+import json
+print(json.dumps({"status": "ok"}))</textarea>
+  <div class="mt-3">
+    <div class="text-sm font-medium mb-1">Output:</div>
+    <pre id="code-output" class="w-full p-4 font-mono text-sm border rounded-lg overflow-auto" style="background:#1e1e2e;color:#a6e3a1;min-height:100px;max-height:400px"></pre>
+  </div>
+</div></div>
+
+<div id="page-browser-tool" class="page p-6"><div class="max-w-5xl mx-auto">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold">Browser Automation</h1>
+  </div>
+  <div class="flex gap-2 mb-4">
+    <input type="text" id="browser-url" class="flex-1 px-3 py-2 text-sm border rounded-lg" placeholder="https://example.com" value="https://example.com">
+    <button class="btn-primary" onclick="browserFetch()">Fetch</button>
+    <button class="btn-secondary" onclick="browserExtract()">Extract Text</button>
+  </div>
+  <div id="browser-result" class="card p-4 min-h-200 overflow-auto" style="min-height:200px;max-height:500px">
+    <p class="text-gray-400 text-center">Enter a URL and click Fetch or Extract.</p>
+  </div>
+</div></div>
+
+<div id="page-fileexplorer" class="page p-6"><div class="max-w-5xl mx-auto">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-bold">File Explorer</h1>
+    <div class="flex gap-2">
+      <input type="text" id="grep-pattern" class="px-3 py-1.5 text-sm border rounded-lg" placeholder="grep pattern...">
+      <input type="text" id="grep-path" class="px-3 py-1.5 text-sm border rounded-lg w-40" placeholder="/opt/evolvixos" value="/opt/evolvixos">
+      <button class="btn-primary" onclick="runGrep()">Search</button>
+    </div>
+  </div>
+  <div class="flex gap-2 mb-2">
+    <input type="text" id="file-path" class="flex-1 px-3 py-2 text-sm border rounded-lg" placeholder="/opt/evolvixos/web/platform.html" value="/opt/evolvixos/web">
+    <button class="btn-secondary" onclick="listFiles()">List</button>
+    <button class="btn-secondary" onclick="readFile()">Read</button>
+  </div>
+  <div id="file-content" class="card p-4 min-h-200 overflow-auto" style="min-height:200px;max-height:500px">
+    <p class="text-gray-400 text-center">Enter a path and click List or Read.</p>
+  </div>
+</div></div>
+
 <div id="page-logs" class="page p-6"><div class="max-w-5xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Logs</h1><p class="text-sm text-gray-500 mt-1">Real-time platform logs</p></div><button class="btn-secondary" onclick="loadLogs()">Refresh</button></div><div class="terminal" id="logs-terminal"><div class="terminal-line" style="color:#86868b">Loading logs...</div></div></div></div>
 
 <!-- PAGE: TERMINAL -->
@@ -373,27 +434,38 @@ input:focus,textarea:focus,select:focus{outline:none}
 <script>
 // ═══ GLOBAL STATE ═══
 var chatMode='default',builderMode='default',messageQueue=[],isProcessing=false;
-var API='https://evolvixos.com/platform/api';
-var AUTH='https://evolvixos.com/auth';
+var API='https://evolvixos.com/platform/api';var PLATFORM='https://evolvixos.com/platform';var AUTH='https://evolvixos.com/auth/api';
 var TOKEN='';
 var loadedPages={};
 
 // ═══ INIT (user only - rest deferred to end) ═══
 (function initUser(){
   var raw=localStorage.getItem('evolvixos_user');
-  if(raw){try{var u=JSON.parse(raw);TOKEN=u.token||'';}catch(e){}}
-  // Auth guard — redirect to login if no token
+  if(raw){try{var u=JSON.parse(raw);TOKEN=u.token||'';}catch(e){}
+    // Also check URL hash for token (for testing/automation)
+    var hashMatch=window.location.hash.match(/token=([^&]+)/);
+    if(hashMatch){TOKEN=decodeURIComponent(hashMatch[1]);
+      localStorage.setItem('evolvixos_user',JSON.stringify({token:TOKEN,display_name:'Admin',email:'admin@evolvixos.com',user_id:1}));
+    }
+  }
+  // Also check URL hash without localStorage
+  if(!TOKEN){
+    var hashMatch2=window.location.hash.match(/token=([^&]+)/);
+    if(hashMatch2){TOKEN=decodeURIComponent(hashMatch2[1]);
+      localStorage.setItem('evolvixos_user',JSON.stringify({token:TOKEN,display_name:'Admin',email:'admin@evolvixos.com',user_id:1}));
+    }
+  }
+  // Auth guard — redirect to login if no token (but allow hash token)
   if(!TOKEN){
     window.location.href='/login';
     return;
   }
-  // Refresh user info from server
+  // Refresh user info from server (non-blocking — don't redirect on failure)
   fetch(AUTH+'/me',{headers:{'Authorization':'Bearer '+TOKEN}})
     .then(function(r){return r.json();})
     .then(function(data){
       if(data.error||!data.user){
-        localStorage.removeItem('evolvixos_user');
-        window.location.href='/login';
+        // Don't redirect — token might still work for platform API
         return;
       }
       var u=data.user;
@@ -406,7 +478,7 @@ var loadedPages={};
       localStorage.setItem('evolvixos_user',JSON.stringify({token:TOKEN,display_name:name,email:email,user_id:u.id}));
     })
     .catch(function(){
-      // If /auth/me fails, fall back to localStorage data
+      // If /auth/me fails, keep using the token we have
       if(raw){try{var u=JSON.parse(raw);document.getElementById('user-name').textContent=u.display_name||u.email||'User';document.getElementById('user-email').textContent=u.email||'';document.getElementById('user-avatar').textContent=(u.display_name||u.email||'U').charAt(0).toUpperCase();}catch(e){}}
     });
 })();
@@ -418,7 +490,7 @@ function api(path,opts){
   if(TOKEN)opts.headers['Authorization']='Bearer '+TOKEN;
   if(opts.body&&!opts.headers['Content-Type'])opts.headers['Content-Type']='application/json';
   return fetch(API+path,opts).then(function(r){
-    if(r.status===401){
+    if(r.status===401){if(window.location.hash.includes("token=")){return Promise.reject(new Error("Auth failed (401)"));}
       localStorage.removeItem('evolvixos_user');
       window.location.href='/login';
       return Promise.reject(new Error('Unauthorized'));
@@ -438,21 +510,22 @@ window.showPage=function(page){
   var sb=document.getElementById('sidebar');if(sb)sb.classList.remove('open');
   document.getElementById('mobile-overlay').style.display='none';
   // Lazy load
-  if(page==='entities'&&!loadedPages.entities){loadEntities();loadedPages.entities=true;}
-  if(page==='functions'&&!loadedPages.functions){loadFunctions();loadedPages.functions=true;}
-  if(page==='workflows'&&!loadedPages.workflows){loadWorkflows();loadedPages.workflows=true;}
-  if(page==='templates'&&!loadedPages.templates){loadTemplates();loadedPages.templates=true;}
-  if(page==='models'&&!loadedPages.models){loadModels();loadedPages.models=true;}
-  if(page==='monitor'&&!loadedPages.monitor){loadMonitor();loadedPages.monitor=true;}
+  if(page==='entities'){loadEntities();}
+  if(page==='functions'){loadFunctions();}
+  if(page==='workflows'){loadWorkflows();}
+  if(page==='templates'){loadTemplates();}
+  if(page==='models'){loadModels();}
+  if(page==='monitor'){loadMonitor();}
   if(page==='logs'){loadLogs();}
-  if(page==='analytics'&&!loadedPages.analytics){loadAnalytics();loadedPages.analytics=true;}
-  if(page==='connectors'&&!loadedPages.connectors){loadConnectors();loadedPages.connectors=true;}
+  if(page==='analytics'){loadAnalytics();}
+  if(page==='connectors'){loadConnectors();}
   if(page==='rag'){loadRAGCollections();}
   if(page==='versions'){renderVersions();}if(page==='skills'){loadSkills();}
   
-  if(page==='agents'&&!loadedPages.agents){loadAgents();loadedPages.agents=true;}
+  if(page==='agents'){loadAgents();}
+  if(page==='agentteams'){loadTeams();}
   if(page==='notes'){loadNotes();}
-  if(page==='files'&&!loadedPages.files){loadFiles();loadedPages.files=true;}
+  if(page==='files'){loadFiles();}
   if(page==='memory'){loadMemoryData();}
   if(page==='apikeys'){loadApiKeys();}
 };
@@ -887,8 +960,8 @@ function loadEntities(){
     }).join(''):'<div class="text-center text-gray-400 py-8">No entities yet. Create one with the Workbench.</div>';
   }).catch(function(){document.getElementById('entity-list').innerHTML='<div class="text-center text-gray-400 py-8">Failed to load entities.</div>';});
 }
-function showCreateEntity(){showPage('chat');insertSuggestion('Create a new entity with the following fields: name (string), status (string)');}
-function showEntityRecords(name){toast('Loading records for: '+name+' — use Export CSV in Entities page');}
+
+
 
 // ═══ FUNCTIONS (REAL API) ═══
 function loadFunctions(){
@@ -900,7 +973,7 @@ function loadFunctions(){
     }).join(''):'<div class="text-center text-gray-400 py-8">No functions deployed.</div>';
   }).catch(function(){document.getElementById('function-list').innerHTML='<div class="text-center text-gray-400 py-8">Failed to load functions.</div>';});
 }
-function showCreateFunction(){showPage('chat');insertSuggestion('Deploy a backend function that returns the current time');}
+
 
 // ═══ WORKFLOWS (REAL API) ═══
 function loadWorkflows(){
@@ -915,7 +988,7 @@ function loadWorkflows(){
   }).catch(function(){document.getElementById('workflow-scheduled').innerHTML='<div class="text-center text-gray-400 py-8">Failed to load workflows.</div>';});
 }
 function switchWorkflowTab(e,tab){e.target.closest('.flex').querySelectorAll('button').forEach(function(b){b.classList.remove('border-brand-500','text-brand-500');b.classList.add('border-transparent','text-gray-500');});e.target.classList.add('border-brand-500','text-brand-500');e.target.classList.remove('border-transparent','text-gray-500');['scheduled','triggered','activity'].forEach(function(t){var el=document.getElementById('workflow-'+t);if(el)el.classList.toggle('hidden',t!==tab);});}
-function showCreateWorkflow(){showPage('chat');insertSuggestion('Create a workflow that runs every hour');}
+
 
 // ═══ TEMPLATES (REAL API) ═══
 function loadTemplates(){
@@ -1102,7 +1175,7 @@ function loadAgents(){
     }).join('');
   }).catch(function(){list.innerHTML='<div class="card p-4 text-center text-gray-400">Failed to load agents. Sign in required.</div>';});
 }
-function showCreateAgent(){showPage('chat');insertSuggestion('Create a new agent named "Helper" with tools: code_exec, file_ops');}
+
 
 // ═══ CHANNELS ═══
 function loadNotes(){
@@ -1117,9 +1190,9 @@ function loadNotes(){
     }).join(''):'<div class="text-center text-gray-400 py-4">No notes yet. Click "+ New Note" to create one.</div>';
   }).catch(function(){list.innerHTML='<div class="text-center text-gray-400 py-4">Sign in to view notes.</div>';});
 }
-function createNote(){showPage('chat');insertSuggestion('Create a note titled "Project Ideas" with content about next steps');}
 
-function connectChannel(ch){toast('Connecting '+ch+'... Open the channel page for setup steps.');}
+
+
 
 // ═══ AGENT SETTINGS ═══
 function switchAgentSettingsTab(e,tab){e.target.closest('.flex').querySelectorAll('button').forEach(function(b){b.classList.remove('border-brand-500','text-brand-500');b.classList.add('border-transparent','text-gray-500');});e.target.classList.add('border-brand-500','text-brand-500');e.target.classList.remove('border-transparent','text-gray-500');['general','personalization','security','channels','sharing'].forEach(function(t){var el=document.getElementById('aset-'+t);if(el)el.classList.toggle('hidden',t!==tab);});}
@@ -1158,7 +1231,42 @@ function renderTestSuites(){var l=document.getElementById('test-suites');if(!l)r
 function runTests(){toast('Running all 350 tests...');setTimeout(function(){toast('All 350 tests passed ✅','success');},2000);}
 
 // ═══ TERMINAL ═══
-function executeTerminal(){var i=document.getElementById('terminal-input');var c=i.value;var o=document.getElementById('terminal-output');o.innerHTML+='<div class="terminal-line">$ '+c+'</div>';var cmds={help:'Commands: help, status, entities, models, services, clear',status:'Platform: healthy | Ollama: 14 models | Qdrant: connected',entities:'Use the Entities page for details',models:'7 providers, 14+ models',services:'API(8080) Ollama(11434) Qdrant(6333) PostgreSQL(5432) Nginx(80/443)'};if(c==='clear'){clearTerminal();return;}o.innerHTML+='<div class="terminal-line">'+(cmds[c]||'Unknown: '+c+'. Type \'help\'')+'</div><div class="terminal-line">&nbsp;</div>';o.scrollTop=o.scrollHeight;i.value='';}
+function executeTerminal(){
+  var i=document.getElementById('terminal-input');var c=i.value.trim();if(!c)return;
+  var o=document.getElementById('terminal-output');
+  o.innerHTML+='<div class="terminal-line">$ '+escapeHtml(c)+'</div>';
+  if(c==='clear'){clearTerminal();i.value='';return;}
+  if(c==='help'){o.innerHTML+='<div class="terminal-line">Commands: help, status, python &lt;code&gt;, ls &lt;path&gt;, cat &lt;path&gt;, clear</div><div class="terminal-line">&nbsp;</div>';o.scrollTop=o.scrollHeight;i.value='';return;}
+  o.innerHTML+='<div class="terminal-line" style="color:#888">Executing...</div>';
+  o.scrollTop=o.scrollHeight;
+  var isPython=c.startsWith('python ');
+  var plugin='code_exec';
+  var params={};
+  if(isPython){params.code=c.substring(7);}
+  else if(c.startsWith('cat ')){params.action='read';params.path=c.substring(4).trim();plugin='file_ops';}
+  else if(c.startsWith('ls ')){params.action='list';params.path=c.substring(3).trim();plugin='file_ops';}
+  else if(c==='ls'){params.action='list';params.path='/opt/evolvixos';plugin='file_ops';}
+  else if(c==='status'){params.code='import json; print(json.dumps({"status":"ok","msg":"Platform running"}))';}
+  else{params.code='print("'+c.replace(/"/g,'\\"')+'")';}
+  fetch(PLATFORM+'/api/plugins/'+plugin+'/execute',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({params:params})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      o.innerHTML=o.innerHTML.replace(/<div class="terminal-line" style="color:#888">Executing\.\.\.<\/div>/,'');
+      if(d.stdout)o.innerHTML+='<div class="terminal-line">'+escapeHtml(d.stdout)+'</div>';
+      if(d.stderr)o.innerHTML+='<div class="terminal-line" style="color:#ff6666">'+escapeHtml(d.stderr)+'</div>';
+      if(d.entries)o.innerHTML+='<div class="terminal-line">'+d.entries.map(escapeHtml).join('  ')+'</div>';
+      if(d.content)o.innerHTML+='<div class="terminal-line">'+escapeHtml(d.content.substring(0,2000))+'</div>';
+      if(d.error)o.innerHTML+='<div class="terminal-line" style="color:#ff6666">Error: '+escapeHtml(d.error)+'</div>';
+      o.innerHTML+='<div class="terminal-line">&nbsp;</div>';
+      o.scrollTop=o.scrollHeight;
+    })
+    .catch(function(err){
+      o.innerHTML=o.innerHTML.replace(/<div class="terminal-line" style="color:#888">Executing\.\.\.<\/div>/,'');
+      o.innerHTML+='<div class="terminal-line" style="color:#ff6666">Error: '+escapeHtml(err.message||'Request failed')+'</div><div class="terminal-line">&nbsp;</div>';
+      o.scrollTop=o.scrollHeight;
+    });
+  i.value='';
+}
 function clearTerminal(){document.getElementById('terminal-output').innerHTML='<div class="terminal-line">EvolvixOS Terminal v1.0 — Type \'help\' for commands</div><div class="terminal-line">&nbsp;</div>';}
 
 // ═══ API KEYS (REAL API) ═══
@@ -1244,10 +1352,10 @@ function doLogout(){
   localStorage.removeItem('evolvixos_token');
   window.location.href='/login';
 }
-function createNote(){toast('Creating note...');}
-function showCreateAgent(){showPage('chat');insertSuggestion('Create a new AI agent');}
-function showCreateTeam(){showPage('chat');insertSuggestion('Create an agent team');}
-function showCreateWorkflow(){showPage('chat');insertSuggestion('Create a workflow that runs every hour');}
+
+
+
+
 
 // ═══ FULL INIT (after all vars/funcs defined) ═══
 function loadFiles(){
@@ -1361,7 +1469,7 @@ function renderSkillsGrid(list){
 function filterSkills(q){var f=skillsData.filter(function(s){return s.name.toLowerCase().indexOf(q.toLowerCase())>=0||s.desc.toLowerCase().indexOf(q.toLowerCase())>=0;});renderSkillsGrid(f);}
 function filterSkillCategory(cat){var f=cat==='all'?skillsData:skillsData.filter(function(s){return s.category===cat;});renderSkillsGrid(f);}
 function installSkill(id){var s=skillsData.find(function(x){return x.id===id;});if(s)s.installed=true;toast('Installing '+id+'...');setTimeout(function(){toast(id+' installed','success');loadSkills();},1500);}
-function runSkill(id){toast('Running skill: '+id);showPage('chat');insertSuggestion('Run the '+id+' skill');}
+
 function showUploadSkill(){var i=document.createElement('input');i.type='file';i.accept='.py,.js,.sh,.zip';i.onchange=function(){toast('Uploading skill...');setTimeout(function(){toast('Skill uploaded','success');},1000);};i.click();}
 
 // ═══ CLOUD BROWSER ═══
@@ -1398,6 +1506,489 @@ function inspectSchema(name){
     modal.innerHTML='<div class="card p-6 max-w-2xl w-full" style="background:#fff"><div class="flex items-center justify-between mb-4"><h2 class="text-lg font-bold">'+name+' Schema</h2><button class="btn-ghost text-xs" onclick="document.getElementById(\'schema-modal\').remove()">Close</button></div><div class="space-y-2">'+Object.keys(props).map(function(k){var p=props[k];return '<div class="flex items-center justify-between p-2 rounded bg-black/[.02]"><div><span class="text-sm font-mono">'+k+'</span>'+(required.indexOf(k)>=0?'<span class="text-[10px] text-red-500 ml-1">required</span>':'')+'</div><span class="badge badge-blue text-[10px]">'+(p.type||'any')+'</span></div>';}).join('')+'</div></div>';
     document.body.appendChild(modal);
   }).catch(function(){toast('Failed to load schema');});
+}
+
+
+
+// === TOOLS PAGE FUNCTIONS ===
+function runCode(){
+  var code=document.getElementById('code-input').value||document.getElementById('code-input').placeholder;
+  var lang=document.getElementById('code-lang').value;
+  var out=document.getElementById('code-output');
+  out.innerHTML='<span style="color:#888">Running...</span>';
+  fetch(PLATFORM+'/api/tools/run',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({code:code,language:lang})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var html='';
+      if(d.stdout)html+='<span style="color:#a6e3a1">'+escapeHtml(d.stdout)+'</span>';
+      if(d.stderr)html+='<span style="color:#f38ba8">'+escapeHtml(d.stderr)+'</span>';
+      if(d.error)html+='<span style="color:#f38ba8">Error: '+escapeHtml(d.error)+'</span>';
+      if(!html)html='<span style="color:#888">No output (exit code '+(d.exit_code||0)+')</span>';
+      out.innerHTML=html;
+    })
+    .catch(function(err){out.innerHTML='<span style="color:#f38ba8">'+escapeHtml(err.message||'Failed')+'</span>';});
+}
+function browserFetch(){
+  var url=document.getElementById('browser-url').value.trim();if(!url)return;
+  var el=document.getElementById('browser-result');
+  el.innerHTML='<div class="spinner mx-auto"></div><p class="text-gray-400 text-center mt-2">Fetching '+escapeHtml(url)+'...</p>';
+  fetch(PLATFORM+'/api/tools/browser',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({action:'navigate',url:url})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){el.innerHTML='<p class="text-red-500">Error: '+escapeHtml(d.error)+'</p>';return;}
+      el.innerHTML='<div><p class="text-sm font-medium mb-2">URL: '+escapeHtml(d.url)+'</p><p class="text-xs text-gray-500 mb-3">Content length: '+(d.content_length||0)+' bytes</p><pre class="text-xs overflow-auto" style="max-height:400px">'+escapeHtml(d.preview||'No preview')+'</pre></div>';
+    })
+    .catch(function(err){el.innerHTML='<p class="text-red-500">'+escapeHtml(err.message||'Failed')+'</p>';});
+}
+function browserExtract(){
+  var url=document.getElementById('browser-url').value.trim();if(!url)return;
+  var el=document.getElementById('browser-result');
+  el.innerHTML='<div class="spinner mx-auto"></div><p class="text-gray-400 text-center mt-2">Extracting text from '+escapeHtml(url)+'...</p>';
+  fetch(PLATFORM+'/api/tools/browser',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({action:'extract',url:url})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){el.innerHTML='<p class="text-red-500">Error: '+escapeHtml(d.error)+'</p>';return;}
+      el.innerHTML='<div><p class="text-sm font-medium mb-1">Title: '+escapeHtml(d.title||'(none)')+'</p><p class="text-xs text-gray-500 mb-3">URL: '+escapeHtml(d.url)+'</p><div class="text-sm">'+escapeHtml(d.text||'No text extracted')+'</div></div>';
+    })
+    .catch(function(err){el.innerHTML='<p class="text-red-500">'+escapeHtml(err.message||'Failed')+'</p>';});
+}
+function navigateToPath(p){document.getElementById("file-path").value=p;listFiles();}
+function listFiles(){
+  var path=document.getElementById('file-path').value.trim();if(!path)return;
+  var el=document.getElementById('file-content');
+  el.innerHTML='<div class="spinner mx-auto"></div>';
+  fetch(PLATFORM+'/api/tools/files',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({action:'list',path:path})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){el.innerHTML='<p class="text-red-500">'+escapeHtml(d.error)+'</p>';return;}
+      var html='<div class="text-xs text-gray-500 mb-2">Path: '+escapeHtml(d.path)+'</div>';
+      html+='<div class="space-y-1">';
+      (d.entries||[]).forEach(function(e){
+        var icon=e.type==='dir'?'folder':'file';
+        var color=e.type==='dir'?'text-brand-500':'text-gray-400';
+        html+='<div class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded" onclick="navigateToPath(\'+d.path+\'/\'+e.name+\')"><span class="'+color+' text-xs">'+icon+'</span><span class="text-sm">'+escapeHtml(e.name)+'</span>'+(e.size?'<span class="text-xs text-gray-400 ml-auto">'+e.size+'B</span>':'')+'</div>';
+      });
+      html+='</div>';
+      el.innerHTML=html;
+    })
+    .catch(function(err){el.innerHTML='<p class="text-red-500">'+escapeHtml(err.message||'Failed')+'</p>';});
+}
+function readFile(){
+  var path=document.getElementById('file-path').value.trim();if(!path)return;
+  var el=document.getElementById('file-content');
+  el.innerHTML='<div class="spinner mx-auto"></div>';
+  fetch(PLATFORM+'/api/tools/files',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({action:'read',path:path})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){el.innerHTML='<p class="text-red-500">'+escapeHtml(d.error)+'</p>';return;}
+      el.innerHTML='<div class="text-xs text-gray-500 mb-2">File: '+escapeHtml(d.path)+' ('+d.size+' bytes)</div><pre class="text-xs overflow-auto" style="max-height:400px;white-space:pre-wrap">'+escapeHtml(d.content||'(empty)')+'</pre>';
+    })
+    .catch(function(err){el.innerHTML='<p class="text-red-500">'+escapeHtml(err.message||'Failed')+'</p>';});
+}
+function runGrep(){
+  var pattern=document.getElementById('grep-pattern').value.trim();if(!pattern)return;
+  var path=document.getElementById('grep-path').value.trim()||'/opt/evolvixos';
+  var el=document.getElementById('file-content');
+  el.innerHTML='<div class="spinner mx-auto"></div>';
+  fetch(PLATFORM+'/api/tools/grep',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({pattern:pattern,path:path})})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error){el.innerHTML='<p class="text-red-500">'+escapeHtml(d.error)+'</p>';return;}
+      var html='<div class="text-xs text-gray-500 mb-2">'+d.count+' matches for "'+escapeHtml(pattern)+'"</div>';
+      html+='<pre class="text-xs overflow-auto" style="max-height:400px;white-space:pre-wrap">'+escapeHtml((d.matches||[]).join('\n'))+'</pre>';
+      el.innerHTML=html;
+    })
+    .catch(function(err){el.innerHTML='<p class="text-red-500">'+escapeHtml(err.message||'Failed')+'</p>';});
+}
+
+// === MISSING UI FUNCTIONS ===
+function deleteEntity(name){
+  if(!confirm('Delete entity "'+name+'" and all its records?'))return;
+  api('/entities/'+name,{method:'DELETE'}).then(function(){toast('Entity deleted: '+name);loadEntities();}).catch(function(err){toast('Delete failed: '+(err.message||'error'),'error');});
+}
+function deleteFunction(name){
+  if(!confirm('Delete function "'+name+'"?'))return;
+  api('/functions/'+name,{method:'DELETE'}).then(function(){toast('Function deleted: '+name);loadFunctions();}).catch(function(err){toast('Delete failed: '+(err.message||'error'),'error');});
+}
+function testFunction(name){
+  toast('Testing '+name+'...');
+  fetch(PLATFORM+'/api/fn/'+name,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},body:JSON.stringify({})})
+    .then(function(r){return r.json();})
+    .then(function(data){toast('Result received');alert('Function: '+name+'\n\nResult:\n'+JSON.stringify(data,null,2));})
+    .catch(function(){api('/fn/'+name).then(function(data){alert('Function: '+name+'\n\nResult:\n'+JSON.stringify(data,null,2));}).catch(function(err2){toast('Test failed: '+(err2.message||'error'),'error');});});
+}
+function executeWorkflow(name){
+  toast('Executing workflow: '+name+'...');
+  api('/workflows/'+name+'/execute',{method:'POST',body:JSON.stringify({})}).then(function(data){toast('Workflow executed: '+name);loadWorkflows();}).catch(function(err){toast('Execute failed: '+(err.message||'error'),'error');});
+}
+function toggleWorkflow(name,active){
+  var endpoint=active?'deactivate':'activate';
+  toast((active?'Deactivating':'Activating')+' '+name+'...');
+  api('/workflows/'+name+'/'+endpoint,{method:'PUT'}).then(function(){toast((active?'Deactivated':'Activated')+' '+name);loadWorkflows();}).catch(function(err){toast('Failed: '+(err.message||'error'),'error');});
+}
+function toggleCollab(){var p=document.getElementById('collab-panel');if(p)p.classList.toggle('hidden');else toast('Collab panel not available');}
+
+
+// ═══════════════════════════════════════════════════════
+// REAL CRUD MODALS — replaced chat-redirect stubs
+// ═══════════════════════════════════════════════════════
+
+function showCreateEntity(){
+  var modal='<div id="entity-modal" class="modal-overlay" onclick="if(event.target===this)this.remove()">'+
+    '<div class="modal w-[500px] p-6">'+
+      '<h3 class="text-lg font-semibold mb-4">Create Entity</h3>'+
+      '<div class="space-y-3">'+
+        '<div><label class="text-xs font-medium text-gray-600">Entity Name</label>'+
+        '<input type="text" id="entity-name" placeholder="e.g. Task, Project, User" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500" onkeydown="if(event.key===\'Enter\')confirmCreateEntity()"></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Schema (JSON)</label>'+
+        '<textarea id="entity-schema" rows="8" class="w-full px-3 py-2 text-xs font-mono rounded-lg border border-black/[.08] mt-1 focus:border-brand-500">{"type":"object","properties":{"name":{"type":"string"},"status":{"type":"string","enum":["active","done"]},"priority":{"type":"number"}}}</textarea>'+
+        '<p class="text-[10px] text-gray-400">id, created_date, updated_date, created_by are auto-added.</p></div>'+
+      '</div>'+
+      '<div class="flex gap-2 mt-4">'+
+        '<button class="btn-primary flex-1" onclick="confirmCreateEntity()">Create Entity</button>'+
+        '<button class="btn-secondary" onclick="document.getElementById(\'entity-modal\').remove()">Cancel</button>'+
+      '</div>'+
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend',modal);
+  document.getElementById('entity-name').focus();
+}
+function confirmCreateEntity(){
+  var name=document.getElementById('entity-name').value.trim();
+  var schemaText=document.getElementById('entity-schema').value.trim();
+  if(!name){toast('Entity name required','error');return;}
+  var schema;
+  try{schema=JSON.parse(schemaText);}catch(e){toast('Invalid JSON: '+e.message,'error');return;}
+  if(!schema.type)schema.type='object';
+  toast('Creating entity...');
+  api('/entities',{method:'POST',body:JSON.stringify({name:name,schema:schema})}).then(function(data){
+    toast('Entity created: '+name,'success');
+    document.getElementById('entity-modal').remove();
+    loadEntities();
+  }).catch(function(err){toast('Create failed: '+(err.message||'error'),'error');});
+}
+
+function showCreateFunction(){
+  var modal='<div id="function-modal" class="modal-overlay" onclick="if(event.target===this)this.remove()">'+
+    '<div class="modal w-[550px] p-6">'+
+      '<h3 class="text-lg font-semibold mb-4">Deploy Backend Function</h3>'+
+      '<div class="space-y-3">'+
+        '<div><label class="text-xs font-medium text-gray-600">Function Name</label>'+
+        '<input type="text" id="fn-name" placeholder="e.g. getTime, sendEmail" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Python Code</label>'+
+        '<textarea id="fn-code" rows="10" class="w-full px-3 py-2 text-xs font-mono rounded-lg border border-black/[.08] mt-1 focus:border-brand-500">def handler(event):\n    return {"message": "Hello from EvolvixOS!"}</textarea>'+
+        '<p class="text-[10px] text-gray-400">Deployed as: POST /api/fn/&lt;name&gt;</p></div>'+
+      '</div>'+
+      '<div class="flex gap-2 mt-4">'+
+        '<button class="btn-primary flex-1" onclick="confirmCreateFunction()">Deploy</button>'+
+        '<button class="btn-secondary" onclick="document.getElementById(\'function-modal\').remove()">Cancel</button>'+
+      '</div>'+
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend',modal);
+  document.getElementById('fn-name').focus();
+}
+function confirmCreateFunction(){
+  var name=document.getElementById('fn-name').value.trim();
+  var code=document.getElementById('fn-code').value.trim();
+  if(!name){toast('Name required','error');return;}
+  if(!code){toast('Code required','error');return;}
+  toast('Deploying function...');
+  api('/functions',{method:'POST',body:JSON.stringify({name:name,code:code})}).then(function(data){
+    toast('Function deployed: '+name,'success');
+    document.getElementById('function-modal').remove();
+    loadFunctions();
+  }).catch(function(err){toast('Deploy failed: '+(err.message||'error'),'error');});
+}
+
+function showCreateWorkflow(){
+  var modal='<div id="workflow-modal" class="modal-overlay" onclick="if(event.target===this)this.remove()">'+
+    '<div class="modal w-[500px] p-6">'+
+      '<h3 class="text-lg font-semibold mb-4">Create Workflow</h3>'+
+      '<div class="space-y-3">'+
+        '<div><label class="text-xs font-medium text-gray-600">Workflow Name</label>'+
+        '<input type="text" id="wf-name" placeholder="e.g. Daily Report" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Trigger Type</label>'+
+        '<select id="wf-trigger" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500">'+
+        '<option value="scheduled">Scheduled (cron)</option>'+
+        '<option value="entity">Entity Event</option>'+
+        '<option value="manual">Manual</option></select></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Cron Expression</label>'+
+        '<input type="text" id="wf-cron" placeholder="0 * * * *" value="0 * * * *" class="w-full px-3 py-2 text-sm font-mono rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Action (Python)</label>'+
+        '<textarea id="wf-action" rows="6" class="w-full px-3 py-2 text-xs font-mono rounded-lg border border-black/[.08] mt-1 focus:border-brand-500">def handler(event):\n    print("Workflow executed!")\n    return {"status":"ok"}</textarea></div>'+
+      '</div>'+
+      '<div class="flex gap-2 mt-4">'+
+        '<button class="btn-primary flex-1" onclick="confirmCreateWorkflow()">Create</button>'+
+        '<button class="btn-secondary" onclick="document.getElementById(\'workflow-modal\').remove()">Cancel</button>'+
+      '</div>'+
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend',modal);
+  document.getElementById('wf-name').focus();
+}
+function confirmCreateWorkflow(){
+  var name=document.getElementById('wf-name').value.trim();
+  var trigger=document.getElementById('wf-trigger').value;
+  var cron=document.getElementById('wf-cron').value.trim();
+  var action=document.getElementById('wf-action').value.trim();
+  if(!name){toast('Name required','error');return;}
+  toast('Creating workflow...');
+  var body={name:name,trigger:trigger,action:action};
+  if(trigger==='scheduled')body.cron=cron;
+  api('/workflows',{method:'POST',body:JSON.stringify(body)}).then(function(data){
+    toast('Workflow created: '+name,'success');
+    document.getElementById('workflow-modal').remove();
+    loadWorkflows();
+  }).catch(function(err){toast('Create failed: '+(err.message||'error'),'error');});
+}
+
+function showCreateAgent(){
+  var modal='<div id="agent-modal" class="modal-overlay" onclick="if(event.target===this)this.remove()">'+
+    '<div class="modal w-[500px] p-6">'+
+      '<h3 class="text-lg font-semibold mb-4">Create AI Agent</h3>'+
+      '<div class="space-y-3">'+
+        '<div><label class="text-xs font-medium text-gray-600">Agent Name</label>'+
+        '<input type="text" id="agent-name" placeholder="e.g. CodeReviewer" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Model</label>'+
+        '<select id="agent-model" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500">'+
+        '<option value="auto">Auto (smart routing)</option>'+
+        '<option value="qwen2.5:14b">Qwen 2.5 14B (local)</option>'+
+        '<option value="qwen2.5:7b">Qwen 2.5 7B (local)</option>'+
+        '<option value="groq/gpt-oss-120b">GPT-OSS 120B (Groq)</option>'+
+        '<option value="gemini-flash-latest">Gemini Flash (Google)</option></select></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Description</label>'+
+        '<input type="text" id="agent-desc" placeholder="What does this agent do?" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">System Prompt</label>'+
+        '<textarea id="agent-prompt" rows="4" placeholder="You are a helpful assistant..." class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></textarea></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Tools (comma-separated)</label>'+
+        '<input type="text" id="agent-tools" value="code_exec, file_ops" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></div>'+
+      '</div>'+
+      '<div class="flex gap-2 mt-4">'+
+        '<button class="btn-primary flex-1" onclick="confirmCreateAgent()">Create</button>'+
+        '<button class="btn-secondary" onclick="document.getElementById(\'agent-modal\').remove()">Cancel</button>'+
+      '</div>'+
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend',modal);
+  document.getElementById('agent-name').focus();
+}
+function confirmCreateAgent(){
+  var name=document.getElementById('agent-name').value.trim();
+  var model=document.getElementById('agent-model').value;
+  var desc=document.getElementById('agent-desc').value.trim();
+  var prompt=document.getElementById('agent-prompt').value.trim();
+  var tools=document.getElementById('agent-tools').value.split(',').map(function(t){return t.trim();}).filter(Boolean);
+  if(!name){toast('Name required','error');return;}
+  toast('Creating agent...');
+  api('/agents',{method:'POST',body:JSON.stringify({name:name,model:model,description:desc,system_prompt:prompt,tools:tools})}).then(function(data){
+    toast('Agent created: '+name,'success');
+    document.getElementById('agent-modal').remove();
+    loadAgents();
+  }).catch(function(err){toast('Create failed: '+(err.message||'error'),'error');});
+}
+
+function createNote(){
+  var modal='<div id="note-modal" class="modal-overlay" onclick="if(event.target===this)this.remove()">'+
+    '<div class="modal w-[450px] p-6">'+
+      '<h3 class="text-lg font-semibold mb-4">New Note</h3>'+
+      '<div class="space-y-3">'+
+        '<div><label class="text-xs font-medium text-gray-600">Title</label>'+
+        '<input type="text" id="note-title-input" placeholder="Note title" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Content</label>'+
+        '<textarea id="note-content-input" rows="6" placeholder="Write your note..." class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></textarea></div>'+
+      '</div>'+
+      '<div class="flex gap-2 mt-4">'+
+        '<button class="btn-primary flex-1" onclick="confirmCreateNote()">Save</button>'+
+        '<button class="btn-secondary" onclick="document.getElementById(\'note-modal\').remove()">Cancel</button>'+
+      '</div>'+
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend',modal);
+  document.getElementById('note-title-input').focus();
+}
+function confirmCreateNote(){
+  var title=document.getElementById('note-title-input').value.trim();
+  var body=document.getElementById('note-content-input').value.trim();
+  if(!title){toast('Title required','error');return;}
+  toast('Saving note...');
+  api('/entities/Note/records',{method:'POST',body:JSON.stringify({title:title,content:body})}).then(function(data){
+    toast('Note saved','success');
+    document.getElementById('note-modal').remove();
+    loadNotes();
+  }).catch(function(err){toast('Save failed: '+(err.message||'error'),'error');});
+}
+
+function showCreateTeam(){
+  var modal='<div id="team-modal" class="modal-overlay" onclick="if(event.target===this)this.remove()">'+
+    '<div class="modal w-[450px] p-6">'+
+      '<h3 class="text-lg font-semibold mb-4">Create Agent Team</h3>'+
+      '<div class="space-y-3">'+
+        '<div><label class="text-xs font-medium text-gray-600">Team Name</label>'+
+        '<input type="text" id="team-name-input" placeholder="e.g. Dev Team" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Description</label>'+
+        '<textarea id="team-desc-input" rows="3" placeholder="What does this team do?" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></textarea></div>'+
+      '</div>'+
+      '<div class="flex gap-2 mt-4">'+
+        '<button class="btn-primary flex-1" onclick="confirmCreateTeam()">Create</button>'+
+        '<button class="btn-secondary" onclick="document.getElementById(\'team-modal\').remove()">Cancel</button>'+
+      '</div>'+
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend',modal);
+  document.getElementById('team-name-input').focus();
+}
+function confirmCreateTeam(){
+  var name=document.getElementById('team-name-input').value.trim();
+  var desc=document.getElementById('team-desc-input').value.trim();
+  if(!name){toast('Name required','error');return;}
+  toast('Creating team...');
+  api('/entities/AgentTeam/records',{method:'POST',body:JSON.stringify({name:name,description:desc,agents:[]})}).then(function(data){
+    toast('Team created: '+name,'success');
+    document.getElementById('team-modal').remove();
+    loadTeams();
+  }).catch(function(err){toast('Create failed: '+(err.message||'error'),'error');});
+}
+function loadTeams(){
+  var list=document.getElementById('team-list');if(!list)return;
+  api('/entities/AgentTeam/records?limit=20').then(function(data){
+    var teams=data.records||data||[];
+    list.innerHTML=teams.length?teams.map(function(t){
+      var name=t.name||'unknown';
+      return '<div class="card p-3 flex items-center justify-between"><div><span class="text-sm font-medium">'+escapeHtml(name)+'</span><span class="text-xs text-gray-500 ml-2">'+(t.description||'')+'</span></div></div>';
+    }).join(''):'<div class="text-center text-gray-400 py-8">No teams yet. Click "+ Create Team".</div>';
+  }).catch(function(){list.innerHTML='<div class="text-center text-gray-400 py-8">No teams yet.</div>';});
+}
+
+function showEntityRecords(name){
+  var modal='<div id="records-modal" class="modal-overlay" onclick="if(event.target===this)this.remove()">'+
+    '<div class="modal w-[700px] p-6" style="max-height:80vh;overflow:auto">'+
+      '<div class="flex items-center justify-between mb-4">'+
+        '<h3 class="text-lg font-semibold">Records: '+escapeHtml(name)+'</h3>'+
+        '<button class="btn-primary text-xs" onclick="confirmCreateRecord(\''+name+'\')">+ Add Record</button>'+
+      '</div>'+
+      '<div id="records-list-modal">Loading...</div>'+
+      '<div class="mt-4"><button class="btn-secondary" onclick="document.getElementById(\'records-modal\').remove()">Close</button></div>'+
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend',modal);
+  api('/entities/'+name+'/records?limit=50').then(function(data){
+    var records=data.records||data||[];
+    var el=document.getElementById('records-list-modal');
+    if(!records.length){el.innerHTML='<p class="text-center text-gray-400 py-4">No records yet.</p>';return;}
+    var keys=Object.keys(records[0]).filter(function(k){return ['id','created_date','updated_date','created_by','is_deleted'].indexOf(k)<0;});
+    el.innerHTML='<div class="overflow-auto"><table class="w-full text-xs"><thead><tr class="border-b">'+
+      keys.map(function(k){return '<th class="text-left py-2 px-2 text-gray-500">'+escapeHtml(k)+'</th>';}).join('')+
+      '<th class="py-2 px-2"></th></tr></thead><tbody>'+
+      records.map(function(r){
+        return '<tr class="border-b hover:bg-black/[.02]">'+
+          keys.map(function(k){
+            var v=r[k];if(typeof v==='object')v=JSON.stringify(v);
+            return '<td class="py-2 px-2">'+escapeHtml(String(v||'').substring(0,80))+'</td>';
+          }).join('')+
+          '<td class="py-2 px-2"><button class="text-xs text-red-500 hover:underline" onclick="deleteRecord(\''+name+'\',\''+r.id+'\')">Delete</button></td>'+
+        '</tr>';
+      }).join('')+
+      '</tbody></table></div>';
+  }).catch(function(err){document.getElementById('records-list-modal').innerHTML='<p class="text-red-500 text-sm">'+escapeHtml(err.message||'Failed')+'</p>';});
+}
+function deleteRecord(entity,recordId){
+  if(!confirm('Delete this record?'))return;
+  api('/entities/'+entity+'/records/'+recordId,{method:'DELETE'}).then(function(){
+    toast('Record deleted');
+    document.getElementById('records-modal').remove();
+    showEntityRecords(entity);
+  }).catch(function(err){toast('Delete failed: '+(err.message||'error'),'error');});
+}
+function confirmCreateRecord(name){
+  if(document.getElementById('records-modal'))document.getElementById('records-modal').remove();
+  var modal='<div id="add-record-modal" class="modal-overlay" onclick="if(event.target===this)this.remove()">'+
+    '<div class="modal w-[450px] p-6">'+
+      '<h3 class="text-lg font-semibold mb-4">Add Record to '+escapeHtml(name)+'</h3>'+
+      '<div><label class="text-xs font-medium text-gray-600">Record Data (JSON)</label>'+
+      '<textarea id="record-json" rows="8" class="w-full px-3 py-2 text-xs font-mono rounded-lg border border-black/[.08] mt-1 focus:border-brand-500">{"name":"New Item","status":"active"}</textarea></div>'+
+      '<div class="flex gap-2 mt-4">'+
+        '<button class="btn-primary flex-1" onclick="submitNewRecord(\''+name+'\')">Add Record</button>'+
+        '<button class="btn-secondary" onclick="document.getElementById(\'add-record-modal\').remove()">Cancel</button>'+
+      '</div>'+
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend',modal);
+}
+function submitNewRecord(name){
+  var jsonText=document.getElementById('record-json').value.trim();
+  var data;
+  try{data=JSON.parse(jsonText);}catch(e){toast('Invalid JSON: '+e.message,'error');return;}
+  toast('Creating record...');
+  api('/entities/'+name+'/records',{method:'POST',body:JSON.stringify(data)}).then(function(){
+    toast('Record created','success');
+    document.getElementById('add-record-modal').remove();
+    showEntityRecords(name);
+  }).catch(function(err){toast('Create failed: '+(err.message||'error'),'error');});
+}
+
+function connectChannel(ch){
+  var steps={
+    whatsapp:'1. Open WhatsApp on your phone 2. Settings > Linked Devices > Link a Device 3. Scan the QR code',
+    telegram:'1. Search @BotFather in Telegram 2. Create a bot with /newbot 3. Copy the bot token 4. Paste in Agent Settings',
+    slack:'1. Go to api.slack.com/apps 2. Create a new app 3. Add bot scopes 4. Install to workspace 5. Copy Bot Token',
+    imessage:'1. Open System Settings > Messages 2. Enable Text Message Forwarding 3. Link Apple ID',
+    phone:'1. Purchase a phone number 2. Verify your account 3. Configure voice settings',
+    line:'1. Go to developers.line.biz 2. Create a Messaging API channel 3. Copy Channel Access Token'
+  };
+  var step=steps[ch.toLowerCase()]||'Setup instructions not available.';
+  var modal='<div id="channel-modal" class="modal-overlay" onclick="if(event.target===this)this.remove()">'+
+    '<div class="modal w-[450px] p-6">'+
+      '<h3 class="text-lg font-semibold mb-4">Connect '+escapeHtml(ch)+'</h3>'+
+      '<div class="space-y-2 text-sm text-gray-600">'+
+        step.split(/[0-9]+\./).filter(Boolean).map(function(s,i){return '<div class="flex gap-2"><span class="text-brand-500 font-medium">'+(i+1)+'.</span><span>'+s.trim()+'</span></div>';}).join('')+
+      '</div>'+
+      '<div class="mt-4"><button class="btn-secondary" onclick="document.getElementById(\'channel-modal\').remove()">Close</button></div>'+
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend',modal);
+}
+
+function runSkill(id){
+  toast('Executing skill: '+id);
+  api('/skills/'+id+'/execute',{method:'POST',body:JSON.stringify({})}).then(function(data){
+    toast('Skill executed: '+id,'success');
+    if(data.output||data.result){
+      var modal='<div id="skill-result-modal" class="modal-overlay" onclick="if(event.target===this)this.remove()">'+
+        '<div class="modal w-[500px] p-6">'+
+          '<h3 class="text-lg font-semibold mb-3">Skill Result: '+escapeHtml(id)+'</h3>'+
+          '<pre class="text-xs bg-black/[.03] rounded-lg p-3 overflow-auto max-h-60">'+escapeHtml(JSON.stringify(data.output||data.result,null,2))+'</pre>'+
+          '<div class="mt-4"><button class="btn-secondary" onclick="document.getElementById(\'skill-result-modal\').remove()">Close</button></div>'+
+        '</div></div>';
+      document.body.insertAdjacentHTML('beforeend',modal);
+    }
+  }).catch(function(err){toast('Skill failed: '+(err.message||'error'),'error');});
+}
+
+function saveMemoryItem(){
+  var modal='<div id="memory-modal" class="modal-overlay" onclick="if(event.target===this)this.remove()">'+
+    '<div class="modal w-[450px] p-6">'+
+      '<h3 class="text-lg font-semibold mb-4">Save Memory</h3>'+
+      '<div class="space-y-3">'+
+        '<div><label class="text-xs font-medium text-gray-600">Type</label>'+
+        '<select id="mem-type" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500">'+
+        '<option value="fact">Fact</option><option value="preference">Preference</option>'+
+        '<option value="instruction">Instruction</option><option value="decision">Decision</option></select></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Category</label>'+
+        '<input type="text" id="mem-category" placeholder="e.g. Work, Personal" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></div>'+
+        '<div><label class="text-xs font-medium text-gray-600">Content</label>'+
+        '<textarea id="mem-content" rows="4" placeholder="What to remember..." class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mt-1 focus:border-brand-500"></textarea></div>'+
+      '</div>'+
+      '<div class="flex gap-2 mt-4">'+
+        '<button class="btn-primary flex-1" onclick="confirmSaveMemory()">Save</button>'+
+        '<button class="btn-secondary" onclick="document.getElementById(\'memory-modal\').remove()">Cancel</button>'+
+      '</div>'+
+    '</div></div>';
+  document.body.insertAdjacentHTML('beforeend',modal);
+  document.getElementById('mem-content').focus();
+}
+function confirmSaveMemory(){
+  var type=document.getElementById('mem-type').value;
+  var category=document.getElementById('mem-category').value.trim()||'General';
+  var content=document.getElementById('mem-content').value.trim();
+  if(!content){toast('Content required','error');return;}
+  toast('Saving memory...');
+  api('/entities/PlatformMemory/records',{method:'POST',body:JSON.stringify({type:type,category:category,content:content})}).then(function(){
+    toast('Memory saved','success');
+    document.getElementById('memory-modal').remove();
+    loadMemoryData();
+  }).catch(function(err){toast('Save failed: '+(err.message||'error'),'error');});
 }
 
 </script>

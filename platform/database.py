@@ -10,13 +10,17 @@ DATABASE_URL = os.environ.get(
     "postgresql+asyncpg://evolvixos:evolvixos@127.0.0.1:5432/evolvixos"
 )
 
-engine = create_async_engine(DATABASE_URL, echo=False, pool_size=10, max_overflow=20)
+engine = create_async_engine(DATABASE_URL, echo=False, pool_size=10, max_overflow=20, pool_pre_ping=True)
 async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
 
 async def get_db():
     async with async_session() as session:
-        yield session
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise
 
 async def init_db():
     """Create all platform tables."""
