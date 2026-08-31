@@ -39,8 +39,8 @@ class OllamaProvider(LLMProvider):
         except Exception:
             return False
 
-    def chat(self, messages, tools=None, stream=False, temperature=0.7, max_tokens=4096) -> LLMResponse:
-        model = self.default_model
+    def chat(self, messages, tools=None, stream=False, temperature=0.7, max_tokens=4096, model=None) -> LLMResponse:
+        model = model or self.default_model
         data = json.dumps({
             "model": model,
             "messages": messages,

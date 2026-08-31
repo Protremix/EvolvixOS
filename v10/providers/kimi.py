@@ -35,12 +35,12 @@ class KimiProvider(LLMProvider):
     def is_available(self) -> bool:
         return bool(self._api_key)
 
-    def chat(self, messages, tools=None, stream=False, temperature=0.7, max_tokens=4096) -> LLMResponse:
+    def chat(self, messages, tools=None, stream=False, temperature=0.7, max_tokens=4096, model=None) -> LLMResponse:
         if not self._api_key:
             raise RuntimeError("Kimi API key not configured")
 
         body = json.dumps({
-            "model": self.default_model,
+            "model": model or self.default_model,
             "messages": messages,
             "temperature": temperature,
             "max_tokens": max_tokens,
@@ -62,7 +62,7 @@ class KimiProvider(LLMProvider):
         return LLMResponse(
             content=msg.get("content", ""),
             provider=self.name,
-            model=self.default_model,
+            model=model or self.default_model,
             tool_calls=msg.get("tool_calls", []),
             usage=result.get("usage", {}),
             latency_ms=latency,

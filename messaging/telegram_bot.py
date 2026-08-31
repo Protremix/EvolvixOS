@@ -180,7 +180,7 @@ async def generate_image_gemini(prompt):
         key = key_match.group(1).strip()
         
         import urllib.request, base64
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={key}"
         data = json.dumps({
             "contents": [{"parts": [{"text": f"Generate an image: {prompt}"}]}],
             "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}

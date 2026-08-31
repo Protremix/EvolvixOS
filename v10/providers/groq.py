@@ -58,7 +58,7 @@ class GroqProvider(LLMProvider):
         filtered = [t for t in tools if t.get("function", {}).get("name", "") in ESSENTIAL_TOOL_NAMES]
         return filtered if filtered else None
 
-    def chat(self, messages, tools=None, stream=False, temperature=0.7, max_tokens=4096) -> LLMResponse:
+    def chat(self, messages, tools=None, stream=False, temperature=0.7, max_tokens=4096, model=None) -> LLMResponse:
         if not self._api_key:
             raise RuntimeError("Groq API key not configured")
 
@@ -78,7 +78,7 @@ class GroqProvider(LLMProvider):
         filtered_tools = self._filter_tools(tools)
 
         body = json.dumps({
-            "model": self.default_model,
+            "model": model or self.default_model,
             "messages": condensed_messages,
             "tools": filtered_tools,
             "stream": stream,
@@ -102,7 +102,7 @@ class GroqProvider(LLMProvider):
         return LLMResponse(
             content=msg.get("content", ""),
             provider=self.name,
-            model=self.default_model,
+            model=model or self.default_model,
             tool_calls=msg.get("tool_calls", []),
             usage=result.get("usage", {}),
             latency_ms=latency,

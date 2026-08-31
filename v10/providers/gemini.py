@@ -35,7 +35,7 @@ class GeminiProvider(LLMProvider):
     def is_available(self) -> bool:
         return bool(self._api_key)
 
-    def chat(self, messages, tools=None, stream=False, temperature=0.7, max_tokens=4096) -> LLMResponse:
+    def chat(self, messages, tools=None, stream=False, temperature=0.7, max_tokens=4096, model=None) -> LLMResponse:
         if not self._api_key:
             raise RuntimeError("Gemini API key not configured")
 
@@ -51,7 +51,7 @@ class GeminiProvider(LLMProvider):
                     "parts": [{"text": msg["content"]}]
                 })
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.default_model}:generateContent?key={self._api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model or self.default_model}:generateContent?key={self._api_key}"
         body = json.dumps({
             "contents": contents,
             "systemInstruction": {"parts": [{"text": system_text}]} if system_text else None,
@@ -73,7 +73,7 @@ class GeminiProvider(LLMProvider):
         return LLMResponse(
             content=text,
             provider=self.name,
-            model=self.default_model,
+            model=model or self.default_model,
             tool_calls=[],
             usage={},
             latency_ms=latency,

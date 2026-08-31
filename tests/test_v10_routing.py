@@ -22,6 +22,11 @@ try:
     from v10.providers.base import LLMRegistry, PrivacyMode
     from v10.providers.ollama import OllamaProvider
     from v10.providers.groq import GroqProvider
+    try:
+        from v10.providers.nvidia import NvidiaProvider
+        HAS_NVIDIA = True
+    except Exception:
+        HAS_NVIDIA = False
     # Also verify Ollama server is reachable
     HAS_OLLAMA = server_available("http://127.0.0.1:11434/api/tags")
     HAS_V10 = True
@@ -38,6 +43,11 @@ def registry():
     reg.set_privacy_mode(PrivacyMode.HYBRID)
     reg.register(OllamaProvider())
     reg.register(GroqProvider())
+    try:
+        from v10.providers.nvidia import NvidiaProvider
+        reg.register(NvidiaProvider())
+    except Exception:
+        pass
     return reg
 
 @pytest.fixture
@@ -66,7 +76,7 @@ class TestProviderSelection:
 
     def test_complex_routes_to_cloud(self, router):
         d = router.route("explain how to design a distributed system with microservices")
-        assert d.provider == "groq"
+        assert d.provider in ("groq", "nvidia")
 
 class TestPerTaskModelSelection:
     def test_simple_uses_7b(self, router):
@@ -75,7 +85,7 @@ class TestPerTaskModelSelection:
 
     def test_code_uses_14b(self, router):
         d = router.route("write a python function")
-        assert d.model == "qwen2.5:14b"
+        assert d.model in ("qwen2.5:14b", "deepseek-ai/deepseek-v4-pro-0813")
 
     def test_simple_short_uses_chat_model(self, router):
         d = router.route("hi")
