@@ -119,6 +119,12 @@ STRIPE_PRICES = {
     "Pro_yearly": "price_1UAELm2fz7mjXQMg9cy365Xv",
     "Team_monthly": "price_1UAELn2fz7mjXQMgBCl8SIHM",
     "Team_yearly": "price_1UAELn2fz7mjXQMgs17UxDHr",
+    "Business_monthly": "price_1UAELm2fz7mjXQMglGtHJS1a",
+    "Business_yearly": "price_1UAELm2fz7mjXQMgm9Jv5slH",
+    "Enterprise_monthly": "price_1UAQ1t2fz7mjXQMg8HQ8go3P",
+    "Enterprise_yearly": "price_1UAQ1t2fz7mjXQMgqHhFDAZh",
+    "Enterprise+_monthly": "price_1UAQ1u2fz7mjXQMgeG034Khh",
+    "Enterprise+_yearly": "price_1UAQ1u2fz7mjXQMg4pMNaTgY",
     "credits_1000": "price_1UAELo2fz7mjXQMg3RC06LQD",
     "credits_5000": "price_1UAELo2fz7mjXQMgxC6Bb9ep",
     "credits_15000": "price_1UAELp2fz7mjXQMgTyvbsV2n",
@@ -1228,7 +1234,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                         line_items=[{
                             "price_data": {
                                 "currency": "eur",
-                                "product_data": {"name": str(credits_amount) + " API Calls"},
+                                "product_data": {"name": str(credits_amount) + " Credits"},
                                 "unit_amount": price_cents
                             },
                             "quantity": 1
@@ -1245,6 +1251,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                         (user_id, price_cents / 100 if price_cents else 0, plan_name or "Purchase", cycle if item_type == "subscription" else "one-time", session.id, time.strftime("%Y-%m-%d %H:%M:%S")))
                     conn.commit()
                 self._send_json(200, {"url": session.url, "checkout_url": session.url, "session_id": session.id})
+                return
             except stripe.error.StripeError as e:
                 self._send_json(400, {"error": str(e)})
                 return
@@ -1277,6 +1284,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                     self._send_json(200, {"portal_url": session.url})
                 else:
                     self._send_json(404, {"error": "No Stripe customer found. Subscribe first."})
+                return
             except Exception as e:
                 self._send_json(500, {"error": str(e)})
                 return
@@ -1311,6 +1319,7 @@ class AuthHandler(BaseHTTPRequestHandler):
                     price = stripe.Price.create(product=p.id, unit_amount=info["price"], currency="usd")
                     created[key] = price.id
                 self._send_json(200, {"created": created, "message": "Products created. Save these price IDs to STRIPE_PRICES in auth_api.py"})
+                return
             except Exception as e:
                 self._send_json(500, {"error": str(e)})
                 return
