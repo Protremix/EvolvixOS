@@ -1217,14 +1217,6 @@ function restoreVersion(vid){
     .catch(function(){toast('Failed to restore version');});
 }
 
-
-).join('');
-      var credits=p.credits_monthly?(p.credits_monthly>=999?'Unlimited':p.credits_monthly.toLocaleString()+' credits'):'';
-      return '<div class="card p-4 flex flex-col"><div class="flex items-center justify-between"><h3 class="text-sm font-semibold">'+p.name+'</h3>'+(credits?'<span class="badge badge-blue text-[10px]">'+credits+'</span>':'')+'</div><p class="text-2xl font-bold mt-2">'+price+'<span class="text-xs text-gray-500">/mo</span>'+(p.price_yearly?'<span class="text-xs text-gray-400 ml-1">or €'+p.price_yearly+'/yr</span>':'')+'</p><ul class="mt-3 space-y-1 flex-1">'+features+'</ul><button class="'+(p.name==='Free'?'btn-secondary':'btn-primary')+' w-full mt-3">'+(p.name==='Free'?'Current Plan':'Upgrade')+'</button></div>';
-    }).join('');
-  })
-}
-
 // ═══ UTILS ═══
 function toast(msg,type){var t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;document.getElementById('toast-container').appendChild(t);setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.remove();},300);},3000);}
 function escapeHtml(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML;}
