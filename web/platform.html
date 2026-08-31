@@ -213,8 +213,8 @@ async function loadBilling() {
     var grid = document.getElementById('plans-grid');
     grid.innerHTML = plans.map(function(p) {
       var isCurrent = p.name === sub.plan_name;
-      var priceStr = p.price_monthly === 0 ? 'Free' : '$' + p.price_monthly + '/mo';
-      var yearStr = p.price_yearly > 0 ? '$' + p.price_yearly + '/yr' : '';
+      var priceStr = p.price_monthly === 0 ? 'Free' : '&euro;' + p.price_monthly + '/mo';
+      var yearStr = p.price_yearly > 0 ? '&euro;' + p.price_yearly + '/yr' : '';
       var features = (p.features || []).map(function(f) { return '<div class="flex items-center gap-2 text-sm text-gray-400"><svg class="w-3.5 h-3.5 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 011.4-1.4l3.3 3.3 7.3-7.3a1 1 0 011.4 0z"/></svg>' + f + '</div>'; }).join('');
       return '<div class="bg-[#f5f5f7] border ' + (isCurrent ? 'border-purple-600' : 'border-gray-200') + ' rounded-xl p-5 flex flex-col' + (p.name === 'Pro' ? ' ring-2 ring-purple-600/30' : '') + '">' +
         '<div class="text-lg font-bold mb-1">' + p.name + (isCurrent ? ' <span class="text-xs text-green-400">Current</span>' : '') + '</div>' +
@@ -254,12 +254,19 @@ async function loadBilling() {
 }
 
 async function subscribe(planName) {
-  var cycle = confirm('Monthly billing? Click OK for monthly, Cancel for yearly (20% off)') ? 'monthly' : 'yearly';
+  var cycle = confirm('Monthly billing? Click OK for monthly, Cancel for yearly (save 20%)') ? 'monthly' : 'yearly';
+  var stripePrices = {
+    'Starter': { monthly: 'price_1UAELl2fz7mjXQMgBNDsM9b1', yearly: 'price_1UAELl2fz7mjXQMgs0QQovNq' },
+    'Pro': { monthly: 'price_1UAELm2fz7mjXQMgwazTQ2MA', yearly: 'price_1UAELm2fz7mjXQMg9cy365Xv' },
+    'Business': { monthly: 'price_1UAELm2fz7mjXQMglGtHJS1a', yearly: 'price_1UAELm2fz7mjXQMgm9Jv5slH' },
+    'Team': { monthly: 'price_1UAELn2fz7mjXQMgBCl8SIHM', yearly: 'price_1UAELn2fz7mjXQMgs17UxDHr' },
+    'Enterprise': { monthly: 'price_1UAQ1t2fz7mjXQMg8HQ8go3P', yearly: 'price_1UAQ1t2fz7mjXQMgqHhFDAZh' },
+    'Enterprise+': { monthly: 'price_1UAQ1u2fz7mjXQMgeG034Khh', yearly: 'price_1UAQ1u2fz7mjXQMg4pMNaTgY' }
+  };
   var priceMap = { 'Free': 0, 'Starter': 900, 'Pro': 2900, 'Team': 9900, 'Business': 4900, 'Enterprise': 19900, 'Enterprise+': 29900 };
   var yearMap = { 'Starter': 8600, 'Pro': 27800, 'Team': 95000, 'Business': 47000, 'Enterprise': 190000, 'Enterprise+': 287000 };
   var priceCents = cycle === 'yearly' ? (yearMap[planName] || 0) : (priceMap[planName] || 0);
   if (planName === 'Free' || priceCents === 0) {
-    // Free plan — no checkout needed
     var raw = localStorage.getItem('evolvixos_user');
     var user = JSON.parse(raw);
     var resp = await fetch('https://evolvixos.com/auth/subscribe', {
@@ -271,15 +278,21 @@ async function subscribe(planName) {
     else { toast('Error: ' + (data.error || 'Unknown'), 'error'); }
     return;
   }
-  // Paddle Checkout
+  // Stripe Checkout
   var raw = localStorage.getItem('evolvixos_user');
   var user = JSON.parse(raw);
-  var resp = await fetch('https://evolvixos.com/auth/paddle-checkout', {
+  var priceId = (stripePrices[planName] && stripePrices[planName][cycle]) ? stripePrices[planName][cycle] : '';
+  var body = { type: 'subscription', plan_name: planName, billing_cycle: cycle };
+  if (priceId) { body.price_id = priceId; }
+  else { body.price_cents = priceCents; }
+  var resp = await fetch('https://evolvixos.com/auth/stripe-checkout', {
     method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'subscription', plan: planName, cycle: cycle })
+    body: JSON.stringify(body)
   });
   var data = await resp.json();
-  if (data.checkout_url) {
+  if (data.url) {
+    window.location.href = data.url;
+  } else if (data.checkout_url) {
     window.location.href = data.checkout_url;
   } else {
     toast('Error: ' + (data.error || 'Payment setup failed'), 'error');
@@ -289,12 +302,15 @@ async function subscribe(planName) {
 async function buyCredits(credits, price) {
   var raw = localStorage.getItem('evolvixos_user');
   var user = JSON.parse(raw);
-  var resp = await fetch('https://evolvixos.com/auth/paddle-checkout', {
+  var priceCents = Math.round(price * 100);
+  var resp = await fetch('https://evolvixos.com/auth/stripe-checkout', {
     method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'credits', credits: credits })
+    body: JSON.stringify({ type: 'credits', credits: credits, price_cents: priceCents })
   });
   var data = await resp.json();
-  if (data.checkout_url) {
+  if (data.url) {
+    window.location.href = data.url;
+  } else if (data.checkout_url) {
     window.location.href = data.checkout_url;
   } else {
     toast('Error: ' + (data.error || 'Payment setup failed'), 'error');
@@ -302,17 +318,18 @@ async function buyCredits(credits, price) {
 }
 
 
-async function openPaddlePortal() {
+async function openBillingPortal() {
   var raw = localStorage.getItem('evolvixos_user');
   if (!raw) return;
   var user = JSON.parse(raw);
   try {
-    var resp = await fetch('https://evolvixos.com/auth/paddle-portal', {
+    var resp = await fetch('https://evolvixos.com/auth/stripe-portal', {
       method: 'POST', headers: { 'Authorization': 'Bearer ' + user.token, 'Content-Type': 'application/json' },
       body: JSON.stringify({})
     });
     var data = await resp.json();
-    if (data.portal_url) window.location.href = data.portal_url;
+    if (data.url) window.location.href = data.url;
+    else if (data.portal_url) window.location.href = data.portal_url;
     else toast('No billing portal available. Subscribe first.', 'info');
   } catch(e) { toast('Error: ' + e.message, 'error'); }
 }
@@ -373,7 +390,7 @@ async function loadBillingData() {
         '<div class="text-sm font-bold mb-1">' + pack.name + '</div>' +
         '<div class="text-2xl font-bold font-mono bg-gradient-to-r from-gray-900 to-blue-500 bg-clip-text text-transparent">' + pack.credits.toLocaleString() + '</div>' +
         '<div class="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Credits</div>' +
-        '<div class="text-xl font-bold mb-1">$' + pack.price + '</div>' + saveBadge +
+        '<div class="text-xl font-bold mb-1">&euro;' + pack.price + '</div>' + saveBadge +
         '<ul class="text-left mt-3 space-y-1">' + features + '</ul>' +
         '<button class="mt-3 w-full py-2 rounded-xl text-sm font-medium bg-[#e8e8ed] border border-gray-200 hover:border-purple-500 hover:bg-purple-500/10 transition-all">Buy Now</button>' +
         '</div>';
@@ -1909,21 +1926,6 @@ a, button, .nav-item, .card, .pricing-tier, input, select, textarea {
 .nav-item.active,.nav-item.active span,.nav-item.active a,.nav-item.active svg{color:#007AFF !important}
 .nav-item.active svg{stroke:currentColor}
 </style>
-  <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
-  <script>
-    // Initialize Paddle.js with live client-side token
-    Paddle.Initialize({
-      token: 'live_7f2f6d0253fcd0e6defac3eb71d',
-      environment: 'production',
-      pwCustomer: null  // Set after login: { id: 'ctm_...' }
-    });
-    // pwAuth will be called after user session loads
-    function setPaddleCustomer(paddleCustomerId) {
-      if (paddleCustomerId) {
-        Paddle.Update({ pwCustomer: { id: paddleCustomerId } });
-      }
-    }
-  </script>
 </head>
 <body class="bg-white text-gray-900 h-screen overflow-hidden"><div class="bg-mouse-glow"></div>
 <!-- Scroll Progress --><div class="scroll-progress-platform" id="scrollProgressPlat"></div>

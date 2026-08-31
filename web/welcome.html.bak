@@ -50,7 +50,8 @@
 </head>
 <body>
   <a href="/" class="logo">
-    <img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS
+    <img src="/assets/evolvixos-logo-64.png" alt="EvolvixOS" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;">
+    EvolvixOS
   </a>
 
   <div class="check">
@@ -58,7 +59,7 @@
       <polyline points="20 6 9 17 4 12"/>
     </svg>
   </div>
-  <h1>Welcome to <img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS!</h1>
+  <h1>Welcome to EvolvixOS!</h1>
   <p>Your subscription is active. Credits are now in your account. Let's start building.</p>
   <div>
     <a href="/dashboard/overview" class="btn">Launch Studio</a>

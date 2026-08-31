@@ -121,7 +121,7 @@ footer{border-top:1px solid var(--border);background:var(--bg-soft);
 <body>
 <nav class="nav">
   <div class="nav-inner">
-    <a href="/" class="brand"><img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;"><span class="brand-name">volvix<span class="os">OS</span></span></a>
+    <a href="/" class="brand"><img src="/assets/evolvixos-logo-64.png" alt="EvolvixOS" style="width:22px;height:22px;object-fit:contain;vertical-align:middle;"><span class="brand-name">Evolvix<span class="os">OS</span></span></a>
     <div class="nav-links">
       <a href="/pricing">Pricing</a>
       <a href="/terms">Terms</a>
@@ -154,7 +154,7 @@ footer{border-top:1px solid var(--border);background:var(--bg-soft);
     <h2 id="s1"><span class="num">01</span>Summary</h2>
 
     <div class="callout warm">
-      <p><strong>The short version.</strong> If you are not satisfied with your purchase for any reason, contact <a href="mailto:support@evolvixos.com">support@evolvixos.com</a> within <strong>14 days</strong> for a full refund. No questions asked. No conditions. No fine print. This applies to all purchases: subscriptions, credit packs, and any other product sold through <img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS. This policy sits alongside our Terms of Service and never reduces your statutory rights.</p>
+      <p><strong>The short version.</strong> If you are not satisfied with your purchase for any reason, contact <a href="mailto:support@evolvixos.com">support@evolvixos.com</a> within <strong>14 days</strong> for a full refund. No questions asked. No conditions. No fine print. This applies to all purchases: subscriptions, credit packs, and any other product sold through EvolvixOS. This policy sits alongside our Terms of Service and never reduces your statutory rights.</p>
     </div>
 
     <h2 id="s2"><span class="num">02</span>Who processes your refund</h2>

@@ -1,12 +1,12 @@
 {
   "version": "1.0",
-  "last_updated": "2026-08-30T22:05:01.802732Z",
-  "total_models": 83,
+  "last_updated": "2026-08-31T08:05:01.279190Z",
+  "total_models": 84,
   "categories": {
     "frameworks": 3,
     "image_generation": 17,
     "llm_text": 20,
-    "local_engines": 7,
+    "local_engines": 8,
     "rag_agents": 4,
     "speech_voice": 17,
     "video_generation": 3,
@@ -1134,6 +1134,22 @@
       "url": "https://github.com/Yuan-ManX/ComfyUI-OmniGen2",
       "language": "Python",
       "topics": "[\"comfyui\", \"comfyui-manager\", \"comfyui-nodes\", \"comfyui-workflow\"]",
+      "installable": true,
+      "running": false
+    },
+    {
+      "name": "airclaw",
+      "full_name": "nickzsche21/airclaw",
+      "description": "Run OpenClaw on a local model. Zero API cost. One OpenAI-compatible endpoint over Ollama, llama.cpp, vLLM or LM Studio \u2014 plus AirLLM for models bigger than your GPU.",
+      "category": "local_engines",
+      "source": "github_discovery",
+      "engine": "discovered",
+      "size": 0,
+      "status": "discovered",
+      "stars": 116,
+      "url": "https://github.com/nickzsche21/AirClaw",
+      "language": "Python",
+      "topics": "[\"ai-agent\", \"airllm\", \"cli\", \"llama\", \"llama-cpp\", \"lm-studio\", \"local-llm\", \"ollama\", \"openai-compatible\", \"openclaw\", \"python\", \"vllm\", \"zero-cost\"]",
       "installable": true,
       "running": false
     },

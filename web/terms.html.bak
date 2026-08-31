@@ -125,7 +125,7 @@ footer{border-top:1px solid var(--border);background:var(--bg-soft);
 <body>
 <nav class="nav">
   <div class="nav-inner">
-    <a href="/" class="brand"><img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;"><span class="brand-name">volvix<span class="os">OS</span></span></a>
+    <a href="/" class="brand"><img src="/assets/evolvixos-logo-64.png" alt="EvolvixOS" style="width:22px;height:22px;object-fit:contain;vertical-align:middle;"><span class="brand-name">Evolvix<span class="os">OS</span></span></a>
     <div class="nav-links">
       <a href="/pricing">Pricing</a>
       <a href="/terms">Terms</a>
@@ -164,21 +164,21 @@ footer{border-top:1px solid var(--border);background:var(--bg-soft);
   <main class="doc">
     <span class="eyebrow">Legal</span>
     <h1>Terms of Service</h1>
-    <p class="lede">The agreement between you and <img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS covering the hosted platform, subscriptions, credits, and acceptable use.</p>
+    <p class="lede">The agreement between you and EvolvixOS covering the hosted platform, subscriptions, credits, and acceptable use.</p>
     <p class="meta">Effective 29 August 2026 &middot; Last updated 29 August 2026</p>
 
       <h2 id="s1"><span class="num">01</span>Who we are and what these terms cover</h2>
 
-      <p><img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS ("<img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS", "we", "us") is an AI engineering platform operated by
+      <p>EvolvixOS ("EvolvixOS", "we", "us") is an AI engineering platform operated by
       <span class="fill">GOLAN EUROPE SL</span>, registered at <span class="fill">Avenida Blai Bonet 8, Bloque 3, Apartamento 301, Santa Ponça, 07180 Calvià (Illes Balears), España</span>, tax identification number <span class="fill">B16546020</span>, Spain.</p>
       <p>These Terms of Service ("Terms") form a binding agreement between you and us and
-      govern your use of the hosted <img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS service at evolvixos.com, including the
+      govern your use of the hosted EvolvixOS service at evolvixos.com, including the
       Studio dashboard, the REST API, and any associated services (together, the
       "Service"). By creating an account or using the Service you accept these Terms.
       If you do not accept them, do not use the Service.</p>
       <div class="callout">
         <h3>The hosted Service and the open-source project are different things</h3>
-        <p>The <img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS source code is published under the MIT License and you may
+        <p>The EvolvixOS source code is published under the MIT License and you may
         self-host it under that licence alone &mdash; these Terms do not restrict that.
         These Terms apply only to the <strong>hosted Service we operate</strong>, which
         includes managed infrastructure, model routing, and paid credits.</p>
@@ -450,7 +450,7 @@ footer{border-top:1px solid var(--border);background:var(--bg-soft);
     <a href="/privacy">Privacy Policy</a>
     <a href="https://github.com/Protremix/EvolvixOS">GitHub</a>
   </div>
-  <p>&copy; 2026 <img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS &middot; Software open-source under the MIT License</p>
+  <p>&copy; 2026 EvolvixOS &middot; Software open-source under the MIT License</p>
 </footer>
 </body>
 </html>

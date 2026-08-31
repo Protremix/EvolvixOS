@@ -61,7 +61,7 @@
     .save-badge { font-size: 11px; background: var(--accent); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 4px; }
 
     /* Cards */
-    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 60px; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 60px; }
     .tier-card {
       background: var(--surface); border-radius: var(--radius); padding: 32px;
       border: 1px solid var(--border); box-shadow: var(--shadow); position: relative;
@@ -90,43 +90,21 @@
     .tier-cta.secondary:hover { background: var(--border); }
     .tier-features { list-style: none; padding: 0; }
     .tier-features li { font-size: 14px; color: var(--text-secondary); padding: 6px 0; display: flex; align-items: start; gap: 8px; }
-    .tier-features li::before { content: "\2713"; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+    .tier-features li::before { content: "\u2713"; color: var(--accent); font-weight: 700; flex-shrink: 0; }
 
     /* Footer note */
     .footer-note { text-align: center; padding: 40px 24px; font-size: 13px; color: var(--text-muted); }
     .footer-note a { color: var(--accent); text-decoration: none; }
 
     @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .mobile-menu-btn { display: block; }
-      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto 60px; }
+      .pricing-grid { grid-template-columns: 1fr; }
       .hero h1 { font-size: 32px; }
     }
-  
-  .mobile-menu-btn { display: none; cursor: pointer; position: absolute; left: 16px; top: 10px; z-index: 1001; background: none; border: none; padding: 8px; }
-  .mobile-menu-btn span { display: block; width: 22px; height: 2px; background: #1d1d1f; border-radius: 1px; margin: 4px 0; }
-  .mobile-nav-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; }
-  body.nav-open .mobile-nav-overlay { display: block; }
-  body.nav-open .nav-links { display: flex !important; flex-direction: column; position: fixed; top: 56px; left: 0; right: 0; background: rgba(255,255,255,0.98); backdrop-filter: blur(20px); padding: 16px 24px; gap: 16px; z-index: 1000; border-bottom: 1px solid #d2d2d7; }
-  body.nav-open .nav-links a { font-size: 17px; padding: 8px 0; }
-
-</style>
-
-<style>
-#toast{position:fixed;top:20px;right:20px;z-index:9999;background:#1d1d1f;color:#fff;
-  padding:14px 22px;border-radius:12px;font-size:14px;font-weight:500;
-  box-shadow:0 8px 32px rgba(0,0,0,.18);opacity:0;transform:translateY(-10px);
-  transition:all .3s cubic-bezier(.2,.8,.2,1);max-width:380px}
-#toast.show{opacity:1;transform:translateY(0)}
-#toast.error{background:#dc3545}
-#toast.success{background:#28a745}
-</style>
+  </style>
 </head>
 <body>
   <nav>
-  <button class="mobile-menu-btn" onclick="document.body.classList.toggle('nav-open')" aria-label="Menu"><span></span><span></span><span></span></button>
-  <div class="mobile-nav-overlay" onclick="document.body.classList.remove('nav-open')"></div>
-    <a href="/" class="nav-logo"><img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvix<span>OS</span></a>
+    <a href="/" class="nav-logo"><img src="/assets/evolvixos-logo-64.png" alt="EvolvixOS" style="width:22px;height:22px;object-fit:contain;vertical-align:middle;"> Evolvix<span>OS</span></a>
     <div class="nav-links">
       <a href="/pricing">Pricing</a>
       <a href="/contact">Contact</a>
@@ -141,17 +119,17 @@
         <div style="border: 1px solid #d1d1d6; border-radius: 12px; padding: 32px; max-width: 260px;">
           <h3>Starter</h3>
           <p style="font-size: 36px; font-weight: 800; margin: 8px 0;">&euro;9<span style="font-size: 14px; color: #6e6e73;">/month</span></p>
-          <p style="font-size: 14px; color: #6e6e73;">&euro;86/year &middot; 2,000 credits/month</p>
+          <p style="font-size: 14px; color: #6e6e73;">&euro;86/year &middot; 5,000 API calls/month</p>
         </div>
         <div style="border: 1px solid #d1d1d6; border-radius: 12px; padding: 32px; max-width: 260px;">
           <h3>Pro</h3>
           <p style="font-size: 36px; font-weight: 800; margin: 8px 0;">&euro;29<span style="font-size: 14px; color: #6e6e73;">/month</span></p>
-          <p style="font-size: 14px; color: #6e6e73;">&euro;278/year &middot; 10,000 credits/month</p>
+          <p style="font-size: 14px; color: #6e6e73;">&euro;278/year &middot; 20,000 API calls/month</p>
         </div>
         <div style="border: 1px solid #d1d1d6; border-radius: 12px; padding: 32px; max-width: 260px;">
           <h3>Business</h3>
           <p style="font-size: 36px; font-weight: 800; margin: 8px 0;">&euro;49<span style="font-size: 14px; color: #6e6e73;">/month</span></p>
-          <p style="font-size: 14px; color: #6e6e73;">&euro;470/year &middot; 30,000 credits/month</p>
+          <p style="font-size: 14px; color: #6e6e73;">&euro;470/year &middot; 50,000 API calls/month</p>
         </div>
       </div>
       <p style="margin-top: 24px; font-size: 13px; color: #6e6e73;">Prices include estimated taxes. Powered by Stripe.</p>
@@ -187,56 +165,25 @@
 
     const TIERS = [
       {
-        name: "Free",
-        description: "For trying out the platform",
-        features: ["100 credits / month", "1 AI Agent", "3 Entities", "1 Backend Function", "Free AI Models (GLM, Nemotron, GPT-OSS)", "Community Support"],
-        prices: { month: 0, year: 0 },
-        stripePrices: { month: null, year: null },
-        isFree: true
-      },
-      {
         name: "Starter",
         description: "For individual developers getting started",
-        features: ["2,000 credits / month", "5 AI Agents", "10 Entities", "5 Backend Functions", "3 Workflows", "All Standard AI Models", "Email Support"],
+        features: ["5,000 API calls / month", "All AI models included", "Entity CRUD + Backend functions", "Community support"],
         prices: { month: 9, year: 86 },
         stripePrices: { month: "price_1UAELl2fz7mjXQMgBNDsM9b1", year: "price_1UAELl2fz7mjXQMgs0QQovNq" }
       },
       {
         name: "Pro",
         description: "For growing teams building production apps",
-        features: ["10,000 credits / month", "20 AI Agents", "50 Entities", "20 Backend Functions", "Unlimited Workflows", "ALL AI Models (Claude, Gemini, Kimi)", "Priority Support"],
+        features: ["20,000 API calls / month", "Priority model routing", "Workflows + automations", "Email support"],
         prices: { month: 29, year: 278 },
         stripePrices: { month: "price_1UAELm2fz7mjXQMgwazTQ2MA", year: "price_1UAELm2fz7mjXQMg9cy365Xv" }
       },
       {
         name: "Business",
         description: "For teams scaling AI infrastructure",
-        features: ["30,000 credits / month", "50 AI Agents", "200 Entities", "50 Backend Functions", "Unlimited Workflows", "All AI Models + Analytics", "Team Collaboration (3 seats)", "Email Support"],
+        features: ["50,000 API calls / month", "Advanced routing + privacy modes", "SSO + audit logs", "Priority support"],
         prices: { month: 49, year: 470 },
         stripePrices: { month: "price_1UAELm2fz7mjXQMglGtHJS1a", year: "price_1UAELm2fz7mjXQMgm9Jv5slH" }
-      },
-      {
-        name: "Team",
-        description: "For growing engineering teams",
-        features: ["50,000 credits / month", "Unlimited AI Agents", "Unlimited Entities", "Unlimited Functions", "Unlimited Workflows", "All AI Models + Early Access", "Team Collaboration (5 seats)", "Custom Model Hosting", "Dedicated Support", "SLA 99.9%"],
-        prices: { month: 99, year: 950 },
-        stripePrices: { month: "price_1UAELn2fz7mjXQMgBCl8SIHM", year: "price_1UAELn2fz7mjXQMgs17UxDHr" }
-      },
-      {
-        name: "Enterprise",
-        description: "For organizations with advanced needs",
-        features: ["200,000 credits / month", "Unlimited Everything", "All AI Models + Early Access", "Dedicated GPU Server (Wan2.1)", "MicroVM Sandboxing", "Tencent Cloud Integration", "Custom AI Model Fine-tuning", "On-Premise Deployment", "Source Code Access"],
-        prices: { month: 199, year: 1900 },
-        stripePrices: { month: "price_1UAQ1t2fz7mjXQMg8HQ8go3P", year: "price_1UAQ1t2fz7mjXQMgqHhFDAZh" },
-        isEnterprise: false
-      },
-      {
-        name: "Enterprise+",
-        description: "Maximum scale and customization",
-        features: ["500,000 credits / month", "Everything in Enterprise", "Dedicated Server Infrastructure", "White-label Platform", "Custom Integrations", "Dedicated AI Engineer", "24/7 Phone Support", "Custom SLA Terms"],
-        prices: { month: 299, year: 2870 },
-        stripePrices: { month: "price_1UAQ1u2fz7mjXQMgeG034Khh", year: "price_1UAQ1u2fz7mjXQMg4pMNaTgY" },
-        isEnterprise: false
       }
     ];
 
@@ -249,24 +196,14 @@
         const featuresHtml = tier.features.map(function(f) {
           return "<li>" + f + "</li>";
         }).join("");
-        const isFree = tier.isFree || tier.prices[currentCycle] === 0;
-        const priceHtml = isFree
-          ? '<div class="tier-price"><span class="tier-price-amount">Free</span></div>'
-          : '<div class="tier-price"><span class="tier-price-amount">&euro;' + tier.prices[currentCycle] + '</span></div>';
-        const noteHtml = isFree
-          ? '<div class="tier-price-note">Forever free</div>'
-          : '<div class="tier-price-note">' + (currentCycle === "month" ? "per month" : "per year") + '</div>';
-        let ctaHtml;
-        if (isFree) {
-          ctaHtml = '<button class="tier-cta secondary" data-tier="' + tier.name + '">Get Started</button>';
-        } else {
-          ctaHtml = '<button class="tier-cta ' + (featured ? "primary" : "secondary") + '" data-tier="' + tier.name + '">Subscribe</button>';
-        }
         return '<div class="tier-card ' + (featured ? "featured" : "") + '">' +
           (featured ? '<div class="featured-badge">Most popular</div>' : "") +
           '<div class="tier-name">' + tier.name + '</div>' +
           '<div class="tier-desc">' + tier.description + '</div>' +
-          priceHtml + noteHtml + ctaHtml +
+          '<div class="tier-price"><span class="tier-price-amount">&euro;' + tier.prices[currentCycle] + '</span></div>' +
+          '<div class="tier-price-note">' + (currentCycle === "month" ? "per month" : "per year") + '</div>' +
+          '<button class="tier-cta ' + (featured ? "primary" : "secondary") + '" ' +
+          'data-tier="' + tier.name + '">Subscribe</button>' +
           '<ul class="tier-features">' + featuresHtml + '</ul>' +
           '</div>';
       }).join("");
@@ -290,10 +227,6 @@
     async function openCheckout(tierName) {
       const tier = TIERS.find(function(t) { return t.name === tierName; });
       if (!tier) return;
-      if (tier.isFree || tier.prices[currentCycle] === 0) {
-        window.location.href = "/dashboard/overview";
-        return;
-      }
       const priceId = tier.stripePrices[currentCycle];
 
       try {
@@ -312,10 +245,6 @@
         });
 
         const data = await res.json();
-        if (res.status === 401 || data.error === "Not authenticated") {
-          window.location.href = "/auth/sign-in";
-          return;
-        }
         if (data.url) {
           window.location.href = data.url;
         } else if (data.error) {

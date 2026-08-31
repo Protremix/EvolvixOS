@@ -4,7 +4,7 @@
   "source": "https://github.com/open-free-llm-api/awesome-freellm-apis",
   "website": "https://freellm.net",
   "total_providers": 31,
-  "total_free_models": 451,
+  "total_free_models": 452,
   "providers": [
     {
       "name": "NVIDIA NIM",
@@ -153,6 +153,21 @@
       "models": []
     },
     {
+      "name": "OpenCode Zen",
+      "free_models": 13,
+      "credit_card": "Registration",
+      "max_context": "1M",
+      "modalities": [
+        "audio",
+        "reasoning",
+        "vision"
+      ],
+      "key_url": "https://opencode.ai/auth",
+      "tier": "permanent_free",
+      "base_url": "https://opencode.ai/zen/v1",
+      "models": []
+    },
+    {
       "name": "Groq",
       "free_models": 12,
       "credit_card": "No",
@@ -212,21 +227,6 @@
       "key_url": "https://kilo.ai",
       "tier": "permanent_free",
       "base_url": "https://api.kilo.ai/api/gateway",
-      "models": []
-    },
-    {
-      "name": "OpenCode Zen",
-      "free_models": 12,
-      "credit_card": "Registration",
-      "max_context": "1M",
-      "modalities": [
-        "audio",
-        "reasoning",
-        "vision"
-      ],
-      "key_url": "https://opencode.ai/auth",
-      "tier": "permanent_free",
-      "base_url": "https://opencode.ai/zen/v1",
       "models": []
     },
     {
@@ -485,5 +485,5 @@
       "models": []
     }
   ],
-  "last_updated": "2026-08-30T22:13:22.293439+00:00"
+  "last_updated": "2026-08-31T08:18:11.500573+00:00"
 }

@@ -145,7 +145,7 @@ body.cine #letterbox::before,body.cine #letterbox::after{height:4.5vh}
       <stop offset="0" stop-color="#007AFF"/><stop offset=".42" stop-color="#0051A8"/>
       <stop offset="1" stop-color="#5856D6"/></linearGradient></defs>
     <path d="M26.77,5.2 Q24,3.6 21.23,5.2 L9.1,12.2 Q6.33,13.8 6.33,17 L6.33,31 Q6.33,34.2 9.1,35.8 L21.23,42.8 Q24,44.4 26.77,42.8 L38.9,35.8 Q41.67,34.2 41.67,31 L41.67,17 Q41.67,13.8 38.9,12.2 Z M13.2,28.4 L24,16.8 L34.8,28.4 L34.8,33.4 L24,21.8 L13.2,33.4 Z" fill="url(#m)" fill-rule="evenodd"/></svg>
-    <span><img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS</span>
+    <span>EvolvixOS</span>
   </div>
   <div class="cnr" id="c-tr">Substrate&nbsp;/&nbsp;<span id="secname">Arrival</span></div>
   <div class="cnr" id="c-bl"><span class="dot"></span><span id="fps">Live</span></div>
@@ -231,7 +231,7 @@ body.cine #letterbox::before,body.cine #letterbox::after{height:4.5vh}
 </div>
 
 <div id="fallback">
-  <div class="eye" style="justify-content:center"><img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS</div>
+  <div class="eye" style="justify-content:center">EvolvixOS</div>
   <div class="ttl" style="font-family:var(--serif);font-size:2rem">WebGL unavailable</div>
   <div class="sub" style="margin:0 auto">This experience needs hardware acceleration.
     The full platform works without it.</div>
