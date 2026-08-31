@@ -223,6 +223,7 @@ async def delete_function(name: str, request: Request = None, db=Depends(get_db)
     try:
         # Delete from DB (asyncpg)
         result = await db.execute(text("DELETE FROM platform_functions WHERE name = :name"), {"name": name})
+        await db.commit()
         if "DELETE 0" in str(result):
             raise ValueError(f"Function '{name}' not found")
         # Also delete from filesystem if exists
