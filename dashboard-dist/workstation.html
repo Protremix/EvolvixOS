@@ -503,6 +503,10 @@ async function sendMessage(){
     if(data.entities||data.actions){
       const actions=data.entities||data.actions||[];
       actions.forEach(a=>addActivity('Created: '+(a.name||a.type||'entity'),'✅'));
+
+    // Auto-load preview when an app is generated
+    if(data.tool_action==='generate_app'&&data.full_url){loadPreview(data.full_url);}
+    if(data.action==='generate_app'&&data.full_url){loadPreview(data.full_url);}
     }
   }catch(e){
     typingDiv.remove();
@@ -529,6 +533,38 @@ function loadPreview(url){
 }
 function refreshPreview(){document.getElementById('previewFrame').src=document.getElementById('previewFrame').src;}
 function openPreviewNew(){window.open(document.getElementById('previewFrame').src,'_blank');}
+async function loadPreview(appUrl){
+  if(appUrl){
+    document.getElementById('previewBar').style.display='flex';
+    document.getElementById('previewFrame').style.display='block';
+    document.getElementById('previewEmpty').style.display='none';
+    document.getElementById('previewUrl').textContent=appUrl;
+    document.getElementById('previewFrame').src=appUrl;
+    addActivity('Preview loaded: '+appUrl,'\u{1F441}');
+  }else{
+    // Try to load last generated app
+    try{
+      const r=await fetch(API+'/apps/latest',{method:'GET',headers:authHeaders});
+      if(r.ok){
+        const d=await r.json();
+        if(d&&d.url){
+          const fullUrl=d.full_url||d.url;
+          document.getElementById('previewBar').style.display='flex';
+          document.getElementById('previewFrame').style.display='block';
+          document.getElementById('previewEmpty').style.display='none';
+          document.getElementById('previewUrl').textContent=fullUrl;
+          document.getElementById('previewFrame').src=fullUrl;
+          addActivity('Preview loaded from last app','\u{1F441}');
+          return;
+        }
+      }
+    }catch(e){console.error('Failed to load preview:',e);}
+    // No app available - show empty state
+    document.getElementById('previewBar').style.display='none';
+    document.getElementById('previewFrame').style.display='none';
+    document.getElementById('previewEmpty').style.display='flex';
+  }
+}
 
 // ─── Connected Apps ───
 let connectedServices={};
@@ -549,8 +585,26 @@ function markConnected(svc,data){
   row.querySelector('.toggle').classList.add('on');
 }
 async function toggleApp(service){
-  if(connectedServices[service]){if(confirm(`Disconnect ${service}?`)){await fetch(`${API}/integrations/${service}/disconnect`,{method:'DELETE',headers:authHeaders});connectedServices[service]=false;const row=document.querySelector(`.app-row[data-service="${service}"]`);row.querySelector('.app-status').textContent='Not connected';row.querySelector('.app-status').classList.remove('connected');row.querySelector('.toggle').classList.remove('on');addActivity(service+' disconnected','🔌');}else{openConnectModal(service);}
-}
+  if(connectedServices[service]){
+    if(confirm('Disconnect '+service+'?')){
+      try{
+        await fetch(API+'/integrations/'+service+'/disconnect',{method:'DELETE',headers:authHeaders});
+        connectedServices[service]=false;
+        const row=document.querySelector('.app-row[data-service="'+service+'"]');
+        if(row){
+          row.querySelector('.app-status').textContent='Not connected';
+          row.querySelector('.app-status').classList.remove('connected');
+          row.querySelector('.toggle').classList.remove('on');
+        }
+        addActivity(service+' disconnected','\u{1F50C}');
+      }catch(e){
+        console.error('Disconnect failed:',e);
+        showToast('Failed to disconnect '+service);
+      }
+    }
+  }else{
+    openConnectModal(service);
+  }
 }
 
 // ─── Connect Modal ───
@@ -917,7 +971,7 @@ async function createEntitySubmit(){
     // Refresh entity list in sidebar
     refreshEntityList();
     // Show success toast
-    showToast('Entity "'+name+'" created successfully!');
+    showToast('Entity "'+name+'" created successfully!');setTimeout(function(){loadPreview();},1500);
   }catch(e){
     document.getElementById('entityError').textContent=e.message;
     document.getElementById('entityError').style.display='block';

@@ -1,0 +1,1 @@
+import{a as e,t}from"./jsx-runtime-B-hcVAMW.js";import{t as n}from"./coming-soon-DcFpQdf9.js";import{t as r}from"./zap-BjBOqjoB.js";var i=e(t()),a=()=>(0,i.jsx)(n,{title:`Skills`,icon:r});export{a as component};

@@ -1,0 +1,1 @@
+import{a as e,t}from"./jsx-runtime-B-hcVAMW.js";import{t as n}from"./layout-template-IVz6jDiY.js";import{t as r}from"./coming-soon-DcFpQdf9.js";var i=e(t()),a=()=>(0,i.jsx)(r,{title:`Templates`,icon:n});export{a as component};

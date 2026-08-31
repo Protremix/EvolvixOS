@@ -1,0 +1,1 @@
+import{a as e,t}from"./jsx-runtime-B-hcVAMW.js";import{t as n}from"./sticky-note-DqHSpOOd.js";import{t as r}from"./coming-soon-DcFpQdf9.js";var i=e(t()),a=()=>(0,i.jsx)(r,{title:`Notes`,icon:n});export{a as component};

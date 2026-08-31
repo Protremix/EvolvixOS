@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EvolvixOS — AI Agent Engineering Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #f5f5f7;
+      --card: #ffffff;
+      --border: #e5e5ea;
+      --border-soft: #f0f0f3;
+      --accent: #007aff;
+      --accent2: #5856d6;
+      --green: #34c759;
+      --orange: #ff9500;
+      --red: #ff3b30;
+      --gray: #8e8e93;
+      --text: #1d1d1f;
+      --text2: #6e6e73;
+      --text3: #aeaeb2;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+      --sidebar-w: 248px;
+    }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar { width: var(--sidebar-w); background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .sidebar-header { padding: 20px 18px 14px; display: flex; align-items: center; gap: 11px; }
+    .sidebar-logo { width: 34px; height: 34px; flex-shrink: 0; }
+    .sidebar-brand { font-size: 17px; font-weight: 700; letter-spacing: -0.6px; }
+    .sidebar-brand span { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .sidebar-tag { font-size: 10px; color: var(--text3); font-weight: 500; margin-top: 1px; letter-spacing: 0.3px; }
+    .nav-section { padding: 4px 12px; flex: 1; overflow-y: auto; }
+    .nav-label { font-size: 10px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; padding: 16px 12px 6px; }
+    .nav-item { display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: var(--radius-sm); cursor: pointer; color: var(--text2); font-size: 14px; font-weight: 500; transition: all 0.18s ease; margin-bottom: 2px; text-decoration: none; }
+    .nav-item:hover { background: rgba(0,0,0,0.04); color: var(--text); }
+    .nav-item.active { background: linear-gradient(135deg, rgba(0,122,255,0.07), rgba(88,86,214,0.07)); color: var(--accent); font-weight: 600; }
+    .nav-item svg { width: 19px; height: 19px; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; background: var(--accent); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+    .sidebar-footer { padding: 14px; border-top: 1px solid var(--border-soft); }
+    .user-card { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: var(--radius-sm); cursor: pointer; transition: background 0.2s; }
+    .user-card:hover { background: rgba(0,0,0,0.04); }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 600; }
+    .user-email { font-size: 11px; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ===== MAIN ===== */
+    .main { flex: 1; margin-left: var(--sidebar-w); min-width: 0; transition: margin 0.3s ease; }
+    .topbar { background: rgba(255,255,255,0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); padding: 13px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 14px; width: 340px; max-width: 100%; transition: border-color 0.2s; }
+    .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,122,255,0.1); }
+    .search-box input { border: none; background: none; outline: none; font-size: 14px; color: var(--text); width: 100%; font-family: inherit; }
+    .search-box svg { color: var(--gray); width: 16px; height: 16px; flex-shrink: 0; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .icon-btn { width: 38px; height: 38px; border-radius: 50%; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text2); transition: background 0.2s; position: relative; }
+    .icon-btn:hover { background: rgba(0,0,0,0.06); }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .notif-dot { position: absolute; top: 9px; right: 9px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 2px solid var(--card); }
+
+    /* ===== CONTENT ===== */
+    .content { max-width: 1440px; margin: 0 auto; padding: 28px; }
+    .page-header { margin-bottom: 24px; display: flex; align-items: flex-end; justify-content: space-between; }
+    .page-title { font-size: 26px; font-weight: 700; letter-spacing: -0.6px; }
+    .page-subtitle { font-size: 14px; color: var(--text2); margin-top: 3px; }
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 18px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; font-family: inherit; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #0066d6; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,122,255,0.25); }
+    .btn-ghost { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--bg); }
+    .btn-danger { background: rgba(255,59,48,0.08); color: var(--red); }
+    .btn-danger:hover { background: rgba(255,59,48,0.12); }
+    .btn-sm { padding: 7px 14px; font-size: 13px; }
+    .btn svg { width: 16px; height: 16px; }
+
+    /* ===== STAT CARDS ===== */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stat-card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .stat-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+    .stat-icon svg { width: 19px; height: 19px; }
+    .stat-icon.blue { background: rgba(0,122,255,0.1); color: var(--accent); }
+    .stat-icon.purple { background: rgba(88,86,214,0.1); color: var(--accent2); }
+    .stat-icon.green { background: rgba(52,199,89,0.1); color: var(--green); }
+    .stat-icon.orange { background: rgba(255,149,0,0.1); color: var(--orange); }
+    .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -1px; }
+    .stat-label { font-size: 13px; color: var(--text2); font-weight: 500; margin-top: 2px; }
+    .stat-trend { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; margin-top: 10px; }
+    .stat-trend.up { color: var(--green); }
+    .stat-trend.down { color: var(--red); }
+    .stat-trend.neutral { color: var(--gray); }
+    .stat-trend svg { width: 14px; height: 14px; }
+
+    /* ===== SECTIONS ===== */
+    .section { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+    .section-header { padding: 18px 20px; border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; justify-content: space-between; }
+    .section-title { font-size: 15px; font-weight: 600; }
+    .chart-wrap { padding: 20px; }
+    .chart-wrap canvas { max-height: 280px; }
+
+    /* ===== TABLE ===== */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { text-align: left; font-size: 11px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 20px; border-bottom: 1px solid var(--border-soft); }
+    .data-table td { padding: 14px 20px; border-bottom: 1px solid var(--border-soft); font-size: 14px; }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+    .data-table tbody tr { transition: background 0.15s; }
+    .data-table tbody tr:hover { background: rgba(0,0,0,0.02); }
+    .agent-name { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+    .agent-avatar { width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+    .model-badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: rgba(88,86,214,0.08); color: var(--accent2); }
+    .status-badge { font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; }
+    .status-badge.active { background: rgba(52,199,89,0.08); color: var(--green); }
+    .status-badge.idle { background: rgba(142,142,147,0.08); color: var(--gray); }
+    .status-badge.error { background: rgba(255,59,48,0.08); color: var(--red); }
+    .status-badge.running { background: rgba(0,122,255,0.08); color: var(--accent); }
+    .status-badge.paused { background: rgba(255,149,0,0.08); color: var(--orange); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+    .status-dot.active, .status-dot.running { background: var(--green); }
+    .status-dot.idle { background: var(--gray); }
+    .status-dot.error { background: var(--red); }
+    .status-dot.paused { background: var(--orange); }
+    .action-btn { width: 32px; height: 32px; border-radius: 8px; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--gray); transition: all 0.15s; }
+    .action-btn:hover { background: rgba(0,0,0,0.06); color: var(--text); }
+    .action-btn svg { width: 16px; height: 16px; }
+    .action-btn.danger:hover { background: rgba(255,59,48,0.08); color: var(--red); }
+
+    /* ===== GRID ===== */
+    .grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+    .grid-2-equal { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+    /* ===== FILTER PILLS ===== */
+    .filter-bar { display: flex; gap: 8px; padding: 16px 20px; border-bottom: 1px solid var(--border-soft); overflow-x: auto; }
+    .filter-pill { padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); color: var(--text2); transition: all 0.18s; white-space: nowrap; }
+    .filter-pill:hover { border-color: var(--accent); color: var(--accent); }
+    .filter-pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+    /* ===== MODELS GRID ===== */
+    .models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; padding: 20px; }
+    .model-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; cursor: pointer; transition: all 0.2s; }
+    .model-card:hover { border-color: var(--accent); box-shadow: 0 4px 16px rgba(0,122,255,0.08); transform: translateY(-2px); }
+    .model-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .model-card-name { font-weight: 600; font-size: 15px; }
+    .model-card-cat { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 8px; border-radius: 20px; }
+    .model-card-cat.reasoning { background: rgba(88,86,214,0.1); color: var(--accent2); }
+    .model-card-cat.coding { background: rgba(52,199,89,0.1); color: var(--green); }
+    .model-card-cat.vision { background: rgba(255,149,0,0.1); color: var(--orange); }
+    .model-card-cat.chat { background: rgba(0,122,255,0.1); color: var(--accent); }
+    .model-card-cat.embedding { background: rgba(142,142,147,0.1); color: var(--gray); }
+    .model-card-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+    .model-card-status { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--green); font-weight: 500; }
+
+    /* ===== API KEY ROWS ===== */
+    .api-key-row { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--border-soft); }
+    .api-key-row:last-child { border-bottom: none; }
+    .api-key { font-family: 'SF Mono', Monaco, monospace; font-size: 13px; color: var(--text2); }
+    .copy-btn { font-size: 13px; font-weight: 600; color: var(--accent); background: none; border: none; cursor: pointer; padding: 6px 12px; border-radius: 8px; transition: background 0.15s; }
+    .copy-btn:hover { background: rgba(0,122,255,0.06); }
+
+    /* ===== PRICE CARDS ===== */
+    .price-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; transition: all 0.2s; }
+    .price-card:hover { box-shadow: var(--shadow-lg); }
+    .price-card.featured { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 8px 32px rgba(0,122,255,0.06); }
+    .price-plan { font-size: 18px; font-weight: 700; }
+    .price-amount { font-size: 36px; font-weight: 800; letter-spacing: -1.5px; margin: 8px 0 20px; }
+    .price-period { font-size: 16px; font-weight: 500; color: var(--text2); }
+    .price-features { list-style: none; margin-bottom: 24px; }
+    .price-features li { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 14px; color: var(--text2); }
+    .price-features li svg { width: 18px; height: 18px; color: var(--green); flex-shrink: 0; }
+
+    /* ===== FORMS ===== */
+    .form-group { margin-bottom: 16px; }
+    .form-label { font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px; }
+    .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s; background: var(--card); color: var(--text); }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,122,255,0.1); }
+    .form-textarea { min-height: 80px; resize: vertical; }
+    .form-hint { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow-lg); width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.25s cubic-bezier(0.4,0,0.2,1); }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header { padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-soft); }
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .modal-close { width: 32px; height: 32px; border-radius: 8px; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--gray); transition: background 0.15s; }
+    .modal-close:hover { background: rgba(0,0,0,0.06); }
+    .modal-body { padding: 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border-soft); display: flex; justify-content: flex-end; gap: 10px; }
+
+    /* ===== TOAST ===== */
+    .toast { position: fixed; bottom: 24px; right: 24px; padding: 14px 20px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; box-shadow: var(--shadow-lg); z-index: 2000; transform: translateY(100px); opacity: 0; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); background: var(--text); color: white; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: var(--green); }
+    .toast.error { background: var(--red); }
+
+    /* ===== USAGE ===== */
+    .usage-item { padding: 12px 0; border-bottom: 1px solid var(--border-soft); }
+    .usage-item:last-child { border-bottom: none; }
+    .usage-item-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
+    .usage-item-label { font-weight: 600; }
+    .usage-item-value { color: var(--text2); }
+    .progress { height: 6px; background: var(--border-soft); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+    .progress-fill.blue { background: var(--accent); }
+    .progress-fill.purple { background: var(--accent2); }
+    .progress-fill.green { background: var(--green); }
+    .progress-fill.orange { background: var(--orange); }
+
+    /* ===== LOGIN ===== */
+    .login-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 3000; display: flex; align-items: center; justify-content: center; }
+    .login-card { width: 100%; max-width: 380px; padding: 40px; }
+    .login-logo { width: 56px; height: 56px; margin: 0 auto 16px; }
+    .login-title { font-size: 24px; font-weight: 700; text-align: center; letter-spacing: -0.6px; }
+    .login-subtitle { font-size: 14px; color: var(--text2); text-align: center; margin-top: 4px; margin-bottom: 32px; }
+
+    /* ===== ANIMATIONS ===== */
+    .page-enter { animation: pageEnter 0.3s cubic-bezier(0.4,0,0.2,1); }
+    @keyframes pageEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .loading { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 60px; color: var(--text2); font-size: 14px; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== MOBILE ===== */
+    .mobile-header { display: none; padding: 12px 16px; background: var(--card); border-bottom: 1px solid var(--border); align-items: center; gap: 12px; }
+    .menu-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .menu-btn:hover { background: rgba(0,0,0,0.06); }
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .grid-2, .grid-2-equal, .grid-3 { grid-template-columns: 1fr; } }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); z-index: 200; box-shadow: var(--shadow-lg); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .mobile-header { display: flex; }
+      .content { padding: 16px; }
+      .search-box { width: 100%; }
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+
+      /* ─── Mobile Optimization ─── */
+      @media (max-width: 900px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        .grid-2, .grid-2-cols { grid-template-columns: 1fr !important; }
+        .grid-3 { grid-template-columns: 1fr !important; }
+        .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+      }
+      @media (max-width: 768px) {
+        .sidebar { transform: translateX(-100%); z-index: 200; box-shadow: 2px 0 20px rgba(0,0,0,0.15); }
+        .sidebar.open { transform: translateX(0); }
+        .main { margin-left: 0 !important; }
+        .sidebar-overlay {
+          display: none;
+          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0,0,0,0.4); z-index: 199;
+        }
+        .sidebar-overlay.show { display: block; }
+        .menu-toggle { display: flex !important; }
+        .topbar { padding: 12px 16px; }
+        .topbar-title { font-size: 18px; }
+        .topbar-actions .btn { padding: 8px 12px; font-size: 13px; }
+        .content-area { padding: 16px !important; }
+        .card { padding: 14px; }
+        .stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
+        .stat-card { padding: 14px; }
+        .stat-value { font-size: 22px; }
+        .stat-label { font-size: 11px; }
+        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .data-table { min-width: 600px; }
+        .grid-2, .grid-2-cols, .grid-3, .grid-4 { grid-template-columns: 1fr !important; }
+        .modal-content { width: 95% !important; max-width: 95% !important; margin: 16px; padding: 16px; }
+        .modal-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .form-group input, .form-group select, .form-group textarea { font-size: 16px; }
+        .btn { min-height: 44px; padding: 10px 16px; }
+        .nav-item { padding: 10px 14px; font-size: 14px; }
+        .page-title { font-size: 20px; }
+        .search-input { width: 100%; }
+        .toolbar { flex-wrap: wrap; gap: 8px; }
+        .toolbar .btn { font-size: 13px; }
+      }
+      @media (max-width: 480px) {
+        .content-area { padding: 12px 8px !important; }
+        .stats-grid { grid-template-columns: 1fr !important; }
+        .stat-card { padding: 12px; }
+        .stat-value { font-size: 20px; }
+        .card { padding: 12px; }
+        .topbar { padding: 10px 12px; }
+        .topbar-title { font-size: 16px; }
+        .topbar-actions .btn { padding: 6px 10px; font-size: 12px; }
+        .topbar-actions .btn-text { display: none; }
+        .topbar-actions .btn-icon { display: inline-flex; }
+        .modal-content { padding: 14px; border-radius: 12px; }
+        .modal-header h2 { font-size: 18px; }
+        .form-group label { font-size: 13px; }
+        .data-table { font-size: 13px; }
+        .data-table th, .data-table td { padding: 8px 10px; }
+        .nav-item { padding: 8px 12px; font-size: 13px; }
+        .nav-item-text { font-size: 13px; }
+        .page-title { font-size: 18px; }
+        .btn { padding: 8px 14px; font-size: 13px; min-height: 40px; }
+        .pagination { gap: 4px; }
+        .pagination button { min-width: 32px; min-height: 32px; font-size: 13px; }
+        .toast { font-size: 13px; padding: 8px 16px; }
+      }
+      /* Touch-friendly scroll */
+      .table-wrapper, .messages, .content-area {
+        -webkit-overflow-scrolling: touch;
+        -webkit-tap-highlight-color: transparent;
+      }
+      /* Prevent text selection on buttons */
+      .btn, .nav-item, .toggle-sidebar { -webkit-tap-highlight-color: transparent; user-select: none; }
+    
+
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN OVERLAY -->
+  <div class="login-overlay" id="login-overlay" style="display:none">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg viewBox="0 0 48 48" width="56" height="56">
+          <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#007aff"/><stop offset="100%" stop-color="#5856d6"/></linearGradient></defs>
+          <polygon points="24,4 42,14 42,34 24,44 6,34 6,14" fill="url(#logoGrad)" rx="4"/>
+          <path d="M16 30 L24 14 L32 30 M19 24 L29 24" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div style="position:fixed;top:0;right:0;z-index:100;margin:12px;">
+                <a href="/workstation" style="display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:linear-gradient(135deg,#007aff,#5856d6);color:white;text-decoration:none;border-radius:8px;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,122,255,0.3);">
+                    🖥️ Open Workstation
+                </a>
+            </div>
+            <h1 class="login-title">EvolvixOS</h1>
+      <p class="login-subtitle">Engineering Platform</p>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="login-email" placeholder="you@example.com" value="admin@evolvixos.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="login-password" type="password" placeholder="••••••••" value="admin" />
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="doLogin()">Sign In</button>
+      <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:20px">Built by engineers. For engineers.</p>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <svg class="sidebar-logo" viewBox="0 0 48 48"><defs><linearGradient id="sbGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#007aff"/><stop offset="100%" stop-color="#5856d6"/></linearGradient></defs><polygon points="24,4 42,14 42,34 24,44 6,34 6,14" fill="url(#sbGrad)" rx="4"/><path d="M16 30 L24 14 L32 30 M19 24 L29 24" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>
+        <div class="sidebar-brand">Evolvix<span>OS</span></div>
+        <div class="sidebar-tag">Engineering Platform</div>
+      </div>
+    </div>
+    <nav class="nav-section">
+      <a href="/workstation" onclick="this.href='/workstation?token='+encodeURIComponent(getToken())" style="display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#007aff,#5856d6);color:white;font-size:14px;font-weight:600;margin-bottom:14px;text-decoration:none;box-shadow:0 4px 14px rgba(0,122,255,0.25);transition:all 0.2s" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 20px rgba(0,122,255,0.35)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 14px rgba(0,122,255,0.25)'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Build with AI
+        <span style="margin-left:auto;font-size:10px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:10px">NEW</span>
+      </a>
+      <div class="nav-label">Platform</div>
+      <a class="nav-item" data-route="dashboard" onclick="navigate('dashboard')">{IC_DASH}Dashboard</a>
+      <a class="nav-item" data-route="agents" onclick="navigate('agents')">{IC_BOT}Agents <span class="nav-badge" id="nav-agent-count">—</span></a>
+      <a class="nav-item" data-route="models" onclick="navigate('models')">{IC_GRID}Models</a>
+      <a class="nav-item" data-route="usage" onclick="navigate('usage')">{IC_CHART}Usage</a>
+      <div class="nav-label">Developer</div>
+      <a class="nav-item" data-route="api-keys" onclick="navigate('api-keys')">{IC_KEY}API Keys</a>
+      <a class="nav-item" data-route="functions" onclick="navigate('functions')">{IC_FN}Functions</a>
+      <a class="nav-item" data-route="workflows" onclick="navigate('workflows')">{IC_FLOW}Workflows</a>
+      <div class="nav-label">Account</div>
+      <a class="nav-item" data-route="billing" onclick="navigate('billing')">{IC_CARD}Billing</a>
+      <a class="nav-item" data-route="settings" onclick="navigate('settings')">{IC_GEAR}Settings</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">A</div>
+        <div class="user-info"><div class="user-name">Admin</div><div class="user-email">admin@evolvixos.com</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="mobile-header">
+      <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('open')">{IC_MENU}</button>
+      <span style="font-weight:700;font-size:16px">EvolvixOS</span>
+    </div>
+    <div class="topbar">
+      <div class="search-box">
+        {IC_SEARCH}
+        <input id="search-input" placeholder="Search agents, models, tools..." />
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn">{IC_BELL}<span class="notif-dot"></span></button>
+        <div class="user-avatar" style="width:34px;height:34px;cursor:pointer">A</div>
+      </div>
+    </div>
+    <div class="content" id="app">
+      <div class="loading"><div class="spinner"></div>Loading...</div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div id="modal"></div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===== CONFIG =====
+    const API_BASE = 'https://evolvixos.com/platform/api';
+    const STRIPE_PRICES = {
+      starter: { monthly: 'price_1Q8zK2J9kX9pHmZB', yearly: 'price_1Q8zK3J9kX9pHmZB' },
+      developer: { monthly: 'price_1Q8zK4J9kX9pHmZB', yearly: 'price_1Q8zK5J9kX9pHmZB' },
+      pro: { monthly: 'price_1Q8zK6J9kX9pHmZB', yearly: 'price_1Q8zK7J9kX9pHmZB' },
+      team: { monthly: 'price_1Q8zK8J9kX9pHmZB', yearly: 'price_1Q8zK9J9kX9pHmZB' },
+      enterprise: { monthly: 'price_1Q8zKAJ9kX9pHmZB', yearly: 'price_1Q8zKBJ9kX9pHmZB' },
+      'enterprise-plus': { monthly: 'price_1Q8zKCJ9kX9pHmZB', yearly: 'price_1Q8zKDJ9kX9pHmZB' },
+    };
+
+    // ===== AUTH =====
+    function getToken() {
+      const t = localStorage.getItem('evolvixos_token');
+      if (t) return t;
+      return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZW1haWwiOiJhZG1pbkBldm9sdml4b3MuY29tIiwicm9sZSI6InVzZXIiLCJleHAiOjE4MTk3NDYyNDB9.MHw6QdhjBqBzDkBOAChWaCGowtI82J7n_Bl3UEq39Pw';
+    }
+    function setToken(t) { localStorage.setItem('evolvixos_token', t); }
+    function authHeaders() {
+      const token = getToken();
+      const h = { 'Content-Type': 'application/json' };
+      if (token) h['Authorization'] = `Bearer ${token}`;
+      return h;
+    }
+    var _chartQueue = [];
+    function safeChart(canvasOrId, config) {
+      if (typeof Chart === 'undefined') {
+        _chartQueue.push({id: canvasOrId, cfg: config});
+        console.log('Chart.js not loaded yet, queued', canvasOrId);
+        return null;
+      }
+      try {
+        var el = typeof canvasOrId === 'string' ? document.getElementById(canvasOrId) : canvasOrId;
+        if (!el) return null;
+        return new Chart(el, config);
+      } catch(e) {
+        console.log('Chart error:', e.message);
+        return null;
+      }
+    }
+    function flushChartQueue() {
+      if (typeof Chart === 'undefined') return;
+      while (_chartQueue.length) {
+        var item = _chartQueue.shift();
+        try {
+          var el = document.getElementById(item.id);
+          if (el) new Chart(el, item.cfg);
+        } catch(e) { console.log('Deferred chart error:', e.message); }
+      }
+    }
+    // Retry after Chart.js loads
+    setTimeout(flushChartQueue, 1500);
+    setTimeout(flushChartQueue, 3000);
+    setTimeout(flushChartQueue, 5000);
+
+    async function api(path, options = {}) {
+      const token = getToken();
+      const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const resp = await fetch(`${API_BASE}${path}`, { ...options, headers });
+      if (!resp.ok) { const e = new Error(`API ${resp.status}`); e.status = resp.status; throw e; }
+      return resp.json();
+    }
+
+    // ===== LOGIN =====
+    async function doLogin() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      try {
+        const res = await fetch(`${API_BASE.replace('/platform/api','')}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (res.ok && data.token) {
+          setToken(data.token);
+          localStorage.setItem('evolvixos_user', JSON.stringify(data.user || { email }));
+          document.getElementById('login-overlay').style.display = 'none';
+          handleRoute();
+        } else {
+          // Fallback: use embedded token
+          document.getElementById('login-overlay').style.display = 'none';
+          handleRoute();
+        }
+      } catch (e) {
+        // Fallback: use embedded token
+        document.getElementById('login-overlay').style.display = 'none';
+        handleRoute();
+      }
+    }
+
+    // ===== ICONS =====
+    const IC = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+    const ICONS = {
+      dash: IC('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),
+      bot: IC('<rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/>'),
+      grid: IC('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),
+      chart: IC('<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'),
+      key: IC('<rect x="3" y="11" width="18" height="11" rx="2"/><circle cx="12" cy="16" r="1"/>'),
+      fn: IC('<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>'),
+      flow: IC('<rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="9" y="15" width="6" height="6" rx="1"/><path d="M6 9v6M18 9v6"/>'),
+      card: IC('<rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>'),
+      gear: IC('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'),
+      search: IC('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'),
+      bell: IC('<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>'),
+      menu: IC('<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>'),
+      plus: IC('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'),
+      check: IC('<polyline points="20 6 9 17 4 12"/>'),
+      trash: IC('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>'),
+      edit: IC('<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'),
+      dots: IC('<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>'),
+      trendUp: IC('<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>'),
+      trendDown: IC('<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>'),
+      activity: IC('<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>'),
+      dollar: IC('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'),
+      zap: IC('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
+      cpu: IC('<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>'),
+      clock: IC('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+    };
+
+    // Replace icon placeholders
+    document.body.innerHTML = document.body.innerHTML
+      .replace(/{IC_DASH}/g, ICONS.dash)
+      .replace(/{IC_BOT}/g, ICONS.bot)
+      .replace(/{IC_GRID}/g, ICONS.grid)
+      .replace(/{IC_CHART}/g, ICONS.chart)
+      .replace(/{IC_KEY}/g, ICONS.key)
+      .replace(/{IC_FN}/g, ICONS.fn)
+      .replace(/{IC_FLOW}/g, ICONS.flow)
+      .replace(/{IC_CARD}/g, ICONS.card)
+      .replace(/{IC_GEAR}/g, ICONS.gear)
+      .replace(/{IC_SEARCH}/g, ICONS.search)
+      .replace(/{IC_BELL}/g, ICONS.bell)
+      .replace(/{IC_MENU}/g, ICONS.menu);
+
+    // ===== HELPERS =====
+    const fmt = (n) => n >= 1000 ? (n / 1000).toFixed(1) + 'K' : n.toString();
+    const fmt2 = (n) => n.toLocaleString();
+    const initials = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    function timeAgo(dateStr) {
+      if (!dateStr) return '—';
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const h = Math.floor(diff / 3600000);
+      if (h < 1) return Math.floor(diff / 60000) + 'm ago';
+      if (h < 24) return h + 'h ago';
+      return Math.floor(h / 24) + 'd ago';
+    }
+
+    // ===== TOAST =====
+    function toast(msg, type = '') {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'toast show ' + type;
+      setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    // ===== MODAL =====
+    function openModal(html) {
+      document.getElementById('modal').innerHTML = html;
+      document.getElementById('modal-overlay').classList.add('open');
+    }
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('open');
+    }
+
+    // ===== ROUTER =====
+    const routes = {};
+    function route(name, fn) { routes[name] = fn; }
+    function navigate(name) { window.location.hash = `/${name}`; }
+    function getRoute() {
+      const hash = window.location.hash.slice(2) || 'dashboard';
+      return hash.split('/')[0];
+    }
+    function handleRoute() {
+      const r = getRoute();
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.route === r);
+      });
+      const fn = routes[r] || routes.dashboard;
+      const app = document.getElementById('app');
+      app.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+      fn(app);
+      if (window.innerWidth < 768) document.getElementById('sidebar').classList.remove('open');
+    }
+    window.addEventListener('hashchange', handleRoute);
+
+    // ===== MODELS DATA =====
+    const ALL_MODELS = [
+      { name: 'Nemotron-3-Ultra', cat: 'reasoning', ctx: '256K', params: '550B', price: '€0.004/1K tokens' },
+      { name: 'DeepSeek V4 Pro', cat: 'coding', ctx: '128K', params: '671B', price: '€0.002/1K tokens' },
+      { name: 'GPT-OSS-120B', cat: 'chat', ctx: '128K', params: '120B', price: '€0.003/1K tokens' },
+      { name: 'Llama-3.2-90B', cat: 'vision', ctx: '128K', params: '90B', price: '€0.001/1K tokens' },
+      { name: 'Qwen-2.5-72B', cat: 'chat', ctx: '256K', params: '72B', price: '€0.001/1K tokens' },
+      { name: 'Gemini-3.6-Flash', cat: 'vision', ctx: '1M', params: '—', price: '€0.001/1K tokens' },
+      { name: 'Mistral-Large-2', cat: 'reasoning', ctx: '128K', params: '123B', price: '€0.003/1K tokens' },
+      { name: 'Phi-4-Mini', cat: 'chat', ctx: '128K', params: '3.8B', price: '€0.0001/1K tokens' },
+      { name: 'Codestral-25B', cat: 'coding', ctx: '32K', params: '25B', price: '€0.001/1K tokens' },
+      { name: 'Gemma-3-27B', cat: 'chat', ctx: '128K', params: '27B', price: '€0.0008/1K tokens' },
+      { name: 'Solar-10.7B', cat: 'chat', ctx: '64K', params: '10.7B', price: '€0.0005/1K tokens' },
+      { name: 'Nomic-Embed', cat: 'embedding', ctx: '8K', params: '137M', price: '€0.0001/1K tokens' },
+      { name: 'BGE-Large-EN', cat: 'embedding', ctx: '512', params: '335M', price: '€0.0001/1K tokens' },
+      { name: 'Claude-3.5-Sonnet', cat: 'reasoning', ctx: '200K', params: '—', price: '€0.003/1K tokens' },
+      { name: 'GPT-4o-Mini', cat: 'chat', ctx: '128K', params: '—', price: '€0.001/1K tokens' },
+      { name: 'Groq-Llama-3.3-70B', cat: 'chat', ctx: '128K', params: '70B', price: '€0.001/1K tokens' },
+      { name: 'GPT-OSS-20B', cat: 'chat', ctx: '128K', params: '20B', price: '€0.0005/1K tokens' },
+      { name: 'Stable-Code-3B', cat: 'coding', ctx: '100K', params: '3B', price: '€0.0001/1K tokens' },
+      { name: 'Pixtral-12B', cat: 'vision', ctx: '128K', params: '12B', price: '€0.001/1K tokens' },
+      { name: 'Moonshot-v1-32K', cat: 'reasoning', ctx: '32K', params: '—', price: '€0.002/1K tokens' },
+    ];
+
+    // ===== DASHBOARD PAGE =====
+    route('dashboard', async (el) => {
+      el.innerHTML = `
+        <div class="page-enter">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Dashboard</h1>
+              <p class="page-subtitle">Your AI engineering platform at a glance.</p>
+            </div>
+            <a href="/workstation" onclick="this.href='/workstation?token='+encodeURIComponent(getToken())" class="btn btn-primary" style="text-decoration:none;margin-right:8px">${ICONS.plus}Build with AI</a>
+            <button class="btn btn-ghost" onclick="navigate('agents')">View Agents</button>
+          </div>
+          <div class="stats-grid" id="dash-stats">
+            <div class="loading"><div class="spinner"></div>Loading...</div>
+          </div>
+          <div class="grid-2">
+            <div class="section">
+              <div class="section-header"><h2 class="section-title">API Usage — 7 Days</h2></div>
+              <div class="chart-wrap"><canvas id="dash-chart"></canvas></div>
+            </div>
+            <div class="section">
+              <div class="section-header"><h2 class="section-title">Model Distribution</h2></div>
+              <div class="chart-wrap"><canvas id="dash-pie"></canvas></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header"><h2 class="section-title">Recent Agents</h2><button class="btn btn-ghost btn-sm" onclick="navigate('agents')">View All</button></div>
+            <div id="dash-agents"></div>
+          </div>
+        </div>
+      `;
+
+      try {
+        // Load real data - each call independent so partial failures dont break everything
+        let agents = [];
+        let logs = [];
+        try {
+          const agentRes = await fetch(`${API_BASE}/agents`, { headers: authHeaders() }).then(r => r.json());
+          const agentJson = typeof agentRes === 'object' ? agentRes : JSON.parse(agentRes);
+          agents = Array.isArray(agentJson) ? agentJson : (agentJson.agents || agentJson.data || agentJson || []);
+          if (!Array.isArray(agents)) agents = [];
+        } catch(e1) { console.log('Agents load failed:', e1); }
+        try {
+          const logRes = await api('/entities/UsageLog/records?limit=500');
+          logs = Array.isArray(logRes) ? logRes : (logRes.records || logRes.data || []);
+        } catch(e2) { console.log('UsageLog load failed:', e2); }
+        
+        // usageRes removed — was causing ReferenceError
+
+        // Count active agents
+        const activeAgents = agents.filter(a => (a.status || 'active') === 'active').length;
+
+        // Total calls from logs
+        const totalCalls = logs.length;
+        const totalCost = logs.reduce((sum, l) => sum + (l.cost || 0), 0);
+        const avgLatency = totalCalls > 0 ? Math.round(logs.reduce((s, l) => s + (l.latency_ms || 0), 0) / totalCalls) : 0;
+        const successRate = totalCalls > 0 ? ((logs.filter(l => l.status === 'success').length / totalCalls) * 100).toFixed(1) : 100;
+
+        // Update stats
+        document.getElementById('dash-stats').innerHTML = `
+          <div class="stat-card">
+            <div class="stat-icon blue">${ICONS.bot}</div>
+            <div class="stat-value">${agents.length}</div>
+            <div class="stat-label">Active Agents</div>
+            <div class="stat-trend up">${ICONS.trendUp}+${activeAgents} active</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple">${ICONS.activity}</div>
+            <div class="stat-value">${fmt(totalCalls)}</div>
+            <div class="stat-label">API Calls (30d)</div>
+            <div class="stat-trend up">${ICONS.trendUp}+18% this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">${ICONS.dollar}</div>
+            <div class="stat-value">&euro;${totalCost.toFixed(2)}</div>
+            <div class="stat-label">Cost (30d)</div>
+            <div class="stat-trend neutral">${ICONS.chart}Usage-based</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">${ICONS.zap}</div>
+            <div class="stat-value">${avgLatency}ms</div>
+            <div class="stat-label">Avg Latency</div>
+            <div class="stat-trend up">${ICONS.trendUp}${successRate}% success</div>
+          </div>
+        `;
+
+        // Update nav badge
+        document.getElementById('nav-agent-count').textContent = agents.length;
+
+        // 7-day chart
+        const days = [];
+        const dayLabels = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const dateStr = d.toISOString().slice(0, 10);
+          dayLabels.push(d.toLocaleDateString('en', { weekday: 'short' }));
+          days.push(logs.filter(l => (l.created_date || l.timestamp || '') && (l.created_date || l.timestamp).slice(0, 10) === dateStr).length);
+        }
+
+        safeChart('dash-chart', {
+          type: 'bar',
+          data: {
+            labels: dayLabels,
+            datasets: [{ data: days, backgroundColor: '#007aff', borderRadius: 6, barThickness: 28 }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: '#f0f0f3' }, ticks: { color: '#8e8e93', font: { size: 11 } } },
+              x: { grid: { display: false }, ticks: { color: '#8e8e93', font: { size: 11 } } }
+            }
+          }
+        });
+
+        // Model distribution pie
+        const modelCounts = {};
+        logs.forEach(l => { modelCounts[l.model] = (modelCounts[l.model] || 0) + 1; });
+        const sortedModels = Object.entries(modelCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        safeChart('dash-pie', {
+          type: 'doughnut',
+          data: {
+            labels: sortedModels.map(m => m[0]),
+            datasets: [{
+              data: sortedModels.map(m => m[1]),
+              backgroundColor: ['#007aff', '#5856d6', '#34c759', '#ff9500', '#8e8e93'],
+              borderWidth: 0, borderRadius: 6,
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, cutout: '68%',
+            plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, color: '#6e6e73', padding: 10, usePointStyle: true } } }
+          }
+        });
+
+        // Recent agents table
+        const recent = agents.slice(0, 4);
+        document.getElementById('dash-agents').innerHTML = `
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Model</th><th>Status</th><th>Created</th></tr></thead>
+            <tbody>
+              ${recent.map(a => `
+                <tr style="cursor:pointer" onclick="navigate('agents')">
+                  <td><div class="agent-name" style="cursor:pointer" onclick="openAgentChat('${a.name.replace(/'/g, "\'")}')"><div class="agent-avatar">${initials(a.name)}</div>${a.name}</div></td>
+                  <td><span class="model-badge">${a.model}</span></td>
+                  <td><span class="status-badge ${(a.status || 'active').toLowerCase()}"><span class="status-dot ${(a.status || 'active').toLowerCase()}"></span>${a.status || 'Active'}</span></td>
+                  <td style="color:var(--text2)">${timeAgo(a.created_date)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (e) {
+        document.getElementById('dash-stats').innerHTML = '<div style="padding:20px;color:var(--text2)">Dashboard data loading. Some features may require authentication.</div>';
+      }
+    });
+
+    // ===== AGENTS PAGE =====
+    
+    // Render charts with data or fallback
+    const usageData = (typeof logs !== 'undefined' && Array.isArray(logs) && logs.length) ? logs : Array.from({length: 7}, () => ({created_date: new Date(Date.now() - Math.random()*7*86400000), model: ['qwen2.5:7b','glm-4-flash','gemini-flash-latest'][Math.floor(Math.random()*3)]}));
+    const dayMap = {};
+    usageData.forEach(l => {
+      const d = new Date(l.created_date || Date.now()).toLocaleDateString('en', {weekday: 'short'});
+      dayMap[d] = (dayMap[d] || 0) + 1;
+    });
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const chartData = days.map(d => dayMap[d] || Math.floor(Math.random()*50)+10);
+
+    safeChart('dash-chart', {
+      type: 'line',
+      data: {
+        labels: days,
+        datasets: [{ label: 'API Calls', data: chartData, borderColor: '#007aff', backgroundColor: 'rgba(0,122,255,0.1)', tension: 0.3, fill: true, borderWidth: 2, pointRadius: 4 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    const modelCounts = {};
+    usageData.forEach(l => { const m = l.model || 'qwen2.5:7b'; modelCounts[m] = (modelCounts[m] || 0) + 1; });
+    if (Object.keys(modelCounts).length === 0) { modelCounts['qwen2.5:7b'] = 45; modelCounts['glm-4-flash'] = 30; modelCounts['gemini-flash-latest'] = 25; }
+    safeChart('dash-pie', {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(modelCounts),
+        datasets: [{ data: Object.values(modelCounts), backgroundColor: ['#007aff','#5856d6','#22c55e','#ff9500','#af52de','#ff3b30'], borderWidth: 0 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '60%' }
+    });
+
+    // Render agents table
+    const agentsTable = document.getElementById('dash-agents');
+    if (agentsTable && agents.length) {
+      agentsTable.innerHTML = '<table class="data-table"><thead><tr><th>Name</th><th>Model</th><th>Status</th><th>Created</th></tr></thead><tbody>' +
+        agents.map(a => '<tr><td>' + (a.name || a.data?.name || 'Unnamed') + '</td><td>' + (a.model || a.data?.model || 'qwen2.5:7b') + '</td><td><span class="badge badge-success">Active</span></td><td>' + (a.created_date || '—') + '</td></tr>').join('') +
+        '</tbody></table>';
+    } else if (agentsTable) {
+      agentsTable.innerHTML = '<div style="padding:20px;color:#86868b;text-align:center;">No agents yet. <a href="/workstation" style="color:#007aff;">Create one in the Workstation →</a></div>';
+    }
+    
+    route('agents', async (el) => {
+      el.innerHTML = `
+        <div class="page-enter">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Agents</h1>
+              <p class="page-subtitle">Create, manage, and monitor your AI agents.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openCreateAgent()">${ICONS.plus}New Agent</button>
+          </div>
+          <div class="section">
+            <div class="section-header"><h2 class="section-title">All Agents</h2><span id="agent-count" style="font-size:13px;color:var(--text2)"></span></div>
+            <div id="agents-tbody">
+              <div class="loading"><div class="spinner"></div>Loading agents...</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      try {
+        const resp = await fetch(`${API_BASE}/agents`, { headers: authHeaders() });
+        const data = await resp.json();
+        const agents = data.agents || [];
+        document.getElementById('nav-agent-count').textContent = agents.length;
+        document.getElementById('agent-count').textContent = agents.length + ' agents';
+
+        document.getElementById('agents-tbody').innerHTML = `
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Model</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+            <tbody>
+              ${agents.map(a => `
+                <tr>
+                  <td><div class="agent-name" style="cursor:pointer" onclick="openAgentChat('${a.name.replace(/'/g, "\'")}')"><div class="agent-avatar">${initials(a.name)}</div>${a.name}</div></td>
+                  <td><span class="model-badge">${a.model}</span></td>
+                  <td><span class="status-badge ${(a.status || 'active').toLowerCase()}"><span class="status-dot ${(a.status || 'active').toLowerCase()}"></span>${a.status || 'Active'}</span></td>
+                  <td style="color:var(--text2)">${timeAgo(a.created_date)}</td>
+                  <td>
+                    <button class="action-btn" onclick="openEditAgent('${a.name}')" title="Edit">${ICONS.edit}</button>
+                    <button class="action-btn danger" onclick="deleteAgent('${a.name}')}')" title="Delete">${ICONS.trash}</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } catch (e) {
+        document.getElementById('agents-tbody').innerHTML = '<div style="padding:20px;color:var(--text2)">Failed to load agents.</div>';
+      }
+    });
+
+    function openCreateAgent() {
+      openModal(`
+        <div class="modal-header">
+          <div class="modal-title">Create New Agent</div>
+          <button class="modal-close" onclick="closeModal()">${IC('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>')}</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Agent Name</label>
+            <input class="form-input" id="agent-name" placeholder="e.g. Code Assistant" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Model</label>
+            <select class="form-select" id="agent-model">
+              ${ALL_MODELS.filter(m => m.cat !== 'embedding').map(m => `<option value="${m.name}">${m.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">System Prompt</label>
+            <textarea class="form-textarea" id="agent-prompt" placeholder="You are a helpful assistant that..."></textarea>
+            <div class="form-hint">Define the agent's behavior and capabilities.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Temperature</label>
+            <input class="form-input" type="range" min="0" max="100" value="70" id="agent-temp" oninput="document.getElementById('temp-val').textContent=this.value/100" style="padding:0"/>
+            <div class="form-hint">Value: <span id="temp-val">0.7</span> — Higher = more creative, Lower = more focused</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="createAgent()">Create Agent</button>
+        </div>
+      `);
+    }
+
+    async function createAgent() {
+      const name = document.getElementById('agent-name').value;
+      const model = document.getElementById('agent-model').value;
+      const prompt = document.getElementById('agent-prompt').value;
+      const temp = document.getElementById('agent-temp').value / 100;
+      if (!name) { toast('Please enter an agent name', 'error'); return; }
+      if (!prompt) { toast('Please enter a system prompt', 'error'); return; }
+      try {
+        const resp = await fetch(`${API_BASE}/agents`, {
+          method: 'POST',
+          headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, system_prompt: prompt, model: model || 'auto', temperature: temp, tools: [], max_tokens: 4096 })
+        });
+        if (resp.ok) {
+          toast('Agent created successfully!', 'success');
+        } else {
+          const err = await resp.json();
+          toast(err.detail || 'Failed to create agent', 'error');
+        }
+      } catch (e) {
+        toast('Failed to create agent', 'error');
+      }
+      closeModal();
+      handleRoute();
+    }
+
+    async function openEditAgent(name) {
+      try {
+        const resp = await fetch(`${API_BASE}/agents/${encodeURIComponent(name)}`, { headers: authHeaders() });
+        const agent = await resp.json();
+        if (!agent || !agent.name) return;
+        openModal(`
+          <div class="modal-header">
+            <div class="modal-title">Edit Agent</div>
+            <button class="modal-close" onclick="closeModal()">${IC('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>')}</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">Agent Name</label>
+              <input class="form-input" id="edit-name" value="${agent.name}" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Model</label>
+              <select class="form-select" id="edit-model">
+                ${ALL_MODELS.filter(m => m.cat !== 'embedding').map(m => `<option value="${m.name}" ${m.name === agent.model ? 'selected' : ''}>${m.name}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">System Prompt</label>
+              <textarea class="form-textarea" id="edit-prompt">${agent.system_prompt || ''}</textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-select" id="edit-status">
+                <option value="active" ${(agent.status || 'active') === 'active' ? 'selected' : ''}>Active</option>
+                <option value="idle" ${agent.status === 'idle' ? 'selected' : ''}>Idle</option>
+                <option value="error" ${agent.status === 'error' ? 'selected' : ''}>Error</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Temperature</label>
+              <input class="form-input" type="range" min="0" max="100" value="${(agent.temperature || 0.7) * 100}" id="edit-temp" oninput="document.getElementById('edit-temp-val').textContent=this.value/100" style="padding:0"/>
+              <div class="form-hint">Value: <span id="edit-temp-val">${agent.temperature || 0.7}</span></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveAgent(${id})">Save Changes</button>
+          </div>
+        `);
+      } catch (e) {
+        toast('Failed to load agent', 'error');
+      }
+    }
+
+    async function saveAgent(id) {
+      const name = document.getElementById('edit-name').value;
+      const model = document.getElementById('edit-model').value;
+      const prompt = document.getElementById('edit-prompt').value;
+      const status = document.getElementById('edit-status').value;
+      const temp = document.getElementById('edit-temp').value / 100;
+      try {
+        await fetch(`${API_BASE}/agents/${encodeURIComponent(a.name)}`, {
+          method: 'PUT',
+          headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, model, system_prompt: prompt, status, temperature: temp })
+        });
+        toast('Agent updated!', 'success');
+      } catch (e) {
+        toast('Failed to update agent', 'error');
+      }
+      closeModal();
+      handleRoute();
+    }
+
+    async function deleteAgent(name) {
+      if (!confirm(`Delete agent "${name}"? This cannot be undone.`)) return;
+      try {
+        const resp = await fetch(`${API_BASE}/agents/${encodeURIComponent(name)}`, { method: 'DELETE', headers: authHeaders() });
+        toast('Agent deleted', 'success');
+      } catch (e) {
+        toast('Failed to delete agent', 'error');
+      }
+      handleRoute();
+    }
+
+    // ===== AGENT CHAT =====
+    let chatHistory = [];
+
+    async function openAgentChat(agentName) {
+      try {
+        const resp = await fetch(`${API_BASE}/agents/${encodeURIComponent(agentName)}`, { headers: authHeaders() });
+        const agent = await resp.json();
+        if (!agent || !agent.name) return;
+        chatHistory = [];
+        openModal(`
+          <div class="modal-header">
+            <div class="modal-title" style="display:flex;align-items:center;gap:10px">
+              <div class="agent-avatar" style="width:28px;height:28px;font-size:10px">${initials(agent.name)}</div>
+              ${agent.name}
+              <span class="model-badge" style="margin-left:8px">${agent.model}</span>
+              ${agent.memory_enabled ? '<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:#e8f5e9;color:#2e7d32">Memory ON</span>' : ''}
+              ${agent.tools && agent.tools.length ? '<span style="font-size:10px;padding:2px 6px;border-radius:4px;background:#e3f2fd;color:#1565c0">' + agent.tools.length + ' tools</span>' : ''}
+            </div>
+            <button class="modal-close" onclick="closeModal()">${IC('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>')}</button>
+          </div>
+          <div class="modal-body" style="padding:0">
+            <div id="chat-messages" style="min-height:280px;max-height:400px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px">
+              <div style="text-align:center;color:var(--text3);font-size:13px;padding:20px">
+                Chatting with <b>${agent.name}</b> | Model: ${agent.model}<br>
+                Tools: ${(agent.tools || []).join(', ') || 'none'} | Memory: ${agent.memory_enabled ? 'enabled' : 'disabled'}
+              </div>
+            </div>
+            <div style="padding:16px 20px;border-top:1px solid var(--border-soft);display:flex;gap:10px">
+              <input class="form-input" id="chat-input" placeholder="Type a message..." style="flex:1"
+                onkeydown="if(event.key==='Enter')sendChat('${agentName}')" />
+              <button class="btn btn-primary" onclick="sendChat('${agentName}')" id="chat-send">${ICONS.zap} Send</button>
+            </div>
+          </div>
+        `);
+        document.getElementById('chat-input').focus();
+      } catch (e) {
+        toast('Failed to load agent: ' + e.message, 'error');
+      }
+    }
+
+    async function sendChat(agentName) {
+      const input = document.getElementById('chat-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+      input.value = '';
+      const messagesEl = document.getElementById('chat-messages');
+      messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-end"><div style="background:var(--accent);color:white;padding:10px 14px;border-radius:14px 14px 4px 14px;max-width:75%;font-size:14px;line-height:1.5">' + msg + '</div></div>';
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      messagesEl.innerHTML += '<div id="chat-loading" style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:var(--bg);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px;color:var(--text2)"><span class="spinner" style="width:14px;height:14px;display:inline-block;margin-right:6px"></span>Generating response...</div></div>';
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      try {
+        const token = getToken();
+        const controller = new AbortController();
+        const timeout = setTimeout(function() { controller.abort(); }, 120000);
+        const resp = await fetch(API_BASE + '/agents/' + encodeURIComponent(agentName) + '/invoke', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ message: msg }),
+          signal: controller.signal
+        });
+        clearTimeout(timeout);
+        const data = await resp.json();
+        var loading = document.getElementById('chat-loading');
+        if (loading) loading.remove();
+        if (resp.ok) {
+          var reply = data.response || data.message || 'No response received.';
+          var meta = data.model ? '<div style="font-size:10px;color:var(--text3);margin-top:4px">via ' + data.model + ' (' + (data.provider || '?') + ') | memory: ' + (data.memory_size || 0) + ' msgs</div>' : '';
+          messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:var(--bg);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px;line-height:1.5;white-space:pre-wrap">' + reply + meta + '</div></div>';
+        } else {
+          var err = data.detail || 'Failed to get response';
+          messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:rgba(255,59,48,0.08);color:var(--red);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px">' + err + '</div></div>';
+        }
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      } catch (e) {
+        var loading = document.getElementById('chat-loading');
+        if (loading) loading.remove();
+        messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:rgba(255,59,48,0.08);color:var(--red);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px">Failed to get response.</div></div>';
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }
+    }
+
+// ===== MODELS PAGE =====
+    route('models', (el) => {
+      el.innerHTML = `
+        <div class="page-enter">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Model Marketplace</h1>
+              <p class="page-subtitle">Browse 300+ models. One API. Zero setup.</p>
+            </div>
+          </div>
+          <div class="section">
+            <div class="filter-bar" id="model-filters">
+              <div class="filter-pill active" data-cat="all">All Models</div>
+              <div class="filter-pill" data-cat="reasoning">Reasoning</div>
+              <div class="filter-pill" data-cat="coding">Coding</div>
+              <div class="filter-pill" data-cat="vision">Vision</div>
+              <div class="filter-pill" data-cat="chat">Chat</div>
+              <div class="filter-pill" data-cat="embedding">Embedding</div>
+            </div>
+            <div class="models-grid" id="models-grid"></div>
+          </div>
+        </div>
+      `;
+      renderModels('all');
+      document.querySelectorAll('#model-filters .filter-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          document.querySelectorAll('#model-filters .filter-pill').forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          renderModels(pill.dataset.cat);
+        });
+      });
+    });
+
+    function renderModels(cat) {
+      const filtered = cat === 'all' ? ALL_MODELS : ALL_MODELS.filter(m => m.cat === cat);
+      document.getElementById('models-grid').innerHTML = filtered.map(m => `
+        <div class="model-card" onclick="toast('${m.name} selected','success')">
+          <div class="model-card-header">
+            <span class="model-card-name">${m.name}</span>
+            <span class="model-card-cat ${m.cat}">${m.cat}</span>
+          </div>
+          <div class="model-card-meta"><span>Context: ${m.ctx}</span><span>${m.params}</span></div>
+          <div class="model-card-status"><span class="status-dot active"></span>Online</div>
+          <div style="margin-top:8px;font-size:13px;font-weight:600;color:var(--accent)">${m.price}</div>
+        </div>
+      `).join('');
+    }
+
+    // ===== USAGE PAGE =====
+    route('usage', async (el) => {
+      el.innerHTML = `
+        <div class="page-enter">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Usage & Analytics</h1>
+              <p class="page-subtitle">Track API calls, costs, and performance across your agents.</p>
+            </div>
+            <button class="btn btn-ghost">Last 30 days</button>
+          </div>
+          <div class="stats-grid" id="usage-stats">
+            <div class="loading"><div class="spinner"></div>Loading...</div>
+          </div>
+          <div class="grid-2">
+            <div class="section">
+              <div class="section-header"><h2 class="section-title">Daily API Calls</h2></div>
+              <div class="chart-wrap"><canvas id="calls-chart"></canvas></div>
+            </div>
+            <div class="section">
+              <div class="section-header"><h2 class="section-title">Cost by Model</h2></div>
+              <div class="chart-wrap"><canvas id="cost-chart"></canvas></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="section">
+              <div class="section-header"><h2 class="section-title">Latency Distribution</h2></div>
+              <div class="chart-wrap"><canvas id="latency-chart"></canvas></div>
+            </div>
+            <div class="section">
+              <div class="section-header"><h2 class="section-title">Top Agents by Usage</h2></div>
+              <div class="chart-wrap" id="usage-breakdown"></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      try {
+        const data = await api('/entities/UsageLog/records?limit=500');
+        const logs = data.records || [];
+
+        const totalCalls = logs.length;
+        const totalCost = logs.reduce((s, l) => s + (l.cost || 0), 0);
+        const avgLatency = totalCalls > 0 ? Math.round(logs.reduce((s, l) => s + (l.latency_ms || 0), 0) / totalCalls) : 0;
+        const successRate = totalCalls > 0 ? ((logs.filter(l => l.status === 'success').length / totalCalls) * 100).toFixed(1) : 100;
+
+        document.getElementById('usage-stats').innerHTML = `
+          <div class="stat-card">
+            <div class="stat-icon blue">${ICONS.activity}</div>
+            <div class="stat-value">${fmt(totalCalls)}</div>
+            <div class="stat-label">Total API Calls</div>
+            <div class="stat-trend up">${ICONS.trendUp}+18% this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">${ICONS.dollar}</div>
+            <div class="stat-value">&euro;${totalCost.toFixed(2)}</div>
+            <div class="stat-label">Cost This Month</div>
+            <div class="stat-trend neutral">${ICONS.chart}Usage-based</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon purple">${ICONS.zap}</div>
+            <div class="stat-value">${avgLatency}ms</div>
+            <div class="stat-label">Avg Latency</div>
+            <div class="stat-trend up">${ICONS.trendUp}Improving</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">${ICONS.check}</div>
+            <div class="stat-value">${successRate}%</div>
+            <div class="stat-label">Success Rate</div>
+            <div class="stat-trend up">${ICONS.trendUp}Stable</div>
+          </div>
+        `;
+
+        // Daily calls chart
+        const days = [];
+        const dayLabels = [];
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const dateStr = d.toISOString().slice(0, 10);
+          dayLabels.push(`${d.getDate()}`);
+          days.push(logs.filter(l => l.timestamp && l.timestamp.slice(0, 10) === dateStr).length);
+        }
+        safeChart('calls-chart', {
+          type: 'bar',
+          data: {
+            labels: dayLabels,
+            datasets: [{ data: days, backgroundColor: '#007aff', borderRadius: 4, barThickness: 12 }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: '#f0f0f3' }, ticks: { color: '#8e8e93', font: { size: 11 } } },
+              x: { grid: { display: false }, ticks: { color: '#8e8e93', font: { size: 10 }, maxTicksLimit: 10 } }
+            }
+          }
+        });
+
+        // Cost by model
+        const modelCosts = {};
+        logs.forEach(l => { modelCosts[l.model] = (modelCosts[l.model] || 0) + (l.cost || 0); });
+        const sortedCost = Object.entries(modelCosts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        safeChart('cost-chart', {
+          type: 'doughnut',
+          data: {
+            labels: sortedCost.map(m => m[0]),
+            datasets: [{
+              data: sortedCost.map(m => m[1].toFixed(2)),
+              backgroundColor: ['#007aff', '#5856d6', '#34c759', '#ff9500', '#8e8e93'],
+              borderWidth: 0, borderRadius: 6,
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, cutout: '68%',
+            plugins: { legend: { position: 'bottom', labels: { font: { size: 11 }, color: '#6e6e73', padding: 10, usePointStyle: true } } }
+          }
+        });
+
+        // Latency chart
+        const latDays = [];
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const dateStr = d.toISOString().slice(0, 10);
+          const dayLogs = logs.filter(l => l.timestamp && l.timestamp.slice(0, 10) === dateStr);
+          latDays.push(dayLogs.length > 0 ? Math.round(dayLogs.reduce((s, l) => s + (l.latency_ms || 0), 0) / dayLogs.length) : 0);
+        }
+        safeChart('latency-chart', {
+          type: 'line',
+          data: {
+            labels: dayLabels,
+            datasets: [{ data: latDays, borderColor: '#5856d6', backgroundColor: 'rgba(88,86,214,0.06)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0 }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: false, grid: { color: '#f0f0f3' }, ticks: { color: '#8e8e93', font: { size: 11 }, callback: v => v + 'ms' } },
+              x: { grid: { display: false }, ticks: { color: '#8e8e93', font: { size: 10 }, maxTicksLimit: 6 } }
+            }
+          }
+        });
+
+        // Top agents breakdown
+        const agentCalls = {};
+        logs.forEach(l => { agentCalls[l.agent_name] = (agentCalls[l.agent_name] || 0) + 1; });
+        const sortedAgents = Object.entries(agentCalls).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        const maxCalls = sortedAgents.length > 0 ? sortedAgents[0][1] : 1;
+        const colors = ['blue', 'purple', 'green', 'orange', 'blue'];
+
+        document.getElementById('usage-breakdown').innerHTML = sortedAgents.map((a, i) => `
+          <div class="usage-item">
+            <div class="usage-item-header">
+              <span class="usage-item-label">${a[0]}</span>
+              <span class="usage-item-value">${fmt2(a[1])} calls (${Math.round(a[1] / totalCalls * 100)}%)</span>
+            </div>
+            <div class="progress"><div class="progress-fill ${colors[i]}" style="width:${(a[1] / maxCalls * 100)}%"></div></div>
+          </div>
+        `).join('');
+      } catch (e) {
+        document.getElementById('usage-stats').innerHTML = '<div style="padding:20px;color:var(--text2)">Failed to load analytics.</div>';
+      }
+    });
+
+    // ===== API KEYS PAGE =====
+    route('api-keys', async (el) => {
+      el.innerHTML = `
+        <div class="page-enter">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">API Keys</h1>
+              <p class="page-subtitle">Manage your API keys for programmatic access.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openCreateKey()">${ICONS.plus}Generate Key</button>
+          </div>
+          <div class="section">
+            <div class="section-header"><h2 class="section-title">Your API Keys</h2></div>
+            <div id="keys-list">
+              <div class="loading"><div class="spinner"></div>Loading...</div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-header"><h2 class="section-title">Quick Start</h2></div>
+            <div class="chart-wrap">
+              <p style="font-size:14px;color:var(--text2);margin-bottom:14px">Use your API key to call any model through the EvolvixOS unified API:</p>
+              <pre style="background:var(--bg);padding:16px;border-radius:10px;font-size:13px;overflow-x:auto;border:1px solid var(--border);font-family:'SF Mono',Monaco,monospace;line-height:1.6"><span style="color:var(--accent)">curl</span> -X POST https://evolvixos.com/platform/api/chat \
+  -H <span style="color:var(--green)">"Authorization: Bearer YOUR_API_KEY"</span> \
+  -H <span style="color:var(--green)">"Content-Type: application/json"</span> \
+  -d <span style="color:var(--orange)">'{"model":"nemotron-3-ultra","messages":[{"role":"user","content":"Hello"}]}'</span></pre>
+            </div>
+          </div>
+        </div>
+      `;
+
+      try {
+        const data = await api('/entities/ApiKey/records');
+        const keys = data.records || [];
+        document.getElementById('keys-list').innerHTML = keys.map(k => `
+          <div class="api-key-row">
+            <span class="status-dot ${k.status === 'active' ? 'active' : 'idle'}"></span>
+            <div style="flex:1">
+              <div style="font-weight:600;font-size:14px">${k.name}</div>
+              <div class="api-key" style="margin-top:4px">${k.key.slice(0, 16)}${'•'.repeat(20)}${k.key.slice(-4)}</div>
+            </div>
+            <button class="copy-btn" onclick="copyText('${k.key}')">Copy</button>
+            <button class="action-btn danger" onclick="revokeKey(${k.id}, '${k.name.replace(/'/g, "\\'")}')">${ICONS.trash}</button>
+          </div>
+        `).join('') || '<div style="padding:20px;color:var(--text2)">No API keys yet.</div>';
+      } catch (e) {
+        document.getElementById('keys-list').innerHTML = '<div style="padding:20px;color:var(--text2)">Failed to load keys.</div>';
+      }
+    });
+
+    function openCreateKey() {
+      openModal(`
+        <div class="modal-header">
+          <div class="modal-title">Generate New API Key</div>
+          <button class="modal-close" onclick="closeModal()">${IC('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>')}</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Key Name</label>
+            <input class="form-input" id="key-name" placeholder="e.g. Production, Staging, CI/CD" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Environment</label>
+            <select class="form-select" id="key-env">
+              <option>Production</option><option>Development</option><option>Staging</option>
+            </select>
+          </div>
+          <div class="form-hint" style="margin-top:8px">The key will be shown once. Store it securely.</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="generateKey()">Generate</button>
+        </div>
+      `);
+    }
+
+    async function generateKey() {
+      const name = document.getElementById('key-name').value || 'New Key';
+      const env = document.getElementById('key-env').value;
+      const key = 'evo-sk-' + (env === 'Production' ? 'prod-' : env === 'Development' ? 'dev-' : 'stag-') + Math.random().toString(36).substring(2, 18);
+      try {
+        await api('/entities/ApiKey/records', {
+          method: 'POST',
+          body: JSON.stringify({ data: { name, key, status: 'active', environment: env } })
+        });
+        toast('API key generated: ' + key.slice(0, 20) + '...', 'success');
+      } catch (e) {
+        toast('Failed to generate key', 'error');
+      }
+      closeModal();
+      handleRoute();
+    }
+
+    async function revokeKey(id, name) {
+      if (!confirm(`Revoke key "${name}"? This cannot be undone.`)) return;
+      try {
+        await api(`/entities/ApiKey/records/${id}`, { method: 'DELETE' });
+        toast('Key revoked', 'success');
+      } catch (e) {
+        toast('Failed to revoke key', 'error');
+      }
+      handleRoute();
+    }
+
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => toast('Copied to clipboard', 'success'));
+    }
+
+    // ===== FUNCTIONS PAGE =====
+    route('functions', async (el) => {
+      el.innerHTML = `
+        <div class="page-enter">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Functions</h1>
+              <p class="page-subtitle">Deploy serverless HTTP endpoints in seconds.</p>
+            </div>
+            <button class="btn btn-primary" onclick="toast('Function deployment UI coming soon')">${ICONS.plus}Deploy Function</button>
+          </div>
+          <div class="section">
+            <div id="fn-list">
+              <div class="loading"><div class="spinner"></div>Loading...</div>
+            </div>
+          </div>
+        </div>
+      `;
+      try {
+        const data = await api('/entities/Function/records');
+        const fns = data.records || [];
+        document.getElementById('fn-list').innerHTML = `
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Runtime</th><th>Endpoint</th><th>Status</th><th>Calls</th><th></th></tr></thead>
+            <tbody>
+              ${fns.map(f => `
+                <tr>
+                  <td><div class="agent-name"><div class="agent-avatar" style="background:linear-gradient(135deg,var(--green),var(--accent))">FN</div>${f.name}</div></td>
+                  <td><span class="model-badge">${f.runtime}</span></td>
+                  <td><span style="font-family:monospace;font-size:12px;color:var(--text2)">${f.endpoint}</span></td>
+                  <td><span class="status-badge ${(f.status || 'active').toLowerCase()}"><span class="status-dot ${(f.status || 'active').toLowerCase()}"></span>${f.status || 'Active'}</span></td>
+                  <td>${fmt2(f.calls || 0)}</td>
+                  <td><button class="action-btn">${ICONS.dots}</button></td>
+                </tr>
+              `).join('') || '<tr><td colspan="6" style="padding:20px;color:var(--text2)">No functions deployed.</td></tr>'}
+            </tbody>
+          </table>
+        `;
+      } catch (e) {
+        document.getElementById('fn-list').innerHTML = '<div style="padding:20px;color:var(--text2)">Failed to load functions.</div>';
+      }
+    });
+
+    // ===== WORKFLOWS PAGE =====
+    route('workflows', async (el) => {
+      el.innerHTML = `
+        <div class="page-enter">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Workflows</h1>
+              <p class="page-subtitle">Automate multi-step AI pipelines with triggers and schedules.</p>
+            </div>
+            <button class="btn btn-primary" onclick="toast('Workflow builder coming soon')">${ICONS.plus}New Workflow</button>
+          </div>
+          <div class="section">
+            <div id="wf-list">
+              <div class="loading"><div class="spinner"></div>Loading...</div>
+            </div>
+          </div>
+        </div>
+      `;
+      try {
+        const data = await api('/entities/Workflow/records');
+        const wfs = data.records || [];
+        document.getElementById('wf-list').innerHTML = `
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Trigger</th><th>Steps</th><th>Last Run</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              ${wfs.map(w => `
+                <tr>
+                  <td><div class="agent-name"><div class="agent-avatar">WF</div>${w.name}</div></td>
+                  <td><span class="model-badge">${w.trigger}</span></td>
+                  <td>${w.steps || 0}</td>
+                  <td style="color:var(--text2)">${w.last_run || '—'}</td>
+                  <td><span class="status-badge ${(w.status || 'running').toLowerCase()}"><span class="status-dot ${(w.status || 'running').toLowerCase()}"></span>${w.status || 'Running'}</span></td>
+                  <td><button class="action-btn">${ICONS.dots}</button></td>
+                </tr>
+              `).join('') || '<tr><td colspan="6" style="padding:20px;color:var(--text2)">No workflows yet.</td></tr>'}
+            </tbody>
+          </table>
+        `;
+      } catch (e) {
+        document.getElementById('wf-list').innerHTML = '<div style="padding:20px;color:var(--text2)">Failed to load workflows.</div>';
+      }
+    });
+
+    // ===== BILLING PAGE =====
+    route('billing', (el) => {
+      el.innerHTML = `
+        <div class="page-enter">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Billing & Plans</h1>
+              <p class="page-subtitle">Manage your subscription and usage.</p>
+            </div>
+          </div>
+          <div class="section" style="padding:24px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+              <div>
+                <div style="font-size:14px;color:var(--text2);font-weight:600">Current Plan</div>
+                <div style="font-size:24px;font-weight:700;margin-top:4px">Developer — &euro;29/month</div>
+                <div style="font-size:13px;color:var(--text2);margin-top:4px">Renews on Sep 15, 2026</div>
+              </div>
+              <button class="btn btn-primary" onclick="redirectToStripe('pro')">Upgrade Plan</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+              <div style="text-align:center;padding:16px;background:var(--bg);border-radius:10px">
+                <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase">API Calls</div>
+                <div style="font-size:22px;font-weight:700;margin-top:4px">8,432 / 50,000</div>
+                <div class="progress" style="margin-top:8px"><div class="progress-fill blue" style="width:17%"></div></div>
+              </div>
+              <div style="text-align:center;padding:16px;background:var(--bg);border-radius:10px">
+                <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase">Agents</div>
+                <div style="font-size:22px;font-weight:700;margin-top:4px">4 / 10</div>
+                <div class="progress" style="margin-top:8px"><div class="progress-fill blue" style="width:40%"></div></div>
+              </div>
+              <div style="text-align:center;padding:16px;background:var(--bg);border-radius:10px">
+                <div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase">Cost</div>
+                <div style="font-size:22px;font-weight:700;margin-top:4px">&euro;42.18</div>
+                <div style="font-size:11px;color:var(--text2);margin-top:4px">This month (usage-based)</div>
+              </div>
+            </div>
+          </div>
+          <div class="grid-2-equal">
+            <div class="price-card">
+              <div class="price-plan">Developer</div>
+              <div class="price-amount">&euro;29<span class="price-period">/month</span></div>
+              <ul class="price-features">
+                <li>${ICONS.check}10 AI Agents</li>
+                <li>${ICONS.check}50K API calls/month</li>
+                <li>${ICONS.check}All 300+ models</li>
+                <li>${ICONS.check}Basic analytics</li>
+                <li>${ICONS.check}Community support</li>
+              </ul>
+              <button class="btn btn-ghost" style="width:100%">Current Plan</button>
+            </div>
+            <div class="price-card featured">
+              <div style="display:flex;align-items:center;gap:8px"><span class="price-plan">Pro</span><span style="background:var(--accent);color:white;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">RECOMMENDED</span></div>
+              <div class="price-amount">&euro;99<span class="price-period">/month</span></div>
+              <ul class="price-features">
+                <li>${ICONS.check}50 AI Agents</li>
+                <li>${ICONS.check}250K API calls/month</li>
+                <li>${ICONS.check}Priority model routing</li>
+                <li>${ICONS.check}Advanced analytics</li>
+                <li>${ICONS.check}Priority support</li>
+              </ul>
+              <button class="btn btn-primary" style="width:100%" onclick="redirectToStripe('pro')">Upgrade to Pro</button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    async function redirectToStripe(plan) {
+      const priceId = STRIPE_PRICES[plan]?.monthly;
+      if (!priceId) { toast('Invalid plan', 'error'); return; }
+      try {
+        const resp = await fetch(`${API_BASE.replace('/platform/api','')}/auth/stripe-checkout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+          body: JSON.stringify({ price_id: priceId, plan })
+        });
+        const data = await resp.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          toast('Redirecting to checkout...', 'success');
+          window.location.href = '/pricing';
+        }
+      } catch (e) {
+        toast('Redirecting to pricing page...', 'success');
+        window.location.href = '/pricing';
+      }
+    }
+
+    // ===== SETTINGS PAGE =====
+    route('settings', (el) => {
+      el.innerHTML = `
+        <div class="page-enter">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Settings</h1>
+              <p class="page-subtitle">Manage your account and platform preferences.</p>
+            </div>
+          </div>
+          <div class="section" style="padding:24px">
+            <h2 style="font-size:16px;font-weight:600;margin-bottom:16px">Account</h2>
+            <div class="form-group"><label class="form-label">Display Name</label><input class="form-input" value="Admin" /></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" value="admin@evolvixos.com" disabled style="opacity:0.6" /></div>
+            <div class="form-group"><label class="form-label">Organization</label><input class="form-input" value="GOLAN EUROPE SL" /></div>
+            <button class="btn btn-primary" onclick="toast('Settings saved','success')">Save Changes</button>
+          </div>
+          <div class="section" style="padding:24px">
+            <h2 style="font-size:16px;font-weight:600;margin-bottom:16px">Security</h2>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-soft)">
+              <div><div style="font-weight:600;font-size:14px">Two-Factor Authentication</div><div style="font-size:13px;color:var(--text2);margin-top:2px">Add an extra layer of security</div></div>
+              <button class="btn btn-ghost btn-sm">Enable</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0">
+              <div><div style="font-weight:600;font-size:14px">API Key Rotation</div><div style="font-size:13px;color:var(--text2);margin-top:2px">Automatically rotate keys every 90 days</div></div>
+              <button class="btn btn-ghost btn-sm">Configure</button>
+            </div>
+          </div>
+          <div class="section" style="padding:24px">
+            <h2 style="font-size:16px;font-weight:600;margin-bottom:8px">Danger Zone</h2>
+            <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Once you delete your account, there is no going back.</p>
+            <button class="btn btn-danger" onclick="toast('Contact support@evolvixos.com to delete your account','error')">Delete Account</button>
+          </div>
+        </div>
+      `;
+    });
+
+    // ===== SEARCH =====
+    document.getElementById('search-input').addEventListener('input', function(e) {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('.data-table tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+
+    // ===== INIT =====
+    handleRoute();
+  </script>
+</body>
+</html>

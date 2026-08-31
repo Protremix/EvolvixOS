@@ -269,10 +269,13 @@ RULES:
         memory.append({"role": "assistant", "content": response_text})
         memory = memory[-20:]
 
-        await db.execute(text(
-            "UPDATE platform_agents SET memory = :memory, updated_date = NOW() WHERE name = :name"
-        ), {"memory": json.dumps(memory), "name": name})
-        await db.commit()
+        try:
+            await db.execute(text(
+                "UPDATE platform_agents SET memory = :memory, updated_date = NOW() WHERE name = :name"
+            ), {"memory": json.dumps(memory), "name": name})
+            await db.commit()
+        except Exception:
+            await db.rollback()
 
         # Auto-extract preferences from user message
         try:

@@ -3,7 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-<style>:root{--app-height:100vh}@supports(height:100dvh){:root{--app-height:100dvh}}</style>
+<style>:root{--app-height:100vh}@supports(height:100dvh){:root{--app-height:100dvh}}
+
+      @media (max-width: 768px) {
+        .platform-layout { flex-direction: column; }
+        .platform-sidebar { position: fixed; transform: translateX(-100%); z-index: 200; width: 280px; height: 100vh; overflow-y: auto; transition: transform 0.3s; }
+        .platform-sidebar.open { transform: translateX(0); }
+        .platform-main { margin-left: 0 !important; }
+        .platform-content { padding: 16px; }
+        .platform-header { padding: 12px 16px; }
+        .entity-grid, .function-grid { grid-template-columns: 1fr; }
+        .stat-cards { grid-template-columns: repeat(2, 1fr); }
+        .code-editor { font-size: 13px; }
+        .modal { width: 95% !important; padding: 16px; }
+        .form-input, .form-select, .form-textarea { font-size: 16px; }
+        .btn { min-height: 44px; }
+      }
+      @media (max-width: 480px) {
+        .stat-cards { grid-template-columns: 1fr; }
+        .platform-content { padding: 12px 8px; }
+        .platform-header h1 { font-size: 18px; }
+      }
+    
+</style>
 <meta name="theme-color" content="#f5f5f7">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">

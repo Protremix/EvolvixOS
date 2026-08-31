@@ -110,6 +110,21 @@
   body.nav-open .nav-links { display: flex !important; flex-direction: column; position: fixed; top: 56px; left: 0; right: 0; background: rgba(255,255,255,0.98); backdrop-filter: blur(20px); padding: 16px 24px; gap: 16px; z-index: 1000; border-bottom: 1px solid #d2d2d7; }
   body.nav-open .nav-links a { font-size: 17px; padding: 8px 0; }
 
+
+
+      @media (max-width: 768px) {
+        .pricing-grid { grid-template-columns: 1fr !important; gap: 16px; }
+        .pricing-card { padding: 24px 16px; }
+        .pricing-features li { font-size: 14px; }
+        .pricing-header h1 { font-size: 28px; }
+        .pricing-header p { font-size: 14px; }
+      }
+      @media (max-width: 480px) {
+        .pricing-card { padding: 20px 12px; }
+        .pricing-price { font-size: 28px; }
+        .pricing-header h1 { font-size: 22px; }
+      }
+    
 </style>
 
 <style>

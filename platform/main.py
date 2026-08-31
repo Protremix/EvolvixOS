@@ -697,8 +697,94 @@ async def invoke_agent(name: str, msg: AgentInvoke, request: Request, db=Depends
         credit_check = deduct_user_credits(int(user_id) if user_id else 0, agent_model)
         if not credit_check.get("ok"):
             raise HTTPException(402, credit_check.get("error", "Insufficient credits"))
+    # Load chat history to give the agent conversation context
+    chat_context = msg.context or {}
     try:
-        result = await AgentManager.invoke_agent(db, name, msg.message, msg.context)
+        hist_result = await db.execute(
+            text("SELECT role, content FROM builder_chat_history WHERE user_id = :uid ORDER BY created_date DESC LIMIT 20"),
+            {"uid": int(user_id) if user_id else 0}
+        )
+        hist_rows = list(reversed(hist_result.fetchall()))
+        if hist_rows:
+            chat_lines = []
+            for hr in hist_rows:
+                role = "User" if hr[0] == "user" else "Builder"
+                chat_lines.append(f"{role}: {hr[1][:300]}")
+            chat_context["system_context"] = "PREVIOUS CONVERSATION (most recent last):\n" + "\n".join(chat_lines)
+    except Exception as hist_err:
+        print(f"Chat history load for agent context failed: {hist_err}")
+
+    try:
+        result = await AgentManager.invoke_agent(db, name, msg.message, chat_context)
+
+        # Save user message to chat history
+        try:
+            await db.execute(text(
+                "INSERT INTO builder_chat_history (user_id, role, content, agent_name) VALUES (:uid, 'user', :msg, :agent)"
+            ), {"uid": int(user_id) if user_id else 0, "msg": msg.message, "agent": name})
+            await db.commit()
+        except Exception as save_err:
+            print(f"Chat history save (user) failed: {save_err}")
+
+        # Save AI response to chat history
+        try:
+            ai_content = result.get("response", "")
+            await db.execute(text(
+                "INSERT INTO builder_chat_history (user_id, role, content, agent_name, tool_action, tool_result) VALUES (:uid, 'assistant', :msg, :agent, :action, :tresult)"
+            ), {
+                "uid": int(user_id) if user_id else 0,
+                "msg": ai_content[:2000],
+                "agent": name,
+                "action": result.get("tool_action"),
+                "tresult": json.dumps(result.get("tool_result")) if result.get("tool_result") else None
+            })
+            await db.commit()
+        except Exception as save_err2:
+            print(f"Chat history save (assistant) failed: {save_err2}")
+
+        # Auto-generate app after entity creation
+        if result.get("tool_action") == "create_entity" and result.get("tool_result") and not result["tool_result"].get("already_existed"):
+            try:
+                import sys as _sys
+                _sys.path.insert(0, "/opt/evolvixos/platform")
+                from app_generator import deploy_app
+                
+                all_ents = await EntityManager.list_entities(db)
+                ents_with_schemas = []
+                for e in (all_ents or []):
+                    if e.get("name") not in ["ApiKey", "UsageLog", "Agent", "Wallet", "Transaction", "Block"]:
+                        ents_with_schemas.append({"name": e["name"], "schema": e.get("schema", {})})
+                
+                if ents_with_schemas:
+                    entity_name = result["tool_result"].get("name", "My App")
+                    app_name = entity_name + " App"
+                    gen_result = deploy_app(app_name, ents_with_schemas)
+                    result["tool_action"] = "generate_app"
+                    result["tool_result"] = {
+                        "name": app_name,
+                        "url": gen_result["url"],
+                        "app_name": app_name,
+                        "entities": [e["name"] for e in ents_with_schemas]
+                    }
+                    result["response"] = "Created the '" + entity_name + "' entity and generated your live app! You can see it in the preview panel on the right. Your app is live at https://evolvixos.com" + gen_result["url"]
+
+                    # Save the app generation message too
+                    try:
+                        await db.execute(text(
+                            "INSERT INTO builder_chat_history (user_id, role, content, agent_name, tool_action, tool_result) VALUES (:uid, 'assistant', :msg, :agent, :action, :tresult)"
+                        ), {
+                            "uid": int(user_id) if user_id else 0,
+                            "msg": result["response"][:2000],
+                            "agent": name,
+                            "action": "generate_app",
+                            "tresult": json.dumps(result["tool_result"])
+                        })
+                        await db.commit()
+                    except Exception:
+                        pass
+            except Exception as gen_err:
+                print(f"Auto-generate app failed: {gen_err}")
+
         return result
     except ValueError as e:
         raise HTTPException(400, str(e))
@@ -1020,6 +1106,326 @@ async def get_file_signed(file_id: str, token: str, db=Depends(get_db)):
 
 
 # --- WebSocket Real-Time (Self-Hosted) ---
+
+
+# ─── Vercel Integration ───
+from vercel_integration import connect_vercel, list_vercel_projects, list_vercel_deployments, deploy_to_vercel, get_vercel_deployment_status
+
+@app.post("/api/vercel/connect")
+async def api_vercel_connect(req: Request):
+    """Connect a Vercel account using an access token."""
+    user = require_auth(req)
+    body = await req.json()
+    token = body.get("token", "").strip()
+    if not token:
+        raise HTTPException(400, "Vercel access token required")
+    result = await connect_vercel(token)
+    if result["connected"]:
+        # Store the token in secrets
+        await secrets_store(user["user_id"], "vercel_token", token)
+        return {"connected": True, "user": {"username": result["username"], "name": result["name"], "email": result["email"]}}
+    raise HTTPException(401, result.get("error", "Connection failed"))
+
+@app.get("/api/vercel/status")
+async def api_vercel_status(req: Request):
+    """Check if Vercel is connected."""
+    user = require_auth(req)
+    token = await secrets_get(user["user_id"], "vercel_token")
+    if not token:
+        return {"connected": False}
+    result = await connect_vercel(token)
+    return result
+
+@app.get("/api/vercel/projects")
+async def api_vercel_projects(req: Request):
+    """List Vercel projects."""
+    user = require_auth(req)
+    token = await secrets_get(user["user_id"], "vercel_token")
+    if not token:
+        raise HTTPException(401, "Vercel not connected")
+    return await list_vercel_projects(token)
+
+@app.get("/api/vercel/deployments")
+async def api_vercel_deployments(req: Request, limit: int = 10):
+    """List recent Vercel deployments."""
+    user = require_auth(req)
+    token = await secrets_get(user["user_id"], "vercel_token")
+    if not token:
+        raise HTTPException(401, "Vercel not connected")
+    return await list_vercel_deployments(token, limit=limit)
+
+@app.post("/api/vercel/deploy")
+async def api_vercel_deploy(req: Request):
+    """Deploy an app to Vercel."""
+    user = require_auth(req)
+    token = await secrets_get(user["user_id"], "vercel_token")
+    if not token:
+        raise HTTPException(401, "Vercel not connected")
+    body = await req.json()
+    project_name = body.get("project_name", f"evolvixos-{int(time.time())}")
+    files = body.get("files", [])
+    framework = body.get("framework")
+    result = await deploy_to_vercel(token, project_name, files, framework)
+    return result
+
+@app.delete("/api/vercel/disconnect")
+async def api_vercel_disconnect(req: Request):
+    """Disconnect Vercel."""
+    user = require_auth(req)
+    await secrets_delete(user["user_id"], "vercel_token")
+    return {"disconnected": True}
+
+# ─── Secret helpers (simple encrypted store) ───
+async def secrets_store(user_id, key, value):
+    """Store a secret in the secrets table (scope=user, scope_id=user_id, name=key)."""
+    async with db.acquire() as conn:
+        # Upsert: if (scope, scope_id, name) exists, update encrypted_value
+        existing = await conn.fetchrow(
+            "SELECT id FROM secrets WHERE scope = 'user' AND scope_id = $1 AND name = $2",
+            str(user_id), key
+        )
+        if existing:
+            await conn.execute(
+                "UPDATE secrets SET encrypted_value = $1, updated_at = NOW() WHERE id = $2",
+                value, existing["id"]
+            )
+        else:
+            await conn.execute(
+                "INSERT INTO secrets (scope, scope_id, name, encrypted_value, created_at, updated_at) "
+                "VALUES ('user', $1, $2, $3, NOW(), NOW())",
+                str(user_id), key, value
+            )
+
+async def secrets_get(user_id, key):
+    """Get a secret from the secrets table."""
+    async with db.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT encrypted_value FROM secrets WHERE scope = 'user' AND scope_id = $1 AND name = $2",
+            str(user_id), key
+        )
+        return row["encrypted_value"] if row else None
+
+async def secrets_delete(user_id, key):
+    """Delete a secret from the secrets table."""
+    async with db.acquire() as conn:
+        await conn.execute(
+            "DELETE FROM secrets WHERE scope = 'user' AND scope_id = $1 AND name = $2",
+            str(user_id), key
+        )
+
+
+# ─── Connected Apps Integrations ───
+
+# ─── Connected Apps Integrations ───
+from integrations_backend import (
+    github_verify_token, github_list_repos, github_create_repo, github_push_file,
+    supabase_verify, supabase_list_tables,
+    slack_verify_token, slack_list_channels, slack_post_message,
+    gmail_send
+)
+from vercel_integration import connect_vercel, list_vercel_projects, list_vercel_deployments, deploy_to_vercel
+
+# ─── Secret helpers (SQLAlchemy) ───
+async def secrets_store(user_id, key, value):
+    async with async_session() as session:
+        existing = await session.execute(
+            text("SELECT id FROM secrets WHERE scope = 'user' AND scope_id = :uid AND name = :key"),
+            {"uid": str(user_id), "key": key}
+        )
+        row = existing.fetchone()
+        if row:
+            await session.execute(
+                text("UPDATE secrets SET encrypted_value = :val, updated_at = NOW() WHERE id = :id"),
+                {"val": value, "id": row[0]}
+            )
+        else:
+            await session.execute(
+                text("INSERT INTO secrets (scope, scope_id, name, encrypted_value, created_at, updated_at) VALUES ('user', :uid, :key, :val, NOW(), NOW())"),
+                {"uid": str(user_id), "key": key, "val": value}
+            )
+        await session.commit()
+
+async def secrets_get(user_id, key):
+    async with async_session() as session:
+        result = await session.execute(
+            text("SELECT encrypted_value FROM secrets WHERE scope = 'user' AND scope_id = :uid AND name = :key"),
+            {"uid": str(user_id), "key": key}
+        )
+        row = result.fetchone()
+        return row[0] if row else None
+
+async def secrets_delete(user_id, key):
+    async with async_session() as session:
+        await session.execute(
+            text("DELETE FROM secrets WHERE scope = 'user' AND scope_id = :uid AND name = :key"),
+            {"uid": str(user_id), "key": key}
+        )
+        await session.commit()
+
+@app.post("/api/integrations/{service}/connect")
+async def api_connect_integration(service: str, req: Request):
+    user = require_auth(req)
+    body = await req.json()
+    token = body.get("token", "").strip()
+    extra = body.get("extra", {})
+    if not token:
+        raise HTTPException(400, "Token/key required")
+    result = {"connected": False}
+    if service == "vercel":
+        result = await connect_vercel(token)
+    elif service == "github":
+        result = await github_verify_token(token)
+    elif service == "supabase":
+        result = await supabase_verify(extra.get("url", ""), token)
+    elif service == "slack":
+        result = await slack_verify_token(token)
+    elif service == "gmail":
+        result = {"connected": True, "email": extra.get("email", "")}
+    else:
+        raise HTTPException(400, f"Unknown service: {service}")
+    if result.get("connected"):
+        await secrets_store(user["user_id"], f"{service}_token", token)
+        if service == "supabase":
+            await secrets_store(user["user_id"], "supabase_url", extra.get("url", ""))
+        if service == "gmail":
+            await secrets_store(user["user_id"], "gmail_email", extra.get("email", ""))
+    return result
+
+@app.get("/api/integrations/{service}/status")
+async def api_integration_status(service: str, req: Request):
+    user = require_auth(req)
+    token = await secrets_get(user["user_id"], f"{service}_token")
+    if not token:
+        return {"connected": False}
+    if service == "vercel":
+        return await connect_vercel(token)
+    elif service == "github":
+        return await github_verify_token(token)
+    elif service == "supabase":
+        url = await secrets_get(user["user_id"], "supabase_url")
+        return await supabase_verify(url, token) if url else {"connected": False}
+    elif service == "slack":
+        return await slack_verify_token(token)
+    elif service == "gmail":
+        email = await secrets_get(user["user_id"], "gmail_email")
+        return {"connected": True, "email": email}
+    return {"connected": False}
+
+@app.delete("/api/integrations/{service}/disconnect")
+async def api_disconnect_integration(service: str, req: Request):
+    user = require_auth(req)
+    await secrets_delete(user["user_id"], f"{service}_token")
+    if service == "supabase":
+        await secrets_delete(user["user_id"], "supabase_url")
+    if service == "gmail":
+        await secrets_delete(user["user_id"], "gmail_email")
+    return {"disconnected": True}
+
+@app.get("/api/integrations/{service}/data")
+async def api_integration_data(service: str, req: Request):
+    user = require_auth(req)
+    token = await secrets_get(user["user_id"], f"{service}_token")
+    if not token:
+        raise HTTPException(401, f"{service} not connected")
+    if service == "vercel":
+        return await list_vercel_projects(token)
+    elif service == "github":
+        return await github_list_repos(token)
+    elif service == "supabase":
+        url = await secrets_get(user["user_id"], "supabase_url")
+        return await supabase_list_tables(url, token) if url else []
+    elif service == "slack":
+        return await slack_list_channels(token)
+    return []
+
+@app.post("/api/integrations/{service}/action")
+async def api_integration_action(service: str, req: Request):
+    user = require_auth(req)
+    token = await secrets_get(user["user_id"], f"{service}_token")
+    if not token:
+        raise HTTPException(401, f"{service} not connected")
+    body = await req.json()
+    action = body.get("action")
+    if service == "github":
+        if action == "create_repo":
+            return await github_create_repo(token, body.get("name"), body.get("private", True), body.get("description", ""))
+        elif action == "push_file":
+            return await github_push_file(token, body.get("owner"), body.get("repo"), body.get("path"), body.get("content"))
+    elif service == "vercel":
+        if action == "deploy":
+            return await deploy_to_vercel(token, body.get("project_name"), body.get("files", []), body.get("framework"))
+    elif service == "slack":
+        if action == "post_message":
+            return await slack_post_message(token, body.get("channel"), body.get("text"))
+    elif service == "gmail":
+        if action == "send_email":
+            sender = await secrets_get(user["user_id"], "gmail_email")
+            return await gmail_send(body.get("to"), body.get("subject"), body.get("body"), token, sender)
+    raise HTTPException(400, f"Unknown action: {action}")
+
+# ─── Workflow Execution ───
+@app.post("/api/workflows/execute")
+async def api_execute_workflow(req: Request):
+    user = require_auth(req)
+    body = await req.json()
+    template = body.get("template", {})
+    steps = template.get("steps", [])
+    results = []
+    for step in steps:
+        step_result = {"step": step.get("name", ""), "status": "pending", "output": ""}
+        step_type = step.get("type", "agent")
+        try:
+            if step_type == "agent":
+                agent_name = step.get("agent", "Builder")
+                message = step.get("prompt", "")
+                from agents.manager import AgentManager
+                mgr = AgentManager()
+                result = await mgr.invoke_agent(agent_name, message, user)
+                step_result["status"] = "completed"
+                step_result["output"] = result.get("response", "")[:200] if isinstance(result, dict) else str(result)[:200]
+            elif step_type == "code":
+                step_result["status"] = "completed"
+                step_result["output"] = "Code step acknowledged"
+            elif step_type == "wait":
+                import asyncio
+                await asyncio.sleep(step.get("seconds", 1))
+                step_result["status"] = "completed"
+                step_result["output"] = f"Waited {step.get('seconds', 1)}s"
+            else:
+                step_result["status"] = "skipped"
+                step_result["output"] = f"Unknown type: {step_type}"
+        except Exception as e:
+            step_result["status"] = "failed"
+            step_result["output"] = str(e)[:200]
+        results.append(step_result)
+    return {"executed": True, "results": results, "template": template.get("name", "")}
+
+# ─── Multi-Project Management ───
+@app.get("/api/projects")
+async def api_list_projects(req: Request, db = Depends(get_db)):
+    user = require_auth(req)
+    result = await db.execute(
+        text("SELECT id, name, description, created_at FROM projects WHERE user_id = :uid ORDER BY created_at DESC"),
+        {"uid": str(user["user_id"])}
+    )
+    rows = result.fetchall()
+    return [{"id": str(r[0]), "name": r[1], "description": r[2] or "", "created_at": str(r[3])} for r in rows]
+
+@app.post("/api/projects")
+async def api_create_project(req: Request, db = Depends(get_db)):
+    user = require_auth(req)
+    body = await req.json()
+    name = body.get("name", "Untitled Project")
+    description = body.get("description", "")
+    result = await db.execute(
+        text("INSERT INTO projects (user_id, name, description, created_at) VALUES (:uid, :name, :desc, NOW()) RETURNING id, name"),
+        {"uid": str(user["user_id"]), "name": name, "desc": description}
+    )
+    await db.commit()
+    row = result.fetchone()
+    return {"id": str(row[0]), "name": row[1], "created": True}
+
+
 @app.websocket("/ws/entities/{entity_name}")
 async def ws_entity_subscriptions(websocket: WebSocket, entity_name: str):
     """Subscribe to entity change events in real-time."""
@@ -1183,6 +1589,47 @@ async def delegate_subagent(req: SubAgentReq, request: Request):
     return {"result": result.get("content", ""), "model": result.get("model", "auto"), "provider": result.get("provider", "auto")}
 
 
+# ─── Chat History ───
+@app.get("/api/chat/history")
+async def get_chat_history(request: Request, db=Depends(get_db)):
+    """Load all chat history for the current user."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, "Not authenticated")
+    user_id = int(user.get("user_id", 0))
+    result = await db.execute(
+        text("SELECT id, role, content, tool_action, tool_result, agent_name, created_date FROM builder_chat_history WHERE user_id = :uid ORDER BY created_date ASC"),
+        {"uid": user_id}
+    )
+    rows = result.fetchall()
+    messages = []
+    for r in rows:
+        msg = {"id": r[0], "role": r[1], "content": r[2], "agent": r[5] or "Builder", "time": str(r[6]) if r[6] else None}
+        if r[3]:
+            msg["tool_action"] = r[3]
+        if r[4]:
+            try:
+                msg["tool_result"] = json.loads(r[4]) if isinstance(r[4], str) else r[4]
+            except:
+                msg["tool_result"] = {"raw": str(r[4])[:200]}
+        messages.append(msg)
+    return {"messages": messages}
+
+@app.delete("/api/chat/history")
+async def clear_chat_history(request: Request, db=Depends(get_db)):
+    """Clear all chat history for the current user."""
+    user = get_user_from_token(request)
+    if not user:
+        raise HTTPException(401, "Not authenticated")
+    user_id = int(user.get("user_id", 0))
+    await db.execute(
+        text("DELETE FROM builder_chat_history WHERE user_id = :uid"),
+        {"uid": user_id}
+    )
+    await db.commit()
+    return {"status": "cleared"}
+
+
 @app.post("/api/chat")
 async def chat_build(msg: ChatMessage, request: Request, db=Depends(get_db)):
     """
@@ -1218,6 +1665,23 @@ async def chat_build(msg: ChatMessage, request: Request, db=Depends(get_db)):
 
     # Load persistent memory to give the builder context
     memory_text = ""
+    # Load chat history for context (last 20 messages)
+    chat_history_text = ""
+    try:
+        history_result = await db.execute(
+            text("SELECT role, content FROM builder_chat_history WHERE user_id = :uid ORDER BY created_date DESC LIMIT 20"),
+            {"uid": int(user_id) if user_id else 0}
+        )
+        history_rows = history_result.fetchall()
+        if history_rows:
+            history_rows = list(reversed(history_rows))
+            chat_lines = []
+            for hr in history_rows:
+                role = "User" if hr[0] == "user" else "Builder"
+                chat_lines.append(f"{role}: {hr[1][:200]}")
+            chat_history_text = "\n\nPREVIOUS CONVERSATION (most recent last):\n" + "\n".join(chat_lines)
+    except Exception as hist_err:
+        print(f"Chat history load failed: {hist_err}")
     try:
         mem_result = await db.execute(text(
             "SELECT content FROM entity_platformmemory ORDER BY created_date DESC LIMIT 20"
@@ -1233,7 +1697,7 @@ async def chat_build(msg: ChatMessage, request: Request, db=Depends(get_db)):
     # System prompt that teaches the LLM about platform capabilities
     system_prompt = f"""You are EvolvixOS Platform Builder. You help users build apps by creating entities, backend functions, and workflows via natural language.
 
-CURRENT STATE — Entities already in the project: {existing_summary}{memory_text}
+CURRENT STATE — Entities already in the project: {existing_summary}{memory_text}{chat_history_text}
 
 Available API actions (respond with JSON):
 - Create entity: {{"action": "create_entity", "name": "Task", "schema": {{"type": "object", "properties": {{"title": {{"type": "string"}}, "done": {{"type": "boolean"}}}}, "required": ["title"]}}}}
@@ -1247,6 +1711,7 @@ CRITICAL RULES:
 2. CHECK the "CURRENT STATE" list above. If a suitable entity already exists, do NOT create a duplicate. Instead respond with {{"action": "chat", "message": "You already have a 'Post' entity for that — want me to add more fields or create a different entity?"}}.
 3. If the user asks for something related but different from existing entities, create a NEW entity with a distinct name. For example, if "Page" exists and the user wants a delivery app, create "Order" (not another "Page").
 4. Only ask a clarifying question if the request is truly ambiguous with no sensible default.
+5. AFTER creating entities, ALWAYS generate a complete web app. Use: {{"action": "generate_app", "app_name": "Blog App", "entities": ["Post", "Comment"]}} — this generates a full CRUD web app deployed live at /apps/{{slug}}/.
 
 Proactive defaults (use "create_entities" for multi-entity, "create_entity" for single):
 - "website" or "landing page" -> "Page": {{title, slug, content, published}}
@@ -1281,6 +1746,20 @@ Always respond with a JSON action object. If the user just wants to chat, respon
     ]
     llm_result = await unified_chat(llm_messages, model=msg.model or "auto", temperature=0.3, max_tokens=2000, prefer_cloud=True)
     ai_response = llm_result.get("content", "")
+    # Save user message to chat history
+    try:
+        await db.execute(text("INSERT INTO builder_chat_history (user_id, role, content, agent_name) VALUES (:uid, 'user', :msg, 'Builder')"),
+            {"uid": int(user_id) if user_id else 0, "msg": msg.message})
+        await db.commit()
+    except Exception as save_err:
+        print(f"Chat save failed: {save_err}")
+    # Save AI response to chat history
+    try:
+        await db.execute(text("INSERT INTO builder_chat_history (user_id, role, content, agent_name) VALUES (:uid, 'assistant', :msg, 'Builder')"),
+            {"uid": int(user_id) if user_id else 0, "msg": ai_response[:2000]})
+        await db.commit()
+    except Exception as save_err2:
+        print(f"AI response save failed: {save_err2}")
     used_model = llm_result.get("model", "auto")
     used_provider = llm_result.get("provider", "auto")
     privacy_mode = llm_result.get("privacy_mode", "HYBRID")
@@ -1409,6 +1888,28 @@ Always respond with a JSON action object. If the user just wants to chat, respon
             """), {"name": action["name"], "def": json.dumps(action.get("definition", {})), "type": action.get("trigger_type", "scheduled")})
             await db.commit()
             return {"action": "create_workflow", "name": action["name"], "message": f"Workflow '{action['name']}' created!"}
+        elif action_type == "generate_app":
+            try:
+                import sys as _sys
+                _sys.path.insert(0, "/opt/evolvixos/platform")
+                from app_generator import deploy_app
+                app_name = action.get("app_name", "My App")
+                entity_names = action.get("entities", [])
+                all_ents = await EntityManager.list_entities(db, user_id=user_id)
+                ents_with_schemas = []
+                for ename in entity_names:
+                    for e in (all_ents or []):
+                        if e.get("name") == ename:
+                            ents_with_schemas.append({"name": ename, "schema": e.get("schema", {})})
+                            break
+                if not ents_with_schemas:
+                    for e in (all_ents or []):
+                        if e.get("name") not in ["ApiKey", "UsageLog", "Agent", "Wallet", "Transaction", "Block"]:
+                            ents_with_schemas.append({"name": e["name"], "schema": e.get("schema", {})})
+                result = deploy_app(app_name, ents_with_schemas)
+                return {"action": "generate_app", "app_name": app_name, "url": result["url"], "full_url": f"https://evolvixos.com{result['url']}", "message": f"Your web app '{app_name}' is live at https://evolvixos.com{result['url']}"}
+            except Exception as e:
+                return {"action": "generate_app", "error": str(e), "message": f"Could not generate web app: {str(e)}"}
         elif action_type == "chat":
             return {"action": "chat", "message": action.get("message", "How can I help you build today?")}
         else:

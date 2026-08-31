@@ -1,0 +1,1 @@
+import{a as e,t}from"./jsx-runtime-B-hcVAMW.js";import{t as n}from"./folder-open-D8T579GV.js";import{t as r}from"./coming-soon-DcFpQdf9.js";var i=e(t()),a=()=>(0,i.jsx)(r,{title:`Files`,icon:n});export{a as component};

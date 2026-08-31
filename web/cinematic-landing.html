@@ -995,6 +995,47 @@ footer {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
 
+      /* ─── Mobile Optimization ─── */
+      @media (max-width: 768px) {
+        .hero { min-height: auto !important; padding: 60px 16px 40px !important; }
+        .hero h1 { font-size: 32px !important; }
+        .hero p { font-size: 16px !important; }
+        .hero-grid { grid-template-columns: 1fr !important; gap: 24px; }
+        .terminal { max-width: 100% !important; }
+        .stats-bar { flex-wrap: wrap; gap: 16px !important; }
+        .stat-item { min-width: 45%; }
+        .stat-number { font-size: 28px !important; }
+        .feature-grid { grid-template-columns: 1fr !important; gap: 16px; }
+        .feature-card { padding: 20px 16px; }
+        .how-it-works { padding: 40px 16px !important; }
+        .steps-grid { grid-template-columns: 1fr !important; gap: 24px; }
+        .step-card { padding: 20px 16px; }
+        .cta-section { padding: 40px 16px !important; }
+        .cta-section h2 { font-size: 24px !important; }
+        .nav-links { display: none !important; }
+        .nav-mobile-toggle { display: flex !important; }
+        .footer-content { grid-template-columns: 1fr !important; gap: 24px; padding: 32px 16px !important; }
+        .footer-links { flex-wrap: wrap; gap: 12px; }
+        .logo-text { font-size: 20px; }
+        .btn-primary, .btn-secondary { padding: 12px 20px; font-size: 14px; width: 100%; }
+        .hero-actions { flex-direction: column; gap: 12px; }
+      }
+      @media (max-width: 480px) {
+        .hero h1 { font-size: 26px !important; }
+        .hero p { font-size: 14px !important; }
+        .stat-item { min-width: 100%; }
+        .stat-number { font-size: 24px !important; }
+        .feature-card { padding: 16px 12px; }
+        .feature-card h3 { font-size: 16px; }
+        .feature-card p { font-size: 13px; }
+        .step-card { padding: 16px 12px; }
+        .cta-section h2 { font-size: 20px !important; }
+        .logo-text { font-size: 18px; }
+        .footer-links { gap: 8px; font-size: 12px; }
+      }
+    
+
+
 /* ─── Scroll Progress Bar ──────────────────────────────── */
 .scroll-progress {
   position: fixed;
@@ -1338,10 +1379,10 @@ footer {
       <a href="#features">Platform</a>
       <a href="#models">Models</a>
       <a href="#architecture">Architecture</a>
-      <a href="#pricing">Pricing</a>
+      <a href="#pricing">Pricing</a><a href="/workstation">Workstation</a>
       <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
     </div>
-    <a href="/pricing" class="nav-cta">Start Building →</a>
+    <a href="/workstation" class="nav-cta">Open Workstation →</a>
   </div>
 </nav>
 
@@ -1360,12 +1401,12 @@ footer {
   <div class="hero-wrap">
     <!-- Left: text -->
     <div class="hero-left">
-      <div class="hero-badge">Open Source · MIT Licensed · Self-Hosted</div>
-      <h1 class="hero-title">Engineering tools<br><span class="os">powered by AI</span></h1>
-      <p class="hero-sub">Agents that write code, manage servers, and solve real engineering tasks. 300+ models. 49 tools. RAG engine. Open source.</p>
+      <div class="hero-badge">Self-hosted · MIT licensed · Agents that execute code</div>
+      <h1 class="hero-title">The engineering<br><span class="os">platform for AI</span></h1>
+      <p class="hero-sub">Define your data, build and deploy agents, orchestrate workflows, and scale your infrastructure — all from one workstation. Open source, your keys, your data.</p>
       <div class="hero-cta">
-        <a href="/platform/" class="btn btn-primary">Start Building</a>
-        <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn btn-link">Star on GitHub</a>
+        <a href="/workstation" class="btn btn-primary">Open Workstation →</a>
+        <a href="/platform/" class="btn btn-link">View Dashboard</a>
       </div>
       <!-- Mini stats -->
       <div class="hero-stats">
@@ -1377,23 +1418,20 @@ footer {
     </div>
     <!-- Right: terminal -->
     <div class="hero-right">
-      <div class="hero-terminal">
+      <div class="hero-terminal" style="font-family: -apple-system, sans-serif;">
         <div class="hero-terminal-bar">
           <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
-          <span class="title">EvolvixOS — agent session</span>
+          <span class="title">EvolvixOS Builder</span>
           <span class="badge-right">live</span>
         </div>
-        <div class="hero-terminal-body">
-          <div><span class="comment"># Deploy an AI agent with tools + memory</span></div>
-          <div><span class="prompt">$</span> evolvix agent create <span class="str">"code-reviewer"</span></div>
-          <div><span class="ok">✓</span> <span class="out">Agent created · id: ag_7f3a2b</span></div>
-          <div><span class="prompt">$</span> evolvix agent tools <span class="key">add</span> code_exec file_ops</div>
-          <div><span class="ok">✓</span> <span class="out">3 tools attached · 49 available</span></div>
-          <div><span class="prompt">$</span> evolvix agent model <span class="key">set</span> nemotron-550b</div>
-          <div><span class="ok">✓</span> <span class="out">Routed via NVIDIA NIM</span></div>
-          <div><span class="prompt">$</span> evolvix agent run <span class="str">"Review src/api.py for SSRF"</span></div>
-          <div><span class="ok">✓</span> <span class="out">847 lines analyzed · </span><span class="warn">2 issues</span><span class="out"> found</span></div>
-          <div><span class="prompt">$</span> <span class="cursor"></span></div>
+        <div class="hero-terminal-body" style="font-family: -apple-system, sans-serif; font-size: 13px; line-height: 1.8;">
+          <div style="margin-bottom:10px"><span style="background:#007aff;color:#fff;padding:4px 12px;border-radius:14px 14px 4px 14px;font-size:12px">I want to track my customers and sales</span></div>
+          <div style="display:flex;gap:8px;margin-bottom:10px"><span style="width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#007aff,#5856d6);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px;flex-shrink:0">B</span><span style="background:#1d1d1f;color:#e8e8ed;padding:6px 12px;border-radius:4px 14px 14px 14px;font-size:12px">Created the Customer entity with fields: name, email, phone, company, status</span></div>
+          <div style="margin-bottom:10px;margin-left:32px"><span style="background:rgba(52,199,89,0.15);border:1px solid rgba(52,199,89,0.3);border-radius:8px;padding:4px 10px;font-size:11px;color:#34c759">✓ Entity Created — Customer</span></div>
+          <div style="margin-bottom:10px"><span style="background:#007aff;color:#fff;padding:4px 12px;border-radius:14px 14px 4px 14px;font-size:12px">Now add sales deals with amount and stage</span></div>
+          <div style="display:flex;gap:8px;margin-bottom:10px"><span style="width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#007aff,#5856d6);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px;flex-shrink:0">B</span><span style="background:#1d1d1f;color:#e8e8ed;padding:6px 12px;border-radius:4px 14px 14px 14px;font-size:12px">Created the Deal entity with fields: title, amount, stage, customer</span></div>
+          <div style="margin-left:32px"><span style="background:rgba(52,199,89,0.15);border:1px solid rgba(52,199,89,0.3);border-radius:8px;padding:4px 10px;font-size:11px;color:#34c759">✓ Entity Created — Deal</span></div>
+          <div style="margin-top:12px"><span class="cursor"></span></div>
         </div>
       </div>
     </div>
@@ -1518,23 +1556,23 @@ footer {
 <!-- Architecture -->
 <section id="architecture">
   <div class="section-label">HOW IT WORKS</div>
-  <h2 class="section-title">From setup to production<br><span class="gradient">in 3 steps</span></h2>
-  <p class="section-sub">Install on any Linux server. Define your data. Deploy your agents. Ship to production. The platform handles the rest.</p>
+  <h2 class="section-title">From idea to app<br><span class="gradient">in 3 steps</span></h2>
+  <p class="section-sub">Define entities. Deploy agents. Orchestrate workflows. Scale infrastructure. One workstation for your entire AI engineering stack.</p>
   <div class="arch-grid">
     <div class="arch-item">
       <div class="arch-num">01</div>
-      <h3>Define Your Data</h3>
-      <p>JSON schema becomes an instant PostgreSQL CRUD API. Auth, filtering, row-level security — all automatic.</p>
+      <h3>Describe What You Want</h3>
+      <p>Tell the AI Builder what you need in plain English. "I want to track my customers and sales deals." That’s it. No technical language required.</p>
     </div>
     <div class="arch-item">
       <div class="arch-num">02</div>
-      <h3>Build & Deploy</h3>
-      <p>Deploy Python functions as HTTP endpoints. Create AI agents with memory. Set up workflows. Everything runs on your server — no cold starts.</p>
+      <h3>AI Builds Everything</h3>
+      <p>The Builder creates your database tables, deploys backend functions, and sets up your API. All automatically. You see exactly what was created.</p>
     </div>
     <div class="arch-item">
       <div class="arch-num">03</div>
-      <h3>Ship &amp; Scale</h3>
-      <p>350+ tests passing. Audit logging. Permission-gated tools. Multi-tenant isolation. Scale on your own infrastructure.</p>
+      <h3>Use &amp; Share</h3>
+      <p>Access your app through the dashboard. Create AI agents to automate tasks. Share with your team. Scale when you need to.</p>
     </div>
   </div>
 </section>
@@ -1557,7 +1595,7 @@ footer {
         <li>Entity CRUD + Functions</li>
         <li>Community support</li>
       </ul>
-      <a href="/platform/" class="price-btn">Start Building</a>
+      <a href="/workstation" class="price-btn">Open Workstation</a>
     </div>
     <div class="price-card featured">
       <div class="price-name">PRO</div>
@@ -1595,10 +1633,10 @@ footer {
 
 <!-- CTA -->
 <section class="cta-section">
-  <h2 class="cta-title">Built by engineers.<br><span class="gradient">For engineers.</span></h2>
-  <p class="cta-sub">Open source. MIT licensed. Self-hosted.<br>300+ models. 49 tools. RAG engine. All on your server.</p>
+  <h2 class="cta-title">Describe it.<br><span class="gradient">I'll build it.</span></h2>
+  <p class="cta-sub">Open source. Self-hosted. Your keys, your data.<br>Define, build, deploy, and scale — all from one workstation.</p>
   <div class="hero-cta">
-    <a href="/platform/" class="btn btn-primary">Start Building</a>
+    <a href="/workstation" class="btn btn-primary">Open Workstation</a>
     <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="btn btn-link">Star on GitHub</a>
   </div>
 </section>
@@ -1618,7 +1656,7 @@ footer {
         <a href="/platform/">Studio</a>
         <a href="#features">Features</a>
         <a href="#models">AI Models</a>
-        <a href="#pricing">Pricing</a>
+        <a href="#pricing">Pricing</a><a href="/workstation">Workstation</a>
       </div>
       <div class="footer-col">
         <h4>RESOURCES</h4>
