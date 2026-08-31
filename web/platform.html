@@ -124,7 +124,6 @@ input:focus,textarea:focus,select:focus{outline:none}
       <div class="nav-section-label">Infrastructure</div>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="models" onclick="showPage('models')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#007AFF" opacity=".08"/><path d="M12 3v18M3 12h18" stroke="#5856D6" stroke-width="1.5"/><circle cx="12" cy="12" r="4" fill="#007AFF" opacity=".15"/></svg></div><span>Model Routing</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="rag" onclick="showPage('rag')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" fill="#007AFF" opacity=".12" stroke="#5856D6" stroke-width="1.5" stroke-linecap="round"/><circle cx="18" cy="18" r="3" fill="#007AFF" opacity=".2"/></svg></div><span>RAG Engine</span></a>
-      <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="testing" onclick="showPage('testing')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#007AFF" opacity=".08" stroke="#5856D6" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="#007AFF" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Testing Agent</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="monitor" onclick="showPage('monitor')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="12" rx="2" fill="#007AFF" opacity=".12"/><path d="M7 10l2 2 4-4M3 20h18" stroke="#5856D6" stroke-width="1.5"/></svg></div><span>Server Monitor</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="logs" onclick="showPage('logs')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" fill="#007AFF" opacity=.08"/><path d="M7 9h10M7 13h7M7 17h4" stroke="#5856D6" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>Logs</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="terminal" onclick="showPage('terminal')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" fill="#1d1d1f"/><path d="M7 9l3 3-3 3M13 15h4" stroke="#00ff00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Terminal</span></a>
@@ -132,12 +131,11 @@ input:focus,textarea:focus,select:focus{outline:none}
       <div class="nav-section-label">Account</div>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="analytics" onclick="showPage('analytics')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><path d="M3 21h18M3 17l5-5 3 3 5-5" stroke="#5856D6" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Analytics</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="apikeys" onclick="showPage('apikeys')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><circle cx="8" cy="12" r="4" fill="#007AFF" opacity=".15" stroke="#5856D6" stroke-width="1.5"/><path d="M12 12h8m-3-3v6" stroke="#5856D6" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>API Keys</span></a>
-      <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="billing" onclick="showPage('billing')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="2" fill="#007AFF" opacity=".12"/><path d="M3 10h18M7 14h4" stroke="#5856D6" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>Billing</span></a>
     </nav>
     <div class="p-3 border-t border-black/[.06]">
       <div class="flex items-center gap-2.5 cursor-pointer hover:bg-black/[.04] p-2 rounded-lg" onclick="openUserSettings()">
         <div style="width:32px;height:32px;background:linear-gradient(135deg,#007AFF,#5856D6);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:13px" id="user-avatar">U</div>
-        <div class="flex-1 min-w-0"><p class="text-sm font-medium text-gray-900 truncate" id="user-name">User</p><p class="text-[10px] text-gray-500 truncate" id="user-email">user@evolvixos.com</p></div>
+        <div class="flex-1 min-w-0"><p class="text-sm font-medium text-gray-900 truncate" id="user-name">User</p><p class="text-[10px] text-gray-500 truncate" id="user-email">admin@evolvixos.com</p></div>
         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
       </div>
     </div>
@@ -173,11 +171,11 @@ input:focus,textarea:focus,select:focus{outline:none}
     </div>
   </div>
   <div class="flex-1 overflow-y-auto px-4 py-4" id="chat-messages">
-    <div class="chat-bubble max-w-2xl mx-auto mb-4"><div class="flex gap-3"><div style="width:32px;height:32px;background:linear-gradient(135deg,#007AFF,#5856D6);border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px">E</div><div class="flex-1"><div class="card p-4"><p class="text-sm text-gray-700">Good morning! I'm your EvolvixOS workbench. I can build apps, manage entities, deploy functions, run workflows, browse the web, and execute code.</p><p class="text-sm text-gray-700 mt-2">What would you like to build today?</p></div><div class="flex flex-wrap gap-2 mt-3"><button class="chat-suggestion text-xs px-3 py-1.5 rounded-lg border border-black/[.08] text-gray-600" onclick="insertSuggestion('Create a CRM entity with name, email, company, status fields')">Create a CRM entity</button><button class="chat-suggestion text-xs px-3 py-1.5 rounded-lg border border-black/[.08] text-gray-600" onclick="insertSuggestion('Deploy a function that sends an email notification')">Deploy a function</button><button class="chat-suggestion text-xs px-3 py-1.5 rounded-lg border border-black/[.08] text-gray-600" onclick="insertSuggestion('Browse the web for latest AI engineering trends')">Web research</button><button class="chat-suggestion text-xs px-3 py-1.5 rounded-lg border border-black/[.08] text-gray-600" onclick="insertSuggestion('Show me the model routing configuration')">Model routing</button></div></div></div></div>
+    <div class="chat-bubble max-w-2xl mx-auto mb-4"><div class="flex gap-3"><div style="width:32px;height:32px;background:linear-gradient(135deg,#007AFF,#5856D6);border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px">E</div><div class="flex-1"><div class="card p-4"><p class="text-sm text-gray-700">Good morning! I'm your EvolvixOS workbench. I can create entities, deploy functions, set up workflows, and execute code.</p><p class="text-sm text-gray-700 mt-2">What would you like to build?</p></div><div class="flex flex-wrap gap-2 mt-3"><button class="chat-suggestion text-xs px-3 py-1.5 rounded-lg border border-black/[.08] text-gray-600" onclick="insertSuggestion('Create an entity with name, email, company, status fields')">Create an entity</button><button class="chat-suggestion text-xs px-3 py-1.5 rounded-lg border border-black/[.08] text-gray-600" onclick="insertSuggestion('Deploy a function that sends an email notification')">Deploy a function</button><button class="chat-suggestion text-xs px-3 py-1.5 rounded-lg border border-black/[.08] text-gray-600" onclick="insertSuggestion('Browse the web for latest AI engineering trends')">Web research</button><button class="chat-suggestion text-xs px-3 py-1.5 rounded-lg border border-black/[.08] text-gray-600" onclick="insertSuggestion('Show me the model routing configuration')">Model routing</button></div></div></div></div>
   </div>
   <div id="chat-queue" class="px-4 hidden"><div class="max-w-2xl mx-auto"><div class="text-xs text-gray-500 mb-1 flex items-center justify-between"><span>Queued messages (<span id="queue-count">0</span>/7)</span><button class="text-xs text-brand-500 hover:underline" onclick="clearQueue()">Clear all</button></div><div id="queue-list" class="space-y-1"></div></div></div>
   <div id="subagent-panel" class="px-4 hidden"><div class="max-w-2xl mx-auto"><div class="subagent-badge rounded-lg p-2 flex items-center gap-2"><div class="spinner"></div><span class="text-xs text-gray-600" id="subagent-status">Sub-agent working...</span></div></div></div>
-  <div class="border-t border-black/[.04] px-4 py-3"><div class="max-w-2xl mx-auto"><div class="flex items-end gap-2"><button class="p-2 rounded-lg hover:bg-black/[.05]" title="Attach file" onclick="document.getElementById('file-upload').click()"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button><input type="file" id="file-upload" class="hidden" onchange="handleFileUpload(this)"><button class="p-2 rounded-lg hover:bg-black/[.05]" title="Screen share" onclick="toggleScreenShare()"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button><button class="p-2 rounded-lg hover:bg-black/[.05]" id="voice-btn" title="Voice input" onclick="toggleVoiceInput()"><svg class="w-5 h-5 text-gray-400" id="voice-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg></button><textarea id="chat-input" rows="1" placeholder="Ask me to build something..." class="flex-1 px-3 py-2 text-sm rounded-xl border border-black/[.08] bg-white resize-none focus:border-brand-500 max-h-32" onkeydown="handleChatKeydown(event)" oninput="autoResize(this)"></textarea><button class="p-2 rounded-xl bg-brand-500 hover:bg-brand-600 transition-colors" onclick="sendChatMessage()"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="flex items-center justify-between mt-2"><div class="flex items-center gap-2"><span class="text-[10px] text-gray-400">Suggestions:</span><button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Create a todo app with CRUD')">Todo app</button><button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Build a blog with markdown support')">Blog</button><button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Set up a daily summary workflow')">Workflow</button></div><span class="text-[10px] text-gray-400" id="mode-indicator">Default mode</span></div></div></div>
+  <div class="border-t border-black/[.04] px-4 py-3"><div class="max-w-2xl mx-auto"><div class="flex items-end gap-2"><button class="p-2 rounded-lg hover:bg-black/[.05]" title="Attach file" onclick="document.getElementById('file-upload').click()"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button><input type="file" id="file-upload" class="hidden" onchange="handleFileUpload(this)"><button class="p-2 rounded-lg hover:bg-black/[.05]" title="Screen share" onclick="toggleScreenShare()"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button><button class="p-2 rounded-lg hover:bg-black/[.05]" id="voice-btn" title="Voice input" onclick="toggleVoiceInput()"><svg class="w-5 h-5 text-gray-400" id="voice-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg></button><textarea id="chat-input" rows="1" placeholder="Ask me to build something..." class="flex-1 px-3 py-2 text-sm rounded-xl border border-black/[.08] bg-white resize-none focus:border-brand-500 max-h-32" onkeydown="handleChatKeydown(event)" oninput="autoResize(this)"></textarea><button class="p-2 rounded-xl bg-brand-500 hover:bg-brand-600 transition-colors" onclick="sendChatMessage()"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="flex items-center justify-between mt-2"><div class="flex items-center gap-2"><span class="text-[10px] text-gray-400">Quick start:</span><button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Create an entity for my project')">New entity<button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Deploy a backend function')">Deploy function<button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Set up a workflow')">Workflow</div><span class="text-[10px] text-gray-400" id="mode-indicator">Default mode</span></div></div></div>
 </div>
 
 <!-- PAGE: BUILDER -->
@@ -346,8 +344,7 @@ input:focus,textarea:focus,select:focus{outline:none}
 <!-- PAGE: RAG ENGINE -->
 <div id="page-rag" class="page p-6"><div class="max-w-4xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">RAG Engine</h1><p class="text-sm text-gray-500 mt-1">Local-first retrieval with Ollama + Qdrant</p></div></div><div id="rag-collections" class="space-y-2 mb-4"></div><div class="card p-4"><h3 class="text-sm font-semibold mb-3">Query RAG</h3><div class="flex gap-2"><input type="text" id="rag-query" placeholder="Ask a question..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-black/[.08] focus:border-brand-500"><button class="btn-primary" onclick="queryRAG()">Query</button></div><div id="rag-results" class="mt-3"></div></div></div></div>
 
-<!-- PAGE: TESTING -->
-<div id="page-testing" class="page p-6"><div class="max-w-4xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Testing Agent</h1><p class="text-sm text-gray-500 mt-1">Browser-based E2E testing</p></div><button class="btn-primary" onclick="runTests()">Run All Tests</button></div><div class="grid grid-cols-3 gap-3 mb-6"><div class="stat-card"><div class="text-xs text-gray-500">Total Tests</div><div class="text-2xl font-bold">350</div></div><div class="stat-card"><div class="text-xs text-gray-500">Passing</div><div class="text-2xl font-bold" style="color:#16a34a">350</div></div><div class="stat-card"><div class="text-xs text-gray-500">Failing</div><div class="text-2xl font-bold" style="color:#dc2626">0</div></div></div><div id="test-suites" class="space-y-2"></div></div></div>
+
 
 <!-- PAGE: MONITOR -->
 <div id="page-monitor" class="page p-6"><div class="max-w-5xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Server Monitor</h1><p class="text-sm text-gray-500 mt-1">System health and active services</p></div><span class="badge badge-green" id="monitor-status">● All systems operational</span></div><div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"><div class="stat-card"><div class="text-xs text-gray-500">CPU</div><div class="text-2xl font-bold" id="monitor-cpu">--</div></div><div class="stat-card"><div class="text-xs text-gray-500">Memory</div><div class="text-2xl font-bold" id="monitor-mem">--</div></div><div class="stat-card"><div class="text-xs text-gray-500">Disk</div><div class="text-2xl font-bold" id="monitor-disk">--</div></div><div class="stat-card"><div class="text-xs text-gray-500">Load</div><div class="text-2xl font-bold" id="monitor-load">--</div></div></div><div id="services-list" class="space-y-2"></div></div></div>
@@ -365,10 +362,7 @@ input:focus,textarea:focus,select:focus{outline:none}
 <div id="page-apikeys" class="page p-6"><div class="max-w-3xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">API Keys</h1><p class="text-sm text-gray-500 mt-1">External API access</p></div><button class="btn-primary" onclick="createApiKey()">+ New Key</button></div><div id="apikeys-list" class="space-y-2"></div></div></div>
 
 <!-- PAGE: VERSIONS -->
-<div id="page-versions" class="page p-6"><div class="max-w-3xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Version History</h1><p class="text-sm text-gray-500 mt-1">Restore and publish previous versions</p></div></div><div id="versions-list" class="space-y-2"></div></div></div>
-
-<!-- PAGE: BILLING -->
-<div id="page-billing" class="page p-6"><div class="max-w-5xl mx-auto"><h1 class="text-2xl font-bold mb-6">Billing</h1><div class="grid grid-cols-3 gap-3 mb-6"><div class="stat-card"><div class="text-xs text-gray-500">Plan</div><div class="text-lg font-bold">Builder</div></div><div class="stat-card"><div class="text-xs text-gray-500">Messages</div><div class="text-lg font-bold">374/1093</div></div><div class="stat-card"><div class="text-xs text-gray-500">Integrations</div><div class="text-lg font-bold">1307/122553</div></div></div><div id="billing-plans" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div></div></div>
+<div id="page-versions" class="page p-6"><div class="max-w-3xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Version History</h1><p class="text-sm text-gray-500 mt-1">Restore and publish previous versions</p></div></div><div id="versions-list" class="space-y-2"></div></div></div><div class="stat-card"><div class="text-xs text-gray-500">Messages</div><div class="text-lg font-bold">374/1093</div></div><div class="stat-card"><div class="text-xs text-gray-500">Integrations</div><div class="text-lg font-bold">1307/122553</div></div></div><div class="text-center text-gray-400 py-8"></div></div></div>
 
     </div>
   </div>
@@ -405,7 +399,7 @@ window.showPage=function(page){
   var t=document.getElementById('page-'+page);if(t)t.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');n.classList.add('text-gray-600');n.classList.remove('text-gray-900');});
   var an=document.querySelector('.nav-item[data-page="'+page+'"]');if(an)an.classList.add('active');
-  var labels={chat:'Workbench',builder:'Builder',entities:'Entities',functions:'Functions',workflows:'Workflows',templates:'Templates',storage:'Files',notes:'Notes',memory:'Memory',agents:'Agents',agentteams:'Agent Teams',channels:'Channels',connectors:'Connectors',agentsettings:'Agent Settings',models:'Model Routing',rag:'RAG Engine',testing:'Testing Agent',monitor:'Server Monitor',logs:'Logs',terminal:'Terminal',analytics:'Analytics',apikeys:'API Keys',versions:'Version History',billing:'Billing'};
+  var labels={chat:'Workbench',builder:'Builder',entities:'Entities',functions:'Functions',workflows:'Workflows',templates:'Templates',storage:'Files',notes:'Notes',memory:'Memory',agents:'Agents',agentteams:'Agent Teams',channels:'Channels',connectors:'Connectors',agentsettings:'Agent Settings',models:'Model Routing',rag:'RAG Engine',monitor:'Server Monitor',logs:'Logs',terminal:'Terminal',analytics:'Analytics',apikeys:'API Keys',versions:'Version History'};
   document.getElementById('breadcrumb').textContent=labels[page]||page;
   var sb=document.getElementById('sidebar');if(sb)sb.classList.remove('open');
   document.getElementById('mobile-overlay').style.display='none';
@@ -421,7 +415,7 @@ window.showPage=function(page){
   if(page==='connectors'&&!loadedPages.connectors){loadConnectors();loadedPages.connectors=true;}
   if(page==='rag'){loadRAGCollections();}
   if(page==='versions'){renderVersions();}if(page==='skills'){loadSkills();}
-  if(page==='billing'){loadBilling();}
+  
   if(page==='agents'&&!loadedPages.agents){loadAgents();loadedPages.agents=true;}
   if(page==='notes'){loadNotes();}
   if(page==='files'&&!loadedPages.files){loadFiles();loadedPages.files=true;}
@@ -525,7 +519,7 @@ function getContextualSuggestions(userMsg,action){
 }
 function addChatMessage(role,text){var msgs=document.getElementById('chat-messages');var u=role==='user';var b=document.createElement('div');b.className='chat-bubble max-w-2xl mx-auto mb-4';b.innerHTML='<div class="flex gap-3 '+(u?'flex-row-reverse':'')+'"><div style="width:32px;height:32px;background:'+(u?'#5856D6':'linear-gradient(135deg,#007AFF,#5856D6)')+';border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px">'+(u?'U':'E')+'</div><div class="flex-1"><div class="card p-3"><p class="text-sm text-gray-700">'+escapeHtml(text)+'</p></div></div></div>';msgs.appendChild(b);msgs.scrollTop=msgs.scrollHeight;}
 function insertSuggestion(t){document.getElementById('chat-input').value=t;document.getElementById('chat-input').focus();autoResize(document.getElementById('chat-input'));}
-function renderChatSuggestions(sugs){var c=document.getElementById('chat-suggestions');if(!c)return;c.innerHTML='<span class="text-[10px] text-gray-400">Suggestions:</span>';sugs.forEach(function(s){c.innerHTML+='<button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion(\''+s.replace(/'/g,"\\'")+'\')">'+s+'</button>';});}
+function renderChatSuggestions(sugs){var c=document.getElementById('chat-suggestions');if(!c)return;c.innerHTML='<span class="text-[10px] text-gray-400">Quick start:</span>';sugs.forEach(function(s){c.innerHTML+='<button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion(\''+s.replace(/'/g,"\\'")+'\')">'+s+'</button>';});}
 function renderQueue(){var q=document.getElementById('chat-queue'),l=document.getElementById('queue-list');document.getElementById('queue-count').textContent=messageQueue.length;if(!messageQueue.length){q.classList.add('hidden');return;}q.classList.remove('hidden');l.innerHTML=messageQueue.map(function(m,i){return '<div class="queue-item flex items-center gap-2 bg-black/[.03] rounded-lg p-2"><span class="text-xs text-gray-400">'+(i+1)+'</span><span class="text-xs text-gray-600 flex-1 truncate">'+escapeHtml(m)+'</span><button class="text-xs text-gray-400 hover:text-red-500" onclick="removeFromQueue('+i+')">✕</button></div>';}).join('');}
 function removeFromQueue(i){messageQueue.splice(i,1);renderQueue();}
 function clearQueue(){messageQueue=[];renderQueue();}
@@ -893,7 +887,7 @@ function showCreateWorkflow(){showPage('chat');insertSuggestion('Create a workfl
 function loadTemplates(){
   var communityTemplates=[
     {id:'crm',name:'CRM App',icon:'📊',description:'Contacts, deals, pipeline management',entity_count:3,tags:['business','sales']},
-    {id:'ecommerce',name:'E-Commerce',icon:'🛒',description:'Products, orders, cart, payments',entity_count:4,tags:['retail','shop']},
+    {id:'ecommerce',name:'E-Commerce',icon:'🛒',description:'Products, orders, cart, inventory',entity_count:4,tags:['retail','shop']},
     {id:'tasks',name:'Task Manager',icon:'✅',description:'Tasks, projects, team collaboration',entity_count:3,tags:['productivity']},
     {id:'blog',name:'Blog Platform',icon:'✍️',description:'Posts, authors, comments, SEO',entity_count:3,tags:['content','cms']},
     {id:'analytics',name:'Analytics Dashboard',icon:'📈',description:'Metrics, charts, real-time data',entity_count:2,tags:['data','metrics']},
@@ -903,7 +897,7 @@ function loadTemplates(){
     {id:'lms',name:'Learning Platform',icon:'🎓',description:'Courses, lessons, students, progress',entity_count:4,tags:['education']},
     {id:'inventory',name:'Inventory Manager',icon:'📦',description:'Stock, suppliers, warehouses',entity_count:3,tags:['logistics']},
     {id:'helpdesk',name:'Help Desk',icon:'🎧',description:'Tickets, agents, SLA, knowledge base',entity_count:4,tags:['support']},
-    {id:'saas',name:'SaaS Starter',icon:'🚀',description:'Auth, billing, teams, API keys',entity_count:5,tags:['startup','platform']}
+    {id:'saas',name:'SaaS Starter',icon:'🚀',description:'Auth, teams, API keys, dashboards',entity_count:5,tags:['startup','platform']}
   ];
   api('/templates').then(function(data){
     var apiTpls=data.templates||data||[];
@@ -1036,7 +1030,7 @@ var memoryItems=[
   {type:'instruction',category:'Operating Protocol',content:'After completing ANY task, report result and ask what to do next.'},
   {type:'preference',category:'EvolvixOS',content:'Apple-style minimalist design with white/grey backgrounds (#f5f5f7) and blue/indigo accents.'},
   {type:'instruction',category:'EvolvixOS',content:'Use NVIDIA build.nvidia.com for advanced agentic reasoning, falling back to local Ollama.'},
-  {type:'decision',category:'Payments',content:'Stripe integrated for EvolvixOS. PAYMENT_PROVIDER switched from paddle to stripe.'},
+  
   {type:'preference',category:'EvolvixOS',content:'Exclusively positioned as an engineering platform. All commercial/payment marketing strictly forbidden.'},
   {type:'fact',category:'EvolvixOS Architecture',content:'EvolvixOS utilizes NVIDIA Nemotron-3-550B as the primary model for complex agentic tasks.'}
 ];
@@ -1046,7 +1040,7 @@ function filterMemoryType(t){if(t==='all')renderMemory();else{var f=memoryItems.
 function loadMemoryData(){
   var list=document.getElementById('memory-list');if(!list)return;
   list.innerHTML='<div class="text-center text-gray-400 py-4"><div class="spinner mx-auto mb-2"></div>Loading memory...</div>';
-  api('/entities/PlatformMemory/records?limit=50').then(function(data){
+  api('/entities/PlatformMemory/records?limit=50').catch(function(e){document.getElementById('memory-list').innerHTML='<div class="text-center text-gray-400 py-8">No memory entries yet.</div>';return {records:[]};}).then(function(data){
     var records=data.records||data||[];
     if(records&&records.length){
       memoryItems=records.map(function(r){
@@ -1189,19 +1183,12 @@ function restoreVersion(vid){
     .catch(function(){toast('Failed to restore version');});
 }
 
-// ═══ BILLING ═══
-function loadBilling(){
-  var l=document.getElementById('billing-plans');if(!l)return;
-  l.innerHTML='<div class="text-center text-gray-400 py-8"><div class="spinner mx-auto mb-2"></div>Loading plans...</div>';
-  api('/billing/plans').then(function(data){
-    var plans=data.plans||data||[];
-    l.innerHTML=plans.map(function(p){
-      var price='€'+(p.price_monthly||0);
-      var features=(p.features||[]).map(function(f){return '<li class="text-xs text-gray-600 flex items-start gap-1"><span class="text-green-500 flex-shrink-0">✓</span><span>'+f+'</span></li>';}).join('');
+
+).join('');
       var credits=p.credits_monthly?(p.credits_monthly>=999?'Unlimited':p.credits_monthly.toLocaleString()+' credits'):'';
       return '<div class="card p-4 flex flex-col"><div class="flex items-center justify-between"><h3 class="text-sm font-semibold">'+p.name+'</h3>'+(credits?'<span class="badge badge-blue text-[10px]">'+credits+'</span>':'')+'</div><p class="text-2xl font-bold mt-2">'+price+'<span class="text-xs text-gray-500">/mo</span>'+(p.price_yearly?'<span class="text-xs text-gray-400 ml-1">or €'+p.price_yearly+'/yr</span>':'')+'</p><ul class="mt-3 space-y-1 flex-1">'+features+'</ul><button class="'+(p.name==='Free'?'btn-secondary':'btn-primary')+' w-full mt-3">'+(p.name==='Free'?'Current Plan':'Upgrade')+'</button></div>';
     }).join('');
-  }).catch(function(){l.innerHTML='<div class="text-center text-gray-400 py-8">Failed to load billing plans.</div>';});
+  })
 }
 
 // ═══ UTILS ═══
