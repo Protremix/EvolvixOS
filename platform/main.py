@@ -44,6 +44,14 @@ JWT_SECRET = os.environ.get('JWT_SECRET', 'evolvixos-platform-secret-2026')
 from routing_bridge import unified_chat
 import sqlite3 as sqlite3_billing
 
+
+# --- Base44-compatible upgrades (Aug 31 2026) ---
+from sandbox_executor import SandboxedExecutor
+from cncf_workflow_engine import CNCFWorkflowEngine, JQExpression
+from signed_urls import SignedURLManager, FileStorageManager
+from websocket_manager import ws_manager, DeclarativeRLS
+from fastapi import WebSocket, WebSocketDisconnect
+
 AUTH_DB_PATH = "/opt/evolvixos/auth/users.db"
 
 def deduct_user_credits(user_id, model_id, tokens_in=0, tokens_out=0):
@@ -470,22 +478,23 @@ async def _execute_function(name: str, request: Request, db, method: str):
         except Exception:
             body = {}
 
-    # Execute function in sandboxed environment
+    # Execute function using sandboxed executor (Base44-style isolation)
     try:
-        local_vars = {"input": body, "request": {"method": method, "query": dict(request.query_params)}}
-        exec_globals = {"__builtins__": __builtins__, "json": json, "time": time, "os": os}
-        exec(code, exec_globals, local_vars)
-
-        # Call the handler function if it exists
-        if "handler" in local_vars and callable(local_vars["handler"]):
-            result_val = local_vars["handler"](body)
-            if asyncio.iscoroutine(result_val):
-                result_val = await result_val
-            return result_val
-        elif "result" in local_vars:
-            return local_vars["result"]
-        else:
-            return {"message": "Function executed", "output": str({k: v for k, v in local_vars.items() if k not in exec_globals})}
+        result = await SandboxedExecutor.execute(
+            code=code,
+            input_data=body,
+            user_id=user_id,
+            env_vars=env_vars,
+            timeout=30,
+            use_docker=False
+        )
+        if result.get("status") == "error":
+            raise HTTPException(500, f"Function error: {result.get('error', 'Unknown error')}")
+        if result.get("status") == "blocked":
+            raise HTTPException(403, result.get("error", "Function blocked by security policy"))
+        return result.get("result", result)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(500, f"Function error: {str(e)}\n{traceback.format_exc()[:500]}")
 
@@ -957,40 +966,74 @@ UPLOAD_DIR = os.environ.get("UPLOAD_DIR", "/opt/evolvixos/uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/api/files/upload")
-async def upload_file(file: UploadFile = File(...), db=Depends(get_db)):
-    """Upload a file (public or private)."""
-    file_id = str(uuid.uuid4())
-    filename = f"{file_id}_{file.filename}"
-    file_path = os.path.join(UPLOAD_DIR, filename)
+async def upload_file(file: UploadFile = File(...), db=Depends(get_db), request: Request = None):
+    """Upload a file (public or private) with Base44-style CDN + signed URL support."""
+    user = get_user_from_token(request) if request else None
+    user_id = user.get("user_id") if user else None
+    is_private = request.query_params.get("private", "false").lower() == "true" if request else False
 
-    content = await file.read()
-    with open(file_path, "wb") as f:
-        f.write(content)
+    content_bytes = await file.read()
+    result = await FileStorageManager.upload(db, file.filename, content_bytes, file.content_type, is_private, user_id)
 
-    await db.execute(text("""
-        INSERT INTO platform_files (filename, file_path, content_type, file_size)
-        VALUES (:name, :path, :type, :size)
-    """), {"name": file.filename, "path": file_path, "type": file.content_type, "size": len(content)})
-    await db.commit()
+    if is_private:
+        signed_url = SignedURLManager.generate_signed_url(result["file_id"], "", expires_in=300)
+        result["signed_url"] = signed_url
 
-    file_url = f"/api/files/{file_id}"
-    return {"filename": file.filename, "url": file_url, "size": len(content)}
+    return result
+
+@app.post("/api/files/{file_id}/signed-url")
+async def create_signed_url_endpoint(file_id: str, expires_in: int = 300, db=Depends(get_db)):
+    """Create a time-limited signed URL for a private file."""
+    url = await SignedURLManager.create_signed_url_from_db(db, file_id, expires_in)
+    if not url:
+        raise HTTPException(404, "File not found")
+    return {"signed_url": url, "expires_in": expires_in}
 
 @app.get("/api/files/{file_id}")
-async def get_file(file_id: str):
-    """Download a file."""
-    # Find file by UUID prefix
-    for f in os.listdir(UPLOAD_DIR):
-        if f.startswith(file_id):
-            file_path = os.path.join(UPLOAD_DIR, f)
-            original_name = f.split("_", 1)[1] if "_" in f else f
-            with open(file_path, "rb") as fp:
-                return StreamingResponse(
-                    iter([fp.read()]),
-                    media_type="application/octet-stream",
-                    headers={"Content-Disposition": f"attachment; filename={original_name}"}
-                )
-    raise HTTPException(404, "File not found")
+async def get_file(file_id: str, token: str = None, db=Depends(get_db)):
+    """Download a file. Private files require a signed URL token."""
+    result = await FileStorageManager.download(db, file_id, token)
+    if not result:
+        raise HTTPException(404, "File not found")
+    if "error" in result:
+        raise HTTPException(result.get("status", 403), result["error"])
+    with open(result["file_path"], "rb") as fp:
+        return StreamingResponse(
+            iter([fp.read()]),
+            media_type=result.get("content_type", "application/octet-stream"),
+            headers={"Content-Disposition": f"attachment; filename={result['filename']}"}
+        )
+
+@app.get("/api/files/{file_id}/signed")
+async def get_file_signed(file_id: str, token: str, db=Depends(get_db)):
+    """Download a private file using a signed URL token."""
+    return await get_file(file_id, token=token, db=db)
+
+
+# --- WebSocket Real-Time (Base44-compatible) ---
+@app.websocket("/ws/entities/{entity_name}")
+async def ws_entity_subscriptions(websocket: WebSocket, entity_name: str):
+    """Subscribe to entity change events in real-time."""
+    connection_id = str(uuid.uuid4())
+    await ws_manager.connect(websocket, connection_id)
+    ws_manager.subscribe_entity(entity_name, connection_id)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        ws_manager.disconnect(connection_id)
+
+@app.websocket("/ws/chat/{conversation_id}")
+async def ws_chat_stream(websocket: WebSocket, conversation_id: str):
+    """Subscribe to agent chat streaming for a conversation."""
+    connection_id = str(uuid.uuid4())
+    await ws_manager.connect(websocket, connection_id)
+    ws_manager.subscribe_chat(conversation_id, connection_id)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        ws_manager.disconnect(connection_id)
 
 
 # ─── AI Chat Builder ───
