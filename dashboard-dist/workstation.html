@@ -831,9 +831,125 @@ function addActivity(text,icon='•'){
 
 // ─── Quick Actions ───
 function quickNewEntity(){
-  switchTab('builder');
-  document.getElementById('chatInput').value='Create a ';
-  document.getElementById('chatInput').focus();
+  const m=document.getElementById('entityModal');
+  if(m){m.style.display='flex';return;}
+  const modal=document.createElement('div');
+  modal.id='entityModal';
+  modal.style='display:flex;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;';
+  modal.innerHTML=`<div style="background:white;border-radius:16px;padding:28px;width:520px;max-width:90vw;max-height:80vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h2 style="font-size:18px;font-weight:700;">Create New Entity</h2>
+      <button onclick="document.getElementById('entityModal').style.display='none'" style="border:none;background:none;font-size:20px;cursor:pointer;">\u2715</button>
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px;">Entity Name</label>
+      <input id="entityName" type="text" placeholder="e.g. Task, Project, User" style="width:100%;padding:10px 12px;border:1px solid #d2d2d7;border-radius:8px;font-size:14px;" />
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:13px;font-weight:600;display:block;margin-bottom:4px;">Description (optional)</label>
+      <input id="entityDesc" type="text" placeholder="What does this entity represent?" style="width:100%;padding:10px 12px;border:1px solid #d2d2d7;border-radius:8px;font-size:14px;" />
+    </div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:13px;font-weight:600;display:block;margin-bottom:8px;">Fields</label>
+      <div id="entityFieldsList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;"></div>
+      <button onclick="addEntityField()" style="padding:6px 12px;border:1px solid #d2d2d7;border-radius:6px;background:white;cursor:pointer;font-size:13px;">+ Add Field</button>
+    </div>
+    <div id="entityError" style="color:#ff3b30;font-size:13px;margin-bottom:8px;display:none;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="document.getElementById('entityModal').style.display='none'" style="padding:8px 16px;border:1px solid #d2d2d7;border-radius:8px;background:white;cursor:pointer;">Cancel</button>
+      <button onclick="createEntitySubmit()" id="entitySubmitBtn" style="padding:8px 16px;background:#007aff;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;">Create Entity</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  window._entityFields=[{name:'name',type:'string'}];
+  renderEntityFields();
+}
+
+function addEntityField(){
+  if(!window._entityFields)window._entityFields=[];
+  window._entityFields.push({name:'',type:'string'});
+  renderEntityFields();
+}
+
+function renderEntityFields(){
+  const list=document.getElementById('entityFieldsList');
+  if(!list)return;
+  const types=['string','number','boolean','date','text'];
+  list.innerHTML=window._entityFields.map((f,i)=>`<div style="display:flex;gap:8px;align-items:center;padding:8px;border:1px solid #e5e5e7;border-radius:8px;">
+    <input type="text" placeholder="Field name" value="${f.name}" oninput="window._entityFields[${i}].name=this.value" style="flex:1;padding:6px 8px;border:1px solid #d2d2d7;border-radius:6px;font-size:13px;" />
+    <select onchange="window._entityFields[${i}].type=this.value" style="padding:6px 8px;border:1px solid #d2d2d7;border-radius:6px;font-size:13px;">
+      ${types.map(t=>`<option value="${t}" ${f.type===t?'selected':''}>${t}</option>`).join('')}
+    </select>
+    <button onclick="window._entityFields.splice(${i},1);renderEntityFields();" style="border:none;background:none;color:#ff3b30;cursor:pointer;font-size:16px;">\u2715</button>
+  </div>`).join('');
+}
+
+async function createEntitySubmit(){
+  const name=document.getElementById('entityName').value.trim();
+  if(!name){document.getElementById('entityError').textContent='Entity name is required';document.getElementById('entityError').style.display='block';return;}
+  const fields=window._entityFields.filter(f=>f.name.trim());
+  if(!fields.length){document.getElementById('entityError').textContent='At least one field is required';document.getElementById('entityError').style.display='block';return;}
+  
+  // Build JSON schema
+  const properties={};
+  fields.forEach(f=>{
+    let t=f.type;
+    if(t==='text')t='string';
+    if(t==='date')t='string';
+    properties[f.name]={type:t};
+  });
+  const schema={type:'object',properties:properties};
+  
+  const btn=document.getElementById('entitySubmitBtn');
+  btn.textContent='Creating...';
+  btn.disabled=true;
+  document.getElementById('entityError').style.display='none';
+  
+  try{
+    const r=await fetch(API+'/entities',{method:'POST',headers:authHeaders,body:JSON.stringify({name:name,schema:schema})});
+    if(!r.ok){
+      const d=await r.json().catch(()=>({detail:'Server error'}));
+      throw new Error(d.detail||'Failed to create entity');
+    }
+    const d=await r.json();
+    document.getElementById('entityModal').style.display='none';
+    addActivity('Entity '+name+' created','\u{1F4CA}');
+    // Refresh entity list in sidebar
+    refreshEntityList();
+    // Show success toast
+    showToast('Entity "'+name+'" created successfully!');
+  }catch(e){
+    document.getElementById('entityError').textContent=e.message;
+    document.getElementById('entityError').style.display='block';
+  }finally{
+    btn.textContent='Create Entity';
+    btn.disabled=false;
+  }
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.style='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1d1d1f;color:white;padding:12px 24px;border-radius:12px;font-size:14px;z-index:300;box-shadow:0 4px 16px rgba(0,0,0,0.2);';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},3000);
+}
+
+async function refreshEntityList(){
+  try{
+    const r=await fetch(API+'/entities',{method:'GET',headers:authHeaders});
+    if(!r.ok)return;
+    const entities=await r.json();
+    // Update sidebar entity list
+    const sidebar=document.querySelector('.sidebar-entities');
+    if(!sidebar)return;
+    const items=Array.isArray(entities)?entities:[entities.entities||[]];
+    const html=items.map(e=>`<div class="sidebar-item" onclick="location.href='/dashboard/'"><span class="icon">\u{1F4CA}</span> ${e.name}</div>`).join('');
+    // Keep the +New Entity button
+    const newBtn=sidebar.querySelector('.sidebar-item[onclick*="quickNewEntity"]');
+    if(newBtn)sidebar.innerHTML='';
+    sidebar.innerHTML='<div class="sidebar-item" onclick="quickNewEntity()"><span class="icon">+</span> New Entity</div>'+html;
+  }catch(e){console.error('Failed to refresh entities:',e);}
 }
 
 // ─── Clock ───
