@@ -104,13 +104,15 @@ class WorkflowEngine:
             return {"error": f"Function '{fn_name}' not found"}
         
         code = row[0]
-        local_vars = {"input": fn_input}
-        exec_globals = {"__builtins__": __builtins__, "json": json}
-        exec(code, exec_globals, local_vars)
-        
-        if "handler" in local_vars and callable(local_vars["handler"]):
-            return local_vars["handler"](fn_input)
-        return local_vars.get("result", {"message": "No result"})
+        import asyncio
+        def _run_sync():
+            local_vars = {"input": fn_input}
+            exec_globals = {"__builtins__": __builtins__, "json": json, "urllib": __import__("urllib.request"), "os": __import__("os"), "time": __import__("time")}
+            exec(code, exec_globals, local_vars)
+            if "handler" in local_vars and callable(local_vars["handler"]):
+                return local_vars["handler"](fn_input)
+            return local_vars.get("result", {"message": "No result"})
+        return await asyncio.to_thread(_run_sync)
 
     @staticmethod
     async def _http_call(url: str, method: str, body: dict):

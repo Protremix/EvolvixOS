@@ -131,7 +131,7 @@ class EntityManager:
 
     @staticmethod
     async def list_entities(db: AsyncSession, app_id: int = None):
-        """List entity schemas, optionally scoped to an app."""
+        """List entity schemas with record counts, optionally scoped to an app."""
         if app_id:
             result = await db.execute(
                 text("SELECT name, schema, created_date, app_id FROM platform_entities WHERE app_id = :app_id ORDER BY created_date DESC"),
@@ -142,15 +142,22 @@ class EntityManager:
                 text("SELECT name, schema, created_date, app_id FROM platform_entities ORDER BY created_date DESC")
             )
         rows = result.fetchall()
-        return [
-            {
+        entities = []
+        for row in rows:
+            tbl = f"entity_{row[0].lower()}"
+            try:
+                cnt_result = await db.execute(text(f"SELECT COUNT(*) FROM {tbl}"))
+                record_count = cnt_result.scalar()
+            except Exception:
+                record_count = 0
+            entities.append({
                 "name": row[0],
                 "schema": row[1] if isinstance(row[1], dict) else json.loads(row[1]),
                 "created_date": row[2].isoformat() if row[2] else None,
-                "app_id": row[3]
-            }
-            for row in rows
-        ]
+                "app_id": row[3],
+                "record_count": record_count
+            })
+        return entities
 
     @staticmethod
     async def get_entity(db: AsyncSession, name: str, app_id: int = None):

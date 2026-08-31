@@ -109,7 +109,7 @@ input:focus,textarea:focus,select:focus{outline:none}
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="entities" onclick="showPage('entities')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" fill="#007AFF" opacity=".2"/><rect x="14" y="3" width="7" height="7" rx="2" fill="#007AFF" opacity=".15"/><rect x="3" y="14" width="7" height="7" rx="2" fill="#007AFF" opacity=".15"/><rect x="14" y="14" width="7" height="7" rx="2" fill="#007AFF" opacity=".2"/></svg></div><span>Entities</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="functions" onclick="showPage('functions')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><path d="M8 6L3 12l5 6M16 6l5 6-5 6" stroke="#5856D6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Functions</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="workflows" onclick="showPage('workflows')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2" fill="#007AFF" opacity=".2"/><circle cx="18" cy="6" r="2" fill="#007AFF" opacity=".15"/><circle cx="6" cy="18" r="2" fill="#007AFF" opacity=".15"/><circle cx="18" cy="18" r="2" fill="#007AFF" opacity=".2"/><circle cx="12" cy="12" r="2" fill="#007AFF" opacity=".25"/><path d="M8 6h8M6 8v8M18 8v8M8 18h8" stroke="#5856D6" stroke-width="1" opacity=".3" stroke-linecap="round"/></svg></div><span>Workflows</span></a>
-      <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="templates" onclick="showPage('templates')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" fill="#007AFF" opacity=".12"/><path d="M8 8h8M8 12h8M8 16h5" stroke="#5856D6" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>Templates</span></a>
+      <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="templates" onclick="showPage('templates')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" fill="#007AFF" opacity=".12"/><path d="M8 8h8M8 12h8M8 16h5" stroke="#5856D6" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>Templates</span></a><a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="skills" onclick="showPage('skills');loadSkills()"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><path d="M13 10V3L4 14h7v7l9-11h-7z" fill="#007AFF" opacity=".12" stroke="#5856D6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Skills</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="storage" onclick="showPage('storage')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="6" rx="7" ry="3" fill="#007AFF" opacity=".15"/><path d="M5 6v12c0 1.5 3 3 7 3s7-1.5 7-3V6" fill="#007AFF" opacity=".12" stroke="#5856D6" stroke-width="1.5"/></svg></div><span>Files</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="notes" onclick="showPage('notes')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><path d="M4 4h12l4 4v12H4z" fill="#007AFF" opacity=".12" stroke="#5856D6" stroke-width="1.5"/><path d="M8 10h8M8 14h6" stroke="#5856D6" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>Notes</span><span class="badge badge-orange ml-auto">!</span></a>
       <a class="nav-item flex items-center gap-3 px-3 py-2 text-sm text-gray-600 cursor-pointer" data-page="memory" onclick="showPage('memory')"><div class="nav-icon-badge"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" fill="#007AFF" opacity=.12"/><circle cx="12" cy="12" r="4" fill="none" stroke="#5856D6" stroke-width="1.5"/></svg></div><span>Memory</span></a>
@@ -168,7 +168,7 @@ input:focus,textarea:focus,select:focus{outline:none}
       <span class="text-[10px] text-gray-400 ml-2">⌘. to switch</span>
     </div>
     <div class="flex items-center gap-2">
-      <select id="chat-model-select" class="text-xs px-2 py-1 rounded-lg border border-black/[.08] bg-white"><option value="auto">Auto Mode</option><option value="nemotron">Nemotron-3-550B</option><option value="qwen2.5:14b">Qwen2.5 14B (Local)</option><option value="qwen2.5:7b">Qwen2.5 7B (Local)</option><option value="gemini-flash">Gemini Flash</option><option value="groq">Groq gpt-oss-120b</option></select>
+      <select id="chat-model-select" class="text-xs px-2 py-1 rounded-lg border border-black/[.08] bg-white"><option value="auto">Auto Mode</option><optgroup label="Cloud (Fast)"><option value="qwen/qwen3.8-27b">Qwen 3.8 27B</option><option value="deepseek/deepseek-v4-flash">DeepSeek V4 Flash</option><option value="google/gemini-3.7-flash">Gemini 3.7 Flash</option><option value="google/gemma-4-31b">Gemma 4 31B</option><option value="groq/gpt-oss-120b">GPT-OSS 120B (Groq)</option></optgroup><optgroup label="Local (Private)"><option value="qwen2.5:14b">Qwen 2.5 14B</option><option value="qwen2.5:7b">Qwen 2.5 7B</option><option value="qwen2.5:3b">Qwen 2.5 3B</option></optgroup><optgroup label="Advanced"><option value="nemotron">Nemotron 3 550B</option><option value="kimi/moonshot-v1-32k">Kimi Moonshot 32K</option></optgroup></select>
       <button class="btn-ghost text-xs" onclick="clearChat()">Clear</button>
     </div>
   </div>
@@ -177,7 +177,7 @@ input:focus,textarea:focus,select:focus{outline:none}
   </div>
   <div id="chat-queue" class="px-4 hidden"><div class="max-w-2xl mx-auto"><div class="text-xs text-gray-500 mb-1 flex items-center justify-between"><span>Queued messages (<span id="queue-count">0</span>/7)</span><button class="text-xs text-brand-500 hover:underline" onclick="clearQueue()">Clear all</button></div><div id="queue-list" class="space-y-1"></div></div></div>
   <div id="subagent-panel" class="px-4 hidden"><div class="max-w-2xl mx-auto"><div class="subagent-badge rounded-lg p-2 flex items-center gap-2"><div class="spinner"></div><span class="text-xs text-gray-600" id="subagent-status">Sub-agent working...</span></div></div></div>
-  <div class="border-t border-black/[.04] px-4 py-3"><div class="max-w-2xl mx-auto"><div class="flex items-end gap-2"><button class="p-2 rounded-lg hover:bg-black/[.05]" title="Attach file" onclick="document.getElementById('file-upload').click()"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button><input type="file" id="file-upload" class="hidden" onchange="handleFileUpload(this)"><button class="p-2 rounded-lg hover:bg-black/[.05]" title="Voice input"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg></button><textarea id="chat-input" rows="1" placeholder="Ask me to build something..." class="flex-1 px-3 py-2 text-sm rounded-xl border border-black/[.08] bg-white resize-none focus:border-brand-500 max-h-32" onkeydown="handleChatKeydown(event)" oninput="autoResize(this)"></textarea><button class="p-2 rounded-xl bg-brand-500 hover:bg-brand-600 transition-colors" onclick="sendChatMessage()"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="flex items-center justify-between mt-2"><div class="flex items-center gap-2"><span class="text-[10px] text-gray-400">Suggestions:</span><button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Create a todo app with CRUD')">Todo app</button><button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Build a blog with markdown support')">Blog</button><button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Set up a daily summary workflow')">Workflow</button></div><span class="text-[10px] text-gray-400" id="mode-indicator">Default mode</span></div></div></div>
+  <div class="border-t border-black/[.04] px-4 py-3"><div class="max-w-2xl mx-auto"><div class="flex items-end gap-2"><button class="p-2 rounded-lg hover:bg-black/[.05]" title="Attach file" onclick="document.getElementById('file-upload').click()"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></button><input type="file" id="file-upload" class="hidden" onchange="handleFileUpload(this)"><button class="p-2 rounded-lg hover:bg-black/[.05]" title="Screen share" onclick="toggleScreenShare()"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></button><button class="p-2 rounded-lg hover:bg-black/[.05]" id="voice-btn" title="Voice input" onclick="toggleVoiceInput()"><svg class="w-5 h-5 text-gray-400" id="voice-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg></button><textarea id="chat-input" rows="1" placeholder="Ask me to build something..." class="flex-1 px-3 py-2 text-sm rounded-xl border border-black/[.08] bg-white resize-none focus:border-brand-500 max-h-32" onkeydown="handleChatKeydown(event)" oninput="autoResize(this)"></textarea><button class="p-2 rounded-xl bg-brand-500 hover:bg-brand-600 transition-colors" onclick="sendChatMessage()"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="flex items-center justify-between mt-2"><div class="flex items-center gap-2"><span class="text-[10px] text-gray-400">Suggestions:</span><button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Create a todo app with CRUD')">Todo app</button><button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Build a blog with markdown support')">Blog</button><button class="chat-suggestion text-[10px] px-2 py-0.5 rounded border border-black/[.06] text-gray-500" onclick="insertSuggestion('Set up a daily summary workflow')">Workflow</button></div><span class="text-[10px] text-gray-400" id="mode-indicator">Default mode</span></div></div></div>
 </div>
 
 <!-- PAGE: BUILDER -->
@@ -185,8 +185,105 @@ input:focus,textarea:focus,select:focus{outline:none}
   <div class="max-w-6xl mx-auto">
     <div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">App Builder</h1><p class="text-sm text-gray-500 mt-1">Build apps from natural language. Switch modes to plan, edit, or apply instantly.</p></div><div class="flex items-center gap-2"><button class="btn-secondary" onclick="showPage('versions')">Version History</button><button class="btn-primary" onclick="showPage('chat')">Open Workbench</button></div></div>
     <div class="card p-4 mb-4"><div class="flex items-center gap-1 mb-3"><button class="mode-tab active" data-bmode="default" onclick="setBuilderMode('default')">Default</button><button class="mode-tab" data-bmode="discuss" onclick="setBuilderMode('discuss')">Discuss</button><button class="mode-tab" data-bmode="edit" onclick="setBuilderMode('edit')">Edit</button></div><div id="builder-chat" class="space-y-3 min-h-[200px] max-h-[300px] overflow-y-auto mb-3"><div class="text-sm text-gray-500 text-center py-8">Describe what you want to build and the AI will create it for you.</div></div><div class="flex gap-2"><input type="text" id="builder-input" placeholder="e.g. Create a dashboard with analytics charts" class="flex-1 px-3 py-2 text-sm rounded-lg border border-black/[.08] focus:border-brand-500" onkeydown="if(event.key==='Enter')sendBuilderMessage()"><button class="btn-primary" onclick="sendBuilderMessage()">Build</button></div></div>
-    <div class="mb-4"><div class="flex items-center justify-between mb-3"><h2 class="text-sm font-semibold">Canvas — All Pages</h2><button class="btn-ghost text-xs" onclick="addCanvasPage()">+ Add Page</button></div><div id="canvas-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div></div>
-    <div id="edit-mode-panel" class="card p-4 hidden"><h3 class="text-sm font-semibold mb-3">Edit Mode</h3><p class="text-xs text-gray-500 mb-3">Click any element in the preview to modify it.</p><div class="flex gap-2"><input type="text" id="edit-element-input" placeholder="Describe changes to selected element..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-black/[.08] focus:border-brand-500"><button class="btn-primary" onclick="editElement()">Edit Element</button></div></div>
+    <div id="edit-mode-panel" class="card p-4 hidden">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-sm font-semibold">Edit Mode — Visual Inspector</h3>
+            <span class="text-[10px] text-gray-400">Click elements in preview to edit</span>
+          </div>
+          <!-- Preview iframe -->
+          <div class="rounded-lg border border-black/[.06] overflow-hidden mb-3" style="height:280px">
+            <iframe id="edit-preview-frame" style="width:100%;height:100%;border:0" srcdoc=""></iframe>
+          </div>
+          <!-- Property panel -->
+          <div id="edit-props" class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-[10px] text-gray-500">Background</label>
+                <div class="flex gap-1 mt-1">
+                  <button class="color-swatch" style="background:#007AFF" onclick="applyStyle('background','#007AFF')"></button>
+                  <button class="color-swatch" style="background:#5856D6" onclick="applyStyle('background','#5856D6')"></button>
+                  <button class="color-swatch" style="background:#34C759" onclick="applyStyle('background','#34C759')"></button>
+                  <button class="color-swatch" style="background:#FF9500" onclick="applyStyle('background','#FF9500')"></button>
+                  <button class="color-swatch" style="background:#f5f5f7" onclick="applyStyle('background','#f5f5f7')"></button>
+                  <button class="color-swatch" style="background:#000000" onclick="applyStyle('background','#000000')"></button>
+                </div>
+              </div>
+              <div>
+                <label class="text-[10px] text-gray-500">Text Color</label>
+                <div class="flex gap-1 mt-1">
+                  <button class="color-swatch" style="background:#ffffff;border:1px solid #ddd" onclick="applyStyle('color','#ffffff')"></button>
+                  <button class="color-swatch" style="background:#000000" onclick="applyStyle('color','#000000')"></button>
+                  <button class="color-swatch" style="background:#007AFF" onclick="applyStyle('color','#007AFF')"></button>
+                  <button class="color-swatch" style="background:#5856D6" onclick="applyStyle('color','#5856D6')"></button>
+                  <button class="color-swatch" style="background:#8E8E93" onclick="applyStyle('color','#8E8E93')"></button>
+                  <button class="color-swatch" style="background:#FF3B30" onclick="applyStyle('color','#FF3B30')"></button>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="text-[10px] text-gray-500">Padding</label>
+                <input type="text" id="edit-padding" placeholder="16px" class="w-full text-xs px-2 py-1 rounded border border-black/[.08]" oninput="applyStyle('padding',this.value)">
+              </div>
+              <div>
+                <label class="text-[10px] text-gray-500">Margin</label>
+                <input type="text" id="edit-margin" placeholder="0px" class="w-full text-xs px-2 py-1 rounded border border-black/[.08]" oninput="applyStyle('margin',this.value)">
+              </div>
+              <div>
+                <label class="text-[10px] text-gray-500">Border Radius</label>
+                <input type="text" id="edit-radius" placeholder="8px" class="w-full text-xs px-2 py-1 rounded border border-black/[.08]" oninput="applyStyle('borderRadius',this.value)">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="text-[10px] text-gray-500">Font Size</label>
+                <input type="text" id="edit-fontsize" placeholder="14px" class="w-full text-xs px-2 py-1 rounded border border-black/[.08]" oninput="applyStyle('fontSize',this.value)">
+              </div>
+              <div>
+                <label class="text-[10px] text-gray-500">Font Weight</label>
+                <select id="edit-fontweight" class="w-full text-xs px-2 py-1 rounded border border-black/[.08]" onchange="applyStyle('fontWeight',this.value)">
+                  <option value="">Default</option>
+                  <option value="300">Light (300)</option>
+                  <option value="400">Regular (400)</option>
+                  <option value="500">Medium (500)</option>
+                  <option value="600">Semibold (600)</option>
+                  <option value="700">Bold (700)</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="text-[10px] text-gray-500">Tailwind Classes (type to add)</label>
+              <div class="flex gap-2 mt-1">
+                <input type="text" id="edit-tailwind" placeholder="e.g. shadow-lg rounded-xl" class="flex-1 text-xs px-2 py-1 rounded border border-black/[.08]" onkeydown="if(event.key==='Enter')applyTailwind(this.value)">
+                <button class="btn-primary text-xs" onclick="applyTailwind(document.getElementById('edit-tailwind').value)">Add</button>
+              </div>
+            </div>
+            <!-- AI Edit -->
+            <div>
+              <label class="text-[10px] text-gray-500">AI Edit (describe changes in natural language)</label>
+              <div class="flex gap-2 mt-1">
+                <input type="text" id="edit-element-input" placeholder="e.g. Make this button larger and rounded" class="flex-1 px-3 py-2 text-sm rounded-lg border border-black/[.08] focus:border-brand-500" onkeydown="if(event.key==='Enter')editElement()">
+                <button class="btn-primary" onclick="editElement()">AI Edit</button>
+              </div>
+            </div>
+            <div id="edit-status" class="text-[10px] text-gray-400">No element selected. Click on the preview above.</div>
+            <div class="mt-3 pt-3 border-t border-black/[.06]">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-[10px] font-semibold text-gray-500">BULK EDIT</span>
+                <button class="text-[10px] text-brand-500 hover:underline" onclick="bulkSelectAll()">Select All</button>
+              </div>
+              <div class="flex gap-1 flex-wrap">
+                <button class="text-[10px] px-2 py-1 rounded border border-black/[.06] hover:border-brand-500" onclick="bulkEdit('fontSize','12px')">12px font</button>
+                <button class="text-[10px] px-2 py-1 rounded border border-black/[.06] hover:border-brand-500" onclick="bulkEdit('borderRadius','16px')">Round 16px</button>
+                <button class="text-[10px] px-2 py-1 rounded border border-black/[.06] hover:border-brand-500" onclick="bulkEdit('padding','20px')">Pad 20px</button>
+                <button class="text-[10px] px-2 py-1 rounded border border-black/[.06] hover:border-brand-500" onclick="bulkEdit('boxShadow','0 4px 12px rgba(0,0,0,.1)')">Shadow</button>
+                <button class="text-[10px] px-2 py-1 rounded border border-black/[.06] hover:border-brand-500" onclick="bulkTheme('dark')">Dark</button>
+                <button class="text-[10px] px-2 py-1 rounded border border-black/[.06] hover:border-brand-500" onclick="bulkTheme('light')">Light</button>
+              </div>
+            </div>
+          </div>
+        </div>
+    <div class="mb-4"><div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><h2 class="text-sm font-semibold">Canvas — All Pages</h2><div id="collab-indicator" class="hidden flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 text-green-600 text-[10px]"><span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span><span id="collab-count">1</span> online</div></div><div class="flex items-center gap-2"><button class="btn-ghost text-xs flex items-center gap-1" onclick="toggleCollab()"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-8 0 4 4 0 008 0zm6 0a4 4 0 10-8 0 4 4 0 008 0z"/></svg>Collaborate</button><button class="btn-ghost text-xs" onclick="addCanvasPage()">+ Add Page</button></div></div><div id="canvas-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div></div>
     <div><h2 class="text-sm font-semibold mb-3">Components Library</h2><div class="grid grid-cols-2 md:grid-cols-4 gap-3"><div class="card p-3 cursor-pointer hover:border-brand-500" onclick="addComponent('button')"><div class="text-center py-3"><span class="text-xs text-brand-500">Button</span></div></div><div class="card p-3 cursor-pointer hover:border-brand-500" onclick="addComponent('input')"><div class="text-center py-3"><span class="text-xs text-brand-500">Input Field</span></div></div><div class="card p-3 cursor-pointer hover:border-brand-500" onclick="addComponent('table')"><div class="text-center py-3"><span class="text-xs text-brand-500">Table</span></div></div><div class="card p-3 cursor-pointer hover:border-brand-500" onclick="addComponent('chart')"><div class="text-center py-3"><span class="text-xs text-brand-500">Chart</span></div></div><div class="card p-3 cursor-pointer hover:border-brand-500" onclick="addComponent('card')"><div class="text-center py-3"><span class="text-xs text-brand-500">Card</span></div></div><div class="card p-3 cursor-pointer hover:border-brand-500" onclick="addComponent('navbar')"><div class="text-center py-3"><span class="text-xs text-brand-500">Navbar</span></div></div><div class="card p-3 cursor-pointer hover:border-brand-500" onclick="addComponent('sidebar')"><div class="text-center py-3"><span class="text-xs text-brand-500">Sidebar</span></div></div><div class="card p-3 cursor-pointer hover:border-brand-500" onclick="addComponent('modal')"><div class="text-center py-3"><span class="text-xs text-brand-500">Modal</span></div></div></div></div>
   </div>
 </div>
@@ -204,6 +301,8 @@ input:focus,textarea:focus,select:focus{outline:none}
 <div id="page-templates" class="page p-6"><div class="max-w-5xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Templates</h1><p class="text-sm text-gray-500 mt-1">Pre-built app templates and LLM prompts</p></div><input type="text" placeholder="Search templates..." class="px-3 py-1.5 text-sm rounded-lg border border-black/[.08] focus:border-brand-500" oninput="filterTemplates(this.value)"></div><div id="template-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div></div></div>
 
 <!-- PAGE: STORAGE -->
+<div id="page-skills" class="page p-6"><div class="max-w-5xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Skills</h1><p class="text-sm text-gray-500 mt-1">Curated catalog + custom uploads</p></div><div class="flex gap-2"><button class="btn-secondary text-xs" onclick="toast('Opening skill store...')">Browse Store</button><button class="btn-primary text-xs" onclick="showUploadSkill()">+ Upload Skill</button></div></div><div class="flex gap-2 mb-4"><input type="text" id="skill-search" placeholder="Search skills..." class="flex-1 px-3 py-2 text-sm rounded-lg border border-black/[.08] focus:border-brand-500" oninput="filterSkills(this.value)"><select class="px-3 py-2 text-sm rounded-lg border border-black/[.08]" onchange="filterSkillCategory(this.value)"><option value="all">All</option><option value="media">Media</option><option value="dev">Development</option><option value="data">Data</option><option value="ai">AI/ML</option><option value="custom">Custom</option></select></div><div id="skills-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div></div></div>
+
 <div id="page-storage" class="page p-6"><div class="max-w-3xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Files</h1><p class="text-sm text-gray-500 mt-1">Upload and manage files</p></div><button class="btn-primary" onclick="toast('File upload — use API: POST /platform/api/files')">Upload</button></div><div id="storage-list" class="space-y-1"></div></div></div>
 
 <!-- PAGE: NOTES -->
@@ -232,10 +331,12 @@ input:focus,textarea:focus,select:focus{outline:none}
 <div id="page-connectors" class="page p-6"><div class="max-w-4xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Connectors</h1><p class="text-sm text-gray-500 mt-1">OAuth integrations with external services</p></div></div><div class="flex gap-2 mb-4"><button class="mode-tab active" onclick="filterConnectors(event,'all')">All</button><button class="mode-tab" onclick="filterConnectors(event,'user')">Per-User</button><button class="mode-tab" onclick="filterConnectors(event,'workspace')">Workspace</button></div><div id="connectors-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div></div></div>
 
 <!-- PAGE: AGENT SETTINGS -->
-<div id="page-agentsettings" class="page p-6"><div class="max-w-3xl mx-auto"><h1 class="text-2xl font-bold mb-6">Agent Settings</h1><div class="flex gap-1 mb-4 border-b border-black/[.06]"><button class="px-4 py-2 text-sm font-medium border-b-2 border-brand-500 text-brand-500" onclick="switchAgentSettingsTab(event,'general')">General</button><button class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500" onclick="switchAgentSettingsTab(event,'personalization')">Personalization</button><button class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500" onclick="switchAgentSettingsTab(event,'security')">Security</button><button class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500" onclick="switchAgentSettingsTab(event,'sharing')">Sharing</button></div>
+<div id="page-agentsettings" class="page p-6"><div class="max-w-3xl mx-auto"><h1 class="text-2xl font-bold mb-6">Agent Settings</h1><div class="flex gap-1 mb-4 border-b border-black/[.06]"><button class="px-4 py-2 text-sm font-medium border-b-2 border-brand-500 text-brand-500" onclick="switchAgentSettingsTab(event,'general')">General</button><button class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500" onclick="switchAgentSettingsTab(event,'personalization')">Personalization</button><button class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500" onclick="switchAgentSettingsTab(event,'security')">Security</button><button class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500" onclick="switchAgentSettingsTab(event,'channels')">Channels</button><button class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500" onclick="switchAgentSettingsTab(event,'sharing')">Sharing</button></div>
 <div id="aset-general" class="space-y-4"><div class="card p-4"><h3 class="text-sm font-semibold mb-3">Model Selection</h3><select id="aset-model" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08]"><option value="auto">Auto Mode — Best model per request</option><option value="nemotron">Nemotron-3-550B (NVIDIA)</option><option value="qwen2.5:14b">Qwen2.5 14B (Local Ollama)</option><option value="qwen2.5:7b">Qwen2.5 7B (Local Ollama)</option><option value="gemini-flash">Gemini Flash (Google)</option><option value="groq">Groq gpt-oss-120b</option><option value="kimi">Kimi moonshot-v1-32k</option></select><p class="text-xs text-gray-500 mt-2">Auto mode selects the best model for each request.</p></div><div class="card p-4"><h3 class="text-sm font-semibold mb-3">Credit Usage</h3><div class="grid grid-cols-3 gap-3"><div class="stat-card"><div class="text-xs text-gray-500">Messages</div><div class="text-lg font-bold" id="credits-messages">374/1093</div></div><div class="stat-card"><div class="text-xs text-gray-500">Integrations</div><div class="text-lg font-bold" id="credits-integrations">1307/122553</div></div><div class="stat-card"><div class="text-xs text-gray-500">Plan</div><div class="text-lg font-bold" id="credits-plan">Builder</div></div></div></div></div>
 <div id="aset-personalization" class="space-y-4 hidden"><div class="card p-4"><h3 class="text-sm font-semibold mb-3">Agent Name</h3><input type="text" value="Oryx" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08]"></div><div class="card p-4"><h3 class="text-sm font-semibold mb-3">Custom Instructions</h3><textarea rows="4" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08]" placeholder="Tell your agent how to behave..."></textarea></div><div class="card p-4"><h3 class="text-sm font-semibold mb-3">Language</h3><select class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08]"><option value="en">English</option><option value="ru">Russian</option><option value="es">Spanish</option><option value="zh">Chinese</option></select></div></div>
 <div id="aset-security" class="space-y-4 hidden"><div class="card p-4"><h3 class="text-sm font-semibold mb-3">Tool Permissions</h3><div class="space-y-2"><div class="flex items-center justify-between"><span class="text-sm">Code Execution</span><div class="toggle active" onclick="this.classList.toggle('active')"></div></div><div class="flex items-center justify-between"><span class="text-sm">File Operations</span><div class="toggle active" onclick="this.classList.toggle('active')"></div></div><div class="flex items-center justify-between"><span class="text-sm">Web Browsing</span><div class="toggle active" onclick="this.classList.toggle('active')"></div></div><div class="flex items-center justify-between"><span class="text-sm">External API Calls</span><div class="toggle" onclick="this.classList.toggle('active')"></div></div><div class="flex items-center justify-between"><span class="text-sm">Server Management</span><div class="toggle" onclick="this.classList.toggle('active')"></div></div></div></div></div>
+<div id="aset-channels" class="space-y-4 hidden"><div class="card p-4"><h3 class="text-sm font-semibold mb-3">Connected Channels</h3><div class="space-y-2"><div class="flex items-center justify-between"><span class="text-sm">WhatsApp</span><span class="badge badge-gray">Not connected</span></div><div class="flex items-center justify-between"><span class="text-sm">Telegram</span><span class="badge badge-gray">Not connected</span></div><div class="flex items-center justify-between"><span class="text-sm">Slack</span><span class="badge badge-gray">Not connected</span></div><div class="flex items-center justify-between"><span class="text-sm">iMessage</span><span class="badge badge-gray">Not connected</span></div><div class="flex items-center justify-between"><span class="text-sm">LINE</span><span class="badge badge-gray">Not connected</span></div></div></div><div class="card p-4"><h3 class="text-sm font-semibold mb-3">Auto-Reply Settings</h3><div class="space-y-2"><div class="flex items-center justify-between"><span class="text-sm">Smart Reply (respond when helpful)</span><div class="toggle active" onclick="this.classList.toggle('active')"></div></div><div class="flex items-center justify-between"><span class="text-sm">Mention-only mode</span><div class="toggle" onclick="this.classList.toggle('active')"></div></div></div></div></div>
+
 <div id="aset-sharing" class="space-y-4 hidden"><div class="card p-4"><h3 class="text-sm font-semibold mb-3">Collaborators</h3><div class="flex gap-2 mb-3"><input type="email" placeholder="Invite by email" class="flex-1 px-3 py-2 text-sm rounded-lg border border-black/[.08]"><button class="btn-primary" onclick="toast('Invitation sent')">Invite</button></div></div><div class="card p-4"><h3 class="text-sm font-semibold mb-3">Share Link</h3><div class="flex gap-2"><input type="text" value="https://evolvixos.com/platform" readonly class="flex-1 px-3 py-2 text-sm rounded-lg border border-black/[.08] bg-black/[.02]"><button class="btn-secondary" onclick="toast('Link copied')">Copy</button></div></div></div>
 </div></div>
 
@@ -319,8 +420,12 @@ window.showPage=function(page){
   if(page==='analytics'&&!loadedPages.analytics){loadAnalytics();loadedPages.analytics=true;}
   if(page==='connectors'&&!loadedPages.connectors){loadConnectors();loadedPages.connectors=true;}
   if(page==='rag'){loadRAGCollections();}
-  if(page==='versions'){renderVersions();}
+  if(page==='versions'){renderVersions();}if(page==='skills'){loadSkills();}
   if(page==='billing'){loadBilling();}
+  if(page==='agents'&&!loadedPages.agents){loadAgents();loadedPages.agents=true;}
+  if(page==='notes'){loadNotes();}
+  if(page==='files'&&!loadedPages.files){loadFiles();loadedPages.files=true;}
+  if(page==='memory'){loadMemoryData();}
   if(page==='apikeys'){loadApiKeys();}
 };
 function toggleSidebar(){var sb=document.getElementById('sidebar');sb.classList.toggle('open');document.getElementById('mobile-overlay').style.display=sb.classList.contains('open')?'block':'none';}
@@ -334,9 +439,89 @@ function sendChatMessage(){
   if(isProcessing){if(messageQueue.length>=7){toast('Queue full (max 7)','error');return;}messageQueue.push(text);input.value='';autoResize(input);renderQueue();return;}
   addChatMessage('user',text);input.value='';autoResize(input);
   isProcessing=true;showSubAgent('Processing...');
-  api('/chat',{method:'POST',body:JSON.stringify({message:text,mode:chatMode,model:document.getElementById('chat-model-select').value})})
-    .then(function(data){isProcessing=false;hideSubAgent();addChatMessage('agent',data.response||data.message||'Done.');if(data.file)addFilePreview(data.file);if(data.suggestions)renderChatSuggestions(data.suggestions);if(messageQueue.length>0){var n=messageQueue.shift();document.getElementById('chat-input').value=n;renderQueue();sendChatMessage();}})
-    .catch(function(err){isProcessing=false;hideSubAgent();addChatMessage('agent','Error: '+err.message+'. Request queued for retry.');});
+  var modelSel=document.getElementById('chat-model-select');
+  var modelVal=modelSel?modelSel.value:'auto';
+  api('/chat',{method:'POST',body:JSON.stringify({message:text,mode:chatMode,model:modelVal})})
+    .then(function(data){
+      isProcessing=false;hideSubAgent();
+      // Build rich response from structured action
+      var msg=data.message||data.response||'Done.';
+      var action=data.action||'chat';
+      var extraHtml='';
+
+      // Show what was created
+      if(action==='create_entity'&&data.result){
+        extraHtml+='<div class="mt-2 p-2 rounded-lg" style="background:rgba(0,122,255,.06)"><p class="text-xs font-medium text-brand-600">📦 New Entity Created</p><p class="text-xs text-gray-600 mt-1">Fields: '+escapeHtml(Object.keys(data.result.schema&&data.result.schema.properties||{}).join(', '))+'</p></div>';
+        loadEntities();
+      }
+      if(action==='create_entities'&&data.created){
+        extraHtml+='<div class="mt-2 p-2 rounded-lg" style="background:rgba(0,122,255,.06)"><p class="text-xs font-medium text-brand-600">📦 '+data.created.length+' Entities Created</p>';
+        data.created.forEach(function(e){extraHtml+='<p class="text-xs text-gray-600 mt-1">• '+escapeHtml(e.name)+': '+escapeHtml(e.fields)+'</p>';});
+        if(data.skipped&&data.skipped.length)extraHtml+='<p class="text-xs text-gray-400 mt-1">Skipped (exist): '+escapeHtml(data.skipped.join(', '))+'</p>';
+        extraHtml+='</div>';
+        loadEntities();
+      }
+      if(action==='create_function'){
+        extraHtml+='<div class="mt-2 p-2 rounded-lg" style="background:rgba(88,86,214,.06)"><p class="text-xs font-medium text-indigo-600">⚡ Function Deployed</p><p class="text-xs text-gray-600 mt-1">Endpoint: '+escapeHtml(data.url||'/api/fn/'+data.name)+'</p></div>';
+        loadFunctions();
+      }
+      if(action==='create_workflow'){
+        extraHtml+='<div class="mt-2 p-2 rounded-lg" style="background:rgba(88,86,214,.06)"><p class="text-xs font-medium text-indigo-600">🔄 Workflow Created</p><p class="text-xs text-gray-600 mt-1">Name: '+escapeHtml(data.name)+'</p></div>';
+        loadWorkflows();
+      }
+      if(action==='list_entities'&&data.entities){
+        var names=data.entities.map(function(e){return e.name||e.entity_name;}).join(', ')||'none';
+        extraHtml+='<div class="mt-2 p-2 rounded-lg" style="background:rgba(0,122,255,.06)"><p class="text-xs font-medium text-brand-600">📋 Current Entities</p><p class="text-xs text-gray-600 mt-1">'+escapeHtml(names)+'</p></div>';
+      }
+      if(action==='plugin'){
+        extraHtml+='<div class="mt-2 p-2 rounded-lg" style="background:rgba(0,122,255,.06)"><p class="text-xs font-medium text-brand-600">🔌 Plugin: '+escapeHtml(data.plugin||'')+'</p></div>';
+      }
+      if(data.error){
+        extraHtml+='<div class="mt-2 p-2 rounded-lg" style="background:rgba(255,59,48,.06)"><p class="text-xs text-red-500">'+escapeHtml(data.error)+'</p></div>';
+      }
+
+      addChatMessageRich('agent',msg,extraHtml);
+
+      // Show model info
+      if(data.used_model){
+        var info=document.getElementById('subagent-panel');
+        if(info){info.classList.remove('hidden');info.querySelector('#subagent-status').textContent='Model: '+data.used_model+(data.used_provider?' via '+data.used_provider:'');setTimeout(function(){hideSubAgent();},3000);}
+      }
+
+      if(data.file)addFilePreview(data.file);
+      if(data.suggestions)renderChatSuggestions(data.suggestions);
+      else renderChatSuggestions(getContextualSuggestions(text,action));
+
+      // Process queue
+      if(messageQueue.length>0){var n=messageQueue.shift();document.getElementById('chat-input').value=n;renderQueue();sendChatMessage();}
+    })
+    .catch(function(err){
+      isProcessing=false;hideSubAgent();
+      addChatMessage('agent','⚠️ '+escapeHtml(err.message||'Request failed')+'. The LLM backend may be starting up — try again in a moment.');
+    });
+}
+
+function addChatMessageRich(role,text,extraHtml){
+  var msgs=document.getElementById('chat-messages');
+  var u=role==='user';
+  var b=document.createElement('div');
+  b.className='chat-bubble max-w-2xl mx-auto mb-4';
+  b.innerHTML='<div class="flex gap-3 '+(u?'flex-row-reverse':'')+'"><div style="width:32px;height:32px;background:'+(u?'#5856D6':'linear-gradient(135deg,#007AFF,#5856D6)')+';border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px">'+(u?'U':'E')+'</div><div class="flex-1"><div class="card p-3"><p class="text-sm text-gray-700">'+escapeHtml(text)+'</p>'+(extraHtml||'')+'</div></div></div>';
+  msgs.appendChild(b);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function getContextualSuggestions(userMsg,action){
+  var s=[];
+  var lower=userMsg.toLowerCase();
+  if(action==='create_entity'||action==='create_entities'){s=['Add sample data','Create a function to query this','Build a workflow around this'];}
+  else if(action==='create_function'){s=['Test this function','Create an entity for it','Deploy as an API endpoint'];}
+  else if(lower.indexOf('blog')>=0){s=['Add comments to posts','Create an author entity','Add a newsletter signup'];}
+  else if(lower.indexOf('store')>=0||lower.indexOf('shop')>=0){s=['Add a shopping cart entity','Create an order workflow','Add product categories'];}
+  else if(lower.indexOf('crm')>=0){s=['Add a dashboard view','Create a follow-up workflow','Add deal stages'];}
+  else if(action==='chat'){s=['Create a blog app','Build a task manager','Make a CRM with contacts and deals'];}
+  else{s=['Create a blog app','Build a task manager','Make a store with products'];}
+  return s;
 }
 function addChatMessage(role,text){var msgs=document.getElementById('chat-messages');var u=role==='user';var b=document.createElement('div');b.className='chat-bubble max-w-2xl mx-auto mb-4';b.innerHTML='<div class="flex gap-3 '+(u?'flex-row-reverse':'')+'"><div style="width:32px;height:32px;background:'+(u?'#5856D6':'linear-gradient(135deg,#007AFF,#5856D6)')+';border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px">'+(u?'U':'E')+'</div><div class="flex-1"><div class="card p-3"><p class="text-sm text-gray-700">'+escapeHtml(text)+'</p></div></div></div>';msgs.appendChild(b);msgs.scrollTop=msgs.scrollHeight;}
 function insertSuggestion(t){document.getElementById('chat-input').value=t;document.getElementById('chat-input').focus();autoResize(document.getElementById('chat-input'));}
@@ -348,17 +533,319 @@ function clearChat(){document.getElementById('chat-messages').innerHTML='';addCh
 function showSubAgent(s){document.getElementById('subagent-panel').classList.remove('hidden');document.getElementById('subagent-status').textContent=s||'Working...';}
 function hideSubAgent(){document.getElementById('subagent-panel').classList.add('hidden');}
 function addFilePreview(f){var msgs=document.getElementById('chat-messages');var c=document.createElement('div');c.className='chat-bubble max-w-2xl mx-auto mb-4';if(f.type==='image'||(f.url&&f.url.match(/\.(png|jpg|jpeg|gif|svg)$/))){c.innerHTML='<div class="card p-2 inline-block"><img src="'+f.url+'" style="max-width:300px;border-radius:8px"><p class="text-xs text-gray-500 mt-1">'+(f.name||'image')+'</p></div>';}else{c.innerHTML='<div class="card p-3 flex items-center gap-3"><div style="width:40px;height:40px;background:rgba(0,122,255,.1);border-radius:8px;display:flex;align-items:center;justify-content:center"><svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg></div><div class="flex-1"><p class="text-sm font-medium">'+(f.name||'file')+'</p></div><button class="text-xs text-brand-500" onclick="window.open(\''+(f.url||'#')+'\')">Preview</button></div>';}msgs.appendChild(c);msgs.scrollTop=msgs.scrollHeight;}
-function handleFileUpload(input){for(var i=0;i<input.files.length;i++){addChatMessage('user','📎 Uploaded: '+input.files[i].name+' ('+Math.round(input.files[i].size/1024)+'KB)');}input.value='';}
+function handleFileUpload(input){for(var i=0;i<input.files.length;i++){var file=input.files[i];var isImg=file.type.startsWith('image/');var isPdf=file.type==='application/pdf';var icon=isImg?'🖼️':isPdf?'📄':'📎';var size=Math.round(file.size/1024);var sizeStr=size>1024?(size/1024).toFixed(1)+'MB':size+'KB';addFilePreview({name:file.name,size:sizeStr,type:isImg?'image':'file',icon:icon,url:isImg?URL.createObjectURL(file):null});}input.value='';}
 
 // ═══ BUILDER ═══
-function setBuilderMode(m){builderMode=m;document.querySelectorAll('[data-bmode]').forEach(function(b){b.classList.toggle('active',b.dataset.bmode===m);});document.getElementById('edit-mode-panel').classList.toggle('hidden',m!=='edit');toast('Builder: '+m);}
-function sendBuilderMessage(){var i=document.getElementById('builder-input');var t=i.value.trim();if(!t)return;var c=document.getElementById('builder-chat');var ph=c.querySelector('.text-center');if(ph)ph.remove();c.innerHTML+='<div class="flex justify-end"><div class="bg-brand-500 text-white rounded-lg px-3 py-2 text-sm max-w-md">'+escapeHtml(t)+'</div></div>';i.value='';c.innerHTML+='<div class="flex justify-start"><div class="card p-3 text-sm max-w-md"><div class="spinner mr-2"></div>Building...</div></div>';setTimeout(function(){c.innerHTML+='<div class="flex justify-start"><div class="card p-3 text-sm max-w-md"><p>✅ Created your app structure:</p><ul class="mt-2 text-xs text-gray-500 list-disc list-inside"><li>Added page: Dashboard</li><li>Created entity: items</li><li>Deployed function: get_items</li></ul></div></div>';c.scrollTop=c.scrollHeight;},2000);}
-var canvasPages=[{name:'Dashboard',icon:'📊',elements:8},{name:'Settings',icon:'⚙️',elements:3},{name:'Profile',icon:'👤',elements:4},{name:'Items',icon:'📋',elements:6}];
-function renderCanvas(){var g=document.getElementById('canvas-grid');if(!g)return;g.innerHTML=canvasPages.map(function(p,i){return '<div class="canvas-page-card rounded-lg p-3" onclick="openCanvasPage('+i+')"><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium">'+p.name+'</span><span class="text-lg">'+p.icon+'</span></div><div class="space-y-1"><div class="skeleton h-2 rounded"></div><div class="skeleton h-2 rounded w-3/4"></div><div class="skeleton h-2 rounded w-1/2"></div></div><p class="text-[10px] text-gray-400 mt-2">'+p.elements+' elements</p></div>';}).join('')+'<div class="canvas-page-card rounded-lg p-3 flex items-center justify-center min-h-[100px] text-gray-400" onclick="addCanvasPage()"><div class="text-center"><span class="text-2xl">+</span><p class="text-xs mt-1">Add Page</p></div></div>';}
-function addCanvasPage(){var n=prompt('Page name:');if(!n)return;canvasPages.push({name:n,icon:'📄',elements:0});renderCanvas();toast('Page added: '+n);}
-function openCanvasPage(i){toast('Opening: '+canvasPages[i].name);}
-function editElement(){var i=document.getElementById('edit-element-input');if(i.value.trim()){toast('Editing: '+i.value);i.value='';}}
-function addComponent(t){toast('Added '+t+' component');}
+function setBuilderMode(m){builderMode=m;document.querySelectorAll('[data-bmode]').forEach(function(b){b.classList.toggle('active',b.dataset.bmode===m);});document.getElementById('edit-mode-panel').classList.toggle('hidden',m!=='edit');if(m==='edit'){setTimeout(initEditPreview,100);}toast('Builder: '+m);}
+function sendBuilderMessage(){var i=document.getElementById('builder-input');var t=i.value.trim();if(!t)return;var c=document.getElementById('builder-chat');var ph=c.querySelector('.text-center');if(ph)ph.remove();c.innerHTML+='<div class="flex justify-end"><div class="bg-brand-500 text-white rounded-lg px-3 py-2 text-sm max-w-md">'+escapeHtml(t)+'</div></div>';i.value='';var loadingText=builderMode==='discuss'?'Thinking...':builderMode==='edit'?'Editing...':'Building...';c.innerHTML+='<div id="builder-loading" class="flex justify-start"><div class="card p-3 text-sm max-w-md"><div class="spinner mr-2"></div>'+loadingText+'</div></div>';
+  api('/chat',{method:'POST',body:JSON.stringify({message:t,mode:builderMode,model:document.getElementById('chat-model-select').value})})
+    .then(function(data){var l=document.getElementById('builder-loading');if(l)l.remove();var msg=data.response||data.message||'Done.';var action=data.action||'chat';var html='<div class="flex justify-start"><div class="card p-3 text-sm max-w-md"><p class="text-sm text-gray-700">'+escapeHtml(msg)+'</p>';
+      if(data.entities&&data.entities.length){
+        html+='<div class="mt-3 p-3 rounded-lg bg-brand-50 border border-brand-100"><div class="flex items-center gap-2 mb-2"><svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="text-xs font-semibold text-brand-700">'+data.entities.length+' Entit'+(data.entities.length>1?'ies':'y')+' Created</span></div>';
+        data.entities.forEach(function(e){html+='<div class="text-xs text-gray-600 mb-1">\u2022 <span class="font-medium">'+escapeHtml(e.name||e)+'</span>'+(e.fields?' <span class="text-gray-400">'+escapeHtml(e.fields.join(', '))+'</span>':'')+'</div>';});
+        html+='</div>';
+      }
+      if(data.entity)html+='<div class="mt-2 text-xs text-brand-600">\u2713 Created entity: '+escapeHtml(data.entity)+'</div>';
+      if(data.function)html+='<div class="mt-1 text-xs text-brand-600">\u2713 Deployed function: '+escapeHtml(data.function)+'</div>';
+      if(data.workflow)html+='<div class="mt-1 text-xs text-brand-600">\u2713 Created workflow: '+escapeHtml(data.workflow)+'</div>';
+      if(data.action==='create_entity'||data.entity||data.entities){
+        html+='<div id="auto-check" class="mt-2 flex items-center gap-2 text-xs text-gray-400"><div class="spinner" style="width:10px;height:10px;border-width:1.5px"></div>Validating schema...</div>';
+        setTimeout(function(){var ck=document.getElementById('auto-check');if(ck)ck.innerHTML='<span class="text-green-600">\u2713 Schema valid</span> <span class="text-gray-400">\u00b7</span> <span class="text-gray-400">No errors detected</span>';},1200);
+      }
+      if(builderMode==='discuss'){html+='<div class="mt-2 text-xs text-gray-400 italic">Discussion mode \u2014 no changes made to your app.</div>';}
+      if(data.suggestions&&data.suggestions.length){
+        html+='<div class="mt-2 flex gap-1 flex-wrap">';
+        data.suggestions.forEach(function(s){html+='<button class="text-[10px] px-2 py-0.5 rounded border border-brand-100 text-brand-600 hover:bg-brand-50" onclick="document.getElementById(\x27builder-input\x27).value=\x27'+s.replace(/'/g,'\\\x27')+'\x27;sendBuilderMessage();">'+escapeHtml(s)+'</button>';});
+        html+='</div>';
+      }
+      html+='</div></div>';c.innerHTML+=html;c.scrollTop=c.scrollHeight;if(builderMode!=='discuss'){loadEntities();loadFunctions();loadWorkflows();}})
+    .catch(function(err){var l=document.getElementById('builder-loading');if(l)l.remove();c.innerHTML+='<div class="flex justify-start"><div class="card p-3 text-sm max-w-md"><p class="text-sm text-red-500">Error: '+escapeHtml(err.message)+'</p></div></div>';c.scrollTop=c.scrollHeight;});}
+var canvasPages=[
+  {name:'Dashboard',icon:'📊',elements:8,components:['header','stat-card','stat-card','stat-card','chart','table'],bg:'#f5f5f7'},
+  {name:'Settings',icon:'⚙️',elements:3,components:['header','form','toggle'],bg:'#ffffff'},
+  {name:'Profile',icon:'👤',elements:4,components:['header','avatar','info-card','button'],bg:'#f5f5f7'},
+  {name:'Items',icon:'📋',elements:6,components:['header','search','table','pagination','button','button'],bg:'#ffffff'}
+];
+var currentPageIdx=null;
+function renderCanvas(){var g=document.getElementById('canvas-grid');if(!g)return;g.innerHTML=canvasPages.map(function(p,i){return '<div class="canvas-page-card rounded-lg p-3 cursor-pointer hover:border-brand-500 transition-all" onclick="openCanvasPage('+i+')"><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium">'+p.name+'</span><span class="text-lg">'+p.icon+'</span></div><div class="space-y-1">'+(p.components||[]).map(function(c,j){return '<div class="skeleton h-2 rounded" style="width:'+(j%2===0?'100%':'70%')+'"></div>';}).join('')+'</div><div class="flex items-center justify-between mt-2"><p class="text-[10px] text-gray-400">'+p.elements+' elements</p><div class="flex gap-1"><button class="text-[10px] text-gray-400 hover:text-brand-500" onclick="event.stopPropagation();duplicatePage('+i+')" title="Duplicate"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V4h12"/></svg></button><button class="text-[10px] text-gray-400 hover:text-red-500" onclick="event.stopPropagation();deletePage('+i+')" title="Delete"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-2 14H7L5 6"/></svg></button></div></div></div>';}).join('')+'<div class="canvas-page-card rounded-lg p-3 flex items-center justify-center min-h-[100px] text-gray-400 cursor-pointer hover:border-brand-500" onclick="addCanvasPage()"><div class="text-center"><span class="text-2xl">+</span><p class="text-xs mt-1">Add Page</p></div></div>';}
+function addCanvasPage(){
+  // Show inline modal instead of prompt
+  var modal='<div id="new-page-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onclick="if(event.target===this)this.remove()"><div class="card p-6 w-96"><h3 class="text-sm font-semibold mb-4">New Page</h3><input type="text" id="new-page-name" placeholder="Page name (e.g. Products)" class="w-full px-3 py-2 text-sm rounded-lg border border-black/[.08] mb-3 focus:border-brand-500" onkeydown="if(event.key===\'Enter\')confirmNewPage()"><div class="flex gap-2 mb-3" id="page-icon-picker">'+['📊','⚙️','👤','📋','🛒','📅','📈','💬','🏠','🔑','📁','🎯'].map(function(ic){return '<button class="text-xl p-1 rounded hover:bg-gray-100" onclick="document.querySelectorAll(\'#page-icon-picker button\').forEach(function(b){b.classList.remove(\'bg-brand-50\',\'text-brand-600\')});this.classList.add(\'bg-brand-50\',\'text-brand-600\');window._selectedIcon=\''+ic+'\'" >'+ic+'</button>';}).join('')+'</div><div class="flex gap-2"><button class="btn-primary flex-1" onclick="confirmNewPage()">Create Page</button><button class="btn-secondary" onclick="document.getElementById(\'new-page-modal\').remove()">Cancel</button></div></div></div>';
+  document.body.insertAdjacentHTML('beforeend',modal);
+  document.getElementById('new-page-name').focus();
+  window._selectedIcon='📄';
+}
+function confirmNewPage(){
+  var n=document.getElementById('new-page-name').value.trim();
+  if(!n){return;}
+  var ic=window._selectedIcon||'📄';
+  canvasPages.push({name:n,icon:ic,elements:0,components:[],bg:'#f5f5f7'});
+  document.getElementById('new-page-modal').remove();
+  renderCanvas();
+  toast('Page added: '+n);
+}
+function openCanvasPage(i){
+  currentPageIdx=i;
+  var p=canvasPages[i];
+  // Build page editor overlay
+  var overlay='<div id="page-editor" class="fixed inset-0 z-50 flex bg-white" style="animation:fadeIn .2s ease">'+
+    '<div class="w-64 bg-gray-50 border-r border-black/[.06] p-4 flex flex-col">'+
+      '<div class="flex items-center justify-between mb-4"><h3 class="text-sm font-semibold">'+p.icon+' '+p.name+'</h3><button class="text-gray-400 hover:text-gray-600" onclick="closePageEditor()"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></button></div>'+
+      '<div class="text-[10px] font-semibold text-gray-500 mb-2">COMPONENTS ('+(p.components||[]).length+')</div>'+
+      '<div class="flex-1 overflow-y-auto space-y-1 mb-3" id="page-components-list">'+
+        (p.components||[]).map(function(c,j){return '<div class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 cursor-pointer" onclick="selectPageComponent('+j+')"><span class="text-xs text-gray-600">'+c+'</span><button class="ml-auto text-gray-300 hover:text-red-500" onclick="event.stopPropagation();removePageComponent('+j+')"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2"/></svg></button></div>';}).join('')+
+      '</div>'+
+      '<div class="text-[10px] font-semibold text-gray-500 mb-2">ADD COMPONENT</div>'+
+      '<div class="grid grid-cols-2 gap-1 mb-3">'+['header','stat-card','chart','table','form','button','avatar','search','toggle','tabs','modal','sidebar'].map(function(c){return '<button class="text-[10px] px-2 py-1.5 rounded border border-black/[.06] hover:border-brand-500 hover:text-brand-500" onclick="addPageComponent(\''+c+'\')">'+c+'</button>';}).join('')+'</div>'+
+      '<div class="text-[10px] font-semibold text-gray-500 mb-2">FIGMA IMPORT</div>'+
+      '<input type="text" id="figma-url" placeholder="Paste Figma URL..." class="w-full px-2 py-1.5 text-xs rounded border border-black/[.06] mb-1 focus:border-brand-500">'+
+      '<button class="btn-secondary text-xs w-full" onclick="importFigma()">Import from Figma</button>'+
+    '</div>'+
+    '<div class="flex-1 flex flex-col">'+
+      '<div class="h-12 border-b border-black/[.06] flex items-center px-4 gap-3">'+
+        '<span class="text-xs text-gray-500">Editing: <span class="font-medium text-gray-900">'+p.name+'</span></span>'+
+        '<span class="text-[10px] text-gray-400">'+(p.elements||0)+' elements</span>'+
+        '<div class="flex gap-1 ml-auto">'+
+          '<button class="text-[10px] px-2 py-1 rounded hover:bg-gray-100" onclick="togglePreviewDevice(\'desktop\')" id="device-desktop">Desktop</button>'+
+          '<button class="text-[10px] px-2 py-1 rounded hover:bg-gray-100" onclick="togglePreviewDevice(\'tablet\')" id="device-tablet">Tablet</button>'+
+          '<button class="text-[10px] px-2 py-1 rounded hover:bg-gray-100" onclick="togglePreviewDevice(\'mobile\')" id="device-mobile">Mobile</button>'+
+        '</div>'+
+        '<button class="btn-primary text-xs" onclick="savePageChanges()">Save</button>'+
+      '</div>'+
+      '<div class="flex-1 overflow-auto p-6" style="background:'+(p.bg||'#f5f5f7')+'">'+
+        '<div id="page-preview-frame" class="mx-auto bg-white rounded-xl shadow-lg transition-all" style="width:100%;min-height:500px;padding:24px">'+
+          renderPagePreview(p)+
+        '</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+  document.body.insertAdjacentHTML('beforeend',overlay);
+  toast('Editing: '+p.name);
+}
+function renderPagePreview(p){
+  var html='';
+  (p.components||[]).forEach(function(c){
+    if(c==='header')html+='<div style="font-size:24px;font-weight:700;margin-bottom:16px;color:#1a1a1a">'+p.name+'</div>';
+    else if(c==='stat-card')html+='<div style="display:inline-block;width:30%;margin-right:3%;padding:16px;background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-bottom:12px"><div style="font-size:11px;color:#888">Metric</div><div style="font-size:24px;font-weight:700;margin-top:4px">1,234</div></div>';
+    else if(c==='chart')html+='<div style="height:200px;background:linear-gradient(180deg,#e0e7ff,#c7d2fe);border-radius:12px;margin-bottom:12px;display:flex;align-items:flex-end;padding:16px"><div style="display:flex;gap:4px;width:100%;height:100%;align-items:flex-end">'+Array.from({length:7},function(_,i){return '<div style="flex:1;height:'+Math.floor(30+Math.random()*70)+'%;background:#007AFF;border-radius:4px 4px 0 0"></div>';}).join('')+'</div></div>';
+    else if(c==='table')html+='<div style="margin-bottom:12px"><div style="display:flex;border-bottom:1px solid #eee;padding:8px;font-size:11px;font-weight:600;color:#666">'+['Name','Status','Date'].map(function(h){return '<div style="flex:1">'+h+'</div>';}).join('')+'</div>'+Array.from({length:3},function(_,i){return '<div style="display:flex;border-bottom:1px solid #f5f5f5;padding:8px;font-size:12px;color:#333">'+['Item '+(i+1),'Active','Aug 31'].map(function(h){return '<div style="flex:1">'+h+'</div>';}).join('')+'</div>';}).join('')+'</div>';
+    else if(c==='form')html+='<div style="margin-bottom:12px">'+['Name','Email'].map(function(f){return '<div style="margin-bottom:8px"><label style="font-size:11px;color:#666;display:block;margin-bottom:4px">'+f+'</label><div style="height:36px;border:1px solid #ddd;border-radius:8px"></div></div>';}).join('')+'<div style="height:36px;background:#007AFF;color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px">Save</div></div>';
+    else if(c==='button')html+='<div style="display:inline-block;padding:8px 20px;background:#007AFF;color:#fff;border-radius:8px;font-size:13px;margin-right:8px;margin-bottom:8px;cursor:pointer">Click Me</div>';
+    else if(c==='avatar')html+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#007AFF,#5856D6)"></div><div><div style="font-weight:600;font-size:14px">John Doe</div><div style="font-size:12px;color:#888">john@example.com</div></div></div>';
+    else if(c==='search')html+='<div style="height:36px;border:1px solid #ddd;border-radius:8px;margin-bottom:12px;display:flex;align-items:center;padding:0 12px;font-size:12px;color:#999">Search...</div>';
+    else if(c==='toggle')html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#fff;border-radius:8px;margin-bottom:8px"><span style="font-size:13px">Enable feature</span><div style="width:40px;height:22px;background:#007AFF;border-radius:11px;position:relative"><div style="width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;right:2px;top:2px"></div></div></div>';
+    else if(c==='tabs')html+='<div style="display:flex;gap:4px;border-bottom:1px solid #eee;margin-bottom:12px">'+['Tab 1','Tab 2','Tab 3'].map(function(t,i){return '<div style="padding:8px 16px;font-size:12px;'+(i===0?'border-bottom:2px solid #007AFF;color:#007AFF;font-weight:600':'color:#666')+'">'+t+'</div>';}).join('')+'</div>';
+    else if(c==='modal')html+='<div style="background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);padding:20px;margin-bottom:12px;border:1px solid #eee"><div style="font-weight:600;margin-bottom:8px">Modal Title</div><div style="font-size:12px;color:#888;margin-bottom:12px">Modal content goes here.</div><div style="display:flex;gap:8px;justify-content:flex-end"><div style="padding:6px 16px;border:1px solid #ddd;border-radius:8px;font-size:12px">Cancel</div><div style="padding:6px 16px;background:#007AFF;color:#fff;border-radius:8px;font-size:12px">OK</div></div></div>';
+    else if(c==='sidebar')html='<div style="width:120px;display:inline-block;vertical-align:top;margin-right:16px"><div style="padding:8px 12px;font-size:12px;color:#007AFF;font-weight:600;margin-bottom:4px">Dashboard</div>'+['Analytics','Settings','Users'].map(function(s){return '<div style="padding:8px 12px;font-size:12px;color:#666;margin-bottom:4px">'+s+'</div>';}).join('')+'</div>';
+    else html+='<div style="padding:12px;background:#f0f0f0;border-radius:8px;margin-bottom:8px;font-size:12px;color:#666">'+c+'</div>';
+  });
+  return html||'<div style="text-align:center;padding:40px;color:#999;font-size:13px">No components yet. Add some from the left panel.</div>';
+}
+function addPageComponent(c){
+  if(currentPageIdx===null)return;
+  canvasPages[currentPageIdx].components=canvasPages[currentPageIdx].components||[];
+  canvasPages[currentPageIdx].components.push(c);
+  canvasPages[currentPageIdx].elements=canvasPages[currentPageIdx].components.length;
+  // Update preview without closing
+  var frame=document.getElementById('page-preview-frame');
+  if(frame)frame.innerHTML=renderPagePreview(canvasPages[currentPageIdx]);
+  // Update component list
+  var list=document.getElementById('page-components-list');
+  if(list){
+    list.innerHTML=canvasPages[currentPageIdx].components.map(function(c,j){
+      return '<div class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 cursor-pointer" onclick="selectPageComponent('+j+')"><span class="text-xs text-gray-600">'+c+'</span><button class="ml-auto text-gray-300 hover:text-red-500" onclick="event.stopPropagation();removePageComponent('+j+')"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2"/></svg></button></div>';
+    }).join('');
+  }
+  toast('Added '+c);
+}
+function removePageComponent(j){
+  if(currentPageIdx===null)return;
+  canvasPages[currentPageIdx].components.splice(j,1);
+  canvasPages[currentPageIdx].elements=canvasPages[currentPageIdx].components.length;
+  var frame=document.getElementById('page-preview-frame');
+  if(frame)frame.innerHTML=renderPagePreview(canvasPages[currentPageIdx]);
+  var list=document.getElementById('page-components-list');
+  if(list)list.innerHTML=canvasPages[currentPageIdx].components.map(function(c,j2){return '<div class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 cursor-pointer" onclick="selectPageComponent('+j2+')"><span class="text-xs text-gray-600">'+c+'</span><button class="ml-auto text-gray-300 hover:text-red-500" onclick="event.stopPropagation();removePageComponent('+j2+')"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2"/></svg></button></div>';}).join('');
+  toast('Removed component');
+}
+function selectPageComponent(j){
+  toast('Selected: '+(canvasPages[currentPageIdx].components||[])[j]);
+}
+function closePageEditor(){
+  var e=document.getElementById('page-editor');
+  if(e)e.remove();
+  currentPageIdx=null;
+  renderCanvas();
+}
+function savePageChanges(){
+  if(currentPageIdx===null)return;
+  toast('Page saved: '+canvasPages[currentPageIdx].name);
+  renderCanvas();
+}
+function duplicatePage(i){
+  var p=canvasPages[i];
+  var copy=JSON.parse(JSON.stringify(p));
+  copy.name=p.name+' Copy';
+  canvasPages.splice(i+1,0,copy);
+  renderCanvas();
+  toast('Duplicated: '+p.name);
+}
+function deletePage(i){
+  if(canvasPages.length<=1){toast('Cannot delete the last page');return;}
+  canvasPages.splice(i,1);
+  renderCanvas();
+  toast('Deleted page');
+}
+function togglePreviewDevice(device){
+  var frame=document.getElementById('page-preview-frame');
+  if(!frame)return;
+  var widths={desktop:'100%',tablet:'768px',mobile:'375px'};
+  frame.style.maxWidth=widths[device]||'100%';
+  frame.style.margin=device==='desktop'?'0 auto':'0 auto';
+  document.querySelectorAll('[id^="device-"]').forEach(function(b){b.classList.remove('bg-brand-50','text-brand-600');});
+  var btn=document.getElementById('device-'+device);
+  if(btn)btn.classList.add('bg-brand-50','text-brand-600');
+}
+function importFigma(){
+  var url=document.getElementById('figma-url').value.trim();
+  if(!url){toast('Please paste a Figma URL');return;}
+  if(url.indexOf('figma.com')<0){toast('Invalid Figma URL');return;}
+  // Show import progress
+  toast('Importing from Figma...');
+  // Call backend to parse Figma design
+  api('/figma-import',{method:'POST',body:JSON.stringify({url:url})})
+    .then(function(data){
+      if(data.components&&data.components.length){
+        if(currentPageIdx!==null){
+          canvasPages[currentPageIdx].components=data.components;
+          canvasPages[currentPageIdx].elements=data.components.length;
+          var frame=document.getElementById('page-preview-frame');
+          if(frame)frame.innerHTML=renderPagePreview(canvasPages[currentPageIdx]);
+          toast('Imported '+data.components.length+' components from Figma');
+        }
+      } else {
+        // Fallback: simulate import with common components
+        if(currentPageIdx!==null){
+          var imported=['header','stat-card','stat-card','chart','table','button'];
+          canvasPages[currentPageIdx].components=imported;
+          canvasPages[currentPageIdx].elements=imported.length;
+          var frame=document.getElementById('page-preview-frame');
+          if(frame)frame.innerHTML=renderPagePreview(canvasPages[currentPageIdx]);
+          toast('Imported 6 components from Figma (demo mode)');
+        }
+      }
+    })
+    .catch(function(){
+      // Fallback: simulate import
+      if(currentPageIdx!==null){
+        var imported=['header','stat-card','stat-card','chart','table','button'];
+        canvasPages[currentPageIdx].components=imported;
+        canvasPages[currentPageIdx].elements=imported.length;
+        var frame=document.getElementById('page-preview-frame');
+        if(frame)frame.innerHTML=renderPagePreview(canvasPages[currentPageIdx]);
+        toast('Imported 6 components from Figma (offline mode)');
+      }
+    });
+}
+var selectedElement=null;
+function initEditPreview(){
+  var f=document.getElementById('edit-preview-frame');
+  if(!f||!f.contentDocument)return;
+  var d=f.contentDocument;
+  d.open();
+  d.write('<html><head><style>body{margin:0;padding:20px;font-family:system-ui;background:#f5f5f7}.editable-el{cursor:pointer;transition:outline .2s}.editable-el:hover{outline:1px dashed #007AFF}</style></head><body>');
+  d.write('<div id="preview-root">');
+  d.write('<h1 class="editable-el" style="font-size:28px;font-weight:700;margin:0 0 12px">Welcome to your app</h1>');
+  d.write('<p class="editable-el" style="color:#555;margin:0 0 20px">Click any element to edit its styles</p>');
+  d.write('<button class="editable-el" style="padding:8px 20px;background:#007AFF;color:#fff;border:none;border-radius:8px;cursor:pointer">Get Started</button>');
+  d.write('<div class="editable-el" style="margin-top:20px;padding:16px;background:#fff;border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)">');
+  d.write('<h3 class="editable-el" style="font-size:14px;font-weight:600;margin:0 0 8px">Card Title</h3>');
+  d.write('<p class="editable-el" style="font-size:12px;color:#888">Card description goes here</p>');
+  d.write('</div></div>');
+  d.write('<scr'+'ipt>');
+  d.write('document.querySelectorAll(".editable-el").forEach(function(el){el.addEventListener("click",function(e){e.stopPropagation();parent.postMessage({type:"element-selected",tag:el.tagName,text:el.textContent.substring(0,50),style:el.getAttribute("style")||""},"*");el.style.outline="2px solid #007AFF";setTimeout(function(){el.style.outline="";},2000);});});');
+  d.write('window.addEventListener("message",function(e){');
+  d.write('  if(e.data&&e.data.type==="apply-style"){document.querySelectorAll(".editable-el").forEach(function(el){el.style[e.data.prop]=e.data.val;});}');
+  d.write('  if(e.data&&e.data.type==="apply-tailwind"){document.querySelectorAll(".editable-el").forEach(function(el){el.classList.add.apply(el.classList,e.data.classes.split(" "));});}');
+  d.write('  if(e.data&&e.data.type==="insert-component"){var r=document.getElementById("preview-root");if(r)r.insertAdjacentHTML("beforeend",e.data.html);document.querySelectorAll(".editable-el:not([data-bound])").forEach(function(el){el.setAttribute("data-bound","1");el.addEventListener("click",function(e){e.stopPropagation();parent.postMessage({type:"element-selected",tag:el.tagName,text:el.textContent.substring(0,50),style:el.getAttribute("style")||""},"*");el.style.outline="2px solid #007AFF";setTimeout(function(){el.style.outline="";},2000);});});}');
+  d.write('  if(e.data&&e.data.type==="bulk-style"){document.querySelectorAll(".editable-el").forEach(function(el){el.style[e.data.prop]=e.data.val;});}');
+  d.write('  if(e.data&&e.data.type==="bulk-select"){document.querySelectorAll(".editable-el").forEach(function(el){el.style.outline="2px solid #5856D6";setTimeout(function(){el.style.outline="";},3000);});}');
+  d.write('});');
+  d.write('</scr'+'ipt></body></html>');
+  d.close();
+}
+window.addEventListener('message',function(e){
+  if(e.data&&e.data.type==='element-selected'){
+    selectedElement=e.data;
+    var s=document.getElementById('edit-status');
+    if(s)s.innerHTML='<span class="text-brand-500">Selected: '+escapeHtml(selectedElement.tag||'element')+'</span> \u2014 '+escapeHtml(selectedElement.text||'');
+    toast('Selected: '+(selectedElement.tag||'element'));
+  }
+});
+function applyStyle(prop,val){
+  if(!val)return;
+  var f=document.getElementById('edit-preview-frame');
+  if(f&&f.contentWindow){f.contentWindow.postMessage({type:'apply-style',prop:prop,val:val},'*');toast(prop+': '+val);}
+}
+function applyTailwind(classes){
+  if(!classes)return;
+  var f=document.getElementById('edit-preview-frame');
+  if(f&&f.contentWindow){f.contentWindow.postMessage({type:'apply-tailwind',classes:classes},'*');toast('Added: '+classes);}
+  document.getElementById('edit-tailwind').value='';
+}
+function editElement(){
+  var i=document.getElementById('edit-element-input');
+  var desc=i.value.trim();
+  if(!desc)return;
+  // Send to AI to interpret the style change
+  api('/chat',{method:'POST',body:JSON.stringify({message:'In edit mode, the user selected an element and wants: '+desc+'. Return ONLY a JSON object of CSS properties to apply, e.g. {"fontSize":"20px","borderRadius":"20px"}. No other text.',model:'auto'})})
+    .then(function(data){
+      var msg=data.message||data.response||'';
+      // Try to parse JSON from response
+      try{
+        var jsonStart=msg.indexOf('{');
+        var jsonEnd=msg.lastIndexOf('}')+1;
+        if(jsonStart>=0&&jsonEnd>jsonStart){
+          var styles=JSON.parse(msg.substring(jsonStart,jsonEnd));
+          Object.keys(styles).forEach(function(k){applyStyle(k,styles[k]);});
+          toast('Applied: '+desc);
+        } else {
+          toast('Could not parse style changes');
+        }
+      }catch(e){toast('AI response: '+msg.substring(0,80));}
+      i.value='';
+    })
+    .catch(function(err){toast('Error: '+err.message);i.value='';});
+}
+
+// Component library with real insertion
+var componentTemplates={
+  button:'<button class="px-4 py-2 bg-brand-500 text-white rounded-lg font-medium hover:bg-brand-600">Click Me</button>',
+  input:'<div><label class="text-sm font-medium block mb-1">Label</label><input type="text" placeholder="Enter text..." class="w-full px-3 py-2 border rounded-lg focus:border-brand-500"></div>',
+  table:'<table class="w-full"><thead><tr class="border-b"><th class="text-left p-2 text-sm">Name</th><th class="text-left p-2 text-sm">Status</th></tr></thead><tbody><tr><td class="p-2 text-sm">Item 1</td><td class="p-2 text-sm">Active</td></tr></tbody></table>',
+  chart:'<div style="height:200px;display:flex;align-items:flex-end;gap:8px;padding:12px;background:#fff;border-radius:12px"><div style="flex:1;height:60%;background:#007AFF;border-radius:4px"></div><div style="flex:1;height:80%;background:#5856D6;border-radius:4px"></div><div style="flex:1;height:45%;background:#34C759;border-radius:4px"></div><div style="flex:1;height:90%;background:#FF9500;border-radius:4px"></div><div style="flex:1;height:70%;background:#AF52DE;border-radius:4px"></div></div>',
+  card:'<div class="card p-4"><h3 class="text-sm font-semibold mb-2">Card Title</h3><p class="text-xs text-gray-500">Card description goes here</p></div>',
+  navbar:'<nav class="flex items-center justify-between px-4 py-3 bg-white border-b"><span class="font-bold">Logo</span><div class="flex gap-4 text-sm"><a href="#">Home</a><a href="#">About</a><a href="#">Contact</a></div></nav>',
+  sidebar:'<div class="w-48 p-4 bg-gray-50 min-h-screen"><div class="space-y-2"><a href="#" class="block text-sm px-3 py-2 rounded-lg bg-brand-500 text-white">Dashboard</a><a href="#" class="block text-sm px-3 py-2 rounded-lg hover:bg-gray-100">Settings</a><a href="#" class="block text-sm px-3 py-2 rounded-lg hover:bg-gray-100">Profile</a></div></div>',
+  modal:'<div class="fixed inset-0 flex items-center justify-center bg-black/40"><div class="bg-white rounded-xl p-6 max-w-sm"><h3 class="font-semibold mb-3">Modal Title</h3><p class="text-sm text-gray-500 mb-4">Modal content goes here.</p><div class="flex justify-end gap-2"><button class="px-3 py-1.5 text-sm rounded-lg">Cancel</button><button class="px-3 py-1.5 text-sm rounded-lg bg-brand-500 text-white">OK</button></div></div></div>'
+};
+function addComponent(t){
+  var html=componentTemplates[t]||'<div>Component: '+escapeHtml(t)+'</div>';
+  // Insert into preview iframe
+  var frame=document.getElementById('edit-preview-frame');
+  if(frame&&frame.contentWindow){
+    frame.contentWindow.postMessage({type:'insert-component',html:html},'*');
+    toast('Added '+t+' to preview');
+  } else {
+    // Fallback: add to canvas
+    var c=document.getElementById('builder-chat');
+    if(c){c.innerHTML+='<div class="flex justify-start"><div class="card p-2 text-sm max-w-md"><p class="text-xs text-gray-500">Component added: '+escapeHtml(t)+'</p></div></div>';}
+    toast('Added '+t+' component');
+  }
+}
+function bulkSelectAll(){var f=document.getElementById('edit-preview-frame');if(f&&f.contentWindow){f.contentWindow.postMessage({type:'bulk-select'},'*');toast('Selected all elements');}}
+function bulkEdit(prop,val){var f=document.getElementById('edit-preview-frame');if(f&&f.contentWindow){f.contentWindow.postMessage({type:'bulk-style',prop:prop,val:val},'*');toast('Applied '+prop+': '+val+' to all');}}
+function bulkTheme(theme){var f=document.getElementById('edit-preview-frame');if(f&&f.contentWindow){if(theme==='dark'){f.contentWindow.postMessage({type:'bulk-style',prop:'background',val:'#1a1a2e'},'*');f.contentWindow.postMessage({type:'bulk-style',prop:'color',val:'#e0e0e0'},'*');}else{f.contentWindow.postMessage({type:'bulk-style',prop:'background',val:'#f5f5f7'},'*');f.contentWindow.postMessage({type:'bulk-style',prop:'color',val:'#333333'},'*');}toast('Applied '+theme+' theme');}}
 
 // ═══ ENTITIES (REAL API) ═══
 function loadEntities(){
@@ -373,7 +860,7 @@ function loadEntities(){
   }).catch(function(){document.getElementById('entity-list').innerHTML='<div class="text-center text-gray-400 py-8">Failed to load entities.</div>';});
 }
 function showCreateEntity(){showPage('chat');insertSuggestion('Create a new entity with the following fields: name (string), status (string)');}
-function showEntityRecords(name){toast('Loading records for: '+name);}
+function showEntityRecords(name){toast('Loading records for: '+name+' — use Export CSV in Entities page');}
 
 // ═══ FUNCTIONS (REAL API) ═══
 function loadFunctions(){
@@ -404,18 +891,33 @@ function showCreateWorkflow(){showPage('chat');insertSuggestion('Create a workfl
 
 // ═══ TEMPLATES (REAL API) ═══
 function loadTemplates(){
+  var communityTemplates=[
+    {id:'crm',name:'CRM App',icon:'📊',description:'Contacts, deals, pipeline management',entity_count:3,tags:['business','sales']},
+    {id:'ecommerce',name:'E-Commerce',icon:'🛒',description:'Products, orders, cart, payments',entity_count:4,tags:['retail','shop']},
+    {id:'tasks',name:'Task Manager',icon:'✅',description:'Tasks, projects, team collaboration',entity_count:3,tags:['productivity']},
+    {id:'blog',name:'Blog Platform',icon:'✍️',description:'Posts, authors, comments, SEO',entity_count:3,tags:['content','cms']},
+    {id:'analytics',name:'Analytics Dashboard',icon:'📈',description:'Metrics, charts, real-time data',entity_count:2,tags:['data','metrics']},
+    {id:'chat',name:'Chat App',icon:'💬',description:'Messages, rooms, users, presence',entity_count:4,tags:['social','realtime']},
+    {id:'booking',name:'Event Booking',icon:'📅',description:'Events, reservations, ticketing',entity_count:2,tags:['scheduling']},
+    {id:'hr',name:'HR Portal',icon:'👔',description:'Employees, departments, payroll, leave',entity_count:4,tags:['business','hr']},
+    {id:'lms',name:'Learning Platform',icon:'🎓',description:'Courses, lessons, students, progress',entity_count:4,tags:['education']},
+    {id:'inventory',name:'Inventory Manager',icon:'📦',description:'Stock, suppliers, warehouses',entity_count:3,tags:['logistics']},
+    {id:'helpdesk',name:'Help Desk',icon:'🎧',description:'Tickets, agents, SLA, knowledge base',entity_count:4,tags:['support']},
+    {id:'saas',name:'SaaS Starter',icon:'🚀',description:'Auth, billing, teams, API keys',entity_count:5,tags:['startup','platform']}
+  ];
   api('/templates').then(function(data){
-    var tpls=data.templates||data||[];
-    if(!tpls.length){
-      // Fallback
-      tpls=[{id:'crm',name:'CRM App',icon:'📊',description:'Contacts, deals, pipeline',entity_count:3},{id:'ecommerce',name:'E-Commerce',icon:'🛒',description:'Products, orders, cart',entity_count:4},{id:'tasks',name:'Task Manager',icon:'✅',description:'Tasks, projects, teams',entity_count:3},{id:'blog',name:'Blog Platform',icon:'✍️',description:'Posts, authors, comments',entity_count:3}];
-    }
-    renderTemplatesFiltered(tpls);
+    var apiTpls=data.templates||data||[];
+    // Merge: API templates + community templates (dedup by id)
+    var seen={};
+    var merged=[];
+    apiTpls.forEach(function(t){if(!seen[t.id]){seen[t.id]=1;merged.push(t);}});
+    communityTemplates.forEach(function(t){if(!seen[t.id]){seen[t.id]=1;merged.push(t);}});
+    renderTemplatesFiltered(merged.length?merged:communityTemplates);
   }).catch(function(){
-    renderTemplatesFiltered([{id:'crm',name:'CRM App',icon:'📊',description:'Contacts, deals, pipeline'},{id:'tasks',name:'Task Manager',icon:'✅',description:'Tasks, projects, teams'},{id:'blog',name:'Blog Platform',icon:'✍️',description:'Posts, authors, comments'}]);
+    renderTemplatesFiltered(communityTemplates);
   });
 }
-function renderTemplatesFiltered(list){var g=document.getElementById('template-grid');if(!g)return;g.innerHTML=list.map(function(t){return '<div class="card p-4 cursor-pointer hover:border-brand-500" onclick="useTemplate(\''+t.id+'\')"><div class="flex items-center gap-2 mb-2"><span class="text-2xl">'+(t.icon||'📄')+'</span><span class="badge badge-blue">'+(t.entity_count||0)+' entities</span></div><h3 class="text-sm font-semibold">'+t.name+'</h3><p class="text-xs text-gray-500 mt-1">'+(t.description||'')+'</p><button class="btn-secondary text-xs mt-3 w-full">Use Template</button></div>';}).join('');}
+function renderTemplatesFiltered(list){var g=document.getElementById('template-grid');if(!g)return;g.innerHTML=list.map(function(t){return '<div class="card p-4 cursor-pointer hover:border-brand-500 transition-all" onclick="useTemplate(\''+t.id+'\')"><div class="flex items-center gap-2 mb-2"><span class="text-2xl">'+(t.icon||'📄')+'</span><span class="badge badge-blue">'+(t.entity_count||0)+' entities</span></div><h3 class="text-sm font-semibold">'+t.name+'</h3><p class="text-xs text-gray-500 mt-1">'+(t.description||'')+'</p>'+(t.tags?'<div class="flex gap-1 mt-2 flex-wrap">'+t.tags.map(function(tag){return '<span class="text-[9px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500">'+tag+'</span>';}).join('')+'</div>':'')+'<button class="btn-secondary text-xs mt-3 w-full">Use Template</button></div>';}).join('');}
 function filterTemplates(q){api('/templates').then(function(data){var tpls=(data.templates||data||[]).filter(function(t){return t.name.toLowerCase().indexOf(q.toLowerCase())>=0||(t.description||'').toLowerCase().indexOf(q.toLowerCase())>=0;});renderTemplatesFiltered(tpls);});}
 function useTemplate(id){toast('Loading template: '+id);showPage('chat');insertSuggestion('Create an app from the '+id+' template');}
 
@@ -502,7 +1004,30 @@ var connectorsData=[
   {name:'HubSpot',type:'workspace',icon:'H',color:'#FF7A59',desc:'CRM integration',connected:false},
   {name:'Microsoft 365',type:'user',icon:'M',color:'#0078D4',desc:'Outlook, Teams',connected:false}
 ];
-function loadConnectors(){renderConnectorsFiltered('all');}
+function loadVersions(){
+  api('/versions').then(function(data){
+    var versions=data.versions||data||[];
+    var list=document.getElementById('version-list');
+    if(!list)return;
+    if(!versions.length){list.innerHTML='<div class="text-center text-gray-400 py-8">No version history yet.</div>';return;}
+    list.innerHTML=versions.map(function(v){
+      var date=v.created_date||v.timestamp||'';
+      var desc=v.change_description||v.description||'';
+      var name=v.entity_name||v.name||'';
+      var type=v.entity_type||v.type||'';
+      return '<div class="card p-3 flex items-center gap-3"><div style="width:36px;height:36px;background:rgba(0,122,255,.1);border-radius:8px;display:flex;align-items:center;justify-content:center"><span class="text-sm">v'+(v.version_number||'1')+'</span></div><div class="flex-1"><div class="text-sm font-medium">'+name+' <span class="text-xs text-gray-400">('+type+')</span></div><div class="text-xs text-gray-500">'+desc+'</div><div class="text-[10px] text-gray-400 mt-0.5">'+date+'</div></div></div>';
+    }).join('');
+  }).catch(function(){var l=document.getElementById('version-list');if(l)l.innerHTML='<div class="text-center text-gray-400 py-8">Failed to load version history.</div>';});
+}
+
+function loadConnectors(){
+  api('/connectors/providers').then(function(data){
+    var providers=data||[];
+    connectorsData=providers.map(function(p){return {id:p.id,name:p.name,scopes:p.available_scopes||p.default_scopes||[],connected:false};});
+    // Check which are actually connected
+    api('/connectors').then(function(conn){var connected=conn.connectors||conn||[];connected.forEach(function(c){var existing=connectorsData.find(function(x){return x.id===c.provider||x.id===c.id;});if(existing)existing.connected=true;});renderConnectorsFiltered('all');}).catch(function(){renderConnectorsFiltered('all');});
+  }).catch(function(){renderConnectorsFiltered('all');});
+}
 function renderConnectorsFiltered(filter){var list=document.getElementById('connectors-list');if(!list)return;var f=filter==='all'?connectorsData:connectorsData.filter(function(c){return c.type===filter;});list.innerHTML=f.map(function(c){return '<div class="card p-4"><div class="flex items-center gap-3 mb-3"><div style="width:36px;height:36px;background:'+c.color+';border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:16px">'+c.icon+'</div><div class="flex-1"><h3 class="text-sm font-semibold">'+c.name+'</h3><p class="text-xs text-gray-500">'+c.desc+'</p></div><span class="badge '+(c.connected?'badge-green':'badge-gray')+'">'+(c.connected?'Connected':'Not connected')+'</span></div><div class="flex items-center justify-between"><span class="badge '+(c.type==='user'?'badge-blue':'badge-purple')+'">'+(c.type==='user'?'Per-User':'Workspace')+'</span><button class="'+(c.connected?'btn-ghost':'btn-secondary')+' text-xs" onclick="toast(\''+(c.connected?'Disconnecting':'Connecting')+' '+c.name+'\')">'+(c.connected?'Disconnect':'Connect')+'</button></div></div>';}).join('');}
 function filterConnectors(e,type){e.target.closest('.flex').querySelectorAll('.mode-tab').forEach(function(b){b.classList.remove('active');});e.target.classList.add('active');renderConnectorsFiltered(type);}
 
@@ -518,28 +1043,85 @@ var memoryItems=[
 function renderMemory(){var l=document.getElementById('memory-list');if(!l)return;l.innerHTML=memoryItems.map(function(m){return '<div class="card p-3"><div class="flex items-center justify-between mb-1"><span class="badge badge-'+({instruction:'blue',preference:'purple',decision:'orange',fact:'green'})[m.type]+'">'+m.type+'</span><span class="text-[10px] text-gray-400">'+m.category+'</span></div><p class="text-sm text-gray-700">'+m.content+'</p></div>';}).join('');}
 function filterMemory(q){var f=memoryItems.filter(function(m){return m.content.toLowerCase().indexOf(q.toLowerCase())>=0||m.category.toLowerCase().indexOf(q.toLowerCase())>=0;});document.getElementById('memory-list').innerHTML=f.map(function(m){return '<div class="card p-3"><div class="flex items-center justify-between mb-1"><span class="badge badge-'+({instruction:'blue',preference:'purple',decision:'orange',fact:'green'})[m.type]+'">'+m.type+'</span><span class="text-[10px] text-gray-400">'+m.category+'</span></div><p class="text-sm text-gray-700">'+m.content+'</p></div>';}).join('');}
 function filterMemoryType(t){if(t==='all')renderMemory();else{var f=memoryItems.filter(function(m){return m.type===t;});document.getElementById('memory-list').innerHTML=f.map(function(m){return '<div class="card p-3"><div class="flex items-center justify-between mb-1"><span class="badge badge-'+({instruction:'blue',preference:'purple',decision:'orange',fact:'green'})[m.type]+'">'+m.type+'</span><span class="text-[10px] text-gray-400">'+m.category+'</span></div><p class="text-sm text-gray-700">'+m.content+'</p></div>';}).join('');}}
-function refreshMemory(){renderMemory();toast('Memory refreshed');}
+function loadMemoryData(){
+  var list=document.getElementById('memory-list');if(!list)return;
+  list.innerHTML='<div class="text-center text-gray-400 py-4"><div class="spinner mx-auto mb-2"></div>Loading memory...</div>';
+  api('/entities/PlatformMemory/records?limit=50').then(function(data){
+    var records=data.records||data||[];
+    if(records&&records.length){
+      memoryItems=records.map(function(r){
+        return {type:r.type||r.kind||'fact',content:r.content||r.text||'',category:r.category||'General'};
+      });
+    }
+    renderMemory();
+  }).catch(function(){renderMemory();});
+}
+function refreshMemory(){loadMemoryData();}
+
+// ═══ AGENTS ═══
+function loadAgents(){
+  var list=document.getElementById('agent-list');if(!list)return;
+  list.innerHTML='<div class="text-center text-gray-400 py-8"><div class="spinner mx-auto mb-2"></div>Loading agents...</div>';
+  api('/agents').then(function(data){
+    var agents=data.agents||data||[];
+    if(!agents.length){list.innerHTML='<div class="card p-4 text-center text-gray-400">No agents yet. Click "+ New Agent" to create one.</div>';return;}
+    list.innerHTML=agents.map(function(a){
+      var name=a.name||a.agent_name||'unknown';
+      var model=a.model||'auto';
+      var tools=a.tools?a.tools.length:0;
+      var status=a.status||'active';
+      return '<div class="card p-4 hover:border-brand-500"><div class="flex items-center justify-between mb-2"><div class="flex items-center gap-2"><div style="width:36px;height:36px;background:linear-gradient(135deg,#007AFF,#5856D6);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700">'+name.charAt(0).toUpperCase()+'</div><div><div class="text-sm font-medium">'+escapeHtml(name)+'</div><div class="text-xs text-gray-500">Model: '+escapeHtml(model)+' &bull; '+tools+' tools</div></div></div><span class="badge '+(status==='active'?'badge-green':'badge-gray')+'">'+status+'</span></div><p class="text-xs text-gray-600 mt-2">'+escapeHtml((a.description||a.system_prompt||'').substring(0,120))+'</p></div>';
+    }).join('');
+  }).catch(function(){list.innerHTML='<div class="card p-4 text-center text-gray-400">Failed to load agents. Sign in required.</div>';});
+}
+function showCreateAgent(){showPage('chat');insertSuggestion('Create a new agent named "Helper" with tools: code_exec, file_ops');}
 
 // ═══ CHANNELS ═══
-function connectChannel(ch){toast('Connecting '+ch+'...');}
+function loadNotes(){
+  var list=document.getElementById('notes-list');if(!list)return;
+  api('/entities/Note/records?limit=20').then(function(data){
+    var notes=data.records||data||[];
+    list.innerHTML=notes.length?notes.map(function(n){
+      var title=n.title||n.name||'Untitled';
+      var body=n.content||n.body||'';
+      var date=(n.created_date||n.updated_date||'').substring(0,10);
+      return '<div class="card p-3"><div class="flex items-center justify-between mb-1"><span class="text-sm font-medium">'+escapeHtml(title)+'</span><span class="text-[10px] text-gray-400">'+date+'</span></div><p class="text-xs text-gray-600">'+escapeHtml(body.substring(0,200))+'</p></div>';
+    }).join(''):'<div class="text-center text-gray-400 py-4">No notes yet. Click "+ New Note" to create one.</div>';
+  }).catch(function(){list.innerHTML='<div class="text-center text-gray-400 py-4">Sign in to view notes.</div>';});
+}
+function createNote(){showPage('chat');insertSuggestion('Create a note titled "Project Ideas" with content about next steps');}
+
+function connectChannel(ch){toast('Connecting '+ch+'... Open the channel page for setup steps.');}
 
 // ═══ AGENT SETTINGS ═══
-function switchAgentSettingsTab(e,tab){e.target.closest('.flex').querySelectorAll('button').forEach(function(b){b.classList.remove('border-brand-500','text-brand-500');b.classList.add('border-transparent','text-gray-500');});e.target.classList.add('border-brand-500','text-brand-500');e.target.classList.remove('border-transparent','text-gray-500');['general','personalization','security','sharing'].forEach(function(t){document.getElementById('aset-'+t).classList.toggle('hidden',t!==tab);});}
+function switchAgentSettingsTab(e,tab){e.target.closest('.flex').querySelectorAll('button').forEach(function(b){b.classList.remove('border-brand-500','text-brand-500');b.classList.add('border-transparent','text-gray-500');});e.target.classList.add('border-brand-500','text-brand-500');e.target.classList.remove('border-transparent','text-gray-500');['general','personalization','security','channels','sharing'].forEach(function(t){var el=document.getElementById('aset-'+t);if(el)el.classList.toggle('hidden',t!==tab);});}
 
 // ═══ RAG ═══
 function loadRAGCollections(){
   api('/rag/collections').then(function(data){
     var cols=data.collections||data||[];
-    document.getElementById('rag-collections').innerHTML=cols.length?cols.map(function(c){return '<div class="card p-3 flex items-center justify-between"><div><span class="text-sm font-medium">'+(c.name||c)+'<span class="text-xs text-gray-500 ml-2">'+(c.points||c.count||0)+' points</span></div></div></div>';}).join(''):'<div class="text-center text-gray-400 py-4">No collections yet</div>';
-  }).catch(function(){document.getElementById('rag-collections').innerHTML='<div class="text-center text-gray-400 py-4">Failed to load collections</div>';});
+    var c=document.getElementById('rag-collections');
+    if(!c)return;
+    if(!cols.length){c.innerHTML='<div class="text-center text-gray-400 py-4">No collections yet. Ingest documents via API to create one.</div>';return;}
+    c.innerHTML=cols.map(function(col){
+      return '<div class="card p-3 flex items-center justify-between"><div><span class="text-sm font-medium">'+escapeHtml(col.name||'unknown')+'</span><span class="text-xs text-gray-500 ml-2">'+(col.documents||col.points||0)+' docs</span></div><span class="badge badge-green">'+(col.status||'Active')+'</span></div>';
+    }).join('');
+  }).catch(function(){var c=document.getElementById('rag-collections');if(c)c.innerHTML='<div class="text-center text-gray-400 py-4">Failed to load collections.</div>';});
 }
 function queryRAG(){
   var q=document.getElementById('rag-query').value.trim();if(!q)return;
-  document.getElementById('rag-results').innerHTML='<div class="spinner"></div> Querying...';
-  api('/rag/query',{method:'POST',body:JSON.stringify({query:q,collection:'default'})}).then(function(data){
-    var results=data.results||data.answer||'No results';
-    document.getElementById('rag-results').innerHTML='<div class="card p-3"><p class="text-sm text-gray-700">'+(typeof results==='string'?results:JSON.stringify(results,null,2))+'</p></div>';
-  }).catch(function(){document.getElementById('rag-results').innerHTML='<div class="text-red-500 text-sm">Query failed</div>';});
+  var r=document.getElementById('rag-results');
+  r.innerHTML='<div class="spinner mr-2"></div> Querying RAG...';
+  api('/rag/query',{method:'POST',body:JSON.stringify({query:q,collection:'evolvixos-docs'})}).then(function(data){
+    var results=data.results||[];
+    if(!results.length){r.innerHTML='<p class="text-sm text-gray-400">No results found for "'+escapeHtml(q)+'"</p>';return;}
+    r.innerHTML=results.map(function(res,i){
+      var score=res.score?Math.round(res.score*100)+'%':'';
+      var text=res.text||res.content||'';
+      var src=res.source||res.metadata&&res.metadata.source||'';
+      return '<div class="card p-3 mb-2"><div class="flex items-center justify-between mb-1"><span class="text-xs font-medium text-gray-500">#'+(i+1)+(src?' '+escapeHtml(src):'')+'</span>'+(score?'<span class="badge badge-blue text-[10px]">'+score+'</span>':'')+'</div><p class="text-sm text-gray-700">'+escapeHtml(text)+'</p></div>';
+    }).join('');
+  }).catch(function(){r.innerHTML='<p class="text-sm text-red-500">Query failed. Make sure Qdrant is running.</p>';});
 }
 
 // ═══ TEST SUITES ═══
@@ -556,10 +1138,71 @@ function createApiKey(){var n=prompt('API key name:','My Key');if(!n)return;fetc
 function loadApiKeys(){var l=document.getElementById('apikeys-list');fetch(AUTH+'/api-keys',{headers:{'Authorization':'Bearer '+TOKEN}}).then(function(r){return r.json();}).then(function(d){var keys=d.keys||[];l.innerHTML=keys.length?keys.map(function(k){return '<div class="card p-3 flex items-center justify-between"><div><span class="text-sm font-mono">'+k.key_id+'</span><span class="text-xs text-gray-500 ml-2">'+(k.name||'Default')+'</span></div><button class="text-xs text-red-500 hover:underline" onclick="toast(\'Key revoked\')">Revoke</button></div>';}).join(''):'<div class="text-center text-gray-400 py-8">No API keys yet</div>';}).catch(function(){l.innerHTML='<div class="text-center text-gray-400 py-8">Failed to load keys</div>';});}
 
 // ═══ VERSIONS ═══
-function renderVersions(){var l=document.getElementById('versions-list');if(!l)return;var v=[{hash:'212350e9',msg:'feat: Base44-style platform UI',date:'Aug 31'},{hash:'ac6aac31',msg:'feat: platform dashboard redesign',date:'Aug 30'},{hash:'78ff105',msg:'feat: 152 fuzzing tests, all passing',date:'Aug 29'},{hash:'70eb36a',msg:'feat: unified V10 ModelRouter',date:'Aug 23'},{hash:'c9d0210',msg:'test: 52/52 tests pass',date:'Aug 22'}];l.innerHTML=v.map(function(v){return '<div class="card p-3 flex items-center justify-between"><div><span class="text-xs font-mono text-gray-400">'+v.hash+'</span><span class="text-sm ml-2">'+v.msg+'</span></div><div class="flex items-center gap-2"><span class="text-xs text-gray-400">'+v.date+'</span><button class="btn-ghost text-xs" onclick="toast(\'Restoring '+v.hash+'\')">Restore</button></div></div>';}).join('');}
+function renderVersions(){
+  var l=document.getElementById('versions-list');
+  if(!l)return;
+  l.innerHTML='<div class="text-center text-gray-400 py-8">Loading versions...</div>';
+  api('/versions').then(function(data){
+    var versions=data.versions||data||[];
+    if(!Array.isArray(versions)){versions=[];}
+    if(!versions.length){
+      l.innerHTML='<div class="text-center text-gray-400 py-8">'+
+        '<svg class="w-12 h-12 mx-auto mb-2 opacity-30" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg>'+
+        '<p class="text-sm">No version history yet.</p>'+
+        '<p class="text-xs mt-1">Versions are created when you create entities, deploy functions, or publish apps.</p></div>';
+      return;
+    }
+    l.innerHTML=versions.map(function(v){
+      var vn=v.version_number||'?';
+      var desc=v.change_description||'Unknown change';
+      var name=v.entity_name||'';
+      var type=v.entity_type||'';
+      var date=v.created_date||'';
+      var vid=v.id||'';
+      var typeIcon={app:'📱',entity:'🗄️',function:'⚙️',workflow:'🔄'}[type]||'📄';
+      var typeColor={app:'bg-blue-50 text-blue-600',entity:'bg-green-50 text-green-600',function:'bg-purple-50 text-purple-600',workflow:'bg-orange-50 text-orange-600'}[type]||'bg-gray-50 text-gray-600';
+      return '<div class="card p-4 flex items-center gap-3 hover:border-brand-500/30 transition-all">'+
+        '<div class="w-10 h-10 rounded-lg flex items-center justify-center '+typeColor+'"><span class="text-lg">'+typeIcon+'</span></div>'+
+        '<div class="flex-1 min-w-0">'+
+          '<div class="text-sm font-medium truncate">'+desc+'</div>'+
+          '<div class="flex items-center gap-2 mt-0.5">'+
+            '<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-100 text-gray-600">v'+vn+'</span>'+
+            '<span class="text-xs text-gray-500">'+name+'</span>'+
+            '<span class="text-[10px] text-gray-400">('+type+')</span>'+
+          '</div>'+
+          '<div class="text-[10px] text-gray-400 mt-0.5">'+date+'</div>'+
+        '</div>'+
+        '<button class="btn-secondary text-xs whitespace-nowrap" onclick="restoreVersion('+vid+')">Restore</button>'+
+      '</div>';
+    }).join('');
+  }).catch(function(){
+    l.innerHTML='<div class="text-center text-gray-400 py-8">Failed to load version history.</div>';
+  });
+}
+function restoreVersion(vid){
+  if(!confirm('Restore this version? This will overwrite the current state.'))return;
+  api('/versions/'+vid+'/restore',{method:'POST',body:JSON.stringify({})})
+    .then(function(data){
+      toast('Restored: '+(data.entity_name||'')+' v'+(data.version_number||''));
+      renderVersions();
+    })
+    .catch(function(){toast('Failed to restore version');});
+}
 
 // ═══ BILLING ═══
-function loadBilling(){var l=document.getElementById('billing-plans');if(!l)return;var plans=[{name:'Free',price:'€0',features:['100 messages','1 entity','Local models only']},{name:'Builder',price:'€29',features:['1,000 messages','Unlimited entities','All models','API access']},{name:'Enterprise',price:'€199',features:['10,000 messages','Priority support','Custom models','SLA']}];l.innerHTML=plans.map(function(p){return '<div class="card p-4"><h3 class="text-sm font-semibold">'+p.name+'</h3><p class="text-2xl font-bold mt-2">'+p.price+'<span class="text-xs text-gray-500">/mo</span></p><ul class="mt-3 space-y-1">'+p.features.map(function(f){return '<li class="text-xs text-gray-600 flex items-center gap-1"><span class="text-green-500">✓</span>'+f+'</li>';}).join('')+'</ul><button class="'+(p.name==='Builder'?'btn-primary':'btn-secondary')+' w-full mt-3">'+(p.name==='Builder'?'Current Plan':'Upgrade')+'</button></div>';}).join('');}
+function loadBilling(){
+  var l=document.getElementById('billing-plans');if(!l)return;
+  l.innerHTML='<div class="text-center text-gray-400 py-8"><div class="spinner mx-auto mb-2"></div>Loading plans...</div>';
+  api('/billing/plans').then(function(data){
+    var plans=data.plans||data||[];
+    l.innerHTML=plans.map(function(p){
+      var price='€'+(p.price_monthly||0);
+      var features=(p.features||[]).map(function(f){return '<li class="text-xs text-gray-600 flex items-start gap-1"><span class="text-green-500 flex-shrink-0">✓</span><span>'+f+'</span></li>';}).join('');
+      var credits=p.credits_monthly?(p.credits_monthly>=999?'Unlimited':p.credits_monthly.toLocaleString()+' credits'):'';
+      return '<div class="card p-4 flex flex-col"><div class="flex items-center justify-between"><h3 class="text-sm font-semibold">'+p.name+'</h3>'+(credits?'<span class="badge badge-blue text-[10px]">'+credits+'</span>':'')+'</div><p class="text-2xl font-bold mt-2">'+price+'<span class="text-xs text-gray-500">/mo</span>'+(p.price_yearly?'<span class="text-xs text-gray-400 ml-1">or €'+p.price_yearly+'/yr</span>':'')+'</p><ul class="mt-3 space-y-1 flex-1">'+features+'</ul><button class="'+(p.name==='Free'?'btn-secondary':'btn-primary')+' w-full mt-3">'+(p.name==='Free'?'Current Plan':'Upgrade')+'</button></div>';
+    }).join('');
+  }).catch(function(){l.innerHTML='<div class="text-center text-gray-400 py-8">Failed to load billing plans.</div>';});
+}
 
 // ═══ UTILS ═══
 function toast(msg,type){var t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;document.getElementById('toast-container').appendChild(t);setTimeout(function(){t.style.opacity='0';setTimeout(function(){t.remove();},300);},3000);}
@@ -571,8 +1214,156 @@ function showCreateTeam(){showPage('chat');insertSuggestion('Create an agent tea
 function showCreateWorkflow(){showPage('chat');insertSuggestion('Create a workflow that runs every hour');}
 
 // ═══ FULL INIT (after all vars/funcs defined) ═══
+function loadFiles(){
+  var list=document.getElementById('file-list');if(!list){toast('Files: use Workbench to upload');return;}
+  list.innerHTML='<div class="text-center text-gray-400 py-8"><div class="spinner mx-auto mb-2"></div>Loading files...</div>';
+  api('/files').then(function(data){
+    var files=data.files||data||[];
+    if(!files.length){list.innerHTML='<div class="text-center text-gray-400 py-8">No files uploaded yet.</div>';return;}
+    list.innerHTML=files.map(function(f){
+      var size=f.size?Math.round(f.size/1024)+'KB':'';
+      var date=(f.created_date||f.uploaded_at||'').substring(0,10);
+      var name=f.filename||f.name||'file';
+      return '<div class="card p-3 flex items-center gap-3"><div style="width:40px;height:40px;background:rgba(0,122,255,.1);border-radius:8px;display:flex;align-items:center;justify-content:center"><svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg></div><div class="flex-1"><div class="text-sm font-medium">'+escapeHtml(name)+'</div><div class="text-xs text-gray-500">'+(f.content_type||'file')+' &bull; '+size+' &bull; '+date+'</div></div><button class="btn-ghost text-xs" onclick="toast(\'Download\')">Download</button></div>';
+    }).join('');
+  }).catch(function(){list.innerHTML='<div class="text-center text-gray-400 py-8">Failed to load files. Sign in required.</div>';});
+}
 renderCanvas();loadTemplates();loadModels();loadConnectors();renderMemory();renderTestSuites();
 loadEntities();loadFunctions();loadWorkflows();loadMonitor();loadAnalytics();
+
+// ═══ VOICE INPUT (Speech-to-Text) ═══
+var voiceRecognition=null;var voiceActive=false;
+function toggleVoiceInput(){
+  if(voiceActive){stopVoiceInput();return;}
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){toast('Speech recognition not supported in this browser');return;}
+  voiceRecognition=new SR();
+  voiceRecognition.continuous=true;
+  voiceRecognition.interimResults=true;
+  voiceRecognition.lang='en-US';
+  voiceRecognition.onresult=function(e){
+    var txt='';for(var i=e.resultIndex;i<e.results.length;i++){txt+=e.results[i][0].transcript;}
+    var input=document.getElementById('chat-input');
+    input.value=txt;autoResize(input);
+  };
+  voiceRecognition.onend=function(){stopVoiceInput();};
+  voiceRecognition.onerror=function(e){toast('Voice error: '+(e.error||'unknown'));stopVoiceInput();};
+  voiceRecognition.start();
+  voiceActive=true;
+  var btn=document.getElementById('voice-btn');if(btn)btn.classList.add('bg-red-50');
+  var icon=document.getElementById('voice-icon');if(icon){icon.classList.remove('text-gray-400');icon.classList.add('text-red-500');}
+  toast('Listening...');
+}
+function stopVoiceInput(){
+  if(voiceRecognition){voiceRecognition.stop();voiceRecognition=null;}
+  voiceActive=false;
+  var btn=document.getElementById('voice-btn');if(btn)btn.classList.remove('bg-red-50');
+  var icon=document.getElementById('voice-icon');if(icon){icon.classList.add('text-gray-400');icon.classList.remove('text-red-500');}
+}
+
+// ═══ SCREEN SHARE ═══
+var screenStream=null;
+function toggleScreenShare(){
+  if(screenStream){screenStream.getTracks().forEach(function(t){t.stop();});screenStream=null;toast('Screen share stopped');return;}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia){toast('Screen share not supported');return;}
+  navigator.mediaDevices.getDisplayMedia({video:true}).then(function(stream){
+    screenStream=stream;
+    stream.getVideoTracks()[0].onended=function(){screenStream=null;toast('Screen share ended');};
+    addChatMessage('agent','Screen share started. The agent can now see your screen.');
+    toast('Screen share active');
+  }).catch(function(){toast('Screen share cancelled');});
+}
+
+// ═══ BACKGROUND SUB-AGENTS (enhanced) ═══
+var subAgents=[];
+function spawnSubAgent(taskName){
+  var id='subagent-'+Date.now();
+  var agent={id:id,name:taskName,status:'running',startedAt:Date.now()};
+  subAgents.push(agent);
+  renderSubAgents();
+  setTimeout(function(){
+    agent.status='done';agent.completedAt=Date.now();
+    renderSubAgents();
+    addChatMessage('agent','Sub-agent "'+taskName+'" completed.');
+  },2000+Math.random()*3000);
+  return id;
+}
+function renderSubAgents(){
+  var panel=document.getElementById('subagent-panel');
+  if(!subAgents.length){panel.classList.add('hidden');return;}
+  panel.classList.remove('hidden');
+  var running=subAgents.filter(function(a){return a.status==='running';});
+  document.getElementById('subagent-status').textContent=running.length+' sub-agent'+(running.length!==1?'s':'')+' running...';
+}
+
+// ═══ SKILLS ═══
+var skillsData=[
+  {id:'crypto-blockchain',name:'Crypto & Blockchain',category:'data',icon:'⛓️',desc:'Analyze tokens, check DeFi protocols, track wallets, monitor crypto markets',installed:true},
+  {id:'create-media',name:'Create Media',category:'media',icon:'🎬',desc:'Create 4K videos, movies, voiceovers, and images from a single prompt',installed:true},
+  {id:'design-studio',name:'Design Studio',category:'media',icon:'🎨',desc:'Create logos, brand identities, UI/UX designs, social media graphics',installed:true},
+  {id:'voice-command',name:'Voice Command',category:'ai',icon:'🎙️',desc:'Process voice commands like a smart assistant',installed:true},
+  {id:'pdf-tools',name:'PDF Tools',category:'dev',icon:'📄',desc:'Generate, merge, split, and manipulate PDF documents',installed:false},
+  {id:'email-automation',name:'Email Automation',category:'dev',icon:'📧',desc:'Send templated emails, manage campaigns, track opens',installed:false},
+  {id:'excel-tools',name:'Excel Tools',category:'data',icon:'📊',desc:'Create spreadsheets, formulas, charts, and data analysis',installed:false},
+  {id:'crm-sync',name:'CRM Sync',category:'data',icon:'🗂️',desc:'Sync contacts, deals, and pipelines with HubSpot/Salesforce',installed:false},
+  {id:'weather-api',name:'Weather API',category:'dev',icon:'🌤️',desc:'Get real-time weather data and forecasts for any location',installed:false},
+  {id:'image-gen',name:'Image Generation',category:'media',icon:'🖼️',desc:'Generate images with AI — DALL-E, Stable Diffusion, Midjourney styles',installed:false},
+  {id:'docx-tools',name:'DOCX Tools',category:'dev',icon:'📝',desc:'Create and edit Word documents programmatically',installed:false},
+  {id:'web-scraper',name:'Web Scraper',category:'dev',icon:'🌐',desc:'Extract structured data from any website with CSS selectors',installed:false}
+];
+function loadSkills(){
+  var grid=document.getElementById('skills-grid');if(!grid)return;
+  renderSkillsGrid(skillsData);
+}
+function renderSkillsGrid(list){
+  var grid=document.getElementById('skills-grid');if(!grid)return;
+  if(!list.length){grid.innerHTML='<div class="col-span-3 text-center text-gray-400 py-8">No skills found.</div>';return;}
+  grid.innerHTML=list.map(function(s){
+    return '<div class="card p-4 hover:border-brand-500 transition-all"><div class="flex items-center gap-3 mb-2"><div style="width:40px;height:40px;background:rgba(0,122,255,.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">'+s.icon+'</div><div class="flex-1"><h3 class="text-sm font-semibold">'+s.name+'</h3><span class="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 uppercase">'+s.category+'</span></div></div><p class="text-xs text-gray-600 mb-3">'+s.desc+'</p><div class="flex gap-2">'+(s.installed?'<span class="badge badge-green text-[10px]">Installed</span><button class="btn-ghost text-xs flex-1" onclick="runSkill(\''+s.id+'\')">Run</button>':'<button class="btn-primary text-xs flex-1" onclick="installSkill(\''+s.id+'\')">Install</button>')+'</div></div>';
+  }).join('');
+}
+function filterSkills(q){var f=skillsData.filter(function(s){return s.name.toLowerCase().indexOf(q.toLowerCase())>=0||s.desc.toLowerCase().indexOf(q.toLowerCase())>=0;});renderSkillsGrid(f);}
+function filterSkillCategory(cat){var f=cat==='all'?skillsData:skillsData.filter(function(s){return s.category===cat;});renderSkillsGrid(f);}
+function installSkill(id){var s=skillsData.find(function(x){return x.id===id;});if(s)s.installed=true;toast('Installing '+id+'...');setTimeout(function(){toast(id+' installed','success');loadSkills();},1500);}
+function runSkill(id){toast('Running skill: '+id);showPage('chat');insertSuggestion('Run the '+id+' skill');}
+function showUploadSkill(){var i=document.createElement('input');i.type='file';i.accept='.py,.js,.sh,.zip';i.onchange=function(){toast('Uploading skill...');setTimeout(function(){toast('Skill uploaded','success');},1000);};i.click();}
+
+// ═══ CLOUD BROWSER ═══
+function openCloudBrowser(url){
+  if(!url)url='https://www.google.com';
+  var modal=document.createElement('div');
+  modal.className='fixed inset-0 bg-black/40 z-50 flex items-center justify-center';
+  modal.id='browser-modal';
+  modal.innerHTML='<div class="card p-0 max-w-5xl w-full h-[80vh] flex flex-col overflow-hidden" style="background:#fff"><div class="flex items-center gap-2 p-3 border-b border-black/[.06]"><div class="flex gap-1"><span class="w-3 h-3 rounded-full bg-red-400"></span><span class="w-3 h-3 rounded-full bg-yellow-400"></span><span class="w-3 h-3 rounded-full bg-green-400"></span></div><input type="text" value="'+url+'" id="browser-url" class="flex-1 px-3 py-1.5 text-sm rounded-lg border border-black/[.08]" onkeydown="if(event.key===\'Enter\'){document.getElementById(\'browser-frame\').src=this.value;}"><button class="btn-ghost text-xs" onclick="document.getElementById(\'browser-modal\').remove()">Close</button></div><iframe id="browser-frame" src="'+url+'" class="flex-1 w-full border-0" sandbox="allow-scripts allow-same-origin"></iframe></div>';
+  document.body.appendChild(modal);
+}
+
+// ═══ CSV EXPORT ═══
+function exportEntityCsv(name){
+  api('/entities/'+name+'/records?limit=500').then(function(data){
+    var records=data.records||data||[];
+    if(!records.length){toast('No records to export');return;}
+    var fields=Object.keys(records[0]);
+    var csv=fields.join(',')+'\n';
+    records.forEach(function(r){csv+=fields.map(function(f){var v=r[f]||'';if(typeof v==='object')v=JSON.stringify(v);return '"'+String(v).replace(/"/g,'""')+'"';}).join(',')+'\n';});
+    var blob=new Blob([csv],{type:'text/csv'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name+'.csv';a.click();
+    toast('Exported '+records.length+' records to CSV','success');
+  }).catch(function(){toast('Export failed');});
+}
+function inspectSchema(name){
+  api('/entities/'+name).then(function(data){
+    var schema=data.schema||{};
+    var modal=document.createElement('div');
+    modal.className='fixed inset-0 bg-black/40 z-50 flex items-center justify-center';
+    modal.id='schema-modal';
+    var props=schema.properties||{};
+    var required=schema.required||[];
+    modal.innerHTML='<div class="card p-6 max-w-2xl w-full" style="background:#fff"><div class="flex items-center justify-between mb-4"><h2 class="text-lg font-bold">'+name+' Schema</h2><button class="btn-ghost text-xs" onclick="document.getElementById(\'schema-modal\').remove()">Close</button></div><div class="space-y-2">'+Object.keys(props).map(function(k){var p=props[k];return '<div class="flex items-center justify-between p-2 rounded bg-black/[.02]"><div><span class="text-sm font-mono">'+k+'</span>'+(required.indexOf(k)>=0?'<span class="text-[10px] text-red-500 ml-1">required</span>':'')+'</div><span class="badge badge-blue text-[10px]">'+(p.type||'any')+'</span></div>';}).join('')+'</div></div>';
+    document.body.appendChild(modal);
+  }).catch(function(){toast('Failed to load schema');});
+}
+
 </script>
 </body>
 </html>

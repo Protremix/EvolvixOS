@@ -340,7 +340,13 @@ async def list_records(
 ):
     """List entity records with pagination, sorting, and optional relation expansion."""
     try:
+        # Parse query params into filters (exclude built-in params)
+        built_in = {"limit", "skip", "sort", "expand"}
         filters = {}
+        if request and request.query_params:
+            for key, value in request.query_params.items():
+                if key not in built_in:
+                    filters[key] = value
         user = get_user_from_token(request) if request else None
         user_id = user.get("user_id") if user else None
         result = await EnhancedCRUD.list_records(db, name, limit=limit, skip=skip, filters=filters, sort=sort, user_id=user_id)
@@ -2185,3 +2191,292 @@ async def update_agent_settings(name: str, settings: dict, db=Depends(get_db), r
     return {"name": name, "status": "updated", "fields": list(settings.keys())}
 
 
+
+# ─── RAG Engine API ───
+from rag_engine import LocalRAGEngine as _RAGEngine
+
+@app.get("/api/rag/status")
+async def rag_status():
+    """Get RAG engine status."""
+    try:
+        import requests
+        resp = requests.get("http://localhost:6333/collections", timeout=3)
+        collections = resp.json().get("result", {}).get("collections", [])
+        return {
+            "status": "active",
+            "qdrant": "running",
+            "ollama": "running",
+            "collections": [c["name"] for c in collections],
+            "embedding_model": "nomic-embed-text"
+        }
+    except Exception as e:
+        return {"status": "error", "error": str(e), "qdrant": "unknown"}
+
+@app.get("/api/rag/collections")
+async def rag_collections():
+    """List RAG collections."""
+    try:
+        import requests
+        resp = requests.get("http://localhost:6333/collections", timeout=3)
+        collections = resp.json().get("result", {}).get("collections", [])
+        result = []
+        for c in collections:
+            try:
+                info = requests.get(f"http://localhost:6333/collections/{c[name]}", timeout=3)
+                info_data = info.json().get("result", {})
+                points = info_data.get("points_count", 0)
+                result.append({"name": c["name"], "documents": points, "status": "active"})
+            except:
+                result.append({"name": c["name"], "documents": 0, "status": "active"})
+        return {"collections": result}
+    except Exception as e:
+        return {"collections": [], "error": str(e)}
+
+@app.post("/api/rag/query")
+async def rag_query(req: Request, body: dict = Body(...)):
+    """Query the RAG knowledge base."""
+    query = body.get("query", "")
+    collection = body.get("collection", "evolvixos-docs")
+    if not query:
+        raise HTTPException(400, "Query is required")
+    try:
+        engine = _RAGEngine()
+        results = engine.search(collection, query, limit=5)
+        return {"query": query, "results": results, "collection": collection}
+    except Exception as e:
+        return {"query": query, "results": [], "error": str(e)}
+
+@app.post("/api/rag/ingest")
+async def rag_ingest(body: dict = Body(...)):
+    """Ingest text into RAG collection."""
+    text = body.get("text", "")
+    collection = body.get("collection", "evolvixos-docs")
+    if not text:
+        raise HTTPException(400, "Text is required")
+    try:
+        engine = _RAGEngine()
+        engine.add_documents(collection, [{"text": text, "source": "api"}])
+        return {"status": "ok", "collection": collection, "chars": len(text)}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.post("/api/figma-import")
+async def figma_import(req: dict):
+    """Import a Figma design and return component list."""
+    url = req.get("url", "")
+    if not url or "figma.com" not in url:
+        return {"error": "Invalid Figma URL"}
+    
+    # Extract file ID and node ID from Figma URL
+    # URL format: https://www.figma.com/file/FILE_ID/Name?node-id=NODE_ID
+    import re
+    file_match = re.search(r"/file/([a-zA-Z0-9]+)", url)
+    node_match = re.search(r"node-id=([0-9-]+)", url)
+    
+    file_id = file_match.group(1) if file_match else None
+    node_id = node_match.group(1).replace("-", ":") if node_match else None
+    
+    # Check if Figma API token is available
+    figma_token = os.environ.get("FIGMA_ACCESS_TOKEN", "")
+    
+    if figma_token and file_id:
+        try:
+            import urllib.request
+            api_url = f"https://api.figma.com/v1/files/{file_id}/nodes"
+            if node_id:
+                api_url += f"?ids={node_id}"
+            req_obj = urllib.request.Request(api_url, headers={"X-Figma-Token": figma_token})
+            with urllib.request.urlopen(req_obj, timeout=10) as resp:
+                data = json.loads(resp.read())
+            
+            # Parse Figma nodes into components
+            components = []
+            if "nodes" in data:
+                for node_key, node_data in data["nodes"].items():
+                    def walk_figma_node(node, depth=0):
+                        if depth > 5:
+                            return
+                        name = node.get("name", "").lower()
+                        ntype = node.get("type", "")
+                        
+                        # Map Figma types to our components
+                        if ntype == "TEXT":
+                            if node.get("characters", ""):
+                                char_count = len(node.get("characters", ""))
+                                if char_count < 30:
+                                    components.append("header")
+                                else:
+                                    components.append("form")
+                        elif ntype == "RECTANGLE" and node.get("cornerRadius", 0) > 0:
+                            components.append("stat-card")
+                        elif ntype == "FRAME":
+                            if "chart" in name or "graph" in name:
+                                components.append("chart")
+                            elif "table" in name or "list" in name:
+                                components.append("table")
+                            elif "button" in name:
+                                components.append("button")
+                            elif "modal" in name or "dialog" in name:
+                                components.append("modal")
+                            elif "search" in name:
+                                components.append("search")
+                            elif "tab" in name:
+                                components.append("tabs")
+                            elif "sidebar" in name or "nav" in name:
+                                components.append("sidebar")
+                            else:
+                                components.append("stat-card")
+                        
+                        for child in node.get("children", []):
+                            walk_figma_node(child, depth + 1)
+                    
+                    walk_figma_node(node_data.get("document", {}))
+            
+            return {"components": components[:20], "file_id": file_id, "source": "figma_api"}
+        except Exception as e:
+            logger.warning(f"Figma API error: {e}")
+    
+    # Fallback: return common web page components
+    return {
+        "components": ["header", "stat-card", "stat-card", "chart", "table", "button"],
+        "file_id": file_id or "unknown",
+        "source": "demo",
+        "message": "Figma API token not configured. Set FIGMA_ACCESS_TOKEN to enable real imports."
+    }
+
+@app.post("/api/versions/{version_id}/restore")
+async def restore_version(version_id: int, db=Depends(get_db)):
+    """Restore a specific version of an entity."""
+    result = await db.execute(text("SELECT * FROM platform_versions WHERE id = :id"), {"id": version_id})
+    row = result.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Version not found")
+    
+    import json
+    snap_raw = row[4]
+    snapshot = snap_raw if isinstance(snap_raw, dict) else json.loads(snap_raw or "{}")
+    entity_type = row[1]
+    entity_id = row[2]
+    entity_name = row[3]
+    
+    if entity_type == "entity":
+        # Restore entity schema
+        schema = snapshot.get("schema", {})
+        await db.execute(text("""
+            UPDATE platform_entities SET schema = :schema, updated_date = NOW()
+            WHERE name = :name
+        """), {"schema": json.dumps(schema), "name": entity_name})
+        await db.commit()
+        # Save restore as new version
+        await AppsManager._save_version(db, entity_type, entity_id, entity_name, snapshot, f"Restored from version {row[6]}", None)
+    elif entity_type == "app":
+        # Restore app settings
+        for k, v in snapshot.items():
+            if k in ("name", "description", "status", "theme", "settings"):
+                val = json.dumps(v) if isinstance(v, dict) else v
+                await db.execute(text(f"UPDATE platform_apps SET {k} = :val WHERE id = :id"), {"val": val, "id": int(entity_id)})
+        await db.commit()
+        await AppsManager._save_version(db, entity_type, entity_id, entity_name, snapshot, f"Restored from version {row[6]}", None)
+    
+    return {"status": "restored", "version_id": version_id, "version_number": row[6], "entity_name": entity_name}
+
+# ─── WebSocket Real-time Collaboration ───
+from fastapi.websockets import WebSocket
+from collections import defaultdict
+import asyncio
+
+class ConnectionManager:
+    """Manage WebSocket connections for real-time collaboration."""
+    def __init__(self):
+        self.active: dict = defaultdict(list)  # room_id -> [WebSocket]
+        self.cursors: dict = defaultdict(dict)  # room_id -> {user_id: cursor_pos}
+    
+    async def connect(self, websocket: WebSocket, room_id: str, user_id: str):
+        await websocket.accept()
+        self.active[room_id].append(websocket)
+        # Send current participants
+        await websocket.send_json({
+            "type": "joined",
+            "room_id": room_id,
+            "participants": len(self.active[room_id]),
+            "cursors": self.cursors[room_id]
+        })
+        # Notify others
+        await self.broadcast(room_id, {
+            "type": "user_joined",
+            "user_id": user_id,
+            "participants": len(self.active[room_id])
+        }, exclude=websocket)
+    
+    async def disconnect(self, websocket: WebSocket, room_id: str, user_id: str):
+        if websocket in self.active[room_id]:
+            self.active[room_id].remove(websocket)
+        if user_id in self.cursors[room_id]:
+            del self.cursors[room_id][user_id]
+        await self.broadcast(room_id, {
+            "type": "user_left",
+            "user_id": user_id,
+            "participants": len(self.active[room_id])
+        })
+    
+    async def broadcast(self, room_id: str, message: dict, exclude: WebSocket = None):
+        for ws in self.active[room_id]:
+            if ws != exclude:
+                try:
+                    await ws.send_json(message)
+                except:
+                    pass
+    
+    async def handle_message(self, websocket: WebSocket, room_id: str, user_id: str, data: dict):
+        msg_type = data.get("type")
+        if msg_type == "cursor":
+            self.cursors[room_id][user_id] = data.get("position", {})
+            await self.broadcast(room_id, {
+                "type": "cursor",
+                "user_id": user_id,
+                "position": data.get("position", {})
+            }, exclude=websocket)
+        elif msg_type == "edit":
+            # Broadcast edit to all participants
+            await self.broadcast(room_id, {
+                "type": "edit",
+                "user_id": user_id,
+                "element_id": data.get("element_id"),
+                "changes": data.get("changes", {})
+            }, exclude=websocket)
+        elif msg_type == "component_add":
+            await self.broadcast(room_id, {
+                "type": "component_add",
+                "user_id": user_id,
+                "component": data.get("component"),
+                "position": data.get("position")
+            }, exclude=websocket)
+        elif msg_type == "component_remove":
+            await self.broadcast(room_id, {
+                "type": "component_remove",
+                "user_id": user_id,
+                "component_id": data.get("component_id")
+            }, exclude=websocket)
+        elif msg_type == "chat":
+            await self.broadcast(room_id, {
+                "type": "chat",
+                "user_id": user_id,
+                "message": data.get("message"),
+                "timestamp": data.get("timestamp")
+            })
+
+ws_manager = ConnectionManager()
+
+@app.websocket("/ws/collab/{room_id}")
+async def websocket_collab(websocket: WebSocket, room_id: str):
+    """WebSocket endpoint for real-time canvas collaboration."""
+    user_id = websocket.query_params.get("user_id", "anonymous")
+    await ws_manager.connect(websocket, room_id, user_id)
+    try:
+        while True:
+            data = await websocket.receive_json()
+            await ws_manager.handle_message(websocket, room_id, user_id, data)
+    except Exception:
+        pass
+    finally:
+        await ws_manager.disconnect(websocket, room_id, user_id)
