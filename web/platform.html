@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<style>:root{--app-height:100vh}@supports(height:100dvh){:root{--app-height:100dvh}}</style>
 <meta name="theme-color" content="#f5f5f7">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -26,7 +27,7 @@ html,body{margin:0;padding:0;height:100%;font-family:-apple-system,BlinkMacSyste
 @keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-.sidebar{background:rgba(245,245,247,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-right:1px solid rgba(0,0,0,.06)}
+.sidebar{background:rgba(245,245,247,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-right:1px solid rgba(0,0,0,.06);height:var(--app-height)}
 .nav-item{transition:all .2s cubic-bezier(.4,0,.2,1);position:relative;border-radius:8px;margin:1px 6px}
 .nav-item:hover{background:rgba(0,122,255,.06)}
 .nav-item.active{background:linear-gradient(90deg,rgba(0,122,255,.12),rgba(88,86,214,.04))}
@@ -79,19 +80,25 @@ html,body{margin:0;padding:0;height:100%;font-family:-apple-system,BlinkMacSyste
 .terminal-line{white-space:pre-wrap}
 .bottom-nav{display:none}
 @media(max-width:768px){
-  .sidebar{position:fixed;left:-260px;width:240px;height:100vh;z-index:50;transition:left .3s}
+  .sidebar{position:fixed;left:-260px;width:240px;height:var(--app-height);z-index:50;transition:left .3s;overflow-y:auto}
   .sidebar.open{left:0}
   .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;height:56px;background:rgba(245,245,247,.92);backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.06);z-index:40;justify-content:space-around;align-items:center}
   .bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:#86868b;padding:4px}
   .bottom-nav-item.active{color:#007AFF}
   .main-content{padding-bottom:60px}
+  .topbar{padding:0 8px}
+  .topbar input[type=text]{width:120px;font-size:12px}
+  #page-chat.active{display:flex!important;height:calc(var(--app-height) - 112px)}
+  .chat-bubble{max-width:100%!important}
+  .mode-tab{font-size:11px;padding:4px 8px}
+  #chat-model-select{font-size:10px;max-width:100px}
 }
 input:focus,textarea:focus,select:focus{outline:none}
 </style>
 </head>
-<body class="h-screen overflow-hidden">
+<body class="overflow-hidden" style="height:var(--app-height)">
 <div id="toast-container"></div>
-<div class="flex h-screen">
+<div class="flex" style="height:var(--app-height)">
   <div id="mobile-overlay" onclick="toggleSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:40"></div>
 
   <!-- SIDEBAR -->
@@ -149,7 +156,7 @@ input:focus,textarea:focus,select:focus{outline:none}
   </aside>
 
   <!-- MAIN -->
-  <div class="flex-1 flex flex-col h-screen overflow-hidden main-content">
+  <div class="flex-1 flex flex-col overflow-hidden main-content">
     <div class="topbar flex items-center justify-between px-4 h-14 flex-shrink-0">
       <div class="flex items-center gap-3">
         <button onclick="toggleSidebar()" class="md:hidden p-2 rounded-lg hover:bg-black/[.05]"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
@@ -423,7 +430,7 @@ print(json.dumps({"status": "ok"}))</textarea>
 <div id="page-apikeys" class="page p-6"><div class="max-w-3xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">API Keys</h1><p class="text-sm text-gray-500 mt-1">External API access</p></div><button class="btn-primary" onclick="createApiKey()">+ New Key</button></div><div id="apikeys-list" class="space-y-2"></div></div></div>
 
 <!-- PAGE: VERSIONS -->
-<div id="page-versions" class="page p-6"><div class="max-w-3xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Version History</h1><p class="text-sm text-gray-500 mt-1">Restore and publish previous versions</p></div></div><div id="versions-list" class="space-y-2"></div></div></div><div class="stat-card"><div class="text-xs text-gray-500">Messages</div><div class="text-lg font-bold">374/1093</div></div><div class="stat-card"><div class="text-xs text-gray-500">Integrations</div><div class="text-lg font-bold">1307/122553</div></div></div><div class="text-center text-gray-400 py-8"></div></div></div>
+<div id="page-versions" class="page p-6"><div class="max-w-3xl mx-auto"><div class="flex items-center justify-between mb-6"><div><h1 class="text-2xl font-bold">Version History</h1><p class="text-sm text-gray-500 mt-1">Restore and publish previous versions</p></div></div><div id="versions-list" class="space-y-2"></div></div></div></div>
 
     </div>
   </div>
