@@ -1,5 +1,5 @@
 [Unit]
-Description=EvolvixOS Platform API (Base44-style)
+Description=EvolvixOS Platform API (Self-Hosted)
 After=network.target docker.service
 
 [Service]

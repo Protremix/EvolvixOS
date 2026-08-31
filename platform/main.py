@@ -1,5 +1,5 @@
 """
-EvolvixOS Platform API — Base44-style platform layer.
+EvolvixOS Platform API — Self-Hosted platform layer.
 Provides: Entity system, Backend functions, Workflows, File storage, Chat builder.
 Runs on port 8080 alongside the existing Mr James API on port 8000.
 """
@@ -45,7 +45,7 @@ from routing_bridge import unified_chat
 import sqlite3 as sqlite3_billing
 
 
-# --- Base44-compatible upgrades (Aug 31 2026) ---
+# --- Self-Hosted upgrades (Aug 31 2026) ---
 from sandbox_executor import SandboxedExecutor
 from cncf_workflow_engine import CNCFWorkflowEngine, JQExpression
 from signed_urls import SignedURLManager, FileStorageManager
@@ -116,7 +116,7 @@ from plugins.registry import PluginRegistry
 # ─── App ───
 app = FastAPI(
     title="EvolvixOS Platform API",
-    description="Base44-style entity system, backend functions, workflows, and AI builder.",
+    description="Self-Hosted entity system, backend functions, workflows, and AI builder.",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
@@ -478,7 +478,7 @@ async def _execute_function(name: str, request: Request, db, method: str):
         except Exception:
             body = {}
 
-    # Execute function using sandboxed executor (Base44-style isolation)
+    # Execute function using sandboxed executor (Self-Hosted isolation)
     try:
         result = await SandboxedExecutor.execute(
             code=code,
@@ -967,7 +967,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/api/files/upload")
 async def upload_file(file: UploadFile = File(...), db=Depends(get_db), request: Request = None):
-    """Upload a file (public or private) with Base44-style CDN + signed URL support."""
+    """Upload a file (public or private) with Self-Hosted CDN + signed URL support."""
     user = get_user_from_token(request) if request else None
     user_id = user.get("user_id") if user else None
     is_private = request.query_params.get("private", "false").lower() == "true" if request else False
@@ -1010,7 +1010,7 @@ async def get_file_signed(file_id: str, token: str, db=Depends(get_db)):
     return await get_file(file_id, token=token, db=db)
 
 
-# --- WebSocket Real-Time (Base44-compatible) ---
+# --- WebSocket Real-Time (Self-Hosted) ---
 @app.websocket("/ws/entities/{entity_name}")
 async def ws_entity_subscriptions(websocket: WebSocket, entity_name: str):
     """Subscribe to entity change events in real-time."""

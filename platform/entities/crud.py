@@ -1,4 +1,4 @@
-"""Enhanced Entity CRUD — Base44-style filtering, RLS, aggregation."""
+"""Enhanced Entity CRUD — Self-Hosted filtering, RLS, aggregation."""
 import json
 import re
 from datetime import datetime

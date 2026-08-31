@@ -1,6 +1,6 @@
 
 """
-Signed URL File Storage — Base44-compatible.
+Signed URL File Storage — Self-Hosted.
 Provides time-limited signed download URLs for private files.
 Also adds CDN-style public/private file separation.
 """
@@ -105,7 +105,7 @@ class SignedURLManager:
 
 
 class FileStorageManager:
-    """Manage file uploads with public/private separation (Base44-style)."""
+    """Manage file uploads with public/private separation (Self-Hosted)."""
     
     @staticmethod
     async def upload(

@@ -43,7 +43,7 @@ class AppsManager:
 
     @staticmethod
     async def list_apps(db: AsyncSession, user_id: str = None):
-        # All apps visible to all authenticated platform users (Base44-style)
+        # All apps visible to all authenticated platform users (Self-Hosted)
         query = "SELECT * FROM platform_apps ORDER BY created_date DESC"
         params = {}
         result = await db.execute(text(query), params)

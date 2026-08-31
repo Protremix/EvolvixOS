@@ -1,4 +1,4 @@
-"""Agent management — create, invoke, and manage AI agents (Base44-style)."""
+"""Agent management — create, invoke, and manage AI agents (Self-Hosted)."""
 import json
 import os
 import urllib.request

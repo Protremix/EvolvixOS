@@ -1,6 +1,6 @@
 
 """
-Sandboxed Backend Function Executor — Base44-style isolation.
+Sandboxed Backend Function Executor — Self-Hosted isolation.
 Replaces unsafe exec() with subprocess-based Docker/gVisor isolation.
 Falls back to restricted Python subprocess when Docker is unavailable.
 """
@@ -15,14 +15,14 @@ import traceback
 from typing import Any, Optional
 
 
-# Wrapper template for user functions — provides Base44-style SDK
+# Wrapper template for user functions — provides Self-Hosted SDK
 FUNCTION_WRAPPER = '''
 import json, os, time, sys, urllib.request, urllib.error
 from typing import Any
 
-# Base44-style SDK simulation
-class Base44SDK:
-    """Mini-SDK providing entity CRUD and HTTP utilities (same pattern as Base44)."""
+# Self-Hosted SDK simulation
+class PlatformSDK:
+    """Mini-SDK providing entity CRUD and HTTP utilities (same pattern as the platform)."""
     def __init__(self, user_id=None):
         self.user_id = user_id
         self._api_base = os.environ.get("PLATFORM_API_BASE", "http://127.0.0.1:8080")
@@ -83,7 +83,7 @@ class EntityClient:
         resp = urllib.request.urlopen(req, timeout=30)
         return json.loads(resp.read())
 
-base44 = Base44SDK(user_id=os.environ.get("EVOLVIX_USER_ID"))
+evolvixos = PlatformSDK(user_id=os.environ.get("EVOLVIX_USER_ID"))
 
 # Read input from stdin
 import sys
@@ -107,7 +107,7 @@ else:
     print("__RESULT__:" + json.dumps({{"message": "Function executed, no handler/result found"}}))
 '''
 
-# Dangerous patterns to block (Base44-style security)
+# Dangerous patterns to block (Self-Hosted security)
 BLOCKED_IMPORTS = {
     "subprocess", "multiprocessing", "ctypes", "socket", "pickle", 
     "marshal", "shutil", "tempfile", "pathlib", "signal",
@@ -194,7 +194,7 @@ class SandboxedExecutor:
             input_json = json.dumps(input_data)
             
             if use_docker and os.path.exists("/var/run/docker.sock"):
-                # Docker isolation (Base44-style)
+                # Docker isolation (Self-Hosted)
                 cmd = [
                     "docker", "run", "--rm", "--network=host",
                     "--memory=256m", "--cpus=0.5",

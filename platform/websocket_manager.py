@@ -1,6 +1,6 @@
 
 """
-WebSocket Real-Time Manager — Base44-compatible.
+WebSocket Real-Time Manager — Self-Hosted.
 Provides entity change streaming and agent chat streaming.
 """
 import os
@@ -109,7 +109,7 @@ ws_manager = ConnectionManager()
 
 
 class DeclarativeRLS:
-    """Declarative Row-Level Security — Base44-compatible.
+    """Declarative Row-Level Security — Self-Hosted.
     
     Evaluates RLS rules from entity schemas against user context.
     Rules are JSON expressions evaluated per query.
@@ -142,7 +142,7 @@ class DeclarativeRLS:
         
         # Evaluate conditions
         if isinstance(action_rule, dict):
-            # Check $or conditions (Base44-style)
+            # Check $or conditions (Self-Hosted)
             if "$or" in action_rule:
                 for condition in action_rule["$or"]:
                     if DeclarativeRLS._eval_condition(condition, user, record):

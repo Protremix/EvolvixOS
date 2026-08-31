@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Comprehensive polish fix for EvolvixOS landing + platform.
-Fix all remaining 'app builder' references, Base44 mentions, and engineering positioning.
+Fix all remaining 'app builder' references, EvolvixOS mentions, and engineering positioning.
 """
 
 def patch_file(filepath, replacements):
@@ -21,7 +21,7 @@ landing_fixes = [
     ("No-Code App Builder", "Engineering Workbench"),
     
     # 2. Feature card badge
-    ('Base44-style', 'Self-Hosted'),
+    ('Self-Hosted', 'Self-Hosted'),
     
     # 3. Feature card description
     ("Build full-stack applications with a drag-and-drop page builder, entity-based CRUD APIs, and auto-generated SDKs. No code required — just describe what you want.",
@@ -31,8 +31,8 @@ landing_fixes = [
     ("Control media generation, server management, and app building through natural language voice commands.",
      "Control media generation, server management, and system engineering through natural language voice commands."),
     
-    # 5. Architecture section — Base44 reference
-    ("EvolvixOS architecture mirrors Base44's proven design — entity-based data, auto-generated APIs,\n      and an AI-driven builder layer, all on your own infrastructure.",
+    # 5. Architecture section — EvolvixOS reference
+    ("EvolvixOS architecture mirrors a proven engineering design — entity-based data, auto-generated APIs,\n      and an AI-driven builder layer, all on your own infrastructure.",
      "EvolvixOS is built on a proven layered architecture — entity-based data, auto-generated APIs,\n      and an AI-driven engineering layer, all on your own infrastructure."),
     
     # 6. Architecture layer title
@@ -102,12 +102,12 @@ print("\n═══ VERIFICATION ═══")
 import subprocess
 for f in ["landing.html", "platform.html"]:
     result = subprocess.run(
-        ["grep", "-cin", "app builder\|no-code\|Base44\|AI Builder\|No-Code"],
+        ["grep", "-cin", "app builder\|no-code\|EvolvixOS\|AI Builder\|No-Code"],
         capture_output=True, text=True
     )
     # More specific check
     result = subprocess.run(
-        ["grep", "-in", "\\bapp builder\\b\\|\\bno-code\\b\\|Base44-style\\|No-Code App",
+        ["grep", "-in", "\\bapp builder\\b\\|\\bno-code\\b\\|Self-Hosted\\|No-Code App",
          f"/opt/evolvixos/web/{f}"],
         capture_output=True, text=True
     )

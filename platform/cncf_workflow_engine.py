@@ -1,6 +1,6 @@
 
 """
-CNCF Serverless Workflow v1.0 Engine — Base44-compatible.
+CNCF Serverless Workflow v1.0 Engine — Self-Hosted.
 Supports: call, switch, wait task types
 Activities: invoke_backend_function, invoke_superagent_step, compute_seconds_until
 Triggers: scheduled, entity, connector

@@ -1,4 +1,4 @@
-"""Entity management — JSON schema → auto CRUD API (Base44-style).
+"""Entity management — JSON schema → auto CRUD API (Self-Hosted).
 Supports: per-app scoping, entity relations (foreign keys), relation field type."""
 import json
 import re
