@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1"><title>Logging in...</title></head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EvolvixOS — Redirecting...</title>
+</head>
 <body>
-<p style="color:white;font-family:sans-serif;padding:40px">Setting up session...</p>
+<p style="color:#1d1d1f;font-family:sans-serif;padding:40px">Redirecting to login...</p>
 <script>
-localStorage.setItem('evolvixos_user', JSON.stringify({
-  email: 'test@evolvixos.com',
-  token: 'jB9lh2SQYSVBBG19kaWVBQu3EyYc9jH9lFU-9ghkJfuooBxfvCUmLruiHw-AylKs',
-  user: {email: 'test@evolvixos.com'}
-}));
-setTimeout(function() { window.location.href = '/platform/'; }, 500);
+// Clear any stale tokens
+localStorage.removeItem('evolvixos_user');
+localStorage.removeItem('evolvixos_token');
+window.location.href = '/login';
 </script>
 </body>
 </html>
