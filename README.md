@@ -331,11 +331,11 @@ export STRIPE_SECRET_KEY="your-stripe-key"
 - [x] No-signup demo mode
 - [x] Stripe billing integration
 - [x] SEO infrastructure (sitemap, robots, JSON-LD)
-- [ ] Streaming responses (SSE)
+- [x] Streaming responses (SSE)
 - [ ] Python SDK package (pip install evolvixos)
 - [ ] JavaScript SDK package (npm install evolvixos)
 - [ ] VS Code extension
-- [ ] Docker Compose one-click deploy
+- [x] Docker Compose one-click deploy
 - [ ] Kubernetes helm chart
 
 ## Contributing

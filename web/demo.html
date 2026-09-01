@@ -221,7 +221,6 @@ async function send() {
   const system = document.getElementById('system-prompt').value.trim();
   const temp = parseInt(document.getElementById('temp').value) / 100;
 
-  // Hide empty state
   if (emptyEl) { emptyEl.remove(); emptyEl = null; }
   suggestionsEl.style.display = 'none';
 
@@ -229,51 +228,89 @@ async function send() {
   messagesEl.innerHTML += '<div class="msg-user"><div class="bubble">' + escapeHtml(msg) + '</div></div>';
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
-  // Add loading
-  const loadId = 'load-' + Date.now();
-  messagesEl.innerHTML += '<div class="msg-ai" id="' + loadId + '"><div class="avatar">AI</div><div class="bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>';
+  // Add AI message placeholder for streaming
+  const msgId = 'ai-' + Date.now();
+  messagesEl.innerHTML += '<div class="msg-ai" id="' + msgId + '"><div class="avatar">AI</div><div class="bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>';
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
-  // Disable send
   const sendBtn = document.getElementById('send-btn');
   sendBtn.disabled = true;
+  sendBtn.textContent = 'Generating...';
 
   try {
-    const resp = await fetch('/platform/api/demo', {
+    const resp = await fetch('/platform/api/demo/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: msg, system_prompt: system || undefined, temperature: temp, max_tokens: 500 })
     });
 
-    const loadEl = document.getElementById(loadId);
-    if (loadEl) loadEl.remove();
-
-    if (resp.ok) {
-      const data = await resp.json();
-      remaining = data.remaining;
-      updateCounter();
-
-      const reply = data.response || 'No response received.';
-      const meta = '<div class="meta">via ' + (data.model || 'auto') + (data.provider ? ' (' + data.provider + ')' : '') + '</div>';
-      messagesEl.innerHTML += '<div class="msg-ai"><div class="avatar">AI</div><div class="bubble">' + escapeHtml(reply) + meta + '</div></div>';
-
-      if (remaining <= 0) {
-        showSignupPrompt();
-      }
-    } else if (resp.status === 429) {
-      messagesEl.innerHTML += '<div class="msg-ai msg-error"><div class="avatar">AI</div><div class="bubble">You have used all 5 free demo requests. <a href="/auth/sign-up">Sign up free</a> for unlimited access — 100 credits/month, all 435+ models, no credit card.</div></div>';
+    if (resp.status === 429) {
+      document.getElementById(msgId).querySelector('.bubble').innerHTML = 'You have used all 5 free demo requests. <a href="/auth/sign-up">Sign up free</a> for unlimited access.';
+      document.getElementById(msgId).classList.add('msg-error');
       showSignupPrompt();
-    } else {
-      const err = await resp.json().catch(() => ({}));
-      messagesEl.innerHTML += '<div class="msg-ai msg-error"><div class="avatar">AI</div><div class="bubble">' + (err.detail || 'Error ' + resp.status) + '</div></div>';
+      return;
     }
-    messagesEl.scrollTop = messagesEl.scrollHeight;
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      document.getElementById(msgId).querySelector('.bubble').innerHTML = escapeHtml(err.detail || 'Error ' + resp.status);
+      document.getElementById(msgId).classList.add('msg-error');
+      return;
+    }
+
+    // Read SSE stream
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullText = '';
+    let modelName = 'auto';
+    let providerName = '';
+    let firstChunk = true;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.done) {
+              modelName = data.model || modelName;
+              providerName = data.provider || '';
+              break;
+            }
+            if (data.chunk) {
+              if (firstChunk) {
+                firstChunk = false;
+                document.getElementById(msgId).querySelector('.bubble').innerHTML = '';
+              }
+              fullText += data.chunk;
+              modelName = data.model || modelName;
+              providerName = data.provider || '';
+              document.getElementById(msgId).querySelector('.bubble').innerHTML = escapeHtml(fullText);
+              messagesEl.scrollTop = messagesEl.scrollHeight;
+            }
+          } catch(e) {}
+        }
+      }
+    }
+
+    // Add metadata
+    const meta = '<div class="meta">via ' + modelName + (providerName ? ' (' + providerName + ')' : '') + '</div>';
+    document.getElementById(msgId).querySelector('.bubble').innerHTML += meta;
+
+    remaining = Math.max(0, remaining - 1);
+    updateCounter();
+    if (remaining <= 0) showSignupPrompt();
   } catch (e) {
-    const loadEl = document.getElementById(loadId);
-    if (loadEl) loadEl.remove();
-    messagesEl.innerHTML += '<div class="msg-ai msg-error"><div class="avatar">AI</div><div class="bubble">Network error. Please try again.</div></div>';
+    document.getElementById(msgId).querySelector('.bubble').innerHTML = 'Network error. Please try again.';
+    document.getElementById(msgId).classList.add('msg-error');
   } finally {
     sendBtn.disabled = false;
+    sendBtn.textContent = 'Send';
+    messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 }
 

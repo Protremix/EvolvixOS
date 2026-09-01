@@ -1,0 +1,91 @@
+# EvolvixOS — One-Click Self-Host
+# Usage:
+#   1. cp .env.example .env  (edit secrets)
+#   2. docker compose up -d
+#   3. Visit http://localhost:8080
+
+services:
+  # ── EvolvixOS Platform ──
+  evolvixos:
+    build: .
+    ports:
+      - "8080:8080"   # Platform API
+      - "5000:5000"   # Auth API
+      - "5010:5010"   # Model API
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-dev-secret-change-me}
+      - EVOLVIX_PRIVACY_MODE=${EVOLVIX_PRIVACY_MODE:-HYBRID}
+      - DATABASE_URL=postgresql://evolvixos:evolvixos@db:5432/evolvixos
+      # AI Providers (all have free tiers — see .env)
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - NVIDIA_API_KEY=${NVIDIA_API_KEY:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - KIMI_API_KEY=${KIMI_API_KEY:-}
+    volumes:
+      - ollama-models:/root/.ollama
+      - app-data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # ── PostgreSQL ──
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: evolvixos
+      POSTGRES_USER: evolvixos
+      POSTGRES_PASSWORD: evolvixos
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evolvixos"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ── Ollama (local models, zero-cost fallback) ──
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    restart: unless-stopped
+    # For GPU support, uncomment:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # ── Nginx (optional: reverse proxy with HTTPS) ──
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./web:/usr/share/nginx/html:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - evolvixos
+    restart: unless-stopped
+    profiles: ["production"]
+
+volumes:
+  pg-data:
+  ollama-models:
+  app-data:

@@ -1751,6 +1751,98 @@ async def demo_playground(req: PlaygroundRequest, request: Request):
 
 
 
+
+# ─── SSE Streaming Endpoints ───
+import json as _json
+
+async def _stream_response(text: str, model: str, provider: str):
+    """Yield SSE events for a complete response, word by word."""
+    words = text.split(" ")
+    for i, word in enumerate(words):
+        chunk = word + (" " if i < len(words) - 1 else "")
+        data = {"chunk": chunk, "model": model, "provider": provider}
+        yield f"data: {_json.dumps(data)}\n\n"
+        await asyncio.sleep(0.02)  # 20ms delay for visual streaming effect
+    yield f"data: {_json.dumps({'done': True, 'model': model, 'provider': provider})}\n\n"
+
+@app.post("/api/playground/stream")
+async def playground_stream(req: PlaygroundRequest, request: Request):
+    """Stream playground response via Server-Sent Events."""
+    user = get_user_from_token(request)
+    user_id = user.get("user_id") if user else None
+    if user_id:
+        credit_check = deduct_user_credits(int(user_id), req.model or "auto")
+        if not credit_check.get("ok"):
+            raise HTTPException(402, credit_check.get("error", "Insufficient credits"))
+
+    messages = []
+    if req.system_prompt:
+        messages.append({"role": "system", "content": req.system_prompt})
+    messages.append({"role": "user", "content": req.message})
+
+    try:
+        result = await asyncio.wait_for(
+            unified_chat(messages, model=req.model or "auto", temperature=req.temperature or 0.7, max_tokens=req.max_tokens or 1000, prefer_cloud=True),
+            timeout=120
+        )
+        response_text = result.get("content", "")
+        model_name = result.get("model", req.model or "auto")
+        provider_name = result.get("provider", "")
+
+        return StreamingResponse(
+            _stream_response(response_text, model_name, provider_name),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            }
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(504, "Model response timed out")
+    except Exception as e:
+        raise HTTPException(500, f"Model error: {str(e)}")
+
+@app.post("/api/demo/stream")
+async def demo_stream(req: PlaygroundRequest, request: Request):
+    """Stream demo response via SSE — no auth, rate-limited."""
+    client_ip = request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+    if not client_ip:
+        client_ip = request.headers.get("X-Real-IP", "unknown")
+
+    allowed, remaining, reset = _check_demo_rate_limit(client_ip)
+    if not allowed:
+        raise HTTPException(429, "Demo limit reached. Sign up for unlimited access — it's free!")
+
+    messages = []
+    if req.system_prompt:
+        messages.append({"role": "system", "content": req.system_prompt[:500]})
+    messages.append({"role": "user", "content": req.message[:1000]})
+
+    try:
+        result = await asyncio.wait_for(
+            unified_chat(messages, model="auto", temperature=min(req.temperature or 0.7, 1.0), max_tokens=min(req.max_tokens or 500, 500), prefer_cloud=True),
+            timeout=60
+        )
+        response_text = result.get("content", "")
+        model_name = result.get("model", "auto")
+        provider_name = result.get("provider", "")
+
+        return StreamingResponse(
+            _stream_response(response_text, model_name, provider_name),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            }
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(504, "Model response timed out")
+    except Exception as e:
+        raise HTTPException(500, f"Model error: {str(e)}")
+
+
 @app.post("/api/chat")
 async def chat_build(msg: ChatMessage, request: Request, db=Depends(get_db)):
     """
