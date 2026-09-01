@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-evolvixos
+  labels:
+    app: evolvixos
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: evolvixos
+  template:
+    metadata:
+      labels:
+        app: evolvixos
+    spec:
+      containers:
+        - name: evolvixos
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: platform
+              containerPort: {{ .Values.services.platform.port }}
+            - name: auth
+              containerPort: {{ .Values.services.auth.port }}
+            - name: model
+              containerPort: {{ .Values.services.model.port }}
+          env:
+            - name: JWT_SECRET
+              value: {{ .Values.env.JWT_SECRET | quote }}
+            - name: EVOLVIX_PRIVACY_MODE
+              value: {{ .Values.env.EVOLVIX_PRIVACY_MODE | quote }}
+            - name: GROQ_API_KEY
+              value: {{ .Values.env.GROQ_API_KEY | quote }}
+            - name: NVIDIA_API_KEY
+              value: {{ .Values.env.NVIDIA_API_KEY | quote }}
+            - name: OPENROUTER_API_KEY
+              value: {{ .Values.env.OPENROUTER_API_KEY | quote }}
+            - name: GEMINI_API_KEY
+              value: {{ .Values.env.GEMINI_API_KEY | quote }}
+            - name: DATABASE_URL
+              value: "postgresql://{{ .Values.postgresql.auth.username }}:{{ .Values.postgresql.auth.password }}@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.auth.database }}"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: platform
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: platform
+            initialDelaySeconds: 30
+            periodSeconds: 60
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-evolvixos
+spec:
+  type: {{ .Values.services.platform.type }}
+  selector:
+    app: evolvixos
+  ports:
+    - name: platform
+      port: {{ .Values.services.platform.port }}
+      targetPort: platform
+    - name: auth
+      port: {{ .Values.services.auth.port }}
+      targetPort: auth
+    - name: model
+      port: {{ .Values.services.model.port }}
+      targetPort: model

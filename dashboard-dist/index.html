@@ -1334,7 +1334,7 @@
         const controller = new AbortController();
         const timeout = setTimeout(function() { controller.abort(); }, 120000);
 
-        const resp = await fetch('/platform/api/playground', {
+        const resp = await fetch('/platform/api/playground/stream', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
           body: JSON.stringify(body),

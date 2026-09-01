@@ -1,0 +1,17 @@
+{
+  "name": "evolvixos",
+  "version": "1.0.0",
+  "description": "JavaScript SDK for EvolvixOS — self-hostable AI engineering platform",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": ["ai", "llm", "platform", "evolvixos", "open-source"],
+  "license": "MIT",
+  "homepage": "https://evolvixos.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Protremix/EvolvixOS"
+  }
+}

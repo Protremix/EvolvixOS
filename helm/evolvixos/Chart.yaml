@@ -1,0 +1,11 @@
+apiVersion: v2
+name: evolvixos
+description: Self-hostable AI engineering platform — 435+ models, one API
+type: application
+version: 1.0.0
+appVersion: "10.0"
+home: https://evolvixos.com
+sources:
+  - https://github.com/Protremix/EvolvixOS
+maintainers:
+  - name: EvolvixOS

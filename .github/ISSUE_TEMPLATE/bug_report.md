@@ -3,33 +3,23 @@ name: Bug Report
 about: Report a bug in EvolvixOS
 title: "[BUG] "
 labels: bug
-assignees: ''
 ---
-
-## Bug Description
-A clear description of what the bug is.
+## Description
+Brief description of the bug.
 
 ## Steps to Reproduce
-1. Go to '...'
-2. Run '...'
-3. See error
+1.
+2.
+3.
 
 ## Expected Behavior
-What you expected to happen.
 
 ## Actual Behavior
-What actually happened.
 
 ## Environment
-- EvolvixOS version: 
-- OS: 
-- Python version: 
-- Docker version (if applicable): 
+- EvolvixOS version:
+- Self-hosted or hosted platform:
+- Browser (if UI issue):
+- OS:
 
-## Logs
-```
-Paste relevant logs here
-```
-
-## Additional Context
-Any other information about the problem.
+## Logs / Screenshots

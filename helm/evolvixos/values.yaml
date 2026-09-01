@@ -1,0 +1,77 @@
+# EvolvixOS Helm Chart Values
+
+# Platform image
+image:
+  repository: evolvixos/platform
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# Number of platform replicas
+replicaCount: 1
+
+# Platform configuration
+env:
+  JWT_SECRET: "change-me-in-production"
+  EVOLVIX_PRIVACY_MODE: "HYBRID"
+  # AI Providers (free tiers available)
+  GROQ_API_KEY: ""
+  NVIDIA_API_KEY: ""
+  OPENROUTER_API_KEY: ""
+  GEMINI_API_KEY: ""
+  KIMI_API_KEY: ""
+
+# Services
+services:
+  platform:
+    port: 8080
+    type: ClusterIP
+  auth:
+    port: 5000
+  model:
+    port: 5010
+
+# PostgreSQL
+postgresql:
+  enabled: true
+  auth:
+    database: evolvixos
+    username: evolvixos
+    password: evolvixos
+  persistence:
+    size: 10Gi
+
+# Ollama (local models)
+ollama:
+  enabled: true
+  image: ollama/ollama:latest
+  persistence:
+    size: 50Gi
+  # gpu:
+  #   enabled: true
+
+# Ingress
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: evolvixos.local
+      paths:
+        - path: /
+          pathType: Prefix
+
+# Resources
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+# Autoscaling
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80

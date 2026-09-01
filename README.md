@@ -40,7 +40,22 @@ curl -X POST https://evolvixos.com/platform/api/demo \
   -d '{"message": "Write a haiku about code"}'
 ```
 
-### Option 2: Self-host
+### Option 2: Use the SDK
+```bash
+# Python
+pip install evolvixos
+
+# JavaScript
+npm install evolvixos
+```
+
+```python
+from evolvixos import EvolvixOS
+client = EvolvixOS(api_key="your-key")
+print(client.chat("Hello!"))["response"])
+```
+
+### Option 3: Self-host
 ```bash
 git clone https://github.com/Protremix/EvolvixOS.git
 cd EvolvixOS
@@ -332,11 +347,11 @@ export STRIPE_SECRET_KEY="your-stripe-key"
 - [x] Stripe billing integration
 - [x] SEO infrastructure (sitemap, robots, JSON-LD)
 - [x] Streaming responses (SSE)
-- [ ] Python SDK package (pip install evolvixos)
-- [ ] JavaScript SDK package (npm install evolvixos)
-- [ ] VS Code extension
+- [x] Python SDK package (pip install evolvixos)
+- [x] JavaScript SDK package (npm install evolvixos)
+- [x] VS Code extension
 - [x] Docker Compose one-click deploy
-- [ ] Kubernetes helm chart
+- [x] Kubernetes helm chart
 
 ## Contributing
 

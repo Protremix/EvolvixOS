@@ -1,73 +1,52 @@
 {
-  "name": "verdis-devkit",
-  "displayName": "Verdis DevKit",
-  "description": "Development toolkit for the Verdis blockchain ecosystem",
-  "version": "0.1.0",
-  "publisher": "verdischain",
+  "name": "evolvixos",
+  "displayName": "EvolvixOS",
+  "description": "AI engineering platform — chat with 435+ models, manage agents and entities from VS Code",
+  "version": "1.0.0",
+  "publisher": "evolvixos",
+  "license": "MIT",
   "engines": { "vscode": "^1.80.0" },
-  "categories": ["Extension Packs", "Snippets", "Programming Languages"],
-  "activationEvents": ["onLanguage:solidity", "onCommand:verdis.deploy"],
-  "main": "./src/extension.js",
+  "categories": ["AI", "Other", "Snippets"],
+  "keywords": ["ai", "llm", "chat", "code", "agent"],
+  "icon": "icon.png",
+  "main": "./extension.js",
+  "activationEvents": ["onCommand:evolvixos.chat", "onCommand:evolvixos.setApiKey"],
   "contributes": {
     "commands": [
       {
-        "command": "verdis.deploy",
-        "title": "Verdis: Deploy Contract"
+        "command": "evolvixos.chat",
+        "title": "EvolvixOS: Chat with AI",
+        "category": "EvolvixOS"
       },
       {
-        "command": "verdis.compile",
-        "title": "Verdis: Compile Contract"
+        "command": "evolvixos.setApiKey",
+        "title": "EvolvixOS: Set API Key",
+        "category": "EvolvixOS"
       },
       {
-        "command": "verdis.checkHealth",
-        "title": "Verdis: Check Chain Health"
-      },
-      {
-        "command": "verdis.getBalance",
-        "title": "Verdis: Get VRDX Balance"
-      },
-      {
-        "command": "verdis.openExplorer",
-        "title": "Verdis: Open in Verdiscan"
-      },
-      {
-        "command": "verdis.runAudit",
-        "title": "Verdis: Run AegisOS Audit"
+        "command": "evolvixos.stream",
+        "title": "EvolvixOS: Stream Response",
+        "category": "EvolvixOS"
       }
     ],
     "configuration": {
-      "title": "Verdis DevKit",
+      "title": "EvolvixOS",
       "properties": {
-        "verdis.rpcUrl": {
+        "evolvixos.baseUrl": {
           "type": "string",
-          "default": "https://verdischain.com/rpc",
-          "description": "Verdis RPC endpoint"
+          "default": "https://evolvixos.com",
+          "description": "EvolvixOS platform URL"
         },
-        "verdis.chainId": {
-          "type": "number",
-          "default": 909,
-          "description": "Verdis chain ID"
-        },
-        "verdis.explorerUrl": {
+        "evolvixos.defaultModel": {
           "type": "string",
-          "default": "https://verdischain.com/explorer",
-          "description": "Verdiscan URL"
-        },
-        "verdis.aegisOSUrl": {
-          "type": "string",
-          "default": "http://localhost:8000",
-          "description": "AegisOS API URL"
+          "default": "auto",
+          "description": "Default model for chat"
         }
       }
-    },
-    "snippets": [
-      {
-        "language": "solidity",
-        "path": "./snippets/solidity.json"
-      }
-    ]
+    }
   },
-  "dependencies": {
-    "ethers": "^6.0.0"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Protremix/EvolvixOS"
   }
 }
