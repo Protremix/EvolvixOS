@@ -402,6 +402,7 @@
       <a class="nav-item" data-route="api-keys" onclick="navigate('api-keys')">{IC_KEY}API Keys</a>
       <a class="nav-item" data-route="functions" onclick="navigate('functions')">{IC_FN}Functions</a>
       <a class="nav-item" data-route="workflows" onclick="navigate('workflows')">{IC_FLOW}Workflows</a>
+      <a class="nav-item" data-route="integrations" onclick="navigate('integrations')">{IC_PLUG}Integrations <span class="nav-badge" id="nav-integration-count">—</span></a>
       <div class="nav-label">Account</div>
       <a class="nav-item" data-route="billing" onclick="navigate('billing')">{IC_CARD}Billing</a>
       <a class="nav-item" data-route="settings" onclick="navigate('settings')">{IC_GEAR}Settings</a>
@@ -564,6 +565,7 @@
       zap: IC('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
       cpu: IC('<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>'),
       clock: IC('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
+      plug: IC('<path d="M9 2v6"/><path d="M15 2v6"/><path d="M6 8h12v4a6 6 0 0 1-12 0V8z"/><path d="M12 18v4"/>'),
     };
 
     // Replace icon placeholders
@@ -579,7 +581,8 @@
       .replace(/{IC_GEAR}/g, ICONS.gear)
       .replace(/{IC_SEARCH}/g, ICONS.search)
       .replace(/{IC_BELL}/g, ICONS.bell)
-      .replace(/{IC_MENU}/g, ICONS.menu);
+      .replace(/{IC_MENU}/g, ICONS.menu)
+      .replace(/{IC_PLUG}/g, ICONS.plug);
 
     // ===== HELPERS =====
     const fmt = (n) => n >= 1000 ? (n / 1000).toFixed(1) + 'K' : n.toString();
@@ -695,6 +698,12 @@
           <div class="stats-grid" id="dash-stats">
             <div class="loading"><div class="spinner"></div>Loading...</div>
           </div>
+          <div class="section">
+            <div class="section-header"><h2 class="section-title">Connected Apps</h2><button class="btn btn-ghost btn-sm" onclick="navigate('integrations')">Manage</button></div>
+            <div id="dash-integrations" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px">
+              <div style="padding:16px;text-align:center;color:var(--muted);font-size:13px">Loading...</div>
+            </div>
+          </div>
           <div class="grid-2">
             <div class="section">
               <div class="section-header"><h2 class="section-title">API Usage — 7 Days</h2></div>
@@ -774,6 +783,27 @@
 
         // Update nav badge
         document.getElementById('nav-agent-count').textContent = agents.length;
+
+        // Connected Apps summary
+        try {
+          const intStatuses = await loadIntegrationStatuses();
+          const intContainer = document.getElementById('dash-integrations');
+          if (intContainer) {
+            intContainer.innerHTML = INTEGRATIONS.map(s => {
+              const st = intStatuses[s.key] || {};
+              const connected = st.connected;
+              return `
+                <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer" onclick="navigate('integrations')">
+                  <div style="width:32px;height:32px;border-radius:8px;background:${s.color}15;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${s.icon}</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</div>
+                    <div style="font-size:11px;color:${connected ? '#34c759' : 'var(--muted)'}">${connected ? '● Connected' : '○ Not connected'}</div>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }
+        } catch(eInt) { console.log('Integrations load failed:', eInt); }
 
         // 7-day chart
         const days = [];
@@ -1197,6 +1227,180 @@
       closeModal();
       handleRoute();
     }
+
+
+    // ─── Integrations Page ──────────────────────────────────────────
+    const INTEGRATIONS = [
+      { key: 'github', name: 'GitHub', icon: '🐙', color: '#24292e', desc: 'Repos, issues, code push', fields: [{ key: 'token', label: 'Personal Access Token', type: 'password', placeholder: 'ghp_xxxx...' }] },
+      { key: 'vercel', name: 'Vercel', icon: '▲', color: '#000000', desc: 'Deployments, projects', fields: [{ key: 'token', label: 'Access Token', type: 'password', placeholder: 'vercel_xxx...' }] },
+      { key: 'supabase', name: 'Supabase', icon: '⚡', color: '#3ecf8e', desc: 'Database, auth, storage', fields: [{ key: 'url', label: 'Project URL', type: 'text', placeholder: 'https://xxx.supabase.co' }, { key: 'key', label: 'Service Role Key', type: 'password', placeholder: 'eyJxxx...' }] },
+      { key: 'slack', name: 'Slack', icon: '💬', color: '#4a154b', desc: 'Channels, messages', fields: [{ key: 'token', label: 'Bot Token', type: 'password', placeholder: 'xoxb-xxx...' }] },
+      { key: 'gmail', name: 'Gmail', icon: '📧', color: '#ea4335', desc: 'Send emails', fields: [{ key: 'email', label: 'Gmail Address', type: 'text', placeholder: 'you@gmail.com' }, { key: 'password', label: 'App Password', type: 'password', placeholder: '16-char app password' }] },
+    ];
+
+    let integrationStatuses = {};
+
+    async function loadIntegrationStatuses() {
+      const results = await Promise.allSettled(
+        INTEGRATIONS.map(s => fetch(`${API_BASE}/integrations/${s.key}/status`, { headers: authHeaders() }).then(r => r.json()).catch(() => ({ connected: false })))
+      );
+      INTEGRATIONS.forEach((s, i) => {
+        integrationStatuses[s.key] = results[i].status === 'fulfilled' ? results[i].value : { connected: false };
+      });
+      const connectedCount = Object.values(integrationStatuses).filter(s => s.connected).length;
+      const badge = document.getElementById('nav-integration-count');
+      if (badge) badge.textContent = `${connectedCount}/${INTEGRATIONS.length}`;
+      return integrationStatuses;
+    }
+
+    function renderIntegrations(el) {
+      el.innerHTML = `
+        <div class="page-enter">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Integrations</h1>
+              <p class="page-subtitle">Connect external services to power your agents and workflows.</p>
+            </div>
+          </div>
+          <div id="integrations-grid" class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">
+            <div class="loading"><div class="spinner"></div>Loading integrations...</div>
+          </div>
+        </div>
+      `;
+      loadIntegrationStatuses().then(() => {
+        const grid = document.getElementById('integrations-grid');
+        grid.innerHTML = INTEGRATIONS.map(s => {
+          const st = integrationStatuses[s.key] || {};
+          const connected = st.connected;
+          return `
+            <div class="stat-card" style="display:flex;flex-direction:column;gap:12px;padding:20px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:44px;height:44px;border-radius:10px;background:${s.color}15;display:flex;align-items:center;justify-content:center;font-size:22px">${s.icon}</div>
+                <div style="flex:1">
+                  <div style="font-size:15px;font-weight:700">${s.name}</div>
+                  <div style="font-size:12px;color:var(--muted)">${s.desc}</div>
+                </div>
+                <span style="font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;background:${connected ? 'rgba(52,199,89,0.15)' : 'rgba(142,142,147,0.15)'};color:${connected ? '#34c759' : 'var(--muted)'}">${connected ? '● Connected' : '○ Not connected'}</span>
+              </div>
+              ${connected && st.username ? `<div style="font-size:12px;color:var(--muted);padding:6px 10px;background:var(--bg);border-radius:8px">👤 ${st.username}${st.name ? ' · ' + st.name : ''}</div>` : ''}
+              <div style="display:flex;gap:8px">
+                ${connected ? `
+                  <button class="btn btn-ghost btn-sm" onclick="loadIntegrationData('${s.key}')" style="flex:1">View Data</button>
+                  <button class="btn btn-ghost btn-sm" onclick="disconnectIntegration('${s.key}')" style="color:#ff3b30">Disconnect</button>
+                ` : `
+                  <button class="btn btn-primary btn-sm" onclick="openConnectModal('${s.key}')" style="flex:1">Connect</button>
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+      });
+    }
+
+    async function openConnectModal(serviceKey) {
+      const svc = INTEGRATIONS.find(s => s.key === serviceKey);
+      if (!svc) return;
+      const fieldsHTML = svc.fields.map(f => `
+        <div class="form-group">
+          <label class="form-label">${f.label}</label>
+          <input class="form-input" type="${f.type}" id="connect-${f.key}" placeholder="${f.placeholder || ''}" style="width:100%" />
+        </div>
+      `).join('');
+      openModal(`
+        <div class="modal-header">
+          <div class="modal-title">Connect ${svc.name}</div>
+          <button class="modal-close" onclick="closeModal()">${IC('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>')}</button>
+        </div>
+        <div class="modal-body">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border)">
+            <div style="width:36px;height:36px;border-radius:8px;background:${svc.color}15;display:flex;align-items:center;justify-content:center;font-size:18px">${svc.icon}</div>
+            <div><div style="font-weight:600;font-size:14px">${svc.name}</div><div style="font-size:12px;color:var(--muted)">${svc.desc}</div></div>
+          </div>
+          ${fieldsHTML}
+          <div class="form-hint" style="margin-top:8px">Your credentials are stored securely and never exposed in the UI.</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" id="connect-btn" onclick="connectIntegration('${serviceKey}')">Connect</button>
+        </div>
+      `);
+    }
+
+    async function connectIntegration(serviceKey) {
+      const svc = INTEGRATIONS.find(s => s.key === serviceKey);
+      if (!svc) return;
+      const btn = document.getElementById('connect-btn');
+      btn.disabled = true;
+      btn.textContent = 'Connecting...';
+      try {
+        const body = {};
+        svc.fields.forEach(f => { body[f.key] = document.getElementById('connect-' + f.key).value.trim(); });
+        const resp = await fetch(`${API_BASE}/integrations/${serviceKey}/connect`, {
+          method: 'POST',
+          headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const result = await resp.json();
+        if (result.connected) {
+          toast(`${svc.name} connected successfully!`, 'success');
+          closeModal();
+          navigate('integrations');
+        } else {
+          toast(result.error || `Failed to connect ${svc.name}`, 'error');
+          btn.disabled = false;
+          btn.textContent = 'Connect';
+        }
+      } catch(e) {
+        toast(`Connection failed: ${e.message}`, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Connect';
+      }
+    }
+
+    async function disconnectIntegration(serviceKey) {
+      const svc = INTEGRATIONS.find(s => s.key === serviceKey);
+      if (!svc) return;
+      try {
+        await fetch(`${API_BASE}/integrations/${serviceKey}/disconnect`, { method: 'DELETE', headers: authHeaders() });
+        toast(`${svc.name} disconnected`, 'success');
+        navigate('integrations');
+      } catch(e) {
+        toast(`Disconnect failed: ${e.message}`, 'error');
+      }
+    }
+
+    async function loadIntegrationData(serviceKey) {
+      const svc = INTEGRATIONS.find(s => s.key === serviceKey);
+      if (!svc) return;
+      try {
+        const resp = await fetch(`${API_BASE}/integrations/${serviceKey}/data`, { headers: authHeaders() });
+        const data = await resp.json();
+        let contentHTML = '<div style="padding:20px;color:var(--muted)">No data available.</div>';
+        if (data.repos && data.repos.length > 0) {
+          contentHTML = `<table class="data-table"><thead><tr><th>Repository</th><th>Language</th><th>Stars</th><th>Updated</th></tr></thead><tbody>${data.repos.slice(0,10).map(r => `<tr><td style="font-weight:600">${r.name}</td><td>${r.language || '—'}</td><td>⭐ ${r.stars || 0}</td><td>${(r.updated || '').slice(0,10)}</td></tr>`).join('')}</tbody></table>`;
+        } else if (data.channels && data.channels.length > 0) {
+          contentHTML = `<table class="data-table"><thead><tr><th>Channel</th><th>Members</th></tr></thead><tbody>${data.channels.slice(0,10).map(ch => `<tr><td style="font-weight:600">#${ch.name || ch.id}</td><td>${ch.num_members || '—'}</td></tr>`).join('')}</tbody></table>`;
+        } else if (data.tables && data.tables.length > 0) {
+          contentHTML = `<table class="data-table"><thead><tr><th>Table</th></tr></thead><tbody>${data.tables.slice(0,15).map(t => `<tr><td style="font-weight:600">${t}</td></tr>`).join('')}</tbody></table>`;
+        } else if (data.projects && data.projects.length > 0) {
+          contentHTML = `<table class="data-table"><thead><tr><th>Project</th><th>Framework</th><th>Status</th></tr></thead><tbody>${data.projects.slice(0,10).map(p => `<tr><td style="font-weight:600">${p.name}</td><td>${p.framework || '—'}</td><td>${p.status || '—'}</td></tr>`).join('')}</tbody></table>`;
+        }
+        openModal(`
+          <div class="modal-header">
+            <div class="modal-title">${svc.name} Data</div>
+            <button class="modal-close" onclick="closeModal()">${IC('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>')}</button>
+          </div>
+          <div class="modal-body" style="max-height:500px;overflow-y:auto">${contentHTML}</div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+          </div>
+        `);
+      } catch(e) {
+        toast(`Failed to load data: ${e.message}`, 'error');
+      }
+    }
+
+
 
     async function deleteAgent(name) {
       if (!confirm(`Delete agent "${name}"? This cannot be undone.`)) return;
@@ -1946,6 +2150,7 @@
     });
 
     // ===== BILLING PAGE =====
+    route('integrations', (el) => renderIntegrations(el));
     route('billing', (el) => {
       el.innerHTML = `
         <div class="page-enter">
