@@ -28,6 +28,96 @@ DB_PATH = "/opt/evolvixos/auth/users.db"
 AUTH_DIR = "/opt/evolvixos/auth"
 os.makedirs(AUTH_DIR, exist_ok=True)
 
+# ─── Payment Fulfillment Layer (provider-neutral) ───
+# Any payment provider normalizes its webhook into these calls via an adapter.
+# Nothing below is provider-specific — adapters do the translating.
+
+PAYMENT_PROVIDER = os.environ.get("PAYMENT_PROVIDER", "stripe").lower()
+
+def _now():
+    return time.strftime("%Y-%m-%d %H:%M:%S")
+
+def mark_payment_paid(charge_id):
+    """Flag a payment row as paid by its provider charge/session id."""
+    if not charge_id:
+        return
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute("UPDATE payments SET status = 'paid' WHERE provider_charge_id = ?", (charge_id,))
+        conn.commit()
+
+def fulfill_subscription(user_id, plan_name, cycle="monthly"):
+    """Activate or upgrade a user's subscription and reset their credit balance."""
+    if not user_id:
+        return False
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("SELECT id, credits_monthly FROM plans WHERE name = ?", (plan_name,))
+        plan = c.fetchone()
+        if not plan:
+            return False
+        plan_id, credits = plan
+        now = _now()
+        days = 365 if cycle == "yearly" else 30
+        period_end = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time() + days * 86400))
+        c.execute("SELECT id FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
+        existing = c.fetchone()
+        if existing:
+            c.execute("UPDATE subscriptions SET plan_id = ?, billing_cycle = ?, credits_remaining = ?, "
+                      "current_period_start = ?, current_period_end = ?, updated_date = ? WHERE id = ?",
+                      (plan_id, cycle, credits, now, period_end, now, existing[0]))
+        else:
+            c.execute("INSERT INTO subscriptions (user_id, plan_id, status, billing_cycle, credits_remaining, "
+                      "credits_used, current_period_start, current_period_end, created_date, updated_date) "
+                      "VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?)",
+                      (user_id, plan_id, "active", cycle, credits, now, period_end, now, now))
+        conn.commit()
+    return True
+
+def fulfill_credits(user_id, credits_amount, provider=None):
+    """Add purchased credits to a user's active subscription."""
+    credits_amount = int(credits_amount or 0)
+    if not (user_id and credits_amount):
+        return False
+    provider = provider or PAYMENT_PROVIDER
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        c.execute("SELECT id, credits_remaining FROM subscriptions WHERE user_id = ? AND status = ?", (user_id, "active"))
+        row = c.fetchone()
+        if not row:
+            return False
+        c.execute("UPDATE subscriptions SET credits_remaining = ? WHERE id = ?", (row[1] + credits_amount, row[0]))
+        c.execute("INSERT INTO credit_transactions (user_id, amount, type, description, timestamp) VALUES (?, ?, ?, ?, ?)",
+                  (user_id, credits_amount, "credit",
+                   "Purchased " + str(credits_amount) + " credits via " + str(provider).title(), _now()))
+        conn.commit()
+    return True
+
+def downgrade_to_free(user_id):
+    """Drop a user back to the Free plan (subscription cancelled/expired)."""
+    if not user_id:
+        return False
+    with sqlite3.connect(DB_PATH) as conn:
+        c = conn.cursor()
+        free = c.execute("SELECT id FROM plans WHERE name = 'Free'").fetchone()
+        if not free:
+            return False
+        c.execute("UPDATE subscriptions SET plan_id = ?, credits_remaining = 500, updated_date = ? "
+                  "WHERE user_id = ? AND status = ?", (free[0], _now(), user_id, "active"))
+        conn.commit()
+    return True
+
+def apply_payment_event(kind, user_id, charge_id=None, plan=None, cycle="monthly",
+                        credits=0, provider=None):
+    """Single entry point every provider adapter calls after verifying a webhook."""
+    mark_payment_paid(charge_id)
+    if kind == "subscription":
+        return fulfill_subscription(user_id, plan or "Free", cycle)
+    if kind == "credits":
+        return fulfill_credits(user_id, credits, provider)
+    if kind == "cancel":
+        return downgrade_to_free(user_id)
+    return False
+
 # Rate limiting
 
 # ─── Billing & Credits ───
@@ -131,6 +221,77 @@ STRIPE_PRICES = {
     "credits_50000": "price_1UAELp2fz7mjXQMgn1XDRMhz",
 }
 
+
+def send_welcome_email(to_email, display_name=""):
+    """Send a welcome email to newly verified users with getting started guide."""
+    import os
+    import urllib.request
+
+    BREVO_API_KEY = os.environ.get("BREVO_API_KEY", os.environ.get("BRAVO_API_KEY", ""))
+    BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
+    SENDER_EMAIL = os.environ.get("SMTP_USER", "info@protremix.com")
+    SENDER_NAME = "EvolvixOS"
+
+    html = f"""<html><body style="font-family:Inter,Arial,sans-serif;background:#f5f5f7;color:#1d1d1f;padding:40px;margin:0;">
+<div style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,0.08);">
+<div style="background:linear-gradient(135deg,#007aff,#5856d6);padding:32px 40px;">
+<h1 style="color:#fff;font-size:28px;margin:0;font-weight:700;">Welcome to EvolvixOS 🚀</h1>
+<p style="color:rgba(255,255,255,0.85);font-size:15px;margin:8px 0 0;">Your AI Engineering Platform</p>
+</div>
+<div style="padding:32px 40px;">
+<p style="color:#1d1d1f;font-size:16px;">Hi {display_name or 'there'},</p>
+<p style="color:#555;font-size:15px;line-height:1.6;">Your account is verified and you have <strong style="color:#007aff;">500 free credits</strong> to start building. Here's how to get going:</p>
+<div style="background:#f5f5f7;border-radius:12px;padding:20px;margin:20px 0;">
+<p style="color:#1d1d1f;font-size:14px;font-weight:600;margin:0 0 12px;">3 steps to your first AI agent:</p>
+<p style="color:#555;font-size:14px;margin:4px 0;">1. 📋 <a href="https://evolvixos.com/dashboard" style="color:#007aff;text-decoration:none;">Open the Dashboard</a> — your control center</p>
+<p style="color:#555;font-size:14px;margin:4px 0;">2. 🔑 Create an API Key — for authenticating your requests</p>
+<p style="color:#555;font-size:14px;margin:4px 0;">3. 🧠 Create a New Agent — pick from 435+ models including GPT, Claude, Gemini, DeepSeek & more</p>
+</div>
+<p style="color:#555;font-size:14px;line-height:1.6;">You can also explore the <a href="https://evolvixos.com/docs" style="color:#007aff;text-decoration:none;">API Docs</a> or browse all <a href="https://evolvixos.com/models" style="color:#007aff;text-decoration:none;">435+ models</a> available.</p>
+<div style="margin:24px 0;">
+<a href="https://evolvixos.com/dashboard" style="display:inline-block;background:#007aff;color:#fff;text-decoration:none;font-size:15px;font-weight:600;padding:12px 28px;border-radius:10px;">Open Dashboard →</a>
+</div>
+<p style="color:#86868b;font-size:13px;margin-top:32px;border-top:1px solid #e5e5e7;padding-top:20px;">Need help? Reply to this email or join our community. Your 500 credits reset monthly on the Free plan.</p>
+</div>
+</div></body></html>"""
+
+    text = f"""Welcome to EvolvixOS!
+
+Hi {display_name or 'there'},
+
+Your account is verified and you have 500 free credits to start building.
+
+3 steps to your first AI agent:
+1. Open the Dashboard: https://evolvixos.com/dashboard
+2. Create an API Key for authenticating your requests
+3. Create a New Agent — pick from 435+ models
+
+Explore: API Docs at https://evolvixos.com/docs | Models at https://evolvixos.com/models
+
+Need help? Reply to this email. Your 500 credits reset monthly on the Free plan.
+
+— EvolvixOS Team"""
+
+    payload = json.dumps({
+        "sender": {"email": SENDER_EMAIL, "name": SENDER_NAME},
+        "to": [{"email": to_email}],
+        "subject": "Welcome to EvolvixOS — 500 free credits to get started 🚀",
+        "htmlContent": html,
+        "textContent": text
+    }).encode()
+
+    try:
+        req = urllib.request.Request(BREVO_API_URL, data=payload, headers={
+            "Content-Type": "application/json",
+            "api-key": BREVO_API_KEY
+        })
+        resp = urllib.request.urlopen(req, timeout=15)
+        if resp.status in (200, 201):
+            print(f"Welcome email sent to {to_email}")
+            return True
+    except Exception as e:
+        print(f"Welcome email failed: {e}")
+    return False
 
 RATE_LIMIT = defaultdict(list)  # ip -> [timestamps]
 MAX_REQUESTS = 10  # per 60 seconds per IP
@@ -855,6 +1016,11 @@ class AuthHandler(BaseHTTPRequestHandler):
                 "user": {"id": user_id, "email": email, "display_name": display_name or email.split("@")[0]},
                 "message": "Account verified! Redirecting to Studio..."
             }, set_cookie_token=token)
+            # Send welcome email (fire-and-forget, non-blocking)
+            try:
+                send_welcome_email(email, display_name or email.split("@")[0])
+            except Exception as e:
+                print(f"[welcome] Failed to send welcome email: {e}")
             return
 
         # ─── Login ───
