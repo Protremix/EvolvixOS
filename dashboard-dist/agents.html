@@ -388,8 +388,13 @@
         <input id="agentName" type="text" placeholder="My AI Agent" style="width:100%;padding:10px 12px;border:1px solid #d2d2d7;border-radius:8px;font-size:14px;margin-bottom:14px;" />
         <label style="display:block;margin-bottom:6px;font-size:13px;font-weight:600;">Model</label>
         <select id="agentModel" style="width:100%;padding:10px 12px;border:1px solid #d2d2d7;border-radius:8px;font-size:14px;margin-bottom:14px;">
+          <option>auto</option>
           <option>qwen2.5:7b</option><option>qwen2.5:14b</option><option>qwen2.5:3b</option>
-          <option>glm-4-flash</option><option>gemini-flash-latest</option>
+          <option>nvidia/nemotron-3.5-lightning-30b-a3b</option>
+          <option>deepseek-v4-flash-0731</option>
+          <option>glm-4-flash</option>
+          <option>gemini-flash-latest</option>
+          <option>llama3.2:3b</option>
         </select>
         <label style="display:block;margin-bottom:6px;font-size:13px;font-weight:600;">System Prompt</label>
         <textarea id="agentPrompt" placeholder="You are a helpful assistant..." style="width:100%;padding:10px 12px;border:1px solid #d2d2d7;border-radius:8px;font-size:14px;min-height:80px;margin-bottom:16px;"></textarea>
@@ -417,19 +422,44 @@ const authHeaders = {'Authorization': 'Bearer ' + getToken(), 'Content-Type': 'a
 
 
     function showCreateAgentModal() {
+      document.getElementById('agentModal').dataset.editId = '';
+      document.getElementById('agentName').value = '';
+      document.getElementById('agentPrompt').value = '';
+      document.querySelector('#agentModal h2').textContent = 'New Agent';
+      document.querySelector('#agentModal button[onclick="createAgent()"]').textContent = 'Create';
       document.getElementById('agentModal').style.display = 'flex';
     }
     async function loadAgents() {
       try {
-        const r = await fetch(API + '/entities/agents', { headers: authHeaders });
-        if (!r.ok) throw new Error('Failed');
-        const agents = await r.json();
+        const r = await fetch(API + '/entities/Agent/records?limit=100', { headers: authHeaders });
+        if (!r.ok) throw new Error('Failed to load');
+        const result = await r.json();
+        const agents = result.records || [];
         const grid = document.getElementById('agentsGrid');
         if (!agents.length) {
           grid.innerHTML = '<div style="text-align:center;padding:40px;color:#86868b;">No agents yet. Create your first AI agent.</div>';
           return;
         }
-        grid.innerHTML = agents.map(a => '<div style="background:white;border:1px solid #e5e5e7;border-radius:12px;padding:20px;"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#007aff,#5856d6);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;">' + (a.data.name||'A')[0] + '</div><div><div style="font-weight:600;font-size:14px;">' + (a.data.name||'Unnamed') + '</div><div style="font-size:12px;color:#86868b;">' + (a.data.model||'qwen2.5:7b') + '</div></div></div><div style="font-size:13px;color:#86868b;margin-bottom:10px;">' + (a.data.system_prompt||'No prompt set').substring(0,80) + '...</div><div style="display:flex;gap:8px;"><button style="font-size:12px;padding:4px 10px;border:1px solid #d2d2d7;border-radius:6px;background:white;cursor:pointer;">Edit</button><button onclick="deleteAgent(\'' + a.id + '\')" style="font-size:12px;padding:4px 10px;border:1px solid #ff3b30;color:#ff3b30;border-radius:6px;background:white;cursor:pointer;">Delete</button></div></div>').join('');
+        grid.innerHTML = agents.map(a => {
+          var name = a.name || 'Unnamed';
+          var model = a.model || 'qwen2.5:7b';
+          var prompt = (a.system_prompt || 'No prompt set').substring(0,80);
+          var status = a.status || 'active';
+          var statusColor = status === 'active' ? '#34c759' : (status === 'offline' ? '#86868b' : '#ff9500');
+          return '<div style="background:white;border:1px solid #e5e5e7;border-radius:12px;padding:20px;">'
+            + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'
+            + '<div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#007aff,#5856d6);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:16px;">' + name[0].toUpperCase() + '</div>'
+            + '<div style="flex:1;"><div style="font-weight:600;font-size:14px;">' + name + '</div>'
+            + '<div style="font-size:12px;color:#86868b;">' + model + '</div></div>'
+            + '<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:' + statusColor + ';">'
+            + '<div style="width:6px;height:6px;border-radius:50%;background:' + statusColor + ';"></div>' + status + '</div>'
+            + '</div>'
+            + '<div style="font-size:13px;color:#86868b;margin-bottom:12px;">' + prompt + (a.system_prompt && a.system_prompt.length > 80 ? '...' : '') + '</div>'
+            + '<div style="display:flex;gap:8px;">'
+            + '<button onclick="editAgent(' + a.id + ')" style="font-size:12px;padding:4px 10px;border:1px solid #d2d2d7;border-radius:6px;background:white;cursor:pointer;">Edit</button>'
+            + '<button onclick="deleteAgent(' + a.id + ')" style="font-size:12px;padding:4px 10px;border:1px solid #ff3b30;color:#ff3b30;border-radius:6px;background:white;cursor:pointer;">Delete</button>'
+            + '</div></div>';
+        }).join('');
       } catch(e) {
         document.getElementById('agentsGrid').innerHTML = '<div style="text-align:center;padding:40px;color:#86868b;">Failed to load agents. ' + e.message + '</div>';
       }
@@ -439,18 +469,47 @@ const authHeaders = {'Authorization': 'Bearer ' + getToken(), 'Content-Type': 'a
       const model = document.getElementById('agentModel').value;
       const prompt = document.getElementById('agentPrompt').value.trim();
       if (!name) return alert('Agent name required');
+      const editId = document.getElementById('agentModal').dataset.editId;
       try {
-        await fetch(API + '/entities/agents', { method: 'POST', headers: authHeaders, body: JSON.stringify({ name, model, system_prompt: prompt, status: 'active' }) });
+        const url = editId
+          ? API + '/entities/Agent/records/' + editId
+          : API + '/entities/Agent/records';
+        const method = editId ? 'PUT' : 'POST';
+        const body = editId
+          ? { data: { name, model, system_prompt: prompt, temperature: 0.7 } }
+          : { data: { name, model, system_prompt: prompt, status: 'active', temperature: 0.7 } };
+        const r = await fetch(url, { method, headers: authHeaders, body: JSON.stringify(body) });
+        if (!r.ok) throw new Error('Server returned ' + r.status);
         document.getElementById('agentModal').style.display = 'none';
+        document.getElementById('agentModal').dataset.editId = '';
         document.getElementById('agentName').value = '';
         document.getElementById('agentPrompt').value = '';
+        document.querySelector('#agentModal h2').textContent = 'New Agent';
+        document.querySelector('#agentModal button[onclick="createAgent()"]').textContent = 'Create';
         loadAgents();
-      } catch(e) { alert('Failed to create agent: ' + e.message); }
+      } catch(e) { alert('Failed to save agent: ' + e.message); }
     }
     async function deleteAgent(id) {
       if (!confirm('Delete this agent?')) return;
-      await fetch(API + '/entities/agents?id=' + id, { method: 'DELETE', headers: authHeaders });
-      loadAgents();
+      try {
+        await fetch(API + '/entities/Agent/records/' + id, { method: 'DELETE', headers: authHeaders });
+        loadAgents();
+      } catch(e) { alert('Failed to delete: ' + e.message); }
+    }
+    async function editAgent(id) {
+      try {
+        const r = await fetch(API + '/entities/Agent/records/' + id, { headers: authHeaders });
+        if (!r.ok) throw new Error('Failed');
+        const a = await r.json();
+        document.getElementById('agentName').value = a.name || '';
+        document.getElementById('agentModel').value = a.model || 'qwen2.5:7b';
+        document.getElementById('agentPrompt').value = a.system_prompt || '';
+        document.getElementById('agentModal').style.display = 'flex';
+        // Store ID for update
+        document.getElementById('agentModal').dataset.editId = id;
+        document.querySelector('#agentModal h2').textContent = 'Edit Agent';
+        document.querySelector('#agentModal button[onclick="createAgent()"]').textContent = 'Save';
+      } catch(e) { alert('Failed to load agent: ' + e.message); }
     }
     loadAgents();
 
