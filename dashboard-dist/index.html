@@ -1332,12 +1332,24 @@
       btn.disabled = true;
       btn.textContent = 'Connecting...';
       try {
-        const body = {};
-        svc.fields.forEach(f => { body[f.key] = document.getElementById('connect-' + f.key).value.trim(); });
+        // Read all field values
+        const fields = {};
+        svc.fields.forEach(f => { fields[f.key] = document.getElementById('connect-' + f.key).value.trim(); });
+        // Transform to backend format: {token, extra}
+        const payload = {};
+        if (serviceKey === 'supabase') {
+          payload.token = fields.key;
+          payload.extra = { url: fields.url };
+        } else if (serviceKey === 'gmail') {
+          payload.token = fields.password;
+          payload.extra = { email: fields.email };
+        } else {
+          payload.token = fields.token;
+        }
         const resp = await fetch(`${API_BASE}/integrations/${serviceKey}/connect`, {
           method: 'POST',
           headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
+          body: JSON.stringify(payload)
         });
         const result = await resp.json();
         if (result.connected) {
