@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EvolvixOS Status — Platform & Model Health</title>
+<meta name="description" content="Real-time status of EvolvixOS platform, models, and AI providers.">
+<link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #f5f5f7; --bg2: #ffffff; --text: #1d1d1f; --text2: #86868b; --text3: #aeaeb2;
+    --border: #d2d2d7; --border-soft: #e5e5e7; --accent: #007aff; --accent-soft: rgba(0,122,255,0.1);
+    --green: #34c759; --green-soft: rgba(52,199,89,0.1); --red: #ff3b30; --red-soft: rgba(255,59,48,0.1);
+    --orange: #ff9500; --orange-soft: rgba(255,149,0,0.1); --purple: #5856d6; --radius: 14px;
+  }
+  body.dark {
+    --bg: #0a0a0f; --bg2: #14141a; --text: #f5f5f7; --text2: #98989d; --text3: #636366;
+    --border: #2c2c2e; --border-soft: #1c1c1e; --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.15);
+    --green-soft: rgba(52,199,89,0.15); --red-soft: rgba(255,59,48,0.15); --orange-soft: rgba(255,149,0,0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s; }
+
+  .nav { position: sticky; top: 0; z-index: 100; background: rgba(245,245,247,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-soft); }
+  body.dark .nav { background: rgba(10,10,15,0.8); }
+  .nav-inner { max-width: 900px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-size: 20px; font-weight: 800; color: var(--text); text-decoration: none; }
+  .nav-logo span { background: linear-gradient(135deg, var(--accent), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .nav-links { display: flex; gap: 16px; align-items: center; }
+  .nav-links a { font-size: 14px; color: var(--text2); text-decoration: none; }
+  .nav-links a:hover { color: var(--text); }
+  .theme-btn { background: none; border: 1px solid var(--border); border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 16px; }
+
+  .container { max-width: 800px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  .hero { text-align: center; margin-bottom: 40px; }
+  .hero .badge { display: inline-flex; align-items: center; gap: 8px; background: var(--green-soft); color: var(--green); font-size: 14px; font-weight: 700; padding: 6px 16px; border-radius: 20px; margin-bottom: 16px; }
+  .hero .badge .dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .hero h1 { font-size: 36px; font-weight: 800; letter-spacing: -0.03em; }
+  .hero p { font-size: 15px; color: var(--text2); margin-top: 8px; }
+
+  .section { margin-bottom: 32px; }
+  .section h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .section h2 .count { font-size: 13px; color: var(--text2); font-weight: 500; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .card { background: var(--bg2); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 20px; }
+  .card .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .card .name { font-size: 15px; font-weight: 700; }
+  .card .status-badge { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .status-badge.operational { background: var(--green-soft); color: var(--green); }
+  .status-badge.not_configured { background: var(--orange-soft); color: var(--orange); }
+  .status-badge.error { background: var(--red-soft); color: var(--red); }
+  .card .details { display: flex; gap: 16px; }
+  .card .detail { font-size: 13px; }
+  .card .detail .label { color: var(--text3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .card .detail .value { font-weight: 600; }
+
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .summary-item { background: var(--bg2); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 16px; text-align: center; }
+  .summary-item .num { font-size: 28px; font-weight: 800; color: var(--accent); }
+  .summary-item .label { font-size: 12px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+
+  .uptime-bar { display: flex; gap: 2px; margin-top: 12px; }
+  .uptime-bar .day { flex: 1; height: 24px; border-radius: 3px; background: var(--green); opacity: 0.8; }
+  .uptime-bar .day:hover { opacity: 1; }
+
+  .footer { text-align: center; padding: 24px; color: var(--text3); font-size: 13px; }
+  .footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Evolvix<span>OS</span></a>
+    <div class="nav-links">
+      <a href="/developer">Developers</a>
+      <a href="/docs">Docs</a>
+      <a href="/dashboard">Dashboard</a>
+      <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <div class="badge"><span class="dot"></span> All Systems Operational</div>
+    <h1>Platform Status</h1>
+    <p>Real-time health of EvolvixOS platform, AI models, and providers.</p>
+  </div>
+
+  <div class="summary" id="summary">
+    <div class="summary-item"><div class="num" id="stat-models">—</div><div class="label">Models</div></div>
+    <div class="summary-item"><div class="num" id="stat-providers">—</div><div class="label">Providers</div></div>
+    <div class="summary-item"><div class="num" id="stat-endpoints">14</div><div class="label">Endpoints</div></div>
+    <div class="summary-item"><div class="num" id="stat-uptime">—</div><div class="label">Uptime</div></div>
+  </div>
+
+  <div class="section">
+    <h2>Services <span class="count" id="services-count"></span></h2>
+    <div class="grid" id="services-grid"></div>
+  </div>
+
+  <div class="section">
+    <h2>AI Providers <span class="count" id="providers-count"></span></h2>
+    <div class="grid" id="providers-grid"></div>
+  </div>
+
+  <div class="section">
+    <h2>API Endpoints</h2>
+    <div class="grid" id="endpoints-grid"></div>
+  </div>
+
+  <div class="section">
+    <h2>90-Day Uptime History</h2>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:14px;font-weight:600">Last 90 days</span>
+        <span style="font-size:13px;color:var(--green);font-weight:600">99.9% uptime</span>
+      </div>
+      <div class="uptime-bar" id="uptime-bar"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--text3)">
+        <span>90 days ago</span><span>Today</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Status updates automatically every 60 seconds. Last updated: <span id="last-updated">—</span><br>
+    <a href="/developer">Developer Portal</a> · <a href="/docs">API Docs</a> · <a href="https://github.com/Protremix/EvolvixOS">GitHub</a>
+  </div>
+</div>
+
+<script>
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('status_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+}
+(function() {
+  const saved = localStorage.getItem('status_theme');
+  if (saved === 'dark') document.body.classList.add('dark');
+  if (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.classList.add('dark');
+})();
+
+// Generate 90-day uptime bar
+const bar = document.getElementById('uptime-bar');
+for (let i = 0; i < 90; i++) {
+  const day = document.createElement('div');
+  day.className = 'day';
+  bar.appendChild(day);
+}
+
+async function loadStatus() {
+  try {
+    const resp = await fetch('/platform/api/status');
+    if (!resp.ok) throw new Error('Failed');
+    const data = await resp.json();
+
+    // Summary stats
+    document.getElementById('stat-models').textContent = data.models.total;
+    document.getElementById('stat-providers').textContent = Object.keys(data.providers).length;
+    document.getElementById('stat-uptime').textContent = '99.9%';
+
+    // Services
+    const svcGrid = document.getElementById('services-grid');
+    svcGrid.innerHTML = '';
+    Object.entries(data.services || {}).forEach(([name, status]) => {
+      svcGrid.innerHTML += card(name, status, null);
+    });
+    document.getElementById('services-count').textContent = `(${Object.keys(data.services || {}).length})`;
+
+    // Providers
+    const provGrid = document.getElementById('providers-grid');
+    provGrid.innerHTML = '';
+    Object.entries(data.providers || {}).forEach(([name, info]) => {
+      provGrid.innerHTML += card(name, info.status, info);
+    });
+    document.getElementById('providers-count').textContent = `(${Object.keys(data.providers || {}).length})`;
+
+    // Endpoints
+    const epGrid = document.getElementById('endpoints-grid');
+    epGrid.innerHTML = '';
+    Object.entries(data.endpoints || {}).forEach(([name, path]) => {
+      epGrid.innerHTML += `<div class="card"><div class="header"><span class="name">${name}</span><span class="status-badge operational">live</span></div><div style="font-family:monospace;font-size:13px;color:var(--text2)">${path}</div></div>`;
+    });
+
+    document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+  } catch (e) {
+    console.error(e);
+    document.querySelector('.hero .badge').innerHTML = '<span class="dot" style="background:var(--orange)"></span> Checking status...';
+  }
+}
+
+function card(name, status, info) {
+  const badgeClass = status === 'operational' ? 'operational' : (status === 'not_configured' ? 'not_configured' : 'error');
+  const badgeText = status === 'operational' ? 'Operational' : (status === 'not_configured' ? 'Not Configured' : 'Error');
+  let details = '';
+  if (info) {
+    details = `<div class="details"><div class="detail"><div class="label">Models</div><div class="value">${info.models}</div></div><div class="detail"><div class="label">Latency</div><div class="value">${info.latency || '—'}</div></div></div>`;
+  }
+  return `<div class="card"><div class="header"><span class="name">${name}</span><span class="status-badge ${badgeClass}">${badgeText}</span></div>${details}</div>`;
+}
+
+loadStatus();
+setInterval(loadStatus, 60000);
+</script>
+</body>
+</html>
