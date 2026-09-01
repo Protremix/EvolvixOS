@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EvolvixOS — The Open-Source AI Engineering Platform</title>
-<meta name="description" content="Self-hosted AI engineering platform. 300+ models, 49 tools, RAG engine, agents that execute code. Open source. MIT licensed.">
+<meta name="description" content="Self-hosted AI engineering platform. 435 models, 49 tools, RAG engine, agents that execute code. Open source. MIT licensed.">
 <link rel="icon" href="/assets/evolvixos-logo-32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -1456,7 +1456,7 @@ footer {
       <div class="feature-icon">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 7l3 3M17 7l-3 3M7 17l3-3M17 17l-3-3"/></svg>
       </div>
-      <h3>300+ Models, One API</h3>
+      <h3>435+ Models, One API</h3>
       <p>Groq, Gemini, Kimi, Nemotron, Ollama, OpenAI, Tencent, HuggingFace. The router picks the right model per task automatically.</p>
       <div class="feature-stat">8 providers · Auto-routing</div>
     </div>
@@ -1499,7 +1499,7 @@ footer {
 <!-- Models -->
 <section id="models">
   <div class="section-label">AI MODELS</div>
-  <h2 class="section-title">300+ models.<br><span class="gradient">One endpoint.</span></h2>
+  <h2 class="section-title">435 models.<br><span class="gradient">One endpoint.</span></h2>
   <p class="section-sub">Code generation needs a different model than reasoning. Vision needs a different model than chat. The router selects automatically. You write one API call.</p>
   <div class="models-grid">
     <div class="model-card">
@@ -1582,7 +1582,7 @@ footer {
 <section id="pricing">
   <div class="section-label">PRICING</div>
   <h2 class="section-title">For engineering<br><span class="gradient">teams</span></h2>
-  <p class="section-sub">Every plan includes all 300+ models, agents, tools, and RAG engine. No usage limits. No hidden costs.</p>
+  <p class="section-sub">Every plan includes all 435 models, agents, tools, and RAG engine. No usage limits. No hidden costs.</p>
   <div class="pricing-grid">
     <div class="price-card">
       <div class="price-name">STARTER</div>
@@ -1590,7 +1590,7 @@ footer {
       <div class="price-desc">For individual engineers</div>
       <ul class="price-features">
         <li>2,000 credits / month</li>
-        <li>All 300+ AI models</li>
+        <li>All 435 AI models</li>
         <li>Local model routing</li>
         <li>Entity CRUD + Functions</li>
         <li>Community support</li>
@@ -1648,7 +1648,7 @@ footer {
       <div class="logo">
         <img class="evx-e" src="/assets/brand/logo-e-128.png" alt="E" style="height:0.82em;width:auto;vertical-align:-0.06em;display:inline-block;margin-right:-0.05em;">volvixOS
       </div>
-      <p>Open-source engineering platform for AI. 300+ models. 49 tools. RAG engine. Self-hosted. MIT licensed.</p>
+      <p>Open-source engineering platform for AI. 435 models. 49 tools. RAG engine. Self-hosted. MIT licensed.</p>
     </div>
     <div class="footer-cols">
       <div class="footer-col">
@@ -2135,6 +2135,114 @@ if (navLogo) {
     terminal.style.animation = ''; // resume CSS float
   });
 })();
+
+
+// ─── Dynamic Models Section ───
+let LANDING_MODELS = [];
+let LANDING_MODEL_COUNT = 60;
+let LANDING_CURRENT_CAT = 'all';
+
+async function loadLandingModels() {
+  try {
+    const resp = await fetch('/platform/api/models');
+    const data = await resp.json();
+    LANDING_MODELS = (data.models || []).map(m => {
+      let cat = m.category || 'chat';
+      if (cat === 'code') cat = 'coding';
+      const provider = m.id.includes('/') ? m.id.split('/')[0] : (cat === 'local' ? 'ollama' : (m.id.startsWith('nemotron') ? 'nvidia' : 'other'));
+      // Clean up provider name
+      const providerName = provider.replace(/^[~]/, '').replace(/-/g, ' ');
+      const cleanName = m.id.includes('/') ? m.id.split('/').slice(1).join('/') : m.id;
+      return { id: m.id, name: cleanName, provider: providerName, rawProvider: provider, cat, free: m.free, ctx: m.context_length };
+    });
+    renderLandingModels();
+  } catch(e) {
+    console.log('Failed to load models:', e);
+    document.getElementById('landing-models-grid').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2);grid-column:1/-1">Models are loading. <a href="/dashboard" style="color:var(--accent)">Open dashboard</a> to see all 435+ engines.</div>';
+  }
+}
+
+function renderLandingModels() {
+  const searchEl = document.getElementById('landing-model-search');
+  const search = searchEl ? searchEl.value.toLowerCase() : '';
+  let filtered = LANDING_CURRENT_CAT === 'all' ? LANDING_MODELS : LANDING_MODELS.filter(m => m.cat === LANDING_CURRENT_CAT);
+  if (search) {
+    filtered = filtered.filter(m => (m.id + ' ' + m.provider + ' ' + m.name).toLowerCase().includes(search));
+  }
+  // Sort: routing first, then free, then alphabetical
+  filtered.sort((a, b) => {
+    if (a.cat === 'routing') return -1;
+    if (b.cat === 'routing') return 1;
+    if (a.free && !b.free) return -1;
+    if (!a.free && b.free) return 1;
+    return a.id.localeCompare(b.id);
+  });
+
+  const grid = document.getElementById('landing-models-grid');
+  const shown = filtered.slice(0, LANDING_MODEL_COUNT);
+
+  grid.innerHTML = shown.map(m => {
+    const ctxStr = m.ctx ? (m.ctx >= 1000000 ? (m.ctx/1e6).toFixed(1)+'M' : Math.floor(m.ctx/1000)+'K') : '';
+    const catColors = { chat: '#007aff', reasoning: '#5856d6', coding: '#34c759', vision: '#ff9500', local: '#8e8e93', routing: '#af52de' };
+    const catColor = catColors[m.cat] || '#007aff';
+    return '<div class="model-card" style="opacity:1;transform:none">' +
+      '<div class="model-name" style="font-size:13px;word-break:break-all">' + m.name + '</div>' +
+      '<div class="model-desc" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px">' +
+        '<span style="font-size:11px;text-transform:capitalize;color:var(--text2)">' + m.provider + '</span>' +
+        (ctxStr ? '<span style="font-size:10px;color:var(--text2)">· ' + ctxStr + ' ctx</span>' : '') +
+      '</div>' +
+      '<div style="margin-top:6px;display:flex;align-items:center;gap:6px">' +
+        '<span style="font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:12px;background:' + catColor + '15;color:' + catColor + '">' + m.cat + '</span>' +
+        (m.free ? '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;background:rgba(52,199,89,0.1);color:#34c759">FREE</span>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  const showMore = document.getElementById('landing-show-more');
+  if (filtered.length > LANDING_MODEL_COUNT) {
+    showMore.style.display = 'inline-block';
+    showMore.textContent = 'Show more (' + (filtered.length - LANDING_MODEL_COUNT) + ' more engines)';
+  } else {
+    showMore.style.display = 'none';
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2);grid-column:1/-1">No engines match your search.</div>';
+  }
+}
+
+function filterLandingModels() {
+  LANDING_MODEL_COUNT = 60;
+  renderLandingModels();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Wire up filter pills
+  document.querySelectorAll('.lm-filter').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.lm-filter').forEach(b => { b.classList.remove('active'); b.style.background = 'var(--bg)'; b.style.color = 'var(--text2)'; b.style.borderColor = 'var(--border)'; });
+      this.classList.add('active');
+      this.style.background = 'var(--accent)';
+      this.style.color = '#fff';
+      this.style.borderColor = 'var(--accent)';
+      LANDING_CURRENT_CAT = this.dataset.cat;
+      LANDING_MODEL_COUNT = 60;
+      filterLandingModels();
+    });
+  });
+
+  // Show more button
+  const showMoreBtn = document.getElementById('landing-show-more');
+  if (showMoreBtn) {
+    showMoreBtn.addEventListener('click', function() {
+      LANDING_MODEL_COUNT += 60;
+      renderLandingModels();
+    });
+  }
+
+  // Load models
+  loadLandingModels();
+});
 
 </script>
 </body>
