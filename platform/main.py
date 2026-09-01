@@ -1631,6 +1631,7 @@ async def clear_chat_history(request: Request, db=Depends(get_db)):
 
 
 
+
 # ─── Model Playground ───
 class PlaygroundRequest(BaseModel):
     message: str = Field(..., description="Message to send to the model")
@@ -1674,6 +1675,80 @@ async def playground_chat(req: PlaygroundRequest, request: Request):
         raise HTTPException(504, "Model response timed out (120s)")
     except Exception as e:
         raise HTTPException(500, f"Model error: {str(e)}")
+
+
+# ─── Demo Playground (no auth, rate-limited) ───
+import time as _time
+
+# Simple in-memory rate limiter for demo endpoint
+_demo_rate_store = {}  # {ip: [timestamps]}
+
+def _check_demo_rate_limit(client_ip: str, max_requests: int = 5, window_hours: int = 24) -> tuple:
+    """Returns (allowed, remaining, reset_seconds)."""
+    now = _time.time()
+    window_seconds = window_hours * 3600
+    if client_ip not in _demo_rate_store:
+        _demo_rate_store[client_ip] = []
+    # Clean old entries
+    _demo_rate_store[client_ip] = [t for t in _demo_rate_store[client_ip] if now - t < window_seconds]
+    requests = _demo_rate_store[client_ip]
+    if len(requests) >= max_requests:
+        oldest = requests[0]
+        reset = int(oldest + window_seconds - now)
+        return (False, 0, reset)
+    requests.append(now)
+    remaining = max_requests - len(requests)
+    return (True, remaining, 0)
+
+@app.post("/api/demo")
+async def demo_playground(req: PlaygroundRequest, request: Request):
+    """
+    Public demo endpoint — no authentication required.
+    Rate-limited to 5 requests per IP per 24 hours.
+    Uses auto-routing only (no model selection to prevent abuse).
+    """
+    # Get client IP
+    client_ip = request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+    if not client_ip:
+        client_ip = request.headers.get("X-Real-IP", "")
+    if not client_ip:
+        client_ip = "unknown"
+
+    # Check rate limit
+    allowed, remaining, reset = _check_demo_rate_limit(client_ip)
+    if not allowed:
+        raise HTTPException(
+            429,
+            f"Demo limit reached. You get 5 free requests per day. Sign up for unlimited access — it's free!"
+        )
+
+    # Force auto model (prevent abuse by selecting expensive models)
+    demo_model = "auto"
+
+    # Build messages
+    messages = []
+    if req.system_prompt:
+        messages.append({"role": "system", "content": req.system_prompt[:500]})  # Cap at 500 chars
+    messages.append({"role": "user", "content": req.message[:1000]})  # Cap message at 1000 chars
+
+    try:
+        result = await asyncio.wait_for(
+            unified_chat(messages, model=demo_model, temperature=min(req.temperature or 0.7, 1.0), max_tokens=min(req.max_tokens or 500, 500), prefer_cloud=True),
+            timeout=60
+        )
+        return {
+            "response": result.get("content", ""),
+            "model": result.get("model", "auto"),
+            "provider": result.get("provider", ""),
+            "demo": True,
+            "remaining": remaining,
+            "limit": 5
+        }
+    except asyncio.TimeoutError:
+        raise HTTPException(504, "Model response timed out")
+    except Exception as e:
+        raise HTTPException(500, f"Model error: {str(e)}")
+
 
 
 @app.post("/api/chat")
