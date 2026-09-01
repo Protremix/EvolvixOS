@@ -370,6 +370,7 @@
       <a class="nav-item" data-route="dashboard" onclick="navigate('dashboard')">{IC_DASH}Dashboard</a>
       <a class="nav-item" data-route="agents" onclick="navigate('agents')">{IC_BOT}Agents <span class="nav-badge" id="nav-agent-count">—</span></a>
       <a class="nav-item" data-route="models" onclick="navigate('models')">{IC_GRID}Models</a>
+      <a class="nav-item" data-route="playground" onclick="navigate('playground')">⚡ Playground</a>
       <a class="nav-item" data-route="usage" onclick="navigate('usage')">{IC_CHART}Usage</a>
       <div class="nav-label">Developer</div>
       <a class="nav-item" data-route="api-keys" onclick="navigate('api-keys')">{IC_KEY}API Keys</a>
@@ -1174,6 +1175,175 @@
 
     }
     }
+
+
+    // ===== PLAYGROUND =====
+    route('playground', async (el) => {
+      el.innerHTML = `
+        <div class="page-enter">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Model Playground</h1>
+              <p class="page-subtitle">Test any of 435+ models instantly. No agent needed.</p>
+            </div>
+          </div>
+          <div class="grid-2" style="grid-template-columns:300px 1fr;gap:0;height:calc(100vh - 200px);min-height:500px">
+            <div style="border-right:1px solid var(--border);padding:20px;overflow-y:auto">
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label" style="font-size:13px;font-weight:600;margin-bottom:6px;display:block">Model</label>
+                <select id="pg-model" class="form-select" style="width:100%">
+                  <option value="auto">⚡ Auto (smart routing)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label" style="font-size:13px;font-weight:600;margin-bottom:6px;display:block">System Prompt (optional)</label>
+                <textarea id="pg-system" class="form-input" placeholder="You are a helpful assistant..." style="width:100%;min-height:80px;resize:vertical;font-size:13px"></textarea>
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label" style="font-size:13px;font-weight:600;margin-bottom:6px;display:block">Temperature: <span id="pg-temp-val" style="color:var(--accent)">0.7</span></label>
+                <input type="range" id="pg-temp" min="0" max="200" value="70" style="width:100%" oninput="document.getElementById('pg-temp-val').textContent=(this.value/100).toFixed(1)">
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label" style="font-size:13px;font-weight:600;margin-bottom:6px;display:block">Max Tokens</label>
+                <input type="number" id="pg-max-tokens" class="form-input" value="1000" min="1" max="8000" style="width:100%">
+              </div>
+              <button class="btn btn-ghost btn-sm" style="width:100%;margin-top:8px" onclick="pgClearChat()">Clear Chat</button>
+            </div>
+            <div style="display:flex;flex-direction:column;padding:20px">
+              <div id="pg-messages" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+                <div style="text-align:center;color:var(--text2);padding:40px 20px">
+                  <div style="font-size:32px;margin-bottom:8px">💬</div>
+                  <p style="font-size:15px">Send a message to test any model</p>
+                  <p style="font-size:12px;color:var(--text3);margin-top:4px">Pick a model from the left, type below, and hit send</p>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-end">
+                <textarea id="pg-input" placeholder="Type your message..." style="flex:1;padding:12px 16px;border:1px solid var(--border);border-radius:12px;font-size:14px;resize:none;height:44px;max-height:120px;background:var(--bg);color:var(--text);font-family:inherit" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();pgSend()}"></textarea>
+                <button class="btn btn-primary" onclick="pgSend()" id="pg-send-btn">${ICONS.zap} Send</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Load models into dropdown
+      const models = await loadAllModels();
+      const select = document.getElementById('pg-model');
+      const sorted = [...models].sort((a, b) => {
+        if (a.cat === 'routing') return -1;
+        if (b.cat === 'routing') return 1;
+        if (a.free && !b.free) return -1;
+        if (!a.free && b.free) return 1;
+        return a.name.localeCompare(b.name);
+      });
+      let currentGroup = '';
+      const optgroups = {};
+      for (const m of sorted) {
+        const group = m.cat.toUpperCase();
+        if (!optgroups[group]) optgroups[group] = [];
+        optgroups[group].push(m);
+      }
+      for (const [group, items] of Object.entries(optgroups)) {
+        const og = document.createElement('optgroup');
+        og.label = group + ' (' + items.length + ')';
+        for (const m of items) {
+          const opt = document.createElement('option');
+          opt.value = m.name;
+          opt.textContent = m.name + (m.free ? ' (FREE)' : '');
+          og.appendChild(opt);
+        }
+        select.appendChild(og);
+      }
+    });
+
+    let pgMessages = [];
+
+    function pgClearChat() {
+      pgMessages = [];
+      document.getElementById('pg-messages').innerHTML = '<div style="text-align:center;color:var(--text2);padding:40px 20px"><div style="font-size:32px;margin-bottom:8px">💬</div><p style="font-size:15px">Send a message to test any model</p><p style="font-size:12px;color:var(--text3);margin-top:4px">Pick a model from the left, type below, and hit send</p></div>';
+    }
+
+    async function pgSend() {
+      const input = document.getElementById('pg-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+      input.value = '';
+      input.style.height = '44px';
+
+      const model = document.getElementById('pg-model').value;
+      const system = document.getElementById('pg-system').value.trim();
+      const temp = parseInt(document.getElementById('pg-temp').value) / 100;
+      const maxTokens = parseInt(document.getElementById('pg-max-tokens').value) || 1000;
+
+      const messagesEl = document.getElementById('pg-messages');
+      // Clear placeholder
+      if (pgMessages.length === 0) messagesEl.innerHTML = '';
+
+      // Add user message
+      pgMessages.push({ role: 'user', content: msg });
+      messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-end"><div style="background:var(--accent);color:white;padding:10px 14px;border-radius:14px 14px 4px 14px;max-width:75%;font-size:14px;line-height:1.5">' + msg.replace(/</g,'&lt;') + '</div></div>';
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      // Add loading
+      const loadingId = 'pg-loading-' + Date.now();
+      messagesEl.innerHTML += '<div id="' + loadingId + '" style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:var(--bg);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px;color:var(--text2)"><span class="spinner" style="width:14px;height:14px;display:inline-block;margin-right:6px"></span>Generating with ' + model + '...</div></div>';
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      // Disable send button
+      const sendBtn = document.getElementById('pg-send-btn');
+      sendBtn.disabled = true;
+      sendBtn.style.opacity = '0.5';
+
+      try {
+        // Build the request — use /api/playground endpoint (direct model chat, no builder prompt)
+        const body = {
+          message: msg,
+          model: model,
+          system_prompt: system || undefined,
+          temperature: temp,
+          max_tokens: maxTokens
+        };
+
+        const token = getToken();
+        const controller = new AbortController();
+        const timeout = setTimeout(function() { controller.abort(); }, 120000);
+
+        const resp = await fetch('/platform/api/playground', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify(body),
+          signal: controller.signal
+        });
+        clearTimeout(timeout);
+
+        // Remove loading
+        const loading = document.getElementById(loadingId);
+        if (loading) loading.remove();
+
+        if (resp.ok) {
+          const data = await resp.json();
+          const reply = data.response || data.message || data.reply || JSON.stringify(data);
+          pgMessages.push({ role: 'assistant', content: reply });
+          const meta = data.model ? '<div style="font-size:10px;color:var(--text3);margin-top:4px">via ' + data.model + (data.provider ? ' (' + data.provider + ')' : '') + '</div>' : '';
+          messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:var(--bg);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px;line-height:1.5;white-space:pre-wrap">' + reply.replace(/</g,'&lt;') + meta + '</div></div>';
+        } else {
+          const errData = await resp.json().catch(() => ({}));
+          const errMsg = errData.detail || ('Error ' + resp.status);
+          messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:rgba(255,59,48,0.08);color:var(--red);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px">' + errMsg + '</div></div>';
+        }
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      } catch (e) {
+        const loading = document.getElementById(loadingId);
+        if (loading) loading.remove();
+        const errMsg = e.name === 'AbortError' ? 'Request timed out (120s)' : 'Failed to get response. Check your connection.';
+        messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:rgba(255,59,48,0.08);color:var(--red);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px">' + errMsg + '</div></div>';
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.style.opacity = '1';
+      }
+    }
+
 
     // ===== USAGE PAGE =====
     route('usage', async (el) => {

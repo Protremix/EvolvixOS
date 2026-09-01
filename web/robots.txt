@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /platform/api/
+Disallow: /auth/
+Allow: /auth/sign-in
+Allow: /auth/sign-up
+
+Sitemap: https://evolvixos.com/sitemap.xml

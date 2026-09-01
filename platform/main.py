@@ -1630,6 +1630,52 @@ async def clear_chat_history(request: Request, db=Depends(get_db)):
     return {"status": "cleared"}
 
 
+
+# ─── Model Playground ───
+class PlaygroundRequest(BaseModel):
+    message: str = Field(..., description="Message to send to the model")
+    model: Optional[str] = Field("auto", description="Model ID or 'auto' for smart routing")
+    system_prompt: Optional[str] = Field(None, description="Optional system prompt")
+    temperature: Optional[float] = Field(0.7, description="Sampling temperature")
+    max_tokens: Optional[int] = Field(1000, description="Max response tokens")
+
+@app.post("/api/playground")
+async def playground_chat(req: PlaygroundRequest, request: Request):
+    """
+    Model playground — test any model directly without creating an agent.
+    No builder system prompt, no entity creation, just pure model chat.
+    """
+    # ─── Credit deduction ───
+    user = get_user_from_token(request)
+    user_id = user.get("user_id") if user else None
+    if user_id:
+        credit_check = deduct_user_credits(int(user_id), req.model or "auto")
+        if not credit_check.get("ok"):
+            raise HTTPException(402, credit_check.get("error", "Insufficient credits"))
+
+    # Build messages
+    messages = []
+    if req.system_prompt:
+        messages.append({"role": "system", "content": req.system_prompt})
+    messages.append({"role": "user", "content": req.message})
+
+    try:
+        result = await asyncio.wait_for(
+            unified_chat(messages, model=req.model or "auto", temperature=req.temperature or 0.7, max_tokens=req.max_tokens or 1000, prefer_cloud=True),
+            timeout=120
+        )
+        return {
+            "response": result.get("content", ""),
+            "model": result.get("model", req.model or "auto"),
+            "provider": result.get("provider", ""),
+            "usage": result.get("usage", {}),
+        }
+    except asyncio.TimeoutError:
+        raise HTTPException(504, "Model response timed out (120s)")
+    except Exception as e:
+        raise HTTPException(500, f"Model error: {str(e)}")
+
+
 @app.post("/api/chat")
 async def chat_build(msg: ChatMessage, request: Request, db=Depends(get_db)):
     """
