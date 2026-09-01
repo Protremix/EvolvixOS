@@ -732,9 +732,8 @@
         let agents = [];
         let logs = [];
         try {
-          const agentRes = await fetch(`${API_BASE}/agents`, { headers: authHeaders() }).then(r => r.json());
-          const agentJson = typeof agentRes === 'object' ? agentRes : JSON.parse(agentRes);
-          agents = Array.isArray(agentJson) ? agentJson : (agentJson.agents || agentJson.data || agentJson || []);
+          const agentRes = await fetch(`${API_BASE}/entities/Agent/records?limit=100`, { headers: authHeaders() }).then(r => r.json());
+          agents = agentRes.records || [];
           if (!Array.isArray(agents)) agents = [];
         } catch(e1) { console.log('Agents load failed:', e1); }
         try {
@@ -912,7 +911,7 @@
     const agentsTable = document.getElementById('dash-agents');
     if (agentsTable && agents.length) {
       agentsTable.innerHTML = '<table class="data-table"><thead><tr><th>Name</th><th>Model</th><th>Status</th><th>Created</th></tr></thead><tbody>' +
-        agents.map(a => '<tr><td>' + (a.name || a.data?.name || 'Unnamed') + '</td><td>' + (a.model || a.data?.model || 'qwen2.5:7b') + '</td><td><span class="badge badge-success">Active</span></td><td>' + (a.created_date || '—') + '</td></tr>').join('') +
+        agents.map(a => '<tr><td>' + (a.name || 'Unnamed') + '</td><td>' + (a.model || 'auto') + '</td><td><span class="badge badge-success">' + (a.status || 'Active') + '</span></td><td>' + (a.created_date || '—') + '</td></tr>').join('') +
         '</tbody></table>';
     } else if (agentsTable) {
       agentsTable.innerHTML = '<div style="padding:20px;color:#86868b;text-align:center;">No agents yet. <a href="/workstation" style="color:#007aff;">Create one in the Workstation →</a></div>';
@@ -938,9 +937,9 @@
       `;
 
       try {
-        const resp = await fetch(`${API_BASE}/agents`, { headers: authHeaders() });
+        const resp = await fetch(`${API_BASE}/entities/Agent/records?limit=100`, { headers: authHeaders() });
         const data = await resp.json();
-        const agents = data.agents || [];
+        const agents = data.records || [];
         document.getElementById('nav-agent-count').textContent = agents.length;
         document.getElementById('agent-count').textContent = agents.length + ' agents';
 
@@ -951,12 +950,12 @@
               ${agents.map(a => `
                 <tr>
                   <td><div class="agent-name" style="cursor:pointer" onclick="openAgentChat('${a.name.replace(/'/g, "\'")}')"><div class="agent-avatar">${initials(a.name)}</div>${a.name}</div></td>
-                  <td><span class="model-badge">${a.model}</span></td>
+                  <td><span class="model-badge">${a.model || 'auto'}</span></td>
                   <td><span class="status-badge ${(a.status || 'active').toLowerCase()}"><span class="status-dot ${(a.status || 'active').toLowerCase()}"></span>${a.status || 'Active'}</span></td>
                   <td style="color:var(--text2)">${timeAgo(a.created_date)}</td>
                   <td>
-                    <button class="action-btn" onclick="openEditAgent('${a.name}')" title="Edit">${ICONS.edit}</button>
-                    <button class="action-btn danger" onclick="deleteAgent('${a.name}')}')" title="Delete">${ICONS.trash}</button>
+                    <button class="action-btn" onclick="openEditAgent(${a.id})" title="Edit">${ICONS.edit}</button>
+                    <button class="action-btn danger" onclick="deleteAgent(${a.id}, '${a.name.replace(/'/g, "\'")}')" title="Delete">${ICONS.trash}</button>
                   </td>
                 </tr>
               `).join('')}
@@ -1093,10 +1092,10 @@
         };
         if (desc) body.identity_doc = desc;
 
-        const resp = await fetch(`${API_BASE}/agents`, {
+        const resp = await fetch(`${API_BASE}/entities/Agent/records`, {
           method: 'POST',
           headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
+          body: JSON.stringify({ data: body })
         });
         if (resp.ok) {
           toast('Agent "' + name + '" created successfully!', 'success');
@@ -1117,11 +1116,11 @@
       handleRoute();
     }
 
-    async function openEditAgent(name) {
+    async function openEditAgent(id) {
       try {
         await loadAllModels();
         await loadAgentTools();
-        const resp = await fetch(`${API_BASE}/agents/${encodeURIComponent(name)}`, { headers: authHeaders() });
+        const resp = await fetch(`${API_BASE}/entities/Agent/records/${id}`, { headers: authHeaders() });
         const agent = await resp.json();
         if (!agent || !agent.name) return;
         const agentTools = agent.tools || [];
@@ -1215,10 +1214,10 @@
       const memoryEnabled = document.getElementById('edit-memory').checked;
       const selectedTools = Array.from(document.querySelectorAll('.agent-tool-cb-edit:checked')).map(cb => cb.value);
       try {
-        await fetch(`${API_BASE}/agents/${encodeURIComponent(name)}`, {
+        await fetch(`${API_BASE}/entities/Agent/records/${id}`, {
           method: 'PUT',
           headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, model, system_prompt: prompt, status, temperature: temp, max_tokens: maxTokens, memory_enabled: memoryEnabled, tools: selectedTools })
+          body: JSON.stringify({ data: { name, model, system_prompt: prompt, status, temperature: temp, max_tokens: maxTokens, memory_enabled: memoryEnabled, tools: selectedTools } })
         });
         toast('Agent updated!', 'success');
       } catch (e) {
@@ -1402,10 +1401,10 @@
 
 
 
-    async function deleteAgent(name) {
+    async function deleteAgent(id, name) {
       if (!confirm(`Delete agent "${name}"? This cannot be undone.`)) return;
       try {
-        const resp = await fetch(`${API_BASE}/agents/${encodeURIComponent(name)}`, { method: 'DELETE', headers: authHeaders() });
+        const resp = await fetch(`${API_BASE}/entities/Agent/records/${id}`, { method: 'DELETE', headers: authHeaders() });
         toast('Agent deleted', 'success');
       } catch (e) {
         toast('Failed to delete agent', 'error');
@@ -1418,8 +1417,9 @@
 
     async function openAgentChat(agentName) {
       try {
-        const resp = await fetch(`${API_BASE}/agents/${encodeURIComponent(agentName)}`, { headers: authHeaders() });
-        const agent = await resp.json();
+        const resp = await fetch(`${API_BASE}/entities/Agent/records?limit=100`, { headers: authHeaders() });
+        const data = await resp.json();
+        const agent = (data.records || []).find(a => a.name === agentName);
         if (!agent || !agent.name) return;
         chatHistory = [];
         openModal(`
@@ -2356,7 +2356,7 @@
 function closeOnboarding(){document.getElementById('onboarding-modal').style.display='none';localStorage.setItem('evolvix_onboarded','true')}
 function showOnboarding(){if(!localStorage.getItem('evolvix_onboarded')){setTimeout(function(){document.getElementById('onboarding-modal').style.display='block'},800)}}
 // Check if this is a new user (no agents yet)
-async function checkNewUser(){try{const r=await fetch('/platform/api/agents',{headers:authHeaders()});const d=await r.json();const agents=Array.isArray(d)?d:(d.agents||d.data||[]);if(agents.length===0&&!localStorage.getItem('evolvix_onboarded')){showOnboarding()}}catch(e){}}
+async function checkNewUser(){try{const r=await fetch('/platform/api/entities/Agent/records?limit=1',{headers:authHeaders()});const d=await r.json();const agents=d.records||[];if(agents.length===0&&!localStorage.getItem('evolvix_onboarded')){showOnboarding()}}catch(e){}}
 checkNewUser();
 </script>
 
