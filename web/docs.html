@@ -126,13 +126,13 @@ tr:hover{background:var(--card)}
     <section id="intro" class="hero">
       <div>
         <span class="badge badge-free">Free Tier Available</span>
-        <span class="badge badge-420">420+ Models</span>
+        <span class="badge badge-420">435+ Models</span>
         <span class="badge badge-new">OpenRouter Auto-Routing</span>
       </div>
       <h1>EvolvixOS API</h1>
-      <p>One API. 420+ AI models. Autonomous agents. Entity storage. Backend functions. Everything you need to build AI-powered applications — with a free tier and zero setup.</p>
+      <p>One API. 435+ AI models. Autonomous agents. Entity storage. Backend functions. Everything you need to build AI-powered applications — with a free tier and zero setup.</p>
       <div class="stats-row">
-        <div class="stat"><div class="stat-value">420+</div><div class="stat-label">AI Models</div></div>
+        <div class="stat"><div class="stat-value">435+</div><div class="stat-label">AI Models</div></div>
         <div class="stat"><div class="stat-value">59</div><div class="stat-label">Providers</div></div>
         <div class="stat"><div class="stat-value">36</div><div class="stat-label">Free Models</div></div>
         <div class="stat"><div class="stat-value">~$0.0002</div><div class="stat-label">Per Call</div></div>
@@ -162,12 +162,12 @@ tr:hover{background:var(--card)}
     "model": "openrouter/auto"
   }'</pre>
       </div>
-      <p>The <code>openrouter/auto</code> model automatically selects the best AI for your task — no need to choose between 420+ models.</p>
+      <p>The <code>openrouter/auto</code> model automatically selects the best AI for your task — no need to choose between 435+ models.</p>
     </section>
 
     <section id="chat">
       <h2>Chat Completion</h2>
-      <p>Send messages to any of the 420+ models through a single OpenAI-compatible endpoint.</p>
+      <p>Send messages to any of the 435+ models through a single OpenAI-compatible endpoint.</p>
       <div class="endpoint">
         <div class="endpoint-header">
           <span class="method method-post">POST</span>
@@ -198,6 +198,91 @@ tr:hover{background:var(--card)}
       </div>
     </section>
 
+
+    <section id="playground">
+      <h2>Model Playground</h2>
+      <p>Test any model directly without creating an agent. Pure model chat — no builder prompt, no entity creation.</p>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/platform/api/playground</span>
+        </div>
+        <div class="endpoint-desc">Send a message to any model. Returns response + model metadata. Requires auth.</div>
+      </div>
+      <h3>Request</h3>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>message</code></td><td>string</td><td>Yes</td><td>The message to send</td></tr>
+        <tr><td><code>model</code></td><td>string</td><td>No</td><td>Model ID or <code>auto</code> (default)</td></tr>
+        <tr><td><code>system_prompt</code></td><td>string</td><td>No</td><td>System prompt for the model</td></tr>
+        <tr><td><code>temperature</code></td><td>float</td><td>No</td><td>0-1, default 0.7</td></tr>
+        <tr><td><code>max_tokens</code></td><td>int</td><td>No</td><td>Max response tokens, default 1000</td></tr>
+      </table>
+      <h3>Example</h3>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>curl -X POST https://evolvixos.com/platform/api/playground \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -d '{
+    "message": "Review this code: def fib(n): return fib(n-1)+fib(n-2)",
+    "system_prompt": "You are a senior code reviewer.",
+    "temperature": 0.3,
+    "max_tokens": 1000
+  }'</pre>
+      </div>
+      <h3>Response</h3>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>{
+  "response": "The function is missing a base case...",
+  "model": "deepseek/deepseek-v4-flash-0731",
+  "provider": "openrouter",
+  "usage": {}
+}</pre>
+      </div>
+    </section>
+
+    <section id="demo-api">
+      <h2>Demo (No Signup)</h2>
+      <p>Try the platform without creating an account. 5 free requests per IP per 24 hours.</p>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/platform/api/demo</span>
+        </div>
+        <div class="endpoint-desc">Public endpoint, no auth required. Auto-routing only. Rate-limited.</div>
+      </div>
+      <h3>Request</h3>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>message</code></td><td>string</td><td>Yes</td><td>Message (max 1000 chars)</td></tr>
+        <tr><td><code>system_prompt</code></td><td>string</td><td>No</td><td>System prompt (max 500 chars)</td></tr>
+        <tr><td><code>temperature</code></td><td>float</td><td>No</td><td>0-1, default 0.7</td></tr>
+        <tr><td><code>max_tokens</code></td><td>int</td><td>No</td><td>Max 500</td></tr>
+      </table>
+      <h3>Example</h3>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>curl -X POST https://evolvixos.com/platform/api/demo \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Write a haiku about code"}'</pre>
+      </div>
+      <h3>Response</h3>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>{
+  "response": "Lines of logic flow...",
+  "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+  "provider": "nvidia",
+  "demo": true,
+  "remaining": 4,
+  "limit": 5
+}</pre>
+      </div>
+      <p><strong>Note:</strong> When rate limit is reached, returns <code>429</code> with a signup message.</p>
+    </section>
+
     <section id="models-api">
       <h2>List Models</h2>
       <div class="endpoint">
@@ -205,7 +290,7 @@ tr:hover{background:var(--card)}
           <span class="method method-get">GET</span>
           <span class="endpoint-path">/platform/api/models</span>
         </div>
-        <div class="endpoint-desc">List all 420+ available AI models (local + OpenRouter)</div>
+        <div class="endpoint-desc">List all 435+ available AI models (local + OpenRouter)</div>
       </div>
       <div class="code-block">
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
@@ -336,7 +421,26 @@ tr:hover{background:var(--card)}
       </div>
     </section>
 
-    <section id="monitor">
+        <section id="streaming">
+      <h2>Streaming (Coming Soon)</h2>
+      <p>Server-Sent Events (SSE) streaming for real-time responses. Currently in development.</p>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre># Planned API (not yet available)
+curl -N https://evolvixos.com/platform/api/playground/stream \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"message":"Write a story","model":"auto"}'
+
+# Response: SSE stream
+# data: {"chunk": "Once"}
+# data: {"chunk": " upon"}
+# data: {"chunk": " a time"}
+# data: [DONE]</pre>
+      </div>
+    </section>
+
+<section id="monitor">
       <h2>Monitoring</h2>
       <div class="endpoint">
         <div class="endpoint-header">
@@ -351,10 +455,10 @@ tr:hover{background:var(--card)}
       <h2>Rate Limits</h2>
       <table>
         <tr><th>Plan</th><th>Requests/min</th><th>Models</th><th>Agents</th><th>Price</th></tr>
-        <tr><td>Free</td><td>10</td><td>420+</td><td>1</td><td>€0/mo</td></tr>
-        <tr><td>Starter</td><td>30</td><td>420+</td><td>5</td><td>€9/mo</td></tr>
-        <tr><td>Pro</td><td>60</td><td>420+</td><td>25</td><td>€29/mo</td></tr>
-        <tr><td>Business</td><td>120</td><td>420+</td><td>Unlimited</td><td>€99/mo</td></tr>
+        <tr><td>Free</td><td>10</td><td>435+</td><td>1</td><td>€0/mo</td></tr>
+        <tr><td>Starter</td><td>30</td><td>435+</td><td>5</td><td>€9/mo</td></tr>
+        <tr><td>Pro</td><td>60</td><td>435+</td><td>25</td><td>€29/mo</td></tr>
+        <tr><td>Business</td><td>120</td><td>435+</td><td>Unlimited</td><td>€99/mo</td></tr>
       </table>
     </section>
 
@@ -443,7 +547,7 @@ curl -X POST https://evolvixos.com/platform/api/agents \
 
     <section style="text-align:center;padding:40px 0;border-top:1px solid var(--border)">
       <h2>Ready to build?</h2>
-      <p style="margin-bottom:24px">Start free with 420+ AI models, autonomous agents, and one unified API.</p>
+      <p style="margin-bottom:24px">Start free with 435+ AI models, autonomous agents, and one unified API.</p>
       <a href="/auth/sign-up" style="display:inline-block;background:var(--accent);color:#fff;padding:14px 32px;border-radius:12px;font-weight:600;font-size:15px;text-decoration:none;transition:transform .2s">Get Started Free →</a>
     </section>
   </main>
