@@ -1156,7 +1156,7 @@
       } catch (e) {
         var loading = document.getElementById('chat-loading');
         if (loading) loading.remove();
-        messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:rgba(255,59,48,0.08);color:var(--red);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px">Failed to get response.</div></div>';
+        messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:rgba(255,59,48,0.08);color:var(--red);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px">Failed to get response. ' + (e.message || 'Check connection.') + '</div></div>';
         messagesEl.scrollTop = messagesEl.scrollHeight;
       }
     }
@@ -1370,26 +1370,78 @@
 
         const resp = await fetch('/platform/api/playground/stream', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (token || '') },
           body: JSON.stringify(body),
           signal: controller.signal
         });
         clearTimeout(timeout);
 
-        // Remove loading
+        // Remove loading spinner
         const loading = document.getElementById(loadingId);
         if (loading) loading.remove();
 
-        if (resp.ok) {
-          const data = await resp.json();
-          const reply = data.response || data.message || data.reply || JSON.stringify(data);
-          pgMessages.push({ role: 'assistant', content: reply });
-          const meta = data.model ? '<div style="font-size:10px;color:var(--text3);margin-top:4px">via ' + data.model + (data.provider ? ' (' + data.provider + ')' : '') + '</div>' : '';
-          messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:var(--bg);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px;line-height:1.5;white-space:pre-wrap">' + reply.replace(/</g,'&lt;') + meta + '</div></div>';
+        if (resp.ok && resp.body) {
+          // Properly handle SSE streaming response
+          const reader = resp.body.getReader();
+          const decoder = new TextDecoder();
+          let fullReply = '';
+          let usedModel = '';
+          let usedProvider = '';
+          let buffer = '';
+
+          // Create the AI response bubble with a unique ID for streaming
+          const bubbleId = 'pg-bubble-' + Date.now();
+          messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div id="' + bubbleId + '" style="background:var(--bg);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px;line-height:1.5;white-space:pre-wrap"></div></div>';
+          const bubble = document.getElementById(bubbleId);
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                try {
+                  const chunk = JSON.parse(line.slice(6));
+                  if (chunk.chunk) {
+                    fullReply += chunk.chunk;
+                    if (chunk.model) usedModel = chunk.model;
+                    if (chunk.provider) usedProvider = chunk.provider;
+                    if (bubble) {
+                      bubble.innerHTML = fullReply.replace(/</g,'&lt;');
+                      messagesEl.scrollTop = messagesEl.scrollHeight;
+                    }
+                  }
+                  if (chunk.done) {
+                    if (chunk.model) usedModel = chunk.model;
+                    if (chunk.provider) usedProvider = chunk.provider;
+                  }
+                } catch(e) { /* skip malformed lines */ }
+              }
+            }
+          }
+
+          pgMessages.push({ role: 'assistant', content: fullReply });
+          if (bubble && usedModel) {
+            bubble.innerHTML = fullReply.replace(/</g,'&lt;') + '<div style="font-size:10px;color:var(--text3);margin-top:4px">via ' + usedModel + (usedProvider ? ' (' + usedProvider + ')' : '') + '</div>';
+          }
         } else {
-          const errData = await resp.json().catch(() => ({}));
-          const errMsg = errData.detail || ('Error ' + resp.status);
-          messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:rgba(255,59,48,0.08);color:var(--red);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px">' + errMsg + '</div></div>';
+          // Fallback: try non-streaming endpoint
+          try {
+            const fallbackResp = await fetch('/platform/api/playground', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (token || '') },
+              body: JSON.stringify(body)
+            });
+            const data = await fallbackResp.json();
+            const reply = data.response || data.message || data.reply || JSON.stringify(data);
+            pgMessages.push({ role: 'assistant', content: reply });
+            const meta = data.model ? '<div style="font-size:10px;color:var(--text3);margin-top:4px">via ' + data.model + (data.provider ? ' (' + data.provider + ')' : '') + '</div>' : '';
+            messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:var(--bg);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px;line-height:1.5;white-space:pre-wrap">' + reply.replace(/</g,'&lt;') + meta + '</div></div>';
+          } catch(fallbackErr) {
+            messagesEl.innerHTML += '<div style="display:flex;justify-content:flex-start;gap:8px;align-items:flex-start"><div class="agent-avatar" style="width:28px;height:28px;font-size:10px;flex-shrink:0">AI</div><div style="background:rgba(255,59,48,0.08);color:var(--red);padding:10px 14px;border-radius:14px 4px 14px 14px;max-width:75%;font-size:14px">Failed to get response. Check your connection.</div></div>';
+          }
         }
         messagesEl.scrollTop = messagesEl.scrollHeight;
       } catch (e) {
@@ -1888,7 +1940,7 @@
           </div>
         </div>
       `;
-    }
+    });
 
     // ===== SEARCH =====
     document.getElementById('search-input').addEventListener('input', function(e) {

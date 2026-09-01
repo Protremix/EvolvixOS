@@ -2237,7 +2237,7 @@ Always respond with a JSON action object. If the user just wants to chat, respon
                 from app_generator import deploy_app
                 app_name = action.get("app_name", "My App")
                 entity_names = action.get("entities", [])
-                all_ents = await EntityManager.list_entities(db, user_id=user_id)
+                all_ents = await EntityManager.list_entities(db)
                 ents_with_schemas = []
                 for ename in entity_names:
                     for e in (all_ents or []):
