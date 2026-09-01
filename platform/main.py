@@ -1585,7 +1585,7 @@ async def delegate_subagent(req: SubAgentReq, request: Request):
     if not user: raise HTTPException(401, "Auth required")
     sys_prompt = "You are an EvolvixOS sub-agent. Context: " + req.context + ". Task: " + req.task
     msgs = [{"role": "system", "content": sys_prompt}, {"role": "user", "content": req.task}]
-    result = await unified_chat(msgs, model="auto", temperature=0.3, max_tokens=2000, prefer_cloud=True)
+    result = await asyncio.wait_for(unified_chat(msgs, model="auto", temperature=0.3, max_tokens=2000, prefer_cloud=True), timeout=120)
     return {"result": result.get("content", ""), "model": result.get("model", "auto"), "provider": result.get("provider", "auto")}
 
 
@@ -1744,7 +1744,7 @@ Always respond with a JSON action object. If the user just wants to chat, respon
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": msg.message}
     ]
-    llm_result = await unified_chat(llm_messages, model=msg.model or "auto", temperature=0.3, max_tokens=2000, prefer_cloud=True)
+    llm_result = await asyncio.wait_for(unified_chat(llm_messages, model=msg.model or "auto", temperature=0.3, max_tokens=2000, prefer_cloud=True), timeout=120)
     ai_response = llm_result.get("content", "")
     # Save user message to chat history
     try:
@@ -1825,13 +1825,73 @@ Always respond with a JSON action object. If the user just wants to chat, respon
                         "result": plugin_result,
                     }
         
-        # Find JSON in response
-        json_start = ai_response.find("{")
-        json_end = ai_response.rfind("}") + 1
-        if json_start >= 0 and json_end > json_start:
-            action = json.loads(ai_response[json_start:json_end])
-        else:
-            return {"action": "chat", "message": ai_response}
+        # Find JSON in response — robust extraction
+        # 1. Strip markdown code blocks first
+        clean = ai_response.strip()
+        if clean.startswith("```"):
+            # Remove first line (```json or ```python) and trailing ```
+            lines = clean.split("\n")
+            if lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].strip() == "```":
+                lines = lines[:-1]
+            clean = "\n".join(lines).strip()
+        
+        # 2. Try direct parse first
+        try:
+            action = json.loads(clean)
+        except json.JSONDecodeError:
+            # 3. Find the JSON object containing "action" key
+            action = None
+            search_start = 0
+            while True:
+                brace_idx = clean.find("{", search_start)
+                if brace_idx < 0:
+                    break
+                # Use brace matching to find the complete JSON object
+                depth = 0
+                in_string = False
+                escape = False
+                for i in range(brace_idx, len(clean)):
+                    c = clean[i]
+                    if escape:
+                        escape = False
+                        continue
+                    if c == "\\":
+                        escape = True
+                        continue
+                    if c == '"':
+                        in_string = not in_string
+                        continue
+                    if in_string:
+                        continue
+                    if c == "{":
+                        depth += 1
+                    elif c == "}":
+                        depth -= 1
+                        if depth == 0:
+                            candidate = clean[brace_idx:i+1]
+                            try:
+                                parsed = json.loads(candidate)
+                                if isinstance(parsed, dict) and "action" in parsed:
+                                    action = parsed
+                                    break
+                            except json.JSONDecodeError:
+                                pass
+                            search_start = i + 1
+                            break
+            
+            if action is None:
+                # 4. Last resort: try the old method (first { to last })
+                json_start = clean.find("{")
+                json_end = clean.rfind("}") + 1
+                if json_start >= 0 and json_end > json_start:
+                    try:
+                        action = json.loads(clean[json_start:json_end])
+                    except json.JSONDecodeError:
+                        return {"action": "chat", "message": ai_response}
+                else:
+                    return {"action": "chat", "message": ai_response}
     except json.JSONDecodeError:
         return {"action": "chat", "message": ai_response}
 
@@ -3098,3 +3158,242 @@ async def websocket_collab(websocket: WebSocket, room_id: str):
         pass
     finally:
         await ws_manager.disconnect(websocket, room_id, user_id)
+
+
+# ─────────────────────────────────────────────────────────────
+# OpenViking Context Database — Bridge Endpoints
+# Provides persistent project memory, semantic search, and
+# session memory extraction for the EvolvixOS platform.
+# OpenViking runs on port 8200 as a separate service.
+# ─────────────────────────────────────────────────────────────
+
+from openviking_bridge import (
+    health_check as ov_health,
+    add_resource as ov_add_resource,
+    list_resources as ov_list_resources,
+    search as ov_search,
+    recall as ov_recall,
+    grep as ov_grep,
+    write_content as ov_write_content,
+    read_content as ov_read_content,
+    get_overview as ov_get_overview,
+    create_session as ov_create_session,
+    list_sessions as ov_list_sessions,
+    add_messages_batch as ov_add_messages_batch,
+    commit_session as ov_commit_session,
+    get_session_context as ov_get_session_context,
+    extract_session as ov_extract_session,
+    get_memory_stats as ov_get_memory_stats,
+    list_context as ov_list_context,
+    tree_context as ov_tree_context,
+    stat_context as ov_stat_context,
+    make_dir as ov_make_dir,
+    save_skill as ov_save_skill,
+    list_skills as ov_list_skills,
+    find_skills as ov_find_skills,
+    get_skill as ov_get_skill,
+    store_knowledge as ov_store_knowledge,
+    recall_for_agent as ov_recall_for_agent,
+    get_evolution_outcomes as ov_get_evolution_outcomes,
+    get_evolution_trajectories as ov_get_evolution_trajectories,
+)
+
+
+@app.get("/api/context/health")
+async def context_health():
+    """Check OpenViking context database health."""
+    return ov_health()
+
+
+@app.post("/api/context/resources")
+async def context_add_resource(request: Request):
+    """Add a resource (repo URL, file, web page) to the context store."""
+    data = await request.json()
+    return ov_add_resource(data.get("source", ""), wait=data.get("wait", False))
+
+
+@app.get("/api/context/resources")
+async def context_list_resources():
+    """List all indexed resources."""
+    return ov_list_resources()
+
+
+@app.post("/api/context/search")
+async def context_search(request: Request):
+    """Semantic search across all context (code, docs, memories)."""
+    data = await request.json()
+    return ov_search(
+        query=data.get("query", ""),
+        limit=data.get("limit", 5),
+        mode=data.get("mode", "thinking"),
+    )
+
+
+@app.post("/api/context/recall")
+async def context_recall(request: Request):
+    """Recall context optimized for agent injection."""
+    data = await request.json()
+    return ov_recall_for_agent(
+        query=data.get("query", ""),
+        limit=data.get("limit", 5),
+    )
+
+
+@app.post("/api/context/grep")
+async def context_grep(request: Request):
+    """Grep within indexed content."""
+    data = await request.json()
+    return ov_grep(
+        pattern=data.get("pattern", ""),
+        path=data.get("path", "viking://"),
+    )
+
+
+@app.post("/api/context/content/write")
+async def context_write_content(request: Request):
+    """Write content to a viking:// URI — explicit knowledge storage."""
+    data = await request.json()
+    return ov_write_content(
+        uri=data.get("uri", ""),
+        content=data.get("content", ""),
+        tags=data.get("tags", []),
+    )
+
+
+@app.get("/api/context/content/read")
+async def context_read_content(uri: str = Query("")):
+    """Read content from a viking:// URI."""
+    return ov_read_content(uri)
+
+
+@app.get("/api/context/content/overview")
+async def context_content_overview(uri: str = Query("")):
+    """Get L1 overview (structured summary) of a resource."""
+    return ov_get_overview(uri)
+
+
+@app.post("/api/context/knowledge")
+async def context_store_knowledge(request: Request):
+    """Store explicit knowledge at a predictable URI."""
+    data = await request.json()
+    return ov_store_knowledge(
+        key=data.get("key", ""),
+        content=data.get("content", ""),
+        category=data.get("category", "knowledge"),
+    )
+
+
+# ── Session-based memory extraction ──
+
+@app.post("/api/context/sessions")
+async def context_create_session(request: Request):
+    """Create a new session for memory tracking."""
+    data = await request.json()
+    return ov_create_session(data.get("title", ""))
+
+
+@app.get("/api/context/sessions")
+async def context_list_sessions():
+    """List all sessions."""
+    return ov_list_sessions()
+
+
+@app.post("/api/context/sessions/{session_id}/messages")
+async def context_add_messages(session_id: str, request: Request):
+    """Add messages to a session (batch)."""
+    data = await request.json()
+    return ov_add_messages_batch(session_id, data.get("messages", []))
+
+
+@app.post("/api/context/sessions/{session_id}/commit")
+async def context_commit_session(session_id: str):
+    """Commit a session — triggers async memory extraction."""
+    return ov_commit_session(session_id)
+
+
+@app.get("/api/context/sessions/{session_id}/context")
+async def context_get_session_context(session_id: str):
+    """Get memories extracted from a session."""
+    return ov_get_session_context(session_id)
+
+
+@app.post("/api/context/sessions/{session_id}/extract")
+async def context_extract_session(session_id: str):
+    """Manually trigger memory extraction."""
+    return ov_extract_session(session_id)
+
+
+@app.get("/api/context/memories/stats")
+async def context_memory_stats():
+    """Get statistics about stored memories."""
+    return ov_get_memory_stats()
+
+
+# ── Filesystem ──
+
+@app.get("/api/context/fs/ls")
+async def context_list_fs(path: str = Query("viking://")):
+    """List context at a viking:// path."""
+    return ov_list_context(path)
+
+
+@app.get("/api/context/fs/tree")
+async def context_tree_fs(path: str = Query("viking://"), depth: int = Query(2)):
+    """Show tree of context at a path."""
+    return ov_tree_context(path, depth)
+
+
+@app.get("/api/context/fs/stat")
+async def context_stat_fs(path: str = Query("")):
+    """Get attributes of a context path."""
+    return ov_stat_context(path)
+
+
+# ── Skills ──
+
+@app.post("/api/context/skills")
+async def context_save_skill(request: Request):
+    """Save a reusable skill to the context store."""
+    data = await request.json()
+    return ov_save_skill(
+        name=data.get("name", ""),
+        description=data.get("description", ""),
+        code=data.get("code", ""),
+        tags=data.get("tags", []),
+    )
+
+
+@app.get("/api/context/skills")
+async def context_list_skills():
+    """List all stored skills."""
+    return ov_list_skills()
+
+
+@app.post("/api/context/skills/find")
+async def context_find_skills(request: Request):
+    """Semantic search for skills."""
+    data = await request.json()
+    return ov_find_skills(
+        query=data.get("query", ""),
+        limit=data.get("limit", 5),
+    )
+
+
+@app.get("/api/context/skills/{name}")
+async def context_get_skill(name: str):
+    """Get a specific skill by name."""
+    return ov_get_skill(name)
+
+
+# ── Agent Evolution ──
+
+@app.get("/api/context/evolution/outcomes")
+async def context_evolution_outcomes():
+    """Get agent evolution experience outcomes."""
+    return ov_get_evolution_outcomes()
+
+
+@app.get("/api/context/evolution/trajectories")
+async def context_evolution_trajectories():
+    """Get agent evolution experience trajectories."""
+    return ov_get_evolution_trajectories()
