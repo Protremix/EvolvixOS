@@ -378,6 +378,7 @@
       <div class="nav-label">Account</div>
       <a class="nav-item" data-route="billing" onclick="navigate('billing')">{IC_CARD}Billing</a>
       <a class="nav-item" data-route="settings" onclick="navigate('settings')">{IC_GEAR}Settings</a>
+      <a class="nav-item" href="/docs" target="_blank" style="text-decoration:none;color:inherit">☰ API Docs ↗</a>
     </nav>
     <div class="sidebar-footer">
       <div class="user-card">
@@ -1670,5 +1671,52 @@
     // ===== INIT =====
     handleRoute();
   </script>
+
+<!-- Onboarding Modal for New Users -->
+<div id="onboarding-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);animation:fadeIn .3s ease">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;max-width:560px;background:#fff;border-radius:20px;padding:40px;box-shadow:0 24px 80px rgba(0,0,0,0.2);animation:slideUp .4s ease">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#007aff,#5856d6);border-radius:16px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:700">E</div>
+      <h2 style="font-size:24px;font-weight:800;letter-spacing:-0.02em;margin-bottom:4px">Welcome to EvolvixOS</h2>
+      <p style="font-size:15px;color:#86868b">Let's get you set up in 3 steps</p>
+    </div>
+    <div id="onboarding-steps" style="margin-bottom:28px">
+      <div class="ob-step" data-step="1" style="display:flex;gap:12px;padding:16px;border:1px solid rgba(0,0,0,0.08);border-radius:12px;margin-bottom:10px;cursor:pointer;transition:all .2s" onclick="navigate('api-keys');closeOnboarding()">
+        <div style="width:32px;height:32px;background:rgba(0,122,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#007aff;flex-shrink:0">1</div>
+        <div>
+          <div style="font-weight:600;font-size:14px">Create an API Key</div>
+          <div style="font-size:12px;color:#86868b;margin-top:2px">Generate a key to authenticate API requests</div>
+        </div>
+      </div>
+      <div class="ob-step" data-step="2" style="display:flex;gap:12px;padding:16px;border:1px solid rgba(0,0,0,0.08);border-radius:12px;margin-bottom:10px;cursor:pointer;transition:all .2s" onclick="navigate('models');closeOnboarding()">
+        <div style="width:32px;height:32px;background:rgba(0,122,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#007aff;flex-shrink:0">2</div>
+        <div>
+          <div style="font-weight:600;font-size:14px">Browse 420+ AI Models</div>
+          <div style="font-size:12px;color:#86868b;margin-top:2px">Explore all available engines — or use auto-routing</div>
+        </div>
+      </div>
+      <div class="ob-step" data-step="3" style="display:flex;gap:12px;padding:16px;border:1px solid rgba(0,0,0,0.08);border-radius:12px;margin-bottom:10px;cursor:pointer;transition:all .2s" onclick="navigate('agents');closeOnboarding()">
+        <div style="width:32px;height:32px;background:rgba(0,122,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#007aff;flex-shrink:0">3</div>
+        <div>
+          <div style="font-weight:600;font-size:14px">Create Your First Agent</div>
+          <div style="font-size:12px;color:#86868b;margin-top:2px">Set up an autonomous AI agent with tools</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeOnboarding()" style="flex:1;padding:12px;border:1px solid rgba(0,0,0,0.1);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;background:#fff;color:#1d1d1f">Skip Tour</button>
+      <button onclick="navigate('api-keys');closeOnboarding()" style="flex:1;padding:12px;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#007aff,#5856d6);color:#fff">Get Started →</button>
+    </div>
+  </div>
+</div>
+<style>@keyframes slideUp{from{opacity:0;transform:translate(-50%,calc(-50% + 20px))}to{opacity:1;transform:translate(-50%,-50%)}}</style>
+<script>
+function closeOnboarding(){document.getElementById('onboarding-modal').style.display='none';localStorage.setItem('evolvix_onboarded','true')}
+function showOnboarding(){if(!localStorage.getItem('evolvix_onboarded')){setTimeout(function(){document.getElementById('onboarding-modal').style.display='block'},800)}}
+// Check if this is a new user (no agents yet)
+async function checkNewUser(){try{const r=await fetch('/platform/api/agents',{headers:authHeaders()});const d=await r.json();const agents=Array.isArray(d)?d:(d.agents||d.data||[]);if(agents.length===0&&!localStorage.getItem('evolvix_onboarded')){showOnboarding()}}catch(e){}}
+checkNewUser();
+</script>
+
 </body>
 </html>

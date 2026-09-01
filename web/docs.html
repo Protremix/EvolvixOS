@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Documentation — EvolvixOS</title>
+<meta name="description" content="EvolvixOS API Documentation — Agents, Models, Entities, Workflows, and more.">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<style>
+:root{
+--bg:#ffffff;--bg2:#f5f5f7;--card:#f5f5f7;--card2:#e8e8ed;--border:rgba(0,0,0,0.08);
+--text:#1d1d1f;--muted:#86868b;--accent:#007aff;--accent2:#5856d6;
+--green:#34c759;--orange:#febc2e;--radius:14px;
+--mono:'SF Mono','Fira Code',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,-apple-system,sans-serif;line-height:1.6;min-height:100vh}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Nav */
+nav{display:flex;justify-content:space-between;align-items:center;padding:16px 48px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);z-index:100}
+.nav-logo{font-size:20px;font-weight:700;text-decoration:none;color:var(--text)}
+.nav-logo span{color:var(--accent)}
+.nav-links{display:flex;gap:24px;align-items:center}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--accent)!important;color:#fff!important;padding:8px 16px;border-radius:8px;font-weight:600!important}
+
+/* Layout */
+.docs-layout{display:grid;grid-template-columns:260px 1fr;max-width:1400px;margin:0 auto;min-height:calc(100vh - 60px)}
+.sidebar{border-right:1px solid var(--border);padding:24px 20px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+.sidebar h3{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:20px 0 8px;font-weight:600}
+.sidebar a{display:block;padding:6px 12px;border-radius:8px;font-size:13px;color:var(--muted);text-decoration:none;transition:all .2s}
+.sidebar a:hover{background:var(--card);color:var(--text)}
+.sidebar a.active{background:rgba(0,122,255,0.1);color:var(--accent);font-weight:600}
+
+/* Content */
+.content{padding:40px 48px;max-width:900px}
+.content section{margin-bottom:60px;animation:fadeIn .4s ease}
+.content h1{font-size:36px;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px}
+.content h2{font-size:24px;font-weight:700;margin-bottom:12px;margin-top:32px}
+.content h3{font-size:18px;font-weight:600;margin-bottom:8px;margin-top:24px}
+.content p{color:var(--text);margin-bottom:16px;font-size:15px}
+.content ul{margin-bottom:16px;padding-left:20px}
+.content li{margin-bottom:6px;font-size:14px}
+.content code{font-family:var(--mono);background:var(--card);padding:2px 6px;border-radius:4px;font-size:13px}
+
+/* Code blocks */
+.code-block{background:#1d1d1f;color:#f5f5f7;border-radius:12px;padding:20px;margin:16px 0;overflow-x:auto;position:relative}
+.code-block pre{font-family:var(--mono);font-size:13px;line-height:1.6;white-space:pre}
+.code-block .copy-btn{position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.1);color:#f5f5f7;border:none;padding:4px 12px;border-radius:6px;font-size:11px;cursor:pointer;transition:background .2s}
+.code-block .copy-btn:hover{background:rgba(255,255,255,0.2)}
+.code-block .method{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;margin-right:8px}
+.method-get{background:rgba(52,199,89,0.3);color:#34c759}
+.method-post{background:rgba(0,122,255,0.3);color:#5ac8fa}
+.method-put{background:rgba(254,188,46,0.3);color:#febc2e}
+.method-del{background:rgba(255,59,48,0.3);color:#ff3b30}
+
+/* Endpoint cards */
+.endpoint{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:12px;transition:all .2s}
+.endpoint:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(0,122,255,0.08)}
+.endpoint-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.endpoint-path{font-family:var(--mono);font-size:14px;font-weight:600}
+.endpoint-desc{font-size:13px;color:var(--muted)}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+th{text-align:left;padding:10px 12px;border-bottom:2px solid var(--border);font-weight:600;color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:.5px}
+td{padding:10px 12px;border-bottom:1px solid var(--border)}
+tr:hover{background:var(--card)}
+
+/* Stats */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:20px 0}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.stat-value{font-size:24px;font-weight:700}
+.stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+/* Hero */
+.hero{margin-bottom:40px}
+.hero p{font-size:17px;color:var(--muted);max-width:600px}
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;margin-right:8px;margin-bottom:8px}
+.badge-free{background:rgba(52,199,89,0.15);color:var(--green)}
+.badge-new{background:rgba(0,122,255,0.15);color:var(--accent)}
+.badge-420{background:rgba(88,86,214,0.15);color:var(--accent2)}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Evolvix<span>OS</span></a>
+  <div class="nav-links">
+    <a href="/#features">Features</a>
+    <a href="/#pricing">Pricing</a>
+    <a href="/models">Models</a>
+    <a href="/docs">Docs</a>
+    <a href="https://github.com/Protremix/EvolvixOS" target="_blank">GitHub</a>
+    <a href="/auth/sign-in">Sign In</a>
+    <a href="/auth/sign-up" class="nav-cta">Get Started Free</a>
+  </div>
+</nav>
+
+<div class="docs-layout">
+  <aside class="sidebar">
+    <h3>Getting Started</h3>
+    <a href="#intro" class="active">Introduction</a>
+    <a href="#auth">Authentication</a>
+    <a href="#quickstart">Quick Start</a>
+    <a href="#rate-limits">Rate Limits</a>
+    <h3>Core API</h3>
+    <a href="#chat">Chat Completion</a>
+    <a href="#models-api">List Models</a>
+    <a href="#agents">Agents</a>
+    <a href="#entities">Entities</a>
+    <a href="#workflows">Workflows</a>
+    <h3>Platform</h3>
+    <a href="#functions">Backend Functions</a>
+    <a href="#files">File Storage</a>
+    <a href="#monitor">Monitoring</a>
+    <a href="#errors">Error Codes</a>
+    <h3>SDKs</h3>
+    <a href="#python">Python</a>
+    <a href="#javascript">JavaScript</a>
+    <a href="#curl">cURL</a>
+  </aside>
+
+  <main class="content">
+    <section id="intro" class="hero">
+      <div>
+        <span class="badge badge-free">Free Tier Available</span>
+        <span class="badge badge-420">420+ Models</span>
+        <span class="badge badge-new">OpenRouter Auto-Routing</span>
+      </div>
+      <h1>EvolvixOS API</h1>
+      <p>One API. 420+ AI models. Autonomous agents. Entity storage. Backend functions. Everything you need to build AI-powered applications — with a free tier and zero setup.</p>
+      <div class="stats-row">
+        <div class="stat"><div class="stat-value">420+</div><div class="stat-label">AI Models</div></div>
+        <div class="stat"><div class="stat-value">59</div><div class="stat-label">Providers</div></div>
+        <div class="stat"><div class="stat-value">36</div><div class="stat-label">Free Models</div></div>
+        <div class="stat"><div class="stat-value">~$0.0002</div><div class="stat-label">Per Call</div></div>
+      </div>
+    </section>
+
+    <section id="auth">
+      <h2>Authentication</h2>
+      <p>All API requests require an API key. Create one in your <a href="/dashboard/api-keys.html">dashboard</a> after signing up. Include it in the <code>Authorization</code> header:</p>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>Authorization: Bearer evx_live_xxxxxxxxxxxxxxxxxxxx</pre>
+      </div>
+      <p>Your API key carries many privileges — keep it secret. Never expose it in client-side code.</p>
+    </section>
+
+    <section id="quickstart">
+      <h2>Quick Start</h2>
+      <p>Send your first AI request in 30 seconds:</p>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>curl -X POST https://evolvixos.com/platform/api/chat \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Write a Python function to check if a number is prime",
+    "model": "openrouter/auto"
+  }'</pre>
+      </div>
+      <p>The <code>openrouter/auto</code> model automatically selects the best AI for your task — no need to choose between 420+ models.</p>
+    </section>
+
+    <section id="chat">
+      <h2>Chat Completion</h2>
+      <p>Send messages to any of the 420+ models through a single OpenAI-compatible endpoint.</p>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/platform/api/chat</span>
+        </div>
+        <div class="endpoint-desc">Send a chat message and get an AI response. Auto-routes to the best model.</div>
+      </div>
+      <h3>Request</h3>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>message</code></td><td>string</td><td>Yes</td><td>The user's message</td></tr>
+        <tr><td><code>model</code></td><td>string</td><td>No</td><td>Model ID (default: <code>openrouter/auto</code>)</td></tr>
+        <tr><td><code>temperature</code></td><td>float</td><td>No</td><td>0-1, default 0.7</td></tr>
+        <tr><td><code>max_tokens</code></td><td>int</td><td>No</td><td>Max response tokens, default 4096</td></tr>
+        <tr><td><code>system</code></td><td>string</td><td>No</td><td>System prompt</td></tr>
+      </table>
+      <h3>Example Response</h3>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>{
+  "response": "def is_prime(n):\n    if n < 2: return False\n    for i in range(2, int(n**0.5)+1):\n        if n % i == 0: return False\n    return True",
+  "model": "deepseek/deepseek-v4-flash-0731",
+  "provider": "openrouter",
+  "tokens": 156,
+  "cost": 0.000218,
+  "latency_ms": 832
+}</pre>
+      </div>
+    </section>
+
+    <section id="models-api">
+      <h2>List Models</h2>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/platform/api/models</span>
+        </div>
+        <div class="endpoint-desc">List all 420+ available AI models (local + OpenRouter)</div>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>curl https://evolvixos.com/platform/api/models \
+  -H "Authorization: Bearer YOUR_API_KEY"</pre>
+      </div>
+      <p>Filter by category: <code>chat</code>, <code>code</code>, <code>reasoning</code>, <code>vision</code>, <code>local</code>, <code>routing</code></p>
+    </section>
+
+    <section id="agents">
+      <h2>Agents</h2>
+      <p>Create autonomous AI agents that can execute multi-step workflows with tools.</p>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/platform/api/agents</span>
+        </div>
+        <div class="endpoint-desc">List your agents</div>
+      </div>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/platform/api/agents</span>
+        </div>
+        <div class="endpoint-desc">Create a new agent with a name, model, and system prompt</div>
+      </div>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/platform/api/orchestrate</span>
+        </div>
+        <div class="endpoint-desc">Run an agent on a goal — it plans and executes multi-step tasks</div>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>curl -X POST https://evolvixos.com/platform/api/orchestrate \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "goal": "Research the latest trends in AI and write a summary"
+  }'</pre>
+      </div>
+    </section>
+
+    <section id="entities">
+      <h2>Entities (Database)</h2>
+      <p>Create JSON-schema-defined data tables with instant CRUD API.</p>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/platform/api/entities</span>
+        </div>
+        <div class="endpoint-desc">Create a new entity (table) with a JSON schema</div>
+      </div>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/platform/api/entities/{name}/records</span>
+        </div>
+        <div class="endpoint-desc">List records in an entity with pagination, filtering, sorting</div>
+      </div>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>curl -X POST https://evolvixos.com/platform/api/entities \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Task",
+    "schema": {
+      "properties": {
+        "title": {"type": "string"},
+        "status": {"type": "string", "enum": ["todo", "doing", "done"]},
+        "priority": {"type": "string", "enum": ["low", "medium", "high"]}
+      },
+      "type": "object"
+    }
+  }'</pre>
+      </div>
+    </section>
+
+    <section id="workflows">
+      <h2>Workflows</h2>
+      <p>Automate tasks with scheduled or entity-triggered workflows.</p>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/platform/api/workflows</span>
+        </div>
+        <div class="endpoint-desc">List all workflows</div>
+      </div>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/platform/api/workflows</span>
+        </div>
+        <div class="endpoint-desc">Create a workflow with trigger + steps</div>
+      </div>
+    </section>
+
+    <section id="functions">
+      <h2>Backend Functions</h2>
+      <p>Deploy Python code as HTTP endpoints — no server management.</p>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/platform/api/functions</span>
+        </div>
+        <div class="endpoint-desc">Deploy a new backend function</div>
+      </div>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/platform/api/fn/{name}</span>
+        </div>
+        <div class="endpoint-desc">Execute a deployed function</div>
+      </div>
+    </section>
+
+    <section id="files">
+      <h2>File Storage</h2>
+      <p>Upload and manage files with CDN-backed public URLs or private signed URLs.</p>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-post">POST</span>
+          <span class="endpoint-path">/platform/api/files/upload</span>
+        </div>
+        <div class="endpoint-desc">Upload a file and get a public URL</div>
+      </div>
+    </section>
+
+    <section id="monitor">
+      <h2>Monitoring</h2>
+      <div class="endpoint">
+        <div class="endpoint-header">
+          <span class="method method-get">GET</span>
+          <span class="endpoint-path">/platform/api/monitor</span>
+        </div>
+        <div class="endpoint-desc">Server health, CPU, RAM, GPU status</div>
+      </div>
+    </section>
+
+    <section id="rate-limits">
+      <h2>Rate Limits</h2>
+      <table>
+        <tr><th>Plan</th><th>Requests/min</th><th>Models</th><th>Agents</th><th>Price</th></tr>
+        <tr><td>Free</td><td>10</td><td>420+</td><td>1</td><td>€0/mo</td></tr>
+        <tr><td>Starter</td><td>30</td><td>420+</td><td>5</td><td>€9/mo</td></tr>
+        <tr><td>Pro</td><td>60</td><td>420+</td><td>25</td><td>€29/mo</td></tr>
+        <tr><td>Business</td><td>120</td><td>420+</td><td>Unlimited</td><td>€99/mo</td></tr>
+      </table>
+    </section>
+
+    <section id="errors">
+      <h2>Error Codes</h2>
+      <table>
+        <tr><th>Code</th><th>Meaning</th></tr>
+        <tr><td>400</td><td>Bad request — invalid parameters</td></tr>
+        <tr><td>401</td><td>Unauthorized — missing or invalid API key</td></tr>
+        <tr><td>403</td><td>Forbidden — insufficient permissions</td></tr>
+        <tr><td>404</td><td>Not found — resource doesn't exist</td></tr>
+        <tr><td>429</td><td>Rate limited — too many requests</td></tr>
+        <tr><td>500</td><td>Server error — try again or contact support</td></tr>
+      </table>
+    </section>
+
+    <section id="python">
+      <h2>Python SDK</h2>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>import requests
+
+API_KEY = "evx_live_xxxxxxxxxxxx"
+BASE = "https://evolvixos.com/platform/api"
+
+# Chat completion
+resp = requests.post(f"{BASE}/chat",
+    headers={"Authorization": f"Bearer {API_KEY}"},
+    json={"message": "What is 2+2?", "model": "openrouter/auto"}
+)
+print(resp.json()["response"])
+
+# List models
+models = requests.get(f"{BASE}/models",
+    headers={"Authorization": f"Bearer {API_KEY}"}
+)
+print(f"{len(models.json()['models'])} models available")</pre>
+      </div>
+    </section>
+
+    <section id="javascript">
+      <h2>JavaScript SDK</h2>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre>const API_KEY = "evx_live_xxxxxxxxxxxx";
+const BASE = "https://evolvixos.com/platform/api";
+
+// Chat completion
+const resp = await fetch(`${BASE}/chat`, {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${API_KEY}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    message: "Write a hello world in Python",
+    model: "openrouter/auto"
+  })
+});
+const data = await resp.json();
+console.log(data.response);</pre>
+      </div>
+    </section>
+
+    <section id="curl">
+      <h2>cURL Examples</h2>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <pre># Chat with auto-routing
+curl -X POST https://evolvixos.com/platform/api/chat \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Explain quantum computing"}'
+
+# List all models
+curl https://evolvixos.com/platform/api/models \
+  -H "Authorization: Bearer $API_KEY"
+
+# Create an agent
+curl -X POST https://evolvixos.com/platform/api/agents \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Code Reviewer", "model": "openrouter/auto"}'</pre>
+      </div>
+    </section>
+
+    <section style="text-align:center;padding:40px 0;border-top:1px solid var(--border)">
+      <h2>Ready to build?</h2>
+      <p style="margin-bottom:24px">Start free with 420+ AI models, autonomous agents, and one unified API.</p>
+      <a href="/auth/sign-up" style="display:inline-block;background:var(--accent);color:#fff;padding:14px 32px;border-radius:12px;font-weight:600;font-size:15px;text-decoration:none;transition:transform .2s">Get Started Free →</a>
+    </section>
+  </main>
+</div>
+
+<script>
+function copyCode(btn) {
+  const code = btn.parentElement.querySelector('pre').textContent;
+  navigator.clipboard.writeText(code);
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 1500);
+}
+
+// Active sidebar link on scroll
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.sidebar a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.classList.remove('active');
+    if (a.getAttribute('href') === '#' + current) a.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

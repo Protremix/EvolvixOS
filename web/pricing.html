@@ -145,7 +145,7 @@
     <div class="nav-links">
       <a href="/pricing">Pricing</a>
       <a href="/contact">Contact</a>
-      <a href="/dashboard/overview" class="nav-cta">Sign in</a>
+      <a href="/auth/sign-in">Sign In</a><a href="/auth/sign-up" class="nav-cta">Get Started Free</a>
     </div>
   </nav>
 
@@ -306,7 +306,7 @@
       const tier = TIERS.find(function(t) { return t.name === tierName; });
       if (!tier) return;
       if (tier.isFree || tier.prices[currentCycle] === 0) {
-        window.location.href = "/dashboard/overview";
+        window.location.href = "/auth/sign-in";
         return;
       }
       const priceId = tier.stripePrices[currentCycle];
