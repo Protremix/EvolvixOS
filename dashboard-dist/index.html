@@ -317,7 +317,33 @@
       .btn, .nav-item, .toggle-sidebar { -webkit-tap-highlight-color: transparent; user-select: none; }
     
 
-  </style>
+  
+    /* Dark Mode */
+    body.dark-mode {
+      --bg: #0a0a0f;
+      --bg2: #14141a;
+      --text: #f5f5f7;
+      --text2: #98989d;
+      --text3: #636366;
+      --border: #2c2c2e;
+      --border-soft: #1c1c1e;
+      --accent: #0a84ff;
+      --accent-soft: rgba(10,132,255,0.15);
+      --green: #30d158;
+      --red: #ff453a;
+      --yellow: #ffd60a;
+      --purple: #bf5af2;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+    }
+    body.dark-mode .chart-wrap { background: var(--bg2); }
+    body.dark-mode .modal-content { background: var(--bg2); }
+    body.dark-mode .form-input, body.dark-mode .form-select { background: var(--bg2); }
+    body.dark-mode pre { background: var(--bg2) !important; }
+    body.dark-mode .agent-avatar { background: linear-gradient(135deg, var(--accent), var(--purple)); }
+    
+    </style>
 </head>
 <body>
 
@@ -1879,7 +1905,33 @@
     </div>
   </div>
 </div>
-<style>@keyframes slideUp{from{opacity:0;transform:translate(-50%,calc(-50% + 20px))}to{opacity:1;transform:translate(-50%,-50%)}}</style>
+<style>@keyframes slideUp{from{opacity:0;transform:translate(-50%,calc(-50% + 20px))}to{opacity:1;transform:translate(-50%,-50%)}}
+    /* Dark Mode */
+    body.dark-mode {
+      --bg: #0a0a0f;
+      --bg2: #14141a;
+      --text: #f5f5f7;
+      --text2: #98989d;
+      --text3: #636366;
+      --border: #2c2c2e;
+      --border-soft: #1c1c1e;
+      --accent: #0a84ff;
+      --accent-soft: rgba(10,132,255,0.15);
+      --green: #30d158;
+      --red: #ff453a;
+      --yellow: #ffd60a;
+      --purple: #bf5af2;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+    }
+    body.dark-mode .chart-wrap { background: var(--bg2); }
+    body.dark-mode .modal-content { background: var(--bg2); }
+    body.dark-mode .form-input, body.dark-mode .form-select { background: var(--bg2); }
+    body.dark-mode pre { background: var(--bg2) !important; }
+    body.dark-mode .agent-avatar { background: linear-gradient(135deg, var(--accent), var(--purple)); }
+    
+    </style>
 <script>
 function closeOnboarding(){document.getElementById('onboarding-modal').style.display='none';localStorage.setItem('evolvix_onboarded','true')}
 function showOnboarding(){if(!localStorage.getItem('evolvix_onboarded')){setTimeout(function(){document.getElementById('onboarding-modal').style.display='block'},800)}}
@@ -1888,5 +1940,51 @@ async function checkNewUser(){try{const r=await fetch('/platform/api/agents',{he
 checkNewUser();
 </script>
 
+
+      <button onclick="toggleTheme()" style="position:fixed;bottom:20px;left:260px;z-index:100;width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .2s" title="Toggle dark mode" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">🌓</button>
+    
+
+    <!-- Credit Warning Banner -->
+    <div id="credit-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:1000;background:linear-gradient(135deg,#ff9500,#ff6b00);color:white;text-align:center;padding:10px 20px;font-size:14px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.15)">
+      <span id="credit-banner-text"></span>
+      <a href="/pricing" style="color:white;text-decoration:underline;margin-left:8px;font-weight:700">Upgrade plan →</a>
+    </div>
+    <script>
+    async function checkCredits() {
+      try {
+        const token = getToken();
+        if (!token) return;
+        const resp = await fetch('/platform/api/credits', { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const remaining = data.remaining || data.credits_remaining || 0;
+        const total = data.total || data.credits_total || 0;
+        if (total > 0 && remaining / total < 0.1 && remaining < 50) {
+          document.getElementById('credit-banner').style.display = 'block';
+          document.getElementById('credit-banner-text').textContent = 'You have ' + remaining + ' credits remaining (' + Math.round(remaining/total*100) + '%).';
+        }
+      } catch(e) { /* silent */ }
+    }
+    setTimeout(checkCredits, 2000);
+    </script>
+
 </body>
+
+<script>
+function toggleTheme() {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('evolvix_theme', isDark ? 'dark' : 'light');
+}
+// Load saved theme
+(function() {
+  const saved = localStorage.getItem('evolvix_theme');
+  if (saved === 'dark') document.body.classList.add('dark-mode');
+  // Auto-detect system preference if no saved preference
+  if (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.body.classList.add('dark-mode');
+  }
+})();
+</script>
+
 </html>
