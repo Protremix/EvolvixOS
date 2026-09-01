@@ -116,10 +116,11 @@ from plugins.registry import PluginRegistry
 # ─── App ───
 app = FastAPI(
     title="EvolvixOS Platform API",
-    description="Self-Hosted entity system, backend functions, workflows, and AI builder.",
-    version="1.0.0",
+    description="Self-Hosted entity system, backend functions, workflows, and AI builder. 435+ models, auto-routing, entities, agents, functions, workflows.",
+    version="10.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    root_path="/platform"
 )
 app.include_router(awesome_router)
 

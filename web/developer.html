@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EvolvixOS Developer Portal — API Keys, SDKs & Documentation</title>
+<meta name="description" content="Get started with EvolvixOS API. Generate keys, install SDKs, explore endpoints, download Postman collection.">
+<link rel="icon" href="/assets/brand/favicon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #f5f5f7; --bg2: #ffffff; --text: #1d1d1f; --text2: #86868b; --text3: #aeaeb2;
+    --border: #d2d2d7; --border-soft: #e5e5e7; --accent: #007aff; --accent-soft: rgba(0,122,255,0.1);
+    --green: #34c759; --purple: #5856d6; --radius: 14px; --code-bg: #1e1e1e;
+  }
+  body.dark {
+    --bg: #0a0a0f; --bg2: #14141a; --text: #f5f5f7; --text2: #98989d; --text3: #636366;
+    --border: #2c2c2e; --border-soft: #1c1c1e; --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; transition: background 0.3s; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .nav { position: sticky; top: 0; z-index: 100; background: rgba(245,245,247,0.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-soft); }
+  body.dark .nav { background: rgba(10,10,15,0.8); }
+  .nav-inner { max-width: 1100px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
+  .nav-logo span { background: linear-gradient(135deg, var(--accent), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .nav-links { display: flex; gap: 20px; align-items: center; }
+  .nav-links a { font-size: 14px; font-weight: 500; color: var(--text2); }
+  .nav-links a:hover { color: var(--text); text-decoration: none; }
+  .btn-primary { background: var(--accent); color: white !important; padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 14px; }
+  .btn-primary:hover { text-decoration: none; opacity: 0.9; }
+
+  .hero { text-align: center; padding: 60px 24px 40px; }
+  .hero h1 { font-size: 42px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 14px; }
+  .hero h1 .gradient { background: linear-gradient(135deg, var(--accent), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero p { font-size: 17px; color: var(--text2); max-width: 600px; margin: 0 auto; line-height: 1.5; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
+
+  .section { margin-bottom: 48px; }
+  .section h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+  .section p.desc { color: var(--text2); font-size: 15px; margin-bottom: 20px; }
+
+  /* Step cards */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .step { background: var(--bg2); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 24px; }
+  .step .num { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: var(--accent-soft); color: var(--accent); border-radius: 50%; font-weight: 700; font-size: 14px; margin-bottom: 12px; }
+  .step h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .step p { font-size: 14px; color: var(--text2); line-height: 1.5; margin-bottom: 12px; }
+  .step a { font-size: 14px; font-weight: 600; }
+
+  /* Code blocks */
+  .code-block { background: var(--code-bg); border-radius: 10px; padding: 16px 20px; margin: 12px 0; overflow-x: auto; position: relative; }
+  .code-block pre { color: #d4d4d4; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.6; white-space: pre; }
+  .code-block .copy { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.1); border: none; color: #aaa; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+  .code-block .copy:hover { background: rgba(255,255,255,0.2); color: white; }
+
+  /* Resource cards */
+  .resources { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .resource { background: var(--bg2); border: 1px solid var(--border-soft); border-radius: var(--radius); padding: 20px; transition: transform 0.15s, border-color 0.2s; }
+  .resource:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .resource .icon { font-size: 28px; margin-bottom: 10px; }
+  .resource h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .resource p { font-size: 13px; color: var(--text2); line-height: 1.4; }
+
+  /* Quick links */
+  .quick-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .quick-link { background: var(--bg2); border: 1px solid var(--border-soft); border-radius: 10px; padding: 10px 16px; font-size: 14px; color: var(--text); font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
+  .quick-link:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+
+  /* Stats */
+  .stats { display: flex; gap: 32px; justify-content: center; margin: 32px 0; flex-wrap: wrap; }
+  .stat { text-align: center; }
+  .stat .num { font-size: 32px; font-weight: 800; color: var(--accent); }
+  .stat .label { font-size: 13px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* Theme toggle */
+  .theme-btn { background: none; border: 1px solid var(--border); border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 16px; }
+  .theme-btn:hover { border-color: var(--accent); }
+
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 2px solid var(--border-soft); }
+  .tab { padding: 10px 16px; font-size: 14px; font-weight: 600; color: var(--text2); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">Evolvix<span>OS</span></a>
+    <div class="nav-links">
+      <a href="/docs">API Docs</a>
+      <a href="/platform/docs" target="_blank">Swagger</a>
+      <a href="/demo">Demo</a>
+      <a href="/pricing">Pricing</a>
+      <a href="/dashboard" class="btn-primary">Dashboard</a>
+      <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Developer <span class="gradient">Portal</span></h1>
+  <p>Everything you need to build with EvolvixOS — API keys, SDKs, interactive docs, Postman collection, and code examples.</p>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="num">435+</div><div class="label">Models</div></div>
+  <div class="stat"><div class="num">14</div><div class="label">Endpoints</div></div>
+  <div class="stat"><div class="num">2</div><div class="label">SDKs</div></div>
+  <div class="stat"><div class="num">100%</div><div class="label">Open Source</div></div>
+</div>
+
+<div class="container">
+
+  <!-- Getting Started -->
+  <div class="section">
+    <h2>Getting Started</h2>
+    <p class="desc">Three steps from zero to your first AI API call.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Create an account</h3>
+        <p>Sign up free — get 100 credits/month, no credit card required.</p>
+        <a href="/auth/sign-up">Create account →</a>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>Generate an API key</h3>
+        <p>Go to Dashboard → API Keys → Generate new key.</p>
+        <a href="/dashboard">Open dashboard →</a>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>Make your first call</h3>
+        <p>Use curl, Python, or JavaScript — pick your tool below.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Start Code -->
+  <div class="section">
+    <h2>Quick Start</h2>
+    <p class="desc">Choose your language and make your first API call in seconds.</p>
+    <div class="tab-bar">
+      <div class="tab active" onclick="showTab(event,'curl')">cURL</div>
+      <div class="tab" onclick="showTab(event,'python')">Python</div>
+      <div class="tab" onclick="showTab(event,'javascript')">JavaScript</div>
+    </div>
+
+    <div id="tab-curl">
+      <div class="code-block">
+        <button class="copy" onclick="copyCode(this)">Copy</button>
+        <pre>curl -X POST https://evolvixos.com/platform/api/playground \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -d '{
+    "message": "Write a haiku about code",
+    "model": "auto"
+  }'</pre>
+      </div>
+    </div>
+
+    <div id="tab-python" style="display:none">
+      <div class="code-block">
+        <button class="copy" onclick="copyCode(this)">Copy</button>
+        <pre>pip install evolvixos</pre>
+      </div>
+      <div class="code-block">
+        <button class="copy" onclick="copyCode(this)">Copy</button>
+        <pre>from evolvixos import EvolvixOS
+
+client = EvolvixOS(api_key="YOUR_API_KEY")
+
+# Chat with any model
+resp = client.chat("Write a haiku about code")
+print(resp["response"])
+
+# Stream responses
+for chunk in client.stream("Tell me a story"):
+    print(chunk, end="", flush=True)
+
+# Create entities
+client.entities.create("Task", {
+    "title": {"type": "string"},
+    "status": {"type": "string", "enum": ["todo", "done"]}
+})
+
+# Create records
+client.entities.records("Task").create({"title": "Ship it"})
+
+# Create AI agents
+client.agents.create("reviewer", system_prompt="You are a code reviewer")
+review = client.agents.chat("reviewer", "Review this function")
+print(review["response"])</pre>
+      </div>
+    </div>
+
+    <div id="tab-javascript" style="display:none">
+      <div class="code-block">
+        <button class="copy" onclick="copyCode(this)">Copy</button>
+        <pre>npm install evolvixos</pre>
+      </div>
+      <div class="code-block">
+        <button class="copy" onclick="copyCode(this)">Copy</button>
+        <pre>import { EvolvixOS } from 'evolvixos';
+
+const client = new EvolvixOS('YOUR_API_KEY');
+
+// Chat with any model
+const resp = await client.chat('Write a haiku about code');
+console.log(resp.response);
+
+// Stream responses
+for await (const chunk of client.stream('Tell me a story')) {
+  process.stdout.write(chunk);
+}
+
+// Create entities
+await client.entities.create('Task', {
+  title: { type: 'string' },
+  status: { type: 'string', enum: ['todo', 'done'] }
+});
+
+// Create AI agents
+await client.agents.create('reviewer', 'You are a code reviewer');
+const review = await client.agents.chat('reviewer', 'Review this code');</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resources -->
+  <div class="section">
+    <h2>Resources</h2>
+    <p class="desc">Everything you need to go deeper.</p>
+    <div class="resources">
+      <a href="/docs" class="resource" style="text-decoration:none;color:inherit">
+        <div class="icon">📚</div>
+        <h3>API Docs</h3>
+        <p>Full endpoint reference with request/response examples for all 14 endpoints.</p>
+      </a>
+      <a href="/platform/docs" target="_blank" class="resource" style="text-decoration:none;color:inherit">
+        <div class="icon">⚡</div>
+        <h3>Swagger UI</h3>
+        <p>Interactive API explorer — try endpoints directly in your browser.</p>
+      </a>
+      <a href="/platform/openapi.json" class="resource" style="text-decoration:none;color:inherit">
+        <div class="icon">📋</div>
+        <h3>OpenAPI Spec</h3>
+        <p>Download the OpenAPI 3.0 spec. Import to Postman, Insomnia, or any API client.</p>
+      </a>
+      <a href="/postman-collection.json" class="resource" style="text-decoration:none;color:inherit">
+        <div class="icon">📮</div>
+        <h3>Postman Collection</h3>
+        <p>Pre-built Postman collection with all endpoints, auth headers, and example payloads.</p>
+      </a>
+      <a href="/demo" class="resource" style="text-decoration:none;color:inherit">
+        <div class="icon">🧪</div>
+        <h3>Try Demo</h3>
+        <p>Test the API without an account — 5 free requests, no signup needed.</p>
+      </a>
+      <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="resource" style="text-decoration:none;color:inherit">
+        <div class="icon">📦</div>
+        <h3>GitHub</h3>
+        <p>Source code, issues, contributing guide, self-hosting instructions.</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- SDKs -->
+  <div class="section">
+    <h2>SDKs</h2>
+    <p class="desc">Official SDKs for Python and JavaScript.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="num" style="background:var(--accent-soft);color:var(--accent)">🐍</div>
+        <h3>Python SDK</h3>
+        <p>pip install evolvixos — full API coverage with streaming support.</p>
+        <div class="code-block" style="margin-top:8px">
+          <pre>pip install evolvixos</pre>
+        </div>
+        <a href="https://github.com/Protremix/EvolvixOS/tree/main/sdk/python" target="_blank" style="font-size:14px;font-weight:600">View source →</a>
+      </div>
+      <div class="step">
+        <div class="num" style="background:var(--accent-soft);color:var(--accent)">🟨</div>
+        <h3>JavaScript SDK</h3>
+        <p>npm install evolvixos — ESM module, zero dependencies, async generators.</p>
+        <div class="code-block" style="margin-top:8px">
+          <pre>npm install evolvixos</pre>
+        </div>
+        <a href="https://github.com/Protremix/EvolvixOS/tree/main/sdk/javascript" target="_blank" style="font-size:14px;font-weight:600">View source →</a>
+      </div>
+      <div class="step">
+        <div class="num" style="background:var(--accent-soft);color:var(--accent)">🔧</div>
+        <h3>VS Code Extension</h3>
+        <p>Chat with 435+ models directly in VS Code. Select code and ask AI to review it.</p>
+        <a href="https://github.com/Protremix/EvolvixOS/tree/main/vscode-extension" target="_blank" style="font-size:14px;font-weight:600">View source →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Self-Host -->
+  <div class="section">
+    <h2>Self-Host</h2>
+    <p class="desc">Run EvolvixOS on your own infrastructure — Docker Compose or Kubernetes.</p>
+    <div class="tab-bar">
+      <div class="tab active" onclick="showTab(event,'docker')">Docker Compose</div>
+      <div class="tab" onclick="showTab(event,'k8s')">Kubernetes</div>
+    </div>
+    <div id="tab-docker">
+      <div class="code-block">
+        <button class="copy" onclick="copyCode(this)">Copy</button>
+        <pre>git clone https://github.com/Protremix/EvolvixOS.git
+cd EvolvixOS
+cp .env.example .env  # Edit secrets
+docker compose up -d  # Done!</pre>
+      </div>
+      <p style="margin-top:12px;color:var(--text2);font-size:14px">Includes PostgreSQL, Ollama (local models), and optional Nginx. All you need is a free Groq or NVIDIA key for cloud models.</p>
+    </div>
+    <div id="tab-k8s" style="display:none">
+      <div class="code-block">
+        <button class="copy" onclick="copyCode(this)">Copy</button>
+        <pre>helm install evolvixos ./helm/evolvixos \
+  --set env.JWT_SECRET="your-secret" \
+  --set env.GROQ_API_KEY="your-key"</pre>
+      </div>
+      <p style="margin-top:12px;color:var(--text2);font-size:14px">Includes PostgreSQL StatefulSet, Ollama with PVC, Ingress, and autoscaling. GPU support for Ollama is configurable.</p>
+    </div>
+  </div>
+
+  <!-- Quick Links -->
+  <div class="section">
+    <h2>Quick Links</h2>
+    <div class="quick-links">
+      <a href="/docs" class="quick-link">📚 API Reference</a>
+      <a href="/platform/docs" target="_blank" class="quick-link">⚡ Swagger UI</a>
+      <a href="/platform/openapi.json" class="quick-link">📋 OpenAPI Spec</a>
+      <a href="/postman-collection.json" class="quick-link">📮 Postman Collection</a>
+      <a href="/demo" class="quick-link">🧪 Try Demo</a>
+      <a href="/dashboard" class="quick-link">🖥️ Dashboard</a>
+      <a href="/pricing" class="quick-link">💰 Pricing</a>
+      <a href="https://github.com/Protremix/EvolvixOS" target="_blank" class="quick-link">📦 GitHub</a>
+      <a href="https://github.com/Protremix/EvolvixOS/issues" target="_blank" class="quick-link">🐛 Report Issue</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('dev_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+}
+(function() {
+  const saved = localStorage.getItem('dev_theme');
+  if (saved === 'dark') document.body.classList.add('dark');
+  if (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches) document.body.classList.add('dark');
+})();
+
+function showTab(e, name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+  const parent = e.target.closest('.section');
+  parent.querySelectorAll('[id^="tab-"]').forEach(d => d.style.display = 'none');
+  const target = parent.querySelector('#tab-' + name);
+  if (target) target.style.display = 'block';
+}
+
+function copyCode(btn) {
+  const pre = btn.parentElement.querySelector('pre');
+  navigator.clipboard.write(pre.textContent);
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy', 2000);
+}
+</script>
+</body>
+</html>
