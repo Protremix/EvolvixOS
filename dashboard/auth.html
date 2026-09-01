@@ -377,7 +377,7 @@ async function doVerify() {
     try {
         const data = await apiCall('/verify', { email: regEmail, otp });
         if (data.ok) {
-            showAlert('Verified! Redirecting...', 'success');
+            showAlert('Verified! 500 free credits added. Redirecting...', 'success');
             setTimeout(() => {
                 apiCall('/login', {
                     email: regEmail,

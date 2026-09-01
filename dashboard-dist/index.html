@@ -878,7 +878,8 @@
       }
     });
 
-    function openCreateAgent() {
+    async function openCreateAgent() {
+      await loadAllModels();
       openModal(`
         <div class="modal-header">
           <div class="modal-title">Create New Agent</div>
