@@ -938,33 +938,93 @@
       }
     });
 
+    let AGENT_TOOLS_LIST = [];
+    async function loadAgentTools() {
+      if (AGENT_TOOLS_LIST.length) return AGENT_TOOLS_LIST;
+      try {
+        const resp = await fetch('/platform/api/agent-tools');
+        const data = await resp.json();
+        AGENT_TOOLS_LIST = data.tools || [];
+      } catch(e) { AGENT_TOOLS_LIST = []; }
+      return AGENT_TOOLS_LIST;
+    }
+
     async function openCreateAgent() {
       await loadAllModels();
+      await loadAgentTools();
+
+      // Group models by provider for better UX
+      const chatModels = (MODELS_LOADED ? ALL_MODELS : []).filter(m => m.cat !== 'embedding' && m.cat !== 'local');
+      const grouped = {};
+      chatModels.forEach(m => {
+        const prov = m.provider || m.params || 'other';
+        if (!grouped[prov]) grouped[prov] = [];
+        grouped[prov].push(m);
+      });
+      let modelOpts = '<option value="auto">⚡ Auto (smart routing)</option>';
+      Object.keys(grouped).sort().forEach(prov => {
+        modelOpts += '<optgroup label="' + prov + '">';
+        grouped[prov].slice(0, 30).forEach(m => {
+          const badge = m.free ? ' (FREE)' : (m.price !== '—' ? '' : '');
+          modelOpts += '<option value="' + m.name + '">' + m.name + badge + '</option>';
+        });
+        modelOpts += '</optgroup>';
+      });
+
+      const toolsHTML = AGENT_TOOLS_LIST.map(t => `
+        <label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:13px;color:var(--text2)">
+          <input type="checkbox" class="agent-tool-cb" value="${t.key}" style="width:16px;height:16px;accent-color:var(--accent)" />
+          <span style="font-weight:500">${t.name}</span>
+          <span style="color:var(--text3);font-size:11px">— ${t.description}</span>
+        </label>
+      `).join('');
+
       openModal(`
         <div class="modal-header">
           <div class="modal-title">Create New Agent</div>
           <button class="modal-close" onclick="closeModal()">${IC('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>')}</button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body" style="max-height:70vh;overflow-y:auto">
           <div class="form-group">
-            <label class="form-label">Agent Name</label>
+            <label class="form-label">Agent Name *</label>
             <input class="form-input" id="agent-name" placeholder="e.g. Code Assistant" />
           </div>
           <div class="form-group">
-            <label class="form-label">Model</label>
-            <select class="form-select" id="agent-model">
-              ${(MODELS_LOADED ? ALL_MODELS : []).filter(m => m.cat !== 'embedding' && m.cat !== 'local').slice(0, 100).map(m => `<option value="${m.name}">${m.name}</option>`).join('')}
-            </select>
+            <label class="form-label">Description</label>
+            <input class="form-input" id="agent-desc" placeholder="A brief description of what this agent does (optional)" />
           </div>
           <div class="form-group">
-            <label class="form-label">System Prompt</label>
-            <textarea class="form-textarea" id="agent-prompt" placeholder="You are a helpful assistant that..."></textarea>
+            <label class="form-label">Model</label>
+            <select class="form-select" id="agent-model">${modelOpts}</select>
+            <div class="form-hint">Auto = smart routing picks the best model per task</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">System Prompt *</label>
+            <textarea class="form-textarea" id="agent-prompt" placeholder="You are a helpful assistant that..." style="min-height:80px"></textarea>
             <div class="form-hint">Define the agent's behavior and capabilities.</div>
           </div>
+          <div style="display:flex;gap:16px">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">Temperature</label>
+              <input class="form-input" type="range" min="0" max="100" value="70" id="agent-temp" oninput="document.getElementById('temp-val').textContent=this.value/100" style="padding:0"/>
+              <div class="form-hint">Value: <span id="temp-val">0.7</span></div>
+            </div>
+            <div class="form-group" style="width:120px">
+              <label class="form-label">Max Tokens</label>
+              <input class="form-input" type="number" id="agent-max-tokens" value="4096" min="256" max="32768" style="width:100%"/>
+            </div>
+          </div>
           <div class="form-group">
-            <label class="form-label">Temperature</label>
-            <input class="form-input" type="range" min="0" max="100" value="70" id="agent-temp" oninput="document.getElementById('temp-val').textContent=this.value/100" style="padding:0"/>
-            <div class="form-hint">Value: <span id="temp-val">0.7</span> — Higher = more creative, Lower = more focused</div>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+              <input type="checkbox" id="agent-memory" checked style="width:18px;height:18px;accent-color:var(--accent)" />
+              <span style="font-weight:600;font-size:14px;color:var(--text)">Memory Enabled</span>
+              <span style="color:var(--text3);font-size:12px">— Agent remembers conversation context</span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tools</label>
+            <div style="border:1px solid var(--border);border-radius:8px;padding:10px 14px;max-height:200px;overflow-y:auto;background:var(--bg)">${toolsHTML}</div>
+            <div class="form-hint">Select tools this agent can use. Empty = no tools.</div>
           </div>
         </div>
         <div class="modal-footer">
@@ -975,26 +1035,53 @@
     }
 
     async function createAgent() {
-      const name = document.getElementById('agent-name').value;
+      const name = document.getElementById('agent-name').value.trim();
+      const desc = document.getElementById('agent-desc').value.trim();
       const model = document.getElementById('agent-model').value;
-      const prompt = document.getElementById('agent-prompt').value;
-      const temp = document.getElementById('agent-temp').value / 100;
+      const prompt = document.getElementById('agent-prompt').value.trim();
+      const temp = parseInt(document.getElementById('agent-temp').value) / 100;
+      const maxTokens = parseInt(document.getElementById('agent-max-tokens').value) || 4096;
+      const memoryEnabled = document.getElementById('agent-memory').checked;
+      const selectedTools = Array.from(document.querySelectorAll('.agent-tool-cb:checked')).map(cb => cb.value);
+
       if (!name) { toast('Please enter an agent name', 'error'); return; }
       if (!prompt) { toast('Please enter a system prompt', 'error'); return; }
+
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+
       try {
+        const body = {
+          name,
+          system_prompt: prompt,
+          model: model || 'auto',
+          temperature: temp,
+          tools: selectedTools,
+          max_tokens: maxTokens,
+          memory_enabled: memoryEnabled
+        };
+        if (desc) body.identity_doc = desc;
+
         const resp = await fetch(`${API_BASE}/agents`, {
           method: 'POST',
           headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, system_prompt: prompt, model: model || 'auto', temperature: temp, tools: [], max_tokens: 4096 })
+          body: JSON.stringify(body)
         });
         if (resp.ok) {
-          toast('Agent created successfully!', 'success');
+          toast('Agent "' + name + '" created successfully!', 'success');
         } else {
-          const err = await resp.json();
+          const err = await resp.json().catch(() => ({}));
           toast(err.detail || 'Failed to create agent', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Create Agent';
+          return;
         }
       } catch (e) {
-        toast('Failed to create agent', 'error');
+        toast('Failed to create agent: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Create Agent';
+        return;
       }
       closeModal();
       handleRoute();
@@ -1002,12 +1089,34 @@
 
     async function openEditAgent(name) {
       try {
+        await loadAllModels();
+        await loadAgentTools();
         const resp = await fetch(`${API_BASE}/agents/${encodeURIComponent(name)}`, { headers: authHeaders() });
         const agent = await resp.json();
         if (!agent || !agent.name) return;
+        const agentTools = agent.tools || [];
+        const toolsHTML = AGENT_TOOLS_LIST.map(t => `
+          <label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:13px;color:var(--text2)">
+            <input type="checkbox" class="agent-tool-cb-edit" value="${t.key}" ${agentTools.includes(t.key) ? 'checked' : ''} style="width:16px;height:16px;accent-color:var(--accent)" />
+            <span style="font-weight:500">${t.name}</span>
+            <span style="color:var(--text3);font-size:11px">— ${t.description}</span>
+          </label>
+        `).join('');
+        // Group models
+        const chatModels = (MODELS_LOADED ? ALL_MODELS : []).filter(m => m.cat !== 'embedding' && m.cat !== 'local');
+        const grouped = {};
+        chatModels.forEach(m => { const prov = m.provider || m.params || 'other'; if (!grouped[prov]) grouped[prov] = []; grouped[prov].push(m); });
+        let modelOpts = '<option value="auto" ' + (agent.model === 'auto' ? 'selected' : '') + '>⚡ Auto (smart routing)</option>';
+        Object.keys(grouped).sort().forEach(prov => {
+          modelOpts += '<optgroup label="' + prov + '">';
+          grouped[prov].slice(0, 30).forEach(m => {
+            modelOpts += '<option value="' + m.name + '" ' + (m.name === agent.model ? 'selected' : '') + '>' + m.name + (m.free ? ' (FREE)' : '') + '</option>';
+          });
+          modelOpts += '</optgroup>';
+        });
         openModal(`
           <div class="modal-header">
-            <div class="modal-title">Edit Agent</div>
+            <div class="modal-title">Edit Agent — ${agent.name}</div>
             <button class="modal-close" onclick="closeModal()">${IC('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>')}</button>
           </div>
           <div class="modal-body">
@@ -1017,13 +1126,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Model</label>
-              <select class="form-select" id="edit-model">
-                ${(MODELS_LOADED ? ALL_MODELS : []).filter(m => m.cat !== 'embedding' && m.cat !== 'local').slice(0, 100).map(m => `<option value="${m.name}" ${m.name === (agent.model||'openrouter/auto') ? 'selected' : ''}>${m.name}</option>`).join('')}
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">System Prompt</label>
-              <textarea class="form-textarea" id="edit-prompt">${agent.system_prompt || ''}</textarea>
+              <select class="form-select" id="edit-model">${modelOpts}</select>
             </div>
             <div class="form-group">
               <label class="form-label">Status</label>
@@ -1034,17 +1137,40 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Temperature</label>
-              <input class="form-input" type="range" min="0" max="100" value="${(agent.temperature || 0.7) * 100}" id="edit-temp" oninput="document.getElementById('edit-temp-val').textContent=this.value/100" style="padding:0"/>
-              <div class="form-hint">Value: <span id="edit-temp-val">${agent.temperature || 0.7}</span></div>
+              <label class="form-label">System Prompt</label>
+              <textarea class="form-textarea" id="edit-prompt" style="min-height:80px">${(agent.system_prompt || '').replace(/</g, '&lt;')}</textarea>
+            </div>
+            <div style="display:flex;gap:16px">
+              <div class="form-group" style="flex:1">
+                <label class="form-label">Temperature</label>
+                <input class="form-input" type="range" min="0" max="100" value="${Math.round((agent.temperature || 0.7) * 100)}" id="edit-temp" oninput="document.getElementById('edit-temp-val').textContent=this.value/100" style="padding:0"/>
+                <div class="form-hint">Value: <span id="edit-temp-val">${agent.temperature || 0.7}</span></div>
+              </div>
+              <div class="form-group" style="width:120px">
+                <label class="form-label">Max Tokens</label>
+                <input class="form-input" type="number" id="edit-max-tokens" value="${agent.max_tokens || 4096}" min="256" max="32768" style="width:100%"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+                <input type="checkbox" id="edit-memory" ${agent.memory_enabled !== false ? 'checked' : ''} style="width:18px;height:18px;accent-color:var(--accent)" />
+                <span style="font-weight:600;font-size:14px;color:var(--text)">Memory Enabled</span>
+                <span style="color:var(--text3);font-size:12px">— Agent remembers conversation context</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tools</label>
+              <div style="border:1px solid var(--border);border-radius:8px;padding:10px 14px;max-height:200px;overflow-y:auto;background:var(--bg)">${toolsHTML}</div>
+              <div class="form-hint">Currently: ${(agent.tools || []).join(', ') || 'none'}</div>
             </div>
           </div>
           <div class="modal-footer">
             <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveAgent(${id})">Save Changes</button>
+            <button class="btn btn-primary" onclick="saveAgent('${agent.name.replace(/'/g, "\\'")}')">Save Changes</button>
           </div>
         `);
       } catch (e) {
+        console.error('[EDIT] ERROR:', e.message, e.stack);
         toast('Failed to load agent', 'error');
       }
     }
@@ -1054,12 +1180,15 @@
       const model = document.getElementById('edit-model').value;
       const prompt = document.getElementById('edit-prompt').value;
       const status = document.getElementById('edit-status').value;
-      const temp = document.getElementById('edit-temp').value / 100;
+      const temp = parseInt(document.getElementById('edit-temp').value) / 100;
+      const maxTokens = parseInt(document.getElementById('edit-max-tokens').value) || 4096;
+      const memoryEnabled = document.getElementById('edit-memory').checked;
+      const selectedTools = Array.from(document.querySelectorAll('.agent-tool-cb-edit:checked')).map(cb => cb.value);
       try {
-        await fetch(`${API_BASE}/agents/${encodeURIComponent(a.name)}`, {
+        await fetch(`${API_BASE}/agents/${encodeURIComponent(name)}`, {
           method: 'PUT',
           headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, model, system_prompt: prompt, status, temperature: temp })
+          body: JSON.stringify({ name, model, system_prompt: prompt, status, temperature: temp, max_tokens: maxTokens, memory_enabled: memoryEnabled, tools: selectedTools })
         });
         toast('Agent updated!', 'success');
       } catch (e) {
@@ -1116,7 +1245,7 @@
         `);
         document.getElementById('chat-input').focus();
       } catch (e) {
-        toast('Failed to load agent: ' + e.message, 'error');
+        toast('Failed to load agent', 'error');
       }
     }
 
