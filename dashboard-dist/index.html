@@ -605,28 +605,25 @@
     window.addEventListener('hashchange', handleRoute);
 
     // ===== MODELS DATA =====
-    const ALL_MODELS = [
-      { name: 'Nemotron-3-Ultra', cat: 'reasoning', ctx: '256K', params: '550B', price: '€0.004/1K tokens' },
-      { name: 'DeepSeek V4 Pro', cat: 'coding', ctx: '128K', params: '671B', price: '€0.002/1K tokens' },
-      { name: 'GPT-OSS-120B', cat: 'chat', ctx: '128K', params: '120B', price: '€0.003/1K tokens' },
-      { name: 'Llama-3.2-90B', cat: 'vision', ctx: '128K', params: '90B', price: '€0.001/1K tokens' },
-      { name: 'Qwen-2.5-72B', cat: 'chat', ctx: '256K', params: '72B', price: '€0.001/1K tokens' },
-      { name: 'Gemini-3.6-Flash', cat: 'vision', ctx: '1M', params: '—', price: '€0.001/1K tokens' },
-      { name: 'Mistral-Large-2', cat: 'reasoning', ctx: '128K', params: '123B', price: '€0.003/1K tokens' },
-      { name: 'Phi-4-Mini', cat: 'chat', ctx: '128K', params: '3.8B', price: '€0.0001/1K tokens' },
-      { name: 'Codestral-25B', cat: 'coding', ctx: '32K', params: '25B', price: '€0.001/1K tokens' },
-      { name: 'Gemma-3-27B', cat: 'chat', ctx: '128K', params: '27B', price: '€0.0008/1K tokens' },
-      { name: 'Solar-10.7B', cat: 'chat', ctx: '64K', params: '10.7B', price: '€0.0005/1K tokens' },
-      { name: 'Nomic-Embed', cat: 'embedding', ctx: '8K', params: '137M', price: '€0.0001/1K tokens' },
-      { name: 'BGE-Large-EN', cat: 'embedding', ctx: '512', params: '335M', price: '€0.0001/1K tokens' },
-      { name: 'Claude-3.5-Sonnet', cat: 'reasoning', ctx: '200K', params: '—', price: '€0.003/1K tokens' },
-      { name: 'GPT-4o-Mini', cat: 'chat', ctx: '128K', params: '—', price: '€0.001/1K tokens' },
-      { name: 'Groq-Llama-3.3-70B', cat: 'chat', ctx: '128K', params: '70B', price: '€0.001/1K tokens' },
-      { name: 'GPT-OSS-20B', cat: 'chat', ctx: '128K', params: '20B', price: '€0.0005/1K tokens' },
-      { name: 'Stable-Code-3B', cat: 'coding', ctx: '100K', params: '3B', price: '€0.0001/1K tokens' },
-      { name: 'Pixtral-12B', cat: 'vision', ctx: '128K', params: '12B', price: '€0.001/1K tokens' },
-      { name: 'Moonshot-v1-32K', cat: 'reasoning', ctx: '32K', params: '—', price: '€0.002/1K tokens' },
-    ];
+    let ALL_MODELS = [];
+    let MODELS_LOADED = false;
+
+    async function loadAllModels() {
+      if (MODELS_LOADED) return ALL_MODELS;
+      try {
+        const resp = await fetch('/platform/api/models');
+        const data = await resp.json();
+        ALL_MODELS = (data.models || []).map(m => {
+          let cat = m.category || 'chat';
+          if (cat === 'code') cat = 'coding';
+          const ctx = m.context_length ? (m.context_length >= 1000000 ? (m.context_length/1e6).toFixed(1)+'M' : Math.floor(m.context_length/1000)+'K') : '—';
+          const price = m.free ? 'FREE' : (m.avg_price_per_mtok != null ? '€'+m.avg_price_per_mtok+'/M tokens' : 'PAID');
+          return { name: m.id, cat, ctx, params: m.provider || '—', price, free: m.free, provider: m.provider, type: m.type };
+        });
+        MODELS_LOADED = true;
+        return ALL_MODELS;
+      } catch(e) { console.log('Failed to load models:', e); return []; }
+    }
 
     // ===== DASHBOARD PAGE =====
     route('dashboard', async (el) => {
@@ -894,7 +891,7 @@
           <div class="form-group">
             <label class="form-label">Model</label>
             <select class="form-select" id="agent-model">
-              ${ALL_MODELS.filter(m => m.cat !== 'embedding').map(m => `<option value="${m.name}">${m.name}</option>`).join('')}
+              ${(MODELS_LOADED ? ALL_MODELS : []).filter(m => m.cat !== 'embedding' && m.cat !== 'local').slice(0, 100).map(m => `<option value="${m.name}">${m.name}</option>`).join('')}
             </select>
           </div>
           <div class="form-group">
@@ -959,7 +956,7 @@
             <div class="form-group">
               <label class="form-label">Model</label>
               <select class="form-select" id="edit-model">
-                ${ALL_MODELS.filter(m => m.cat !== 'embedding').map(m => `<option value="${m.name}" ${m.name === agent.model ? 'selected' : ''}>${m.name}</option>`).join('')}
+                ${(MODELS_LOADED ? ALL_MODELS : []).filter(m => m.cat !== 'embedding' && m.cat !== 'local').slice(0, 100).map(m => `<option value="${m.name}" ${m.name === (agent.model||'openrouter/auto') ? 'selected' : ''}>${m.name}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
@@ -1103,28 +1100,32 @@
     }
 
 // ===== MODELS PAGE =====
-    route('models', (el) => {
+    route('models', async (el) => {
       el.innerHTML = `
         <div class="page-enter">
           <div class="page-header">
             <div>
-              <h1 class="page-title">Model Marketplace</h1>
-              <p class="page-subtitle">Browse 300+ models. One API. Zero setup.</p>
+              <h1 class="page-title">AI Engine Registry</h1>
+              <p class="page-subtitle" id="models-subtitle">Loading engines from OpenRouter...</p>
             </div>
           </div>
           <div class="section">
             <div class="filter-bar" id="model-filters">
-              <div class="filter-pill active" data-cat="all">All Models</div>
+              <div class="filter-pill active" data-cat="all">All</div>
+              <div class="filter-pill" data-cat="routing">Auto</div>
               <div class="filter-pill" data-cat="reasoning">Reasoning</div>
               <div class="filter-pill" data-cat="coding">Coding</div>
               <div class="filter-pill" data-cat="vision">Vision</div>
               <div class="filter-pill" data-cat="chat">Chat</div>
-              <div class="filter-pill" data-cat="embedding">Embedding</div>
+              <div class="filter-pill" data-cat="local">Local</div>
             </div>
-            <div class="models-grid" id="models-grid"></div>
+            <input id="model-search" placeholder="Search 420+ engines..." style="width:100%;padding:10px 16px;border:1px solid var(--border);border-radius:10px;font-size:14px;margin-bottom:16px;background:var(--bg);color:var(--text)" oninput="renderModels(currentModelCat)">
+            <div class="models-grid" id="models-grid"><div class="loading"><div class="spinner"></div>Fetching all engines...</div></div>
           </div>
         </div>
       `;
+      await loadAllModels();
+      document.getElementById('models-subtitle').textContent = ALL_MODELS.length + ' engines available. One API. Zero setup.';
       renderModels('all');
       document.querySelectorAll('#model-filters .filter-pill').forEach(pill => {
         pill.addEventListener('click', () => {
@@ -1134,20 +1135,43 @@
         });
       });
     });
+    let currentModelCat = 'all';
 
     function renderModels(cat) {
-      const filtered = cat === 'all' ? ALL_MODELS : ALL_MODELS.filter(m => m.cat === cat);
-      document.getElementById('models-grid').innerHTML = filtered.map(m => `
+      currentModelCat = cat;
+      const searchEl = document.getElementById('model-search');
+      const search = searchEl ? searchEl.value.toLowerCase() : '';
+      let filtered = cat === 'all' ? ALL_MODELS : ALL_MODELS.filter(m => m.cat === cat);
+      if (search) {
+        filtered = filtered.filter(m => (m.name + ' ' + m.provider + ' ' + m.cat).toLowerCase().includes(search));
+      }
+      if (filtered.length === 0) {
+        document.getElementById('models-grid').innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">No engines match your search.</div>';
+        return;
+      }
+      // Sort: routing first, then free, then alphabetical
+      filtered.sort((a, b) => {
+        if (a.type === 'routing') return -1;
+        if (b.type === 'routing') return 1;
+        if (a.free && !b.free) return -1;
+        if (!a.free && b.free) return 1;
+        return a.name.localeCompare(b.name);
+      });
+      document.getElementById('models-grid').innerHTML = filtered.slice(0, 200).map(m => `
         <div class="model-card" onclick="toast('${m.name} selected','success')">
           <div class="model-card-header">
-            <span class="model-card-name">${m.name}</span>
+            <span class="model-card-name" style="font-size:12px;word-break:break-all">${m.name}</span>
             <span class="model-card-cat ${m.cat}">${m.cat}</span>
           </div>
-          <div class="model-card-meta"><span>Context: ${m.ctx}</span><span>${m.params}</span></div>
+          <div class="model-card-meta"><span>Context: ${m.ctx}</span><span>${m.provider || m.params}</span></div>
           <div class="model-card-status"><span class="status-dot active"></span>Online</div>
-          <div style="margin-top:8px;font-size:13px;font-weight:600;color:var(--accent)">${m.price}</div>
+          <div style="margin-top:8px;font-size:13px;font-weight:600;color:${m.free ? 'var(--green)' : 'var(--accent)'}">${m.price}</div>
         </div>
       `).join('');
+      if (filtered.length > 200) {
+        document.getElementById('models-grid').innerHTML += '<div style="text-align:center;padding:20px;color:var(--muted);grid-column:1/-1">Showing 200 of ' + filtered.length + ' engines. Refine your search to see more.</div>';
+      }
+    }
     }
 
     // ===== USAGE PAGE =====
@@ -1553,7 +1577,7 @@
               <ul class="price-features">
                 <li>${ICONS.check}10 AI Agents</li>
                 <li>${ICONS.check}50K API calls/month</li>
-                <li>${ICONS.check}All 300+ models</li>
+                <li>${ICONS.check}All 420+ engines</li>
                 <li>${ICONS.check}Basic analytics</li>
                 <li>${ICONS.check}Community support</li>
               </ul>

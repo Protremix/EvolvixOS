@@ -180,16 +180,291 @@ def _v10_route_and_chat_sync(messages: list, model: str = "auto", temperature: f
     return None, None, None
 
 
+
+# ─── FreeToken Provider (edge-native MoE serving, activates with GPU) ───
+
+FREETOKEN_URL = os.environ.get("FREETOKEN_URL", "http://127.0.0.1:8088")
+FREETOKEN_AVAILABLE = False
+
+def _check_freetoken():
+    """Check if FreeToken engine is running locally (requires GPU)."""
+    global FREETOKEN_AVAILABLE
+    try:
+        import urllib.request
+        req = urllib.request.Request(FREETOKEN_URL + "/v1/models", method="GET")
+        resp = urllib.request.urlopen(req, timeout=2)
+        if resp.status == 200:
+            FREETOKEN_AVAILABLE = True
+            logger.info("FreeToken engine detected at " + FREETOKEN_URL)
+            return True
+    except Exception:
+        pass
+    FREETOKEN_AVAILABLE = False
+    return False
+
+def _freetoken_chat(messages, model="auto", temperature=0.7, max_tokens=4096):
+    """Call FreeToken OpenAI-compatible API."""
+    # Map model names to FreeToken-supported models
+    model_map = {
+        "auto": "deepseek-v4-flash",
+        "deepseek/deepseek-v4-flash": "deepseek-v4-flash",
+        "qwen/qwen3.8-27b": "qwen3.6-35b-a3b",
+        "z-ai/glm-5": "glm-5.2",
+        "code": "deepseek-v4-flash",
+    }
+    ft_model = model_map.get(model, "deepseek-v4-flash")
+    
+    payload = json.dumps({
+        "model": ft_model,
+        "messages": messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }).encode()
+    
+    req = urllib.request.Request(
+        FREETOKEN_URL + "/v1/chat/completions",
+        data=payload,
+        method="POST",
+        headers={"Content-Type": "application/json"}
+    )
+    
+    resp = urllib.request.urlopen(req, timeout=120)
+    data = json.loads(resp.read().decode())
+    return {
+        "content": data["choices"][0]["message"]["content"],
+        "model": ft_model,
+        "provider": "freetoken",
+        "tokens": data.get("usage", {}).get("total_tokens", 0),
+    }
+
+
+# ─── NVIDIA build.nvidia.com API (free cloud inference) ───
+
+NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
+NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1"
+
+NVIDIA_MODELS = [
+    "nvidia/nemotron-3.5-lightning-30b-a3b",
+    "deepseek-ai/deepseek-v4-flash-0731",
+    "moonshotai/kimi-k3",
+    "meta/muse-glimmer-30b",
+]
+
+def _nvidia_chat(messages, model="auto", temperature=0.7, max_tokens=4096):
+    if not NVIDIA_API_KEY:
+        raise ValueError("NVIDIA_API_KEY not set")
+
+    nvidia_model = model
+    if model == "auto":
+        nvidia_model = "nvidia/nemotron-3.5-lightning-30b-a3b"
+    elif model.startswith("nvidia/") or model.startswith("deepseek") or model.startswith("moonshot") or model.startswith("meta/"):
+        nvidia_model = model
+    elif "deepseek" in model:
+        nvidia_model = "deepseek-ai/deepseek-v4-flash-0731"
+    elif "qwen" in model:
+        nvidia_model = "nvidia/nemotron-3.5-lightning-30b-a3b"
+    elif "code" in model:
+        nvidia_model = "deepseek-ai/deepseek-v4-flash-0731"
+
+    payload = json.dumps({
+        "model": nvidia_model,
+        "messages": messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }).encode()
+
+    req = urllib.request.Request(
+        NVIDIA_BASE_URL + "/chat/completions",
+        data=payload,
+        method="POST",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + NVIDIA_API_KEY,
+            "Accept": "application/json",
+        }
+    )
+
+    resp = urllib.request.urlopen(req, timeout=30)
+    data = json.loads(resp.read().decode())
+    raw_content = data["choices"][0]["message"]["content"]
+
+    # Strip thinking/reasoning tokens
+    import re as _re
+    raw_content = _re.sub(r"\boxed.*?\boxed", "", raw_content, flags=_re.DOTALL).strip()
+
+    return {
+        "content": raw_content,
+        "model": nvidia_model,
+        "provider": "nvidia",
+        "tokens": data.get("usage", {}).get("total_tokens", 0),
+    }
+
+
+
+# ─── Groq API (free tier, fast inference) ───
+
+GROQ_API_KEY_ENV = os.environ.get("GROQ_API_KEY", "")
+GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+
+GROQ_MODELS = [
+    "openai/gpt-oss-20b",
+    "qwen/qwen3.6-27b",
+    "groq/compound-mini",
+]
+
+def _groq_chat(messages, model="auto", temperature=0.7, max_tokens=4096):
+    """Call Groq API (free tier)."""
+    if not GROQ_API_KEY_ENV:
+        raise ValueError("GROQ_API_KEY not set")
+    
+    groq_model = model
+    if model == "auto":
+        groq_model = "openai/gpt-oss-20b"
+    elif "deepseek" in model:
+        groq_model = "openai/gpt-oss-20b"
+    elif "qwen" in model:
+        groq_model = "qwen/qwen3.6-27b"
+    
+    payload = json.dumps({
+        "model": groq_model,
+        "messages": messages,
+        "temperature": temperature,
+        "max_tokens": max_tokens,
+    }).encode()
+    
+    req = urllib.request.Request(
+        GROQ_BASE_URL + "/chat/completions",
+        data=payload,
+        method="POST",
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + GROQ_API_KEY_ENV,
+            "User-Agent": "EvolvixOS/1.0",
+        }
+    )
+    
+    resp = urllib.request.urlopen(req, timeout=120)
+    data = json.loads(resp.read().decode())
+    return {
+        "content": data["choices"][0]["message"]["content"],
+        "model": groq_model,
+        "provider": "groq",
+        "tokens": data.get("usage", {}).get("total_tokens", 0),
+    }
+
+def _openrouter_chat(messages, model="auto", temperature=0.7, max_tokens=4096):
+    """Call OpenRouter API directly — uses openrouter/auto for smart model selection."""
+    or_key = os.environ.get("OPENROUTER_API_KEY", "")
+    if not or_key:
+        raise ValueError("OPENROUTER_API_KEY not set")
+
+    # Primary: openrouter/auto (smart routing — OpenRouter picks best model per task)
+    # Fallback: specific models if auto fails
+    if model == "auto":
+        model_chain = [
+            "openrouter/auto",                    # smart auto-routing (primary)
+            "deepseek/deepseek-v4-flash-0731",     # fast, cheap, 1.3M ctx
+            "qwen/qwen3.8-27b",                   # 1M ctx, strong all-rounder
+            "openai/gpt-4o-mini",                 # reliable fallback
+        ]
+    else:
+        model_chain = [model, "openrouter/auto"]
+
+    for try_model in model_chain:
+        try:
+            payload = json.dumps({
+                "model": try_model,
+                "messages": messages,
+                "stream": False,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            }).encode()
+            req = urllib.request.Request(
+                "https://openrouter.ai/api/v1/chat/completions",
+                data=payload,
+                method="POST",
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + or_key,
+                    "HTTP-Referer": "https://evolvixos.com",
+                    "X-Title": "EvolvixOS",
+                }
+            )
+            resp = urllib.request.urlopen(req, timeout=45)
+            data = json.loads(resp.read().decode())
+            resp.close()
+            msg = data.get("choices", [{}])[0].get("message", {})
+            content = msg.get("content") or msg.get("reasoning", "") or ""
+            if content and len(content) > 5:
+                return {
+                    "content": content,
+                    "model": data.get("model", try_model),
+                    "provider": "openrouter",
+                    "tokens": data.get("usage", {}).get("total_tokens", 0),
+                    "cost": data.get("usage", {}).get("cost", 0),
+                }
+        except Exception as e:
+            logger.warning("OpenRouter " + try_model + " failed: " + str(e))
+            continue
+
+    raise ValueError("All OpenRouter models failed")
+
+
+
+
+
 async def unified_chat(messages: list, model: str = "auto", temperature: float = 0.7,
                        max_tokens: int = 4096, prefer_cloud: bool = False) -> dict:
     """
-    Unified chat — V10 routing first, benchmark-driven fallback second.
+    Unified chat — free providers first (zero paid tokens), V10 as fallback.
 
-    prefer_cloud=True uses benchmark-ranked models for tool-calling tasks.
+    Provider priority:
+      1. FreeToken (local GPU MoE) — if available
+      2. NVIDIA API (free cloud) — for cloud-preferred tasks
+      3. Groq (free cloud) — fast fallback
+      4. OpenRouter (openrouter/auto — smart model selection, paid)
+      5. V10 ModelRouter (legacy fallback)
+      6. Ollama (local CPU) — always available
     """
+    privacy_mode = os.environ.get("EVOLVIX_PRIVACY_MODE", "HYBRID").upper()
+
+    # ── 1. FreeToken (local GPU MoE serving) ──
+    if _check_freetoken():
+        try:
+            return _freetoken_chat(messages, model, temperature, max_tokens)
+        except Exception as e:
+            logger.warning("FreeToken failed: " + str(e))
+
+    # ── 2. NVIDIA API (free cloud inference) ──
+    if prefer_cloud or privacy_mode != "LOCAL":
+        if NVIDIA_API_KEY:
+            try:
+                return _nvidia_chat(messages, model, temperature, max_tokens)
+            except Exception as e:
+                logger.warning("NVIDIA API failed: " + str(e))
+
+    # ── 3. Groq (free cloud, fast) ──
+    if prefer_cloud or privacy_mode != "LOCAL":
+        if GROQ_API_KEY_ENV:
+            try:
+                return _groq_chat(messages, model, temperature, max_tokens)
+            except Exception as e:
+                logger.warning("Groq failed: " + str(e))
+
+    # ── 4. OpenRouter (paid, high quality) ──
+    if prefer_cloud or privacy_mode != "LOCAL":
+        or_key = os.environ.get("OPENROUTER_API_KEY", "")
+        if or_key:
+            try:
+                return _openrouter_chat(messages, model, temperature, max_tokens)
+            except Exception as e:
+                logger.warning("OpenRouter failed: " + str(e))
+
+    # ── 5. V10 ModelRouter (legacy fallback) ──
     try:
-        result = await asyncio.to_thread(
-            _v10_route_and_chat_sync, messages, model, temperature, max_tokens, prefer_cloud
+        result = await asyncio.wait_for(
+            asyncio.to_thread(_v10_route_and_chat_sync, messages, model, temperature, max_tokens, prefer_cloud),
+            timeout=30
         )
         if result[0]:
             registry, _ = _get_router()
@@ -198,11 +473,9 @@ async def unified_chat(messages: list, model: str = "auto", temperature: float =
                 privacy = registry.privacy_mode.value
             return {"content": result[0], "provider": result[1], "model": result[2], "privacy_mode": privacy}
     except Exception as e:
-        logger.warning(f"V11 routing bridge error: {e}")
+        logger.warning(f"V10 routing bridge error: {e}")
 
-    # ── Fallback: inline routing (benchmark-driven) ──
-    privacy_mode = os.environ.get("EVOLVIX_PRIVACY_MODE", "HYBRID").upper()
-
+    # ── 6. Ollama (local CPU, always available) ──
     if privacy_mode == "LOCAL":
         ollama_url = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
         local_model = os.environ.get("OLLAMA_DEFAULT_MODEL", "qwen2.5:7b")
@@ -241,7 +514,7 @@ async def unified_chat(messages: list, model: str = "auto", temperature: float =
                     headers={"Content-Type": "application/json", "Authorization": f"Bearer {or_key}",
                              "HTTP-Referer": "https://evolvixos.com", "X-Title": "EvolvixOS"}
                 )
-                or_resp = urllib.request.urlopen(or_req, timeout=60)
+                or_resp = urllib.request.urlopen(or_req, timeout=30)
                 or_data = json.loads(or_resp.read())
                 or_resp.close()
                 or_msg = or_data.get("choices", [{}])[0].get("message", {})
@@ -260,7 +533,7 @@ async def unified_chat(messages: list, model: str = "auto", temperature: float =
             glm_req = urllib.request.Request("https://api.z.ai/api/paas/v4/chat/completions",
                 data=glm_payload, headers={"Content-Type": "application/json",
                 "Authorization": f"Bearer {zai_key}", "Accept-Language": "en-US,en"})
-            glm_resp = urllib.request.urlopen(glm_req, timeout=60)
+            glm_resp = urllib.request.urlopen(glm_req, timeout=30)
             glm_data = json.loads(glm_resp.read())
             glm_resp.close()
             content = glm_data.get("choices", [{}])[0].get("message", {}).get("content", "")

@@ -2608,13 +2608,13 @@ async def get_logs(limit: int = 50, offset: int = 0, db=Depends(get_db), request
 
 @app.get("/api/models")
 async def list_models(request: Request = None):
-    """List all available AI models — local and cloud."""
+    """List all available AI models — local Ollama + all OpenRouter engines (420+)."""
+    import urllib.request as _urllib
     models = []
-    
+
     # Local Ollama models
     try:
-        import urllib.request
-        resp = urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=5)
+        resp = _urllib.urlopen("http://127.0.0.1:11434/api/tags", timeout=5)
         data = json.loads(resp.read())
         for m in data.get("models", []):
             models.append({
@@ -2623,31 +2623,98 @@ async def list_models(request: Request = None):
                 "provider": "ollama",
                 "type": "local",
                 "size_mb": round(m.get("size", 0) / 1e6),
-                "status": "active"
+                "status": "active",
+                "category": "local",
+                "free": True,
             })
     except Exception:
         pass
-    
-    # Cloud models (via OpenRouter)
-    cloud_models = [
-        {"id": "auto", "name": "Auto (Best per task)", "provider": "auto", "type": "routing", "status": "active"},
-        {"id": "qwen/qwen3.8-27b", "name": "qwen3.8-27b", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Tool-calling 80.7%"},
-        {"id": "google/gemini-3.7-flash", "name": "gemini-3.7-flash", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Fast + multimodal"},
-        {"id": "moonshotai/kimi-k3", "name": "kimi-k3", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "2.8T multimodal"},
-        {"id": "deepseek/deepseek-v4-flash-0731", "name": "deepseek-v4-flash", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Best code value"},
-        {"id": "nvidia/nemotron-3-ultra-550b-a55b", "name": "nemotron-3-ultra", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "550B params"},
-        {"id": "nvidia/nemotron-3.5-lightning", "name": "nemotron-3.5-lightning", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Fast reasoning"},
-        {"id": "meta/muse-glimmer-30b", "name": "muse-glimmer-30b", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Multimodal"},
-        {"id": "stepfun/step-3.7-flash", "name": "step-3.7-flash", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Cheapest"},
-        {"id": "z-ai/glm-5", "name": "glm-5", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Legacy fallback"},
-        {"id": "google/gemma-4-31b", "name": "gemma-4-31b", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Chat"},
-        {"id": "openai/gpt-oss-120b", "name": "gpt-oss-120b", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "OpenAI open"},
-        {"id": "deepseek/deepseek-v4-pro-0813", "name": "deepseek-v4-pro", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "1M ctx MoE"},
-        {"id": "qwen/qwen3-coder-30b-a3b-instruct", "name": "qwen3-coder-30b", "provider": "openrouter", "type": "cloud", "status": "active", "strength": "Agentic coding"},
-    ]
-    models.extend(cloud_models)
-    
-    return {"models": models, "total": len(models)}
+
+    # OpenRouter: auto routing model
+    models.append({
+        "id": "openrouter/auto",
+        "name": "Auto (Smart Routing)",
+        "provider": "openrouter",
+        "type": "routing",
+        "status": "active",
+        "category": "routing",
+        "free": True,
+        "description": "OpenRouter analyzes each prompt and selects the best model automatically",
+        "context_length": 200000,
+        "strength": "Smart auto-selection",
+    })
+
+    # OpenRouter: fetch ALL models dynamically
+    or_key = os.environ.get("OPENROUTER_API_KEY", "")
+    if or_key:
+        try:
+            or_req = _urllib.Request(
+                "https://openrouter.ai/api/v1/models",
+                headers={
+                    "Authorization": "Bearer " + or_key,
+                    "HTTP-Referer": "https://evolvixos.com",
+                }
+            )
+            or_resp = _urllib.urlopen(or_req, timeout=30)
+            or_data = json.loads(or_resp.read().decode())
+
+            for m in or_data.get("data", []):
+                mid = m.get("id", "")
+                name = m.get("name", mid)
+                ctx = m.get("context_length", 0)
+                pricing = m.get("pricing", {})
+                prompt_p = float(pricing.get("prompt", "0") or "0")
+                comp_p = float(pricing.get("completion", "0") or "0")
+                is_free = prompt_p == 0 and comp_p == 0
+                avg_price = (prompt_p + comp_p) / 2
+
+                # Categorize
+                ml = mid.lower()
+                if any(w in ml for w in ["code", "coder", "coding"]):
+                    category = "code"
+                elif any(w in ml for w in ["reason", "think", "r1", "o1", "o3"]):
+                    category = "reasoning"
+                elif any(w in ml for w in ["vision", "vl", "image", "multimodal"]):
+                    category = "vision"
+                elif any(w in ml for w in ["embed"]):
+                    category = "embedding"
+                else:
+                    category = "chat"
+
+                # Provider
+                prov = mid.split("/")[0] if "/" in mid else "other"
+
+                models.append({
+                    "id": mid,
+                    "name": name,
+                    "provider": prov,
+                    "type": "cloud",
+                    "status": "active",
+                    "category": category,
+                    "free": is_free,
+                    "context_length": ctx,
+                    "prompt_price": prompt_p,
+                    "completion_price": comp_p,
+                    "avg_price_per_mtok": round(avg_price * 1e6, 3),
+                    "description": m.get("description", "")[:200] if m.get("description") else "",
+                })
+        except Exception as e:
+            logger.warning("Failed to fetch OpenRouter models: " + str(e))
+
+    # Count by category
+    categories = {}
+    for m in models:
+        cat = m.get("category", "other")
+        categories[cat] = categories.get(cat, 0) + 1
+
+    return {
+        "models": models,
+        "total": len(models),
+        "free_count": sum(1 for m in models if m.get("free")),
+        "paid_count": sum(1 for m in models if not m.get("free")),
+        "categories": categories,
+        "providers": list(set(m.get("provider", "") for m in models)),
+    }
 
 
 # ─── Server Monitor ───
@@ -3397,3 +3464,46 @@ async def context_evolution_outcomes():
 async def context_evolution_trajectories():
     """Get agent evolution experience trajectories."""
     return ov_get_evolution_trajectories()
+
+
+# ─────────────────────────────────────────────────────────────
+# Agent Orchestrator — Multi-step task planning & self-correction
+# ─────────────────────────────────────────────────────────────
+
+from agents.orchestrator import orchestrate as run_orchestration
+
+
+@app.post("/api/orchestrate")
+async def api_orchestrate(request: Request):
+    """Orchestrate a complex multi-step task with planning and self-correction."""
+    data = await request.json()
+    goal = data.get("goal", "")
+    context = data.get("context", "")
+    result = await run_orchestration(goal, context=context)
+    return result
+
+
+# ─────────────────────────────────────────────────────────────
+# Connector Framework — External service integrations
+# ─────────────────────────────────────────────────────────────
+
+from connectors.framework import ConnectorRegistry
+
+
+@app.get("/api/dev-tools")
+async def api_list_connectors():
+    """List all available developer tool connectors and their configuration status."""
+    try:
+        connectors = ConnectorRegistry.list_connectors()
+        return {"connectors": connectors}
+    except Exception as e:
+        return {"connectors": [], "error": str(e)}
+
+
+@app.post("/api/dev-tools/{connector_name}/execute")
+async def api_execute_connector(connector_name: str, request: Request):
+    """Execute an action on a connector."""
+    data = await request.json()
+    action = data.get("action", "")
+    params = data.get("params", {})
+    return await ConnectorRegistry.execute(connector_name, action, params)
