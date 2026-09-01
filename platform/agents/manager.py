@@ -7,6 +7,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from entities.manager import EntityManager
 from plugins.registry import PluginRegistry
+from agents.context_middleware import inject_context, post_task_commit, learn_preference
 
 class AgentManager:
     """Manages AI agents with custom prompts, models, and tools."""
@@ -253,6 +254,13 @@ RULES:
             messages.append({"role": "system", "content": f"Context: {context['system_context']}"})
         messages.append({"role": "user", "content": message})
 
+        # ─── OpenViking context recall (self-improvement loop) ───
+        try:
+            enhanced_prompt = await inject_context(messages[0]["content"], name, message)
+            messages[0]["content"] = enhanced_prompt
+        except Exception:
+            pass  # Context recall is best-effort — never block the agent
+
         # ─── Unified routing via V10 ModelRouter (respects privacy mode) ───
         from routing_bridge import unified_chat
         llm_result = await unified_chat(
@@ -380,12 +388,17 @@ RULES:
             ), {"memory": json.dumps(memory), "name": name})
             await db.commit()
 
+        # ─── OpenViking session commit (triggers async memory extraction) ───
+        try:
+            await post_task_commit(name, message, final_message)
+        except Exception:
+            pass  # Best-effort — never block the agent
+
         return {
             "agent": name, "response": final_message,
-            "model": model, "tokens": eval_count,
+            "model": used_model, "tokens": eval_count,
             "memory_size": len(memory),
             "tool_action": tool_action, "tool_result": tool_result,
-            "model": used_model,
             "provider": used_provider
         }
 

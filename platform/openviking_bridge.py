@@ -88,7 +88,6 @@ def recall(query: str, limit: int = 5) -> dict:
     """Recall relevant context — optimized for agent context injection."""
     return _request("POST", "/api/v1/search/recall", {
         "query": query,
-        "limit": limit,
     })
 
 
