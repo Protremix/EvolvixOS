@@ -836,6 +836,8 @@ async def invoke_agent(name: str, msg: AgentInvoke, request: Request, db=Depends
                         "entities": [e["name"] for e in ents_with_schemas]
                     }
                     result["response"] = "Created the '" + entity_name + "' entity and generated your live app! You can see it in the preview panel on the right. Your app is live at https://evolvixos.com" + gen_result["url"]
+                    result["full_url"] = "https://evolvixos.com" + gen_result["url"]
+                    result["url"] = gen_result["url"]
 
                     # Save the app generation message too
                     try:

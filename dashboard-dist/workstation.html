@@ -470,6 +470,10 @@ function switchTab(name) {
   document.querySelectorAll('.sidebar-item').forEach((item,i)=>item.classList.toggle('active',i<4&&['builder','preview','workflows','code'][i]===name));
   if(name==='code')initCodeEditor();
   if(name==='workflows')renderWorkflows();
+  // Auto-load preview when switching to preview tab if nothing loaded yet
+  if(name==='preview' && document.getElementById('previewEmpty').style.display!=='none'){
+    loadPreview();
+  }
 }
 
 // ─── Chat / Builder ───
@@ -503,11 +507,19 @@ async function sendMessage(){
     if(data.entities||data.actions){
       const actions=data.entities||data.actions||[];
       actions.forEach(a=>addActivity('Created: '+(a.name||a.type||'entity'),'✅'));
-
-    // Auto-load preview when an app is generated
-    if(data.tool_action==='generate_app'&&data.full_url){loadPreview(data.full_url);}
-    if(data.action==='generate_app'&&data.full_url){loadPreview(data.full_url);}
     }
+    // Auto-load preview when an app is generated
+    if(data.tool_action==='generate_app'&&data.full_url){loadPreview(data.full_url);switchTab('preview');}
+    if(data.action==='generate_app'&&data.full_url){loadPreview(data.full_url);switchTab('preview');}
+    if(data.tool_action==='generate_app'&&data.tool_result&&data.tool_result.url){
+      var fu='https://evolvixos.com'+data.tool_result.url;
+      loadPreview(fu);switchTab('preview');
+    }
+    if(data.action==='generate_app'&&data.url&&!data.full_url){
+      var fu2='https://evolvixos.com'+data.url;
+      loadPreview(fu2);switchTab('preview');
+    }
+    if(data.action==='generate_app'){addActivity('Generated: '+(data.app_name||'app'),'🚀');}
   }catch(e){
     typingDiv.remove();
     addMessage('agent','I could not reach the AI service. Error: '+e.message);
@@ -524,13 +536,6 @@ async function loadEntities(){
 }
 
 // ─── Preview ───
-function loadPreview(url){
-  document.getElementById('previewEmpty').style.display='none';
-  document.getElementById('previewFrame').style.display='block';
-  document.getElementById('previewBar').style.display='flex';
-  document.getElementById('previewFrame').src=url;
-  document.getElementById('previewUrl').textContent=url;
-}
 function refreshPreview(){document.getElementById('previewFrame').src=document.getElementById('previewFrame').src;}
 function openPreviewNew(){window.open(document.getElementById('previewFrame').src,'_blank');}
 async function loadPreview(appUrl){
