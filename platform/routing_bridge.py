@@ -54,16 +54,16 @@ BUILDER_MODELS = [
     "z-ai/glm-5",                  # 74.8%, $0.036/task (legacy)
 ]
 CODE_MODELS = [
-    "deepseek/deepseek-v4-flash-0731", # 76.3%, $0.010/task (NVIDIA free)
-    "deepseek/deepseek-v4-pro-0813",   # 1M ctx, MoE (NVIDIA free)
-    "qwen/qwen3-coder-30b-a3b-instruct",  # 33B MoE, agentic coding (NVIDIA free)
-    "nvidia/nemotron-3-ultra-550b-a55b",  # 76.9%, 1M ctx (NVIDIA free)
+    "qwen/qwen3.8-27b",                      # 80.7% tool accuracy (Groq free)
+    "nvidia/nemotron-3-super-120b-a12b",    # 120B MoE (NVIDIA free, works)
+    "nvidia/nemotron-3.5-lightning-30b-a3b", # 30B MoE fast (NVIDIA free, works)
+    "openai/gpt-oss-120b",                   # 63.0% (Groq free, legacy fallback)
 ]
 CHAT_MODELS = [
-    "nvidia/nemotron-3.5-lightning", # 30B MoE, 3B active, fast (NVIDIA free)
-    "google/gemma-4-31b-it",               # 76.5%, $0.016/task
-    "deepseek/deepseek-v4-flash",   # 75.2%, $0.009/task
-    "openai/gpt-oss-20b",               # 51.5%, $0.021/task (legacy, BAD)
+    "nvidia/nemotron-3.5-lightning-30b-a3b", # 30B MoE, fast (NVIDIA free, works)
+    "nvidia/nemotron-3-super-120b-a12b",     # 120B MoE (NVIDIA free, works)
+    "qwen/qwen3.8-27b",                      # strong all-rounder (Groq free)
+    "openai/gpt-oss-20b",                    # legacy fallback (Groq free)
 ]
 REASONING_MODELS = [
     "google/gemini-3.7-flash",          # 80.6%, $0.077/task
@@ -244,10 +244,8 @@ NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
 NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1"
 
 NVIDIA_MODELS = [
-    "nvidia/nemotron-3.5-lightning-30b-a3b",
-    "deepseek-ai/deepseek-v4-flash-0731",
-    "moonshotai/kimi-k3",
-    "meta/muse-glimmer-30b",
+    "nvidia/nemotron-3.5-lightning-30b-a3b",   # 30B MoE, 3B active — fast, works
+    "nvidia/nemotron-3-super-120b-a12b",        # 120B MoE, 12B active — higher quality, works
 ]
 
 def _nvidia_chat(messages, model="auto", temperature=0.7, max_tokens=4096):
@@ -257,14 +255,14 @@ def _nvidia_chat(messages, model="auto", temperature=0.7, max_tokens=4096):
     nvidia_model = model
     if model == "auto":
         nvidia_model = "nvidia/nemotron-3.5-lightning-30b-a3b"
-    elif model.startswith("nvidia/") or model.startswith("deepseek") or model.startswith("moonshot") or model.startswith("meta/"):
+    elif model.startswith("nvidia/") or model.startswith("meta/"):
         nvidia_model = model
     elif "deepseek" in model:
-        nvidia_model = "deepseek-ai/deepseek-v4-flash-0731"
+        nvidia_model = "nvidia/nemotron-3-super-120b-a12b"
     elif "qwen" in model:
         nvidia_model = "nvidia/nemotron-3.5-lightning-30b-a3b"
     elif "code" in model:
-        nvidia_model = "deepseek-ai/deepseek-v4-flash-0731"
+        nvidia_model = "nvidia/nemotron-3-super-120b-a12b"
 
     payload = json.dumps({
         "model": nvidia_model,
@@ -284,13 +282,32 @@ def _nvidia_chat(messages, model="auto", temperature=0.7, max_tokens=4096):
         }
     )
 
-    resp = urllib.request.urlopen(req, timeout=30)
+    resp = urllib.request.urlopen(req, timeout=45)
     data = json.loads(resp.read().decode())
-    raw_content = data["choices"][0]["message"]["content"]
+    raw_content = data["choices"][0]["message"].get("content", "")
+    
+    # If content is empty, try reasoning_content (some Nemotron models put answer there)
+    if not raw_content:
+        raw_content = data["choices"][0]["message"].get("reasoning_content", "")
 
     # Strip thinking/reasoning tokens
     import re as _re
-    raw_content = _re.sub(r"\boxed.*?\boxed", "", raw_content, flags=_re.DOTALL).strip()
+    # Strip thinking/reasoning prefixes from Nemotron models
+    # If finish_reason is "length", the model ran out of tokens during thinking — discard
+    finish_reason = data.get("choices", [{}])[0].get("finish_reason", "")
+    if finish_reason == "length" and "thinking process" in raw_content.lower():
+        raw_content = raw_content  # Keep partial — better than empty
+    # Remove common thinking prefixes
+    for prefix in ["Here's a thinking process:", "Here is a thinking process:", "Let me think about this."]:
+        if raw_content.startswith(prefix):
+            # Try to find the actual answer after the thinking
+            lines = raw_content.split("\n")
+            # The answer is usually the last non-empty line
+            answer_lines = [l.strip() for l in lines if l.strip() and not l.strip().startswith(("1.", "2.", "3.", "4.", "5.", "-", "*", "**"))]
+            if answer_lines and len(answer_lines) < len(lines):
+                raw_content = answer_lines[-1]  # Take last non-thinking line
+            break
+    raw_content = raw_content.strip()
 
     return {
         "content": raw_content,
